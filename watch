@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 cd server
     tsc-watch --noClear --onSuccess "npx vlquery compile" &
@@ -9,7 +8,7 @@ cd client
     tsc-watch --noClear --onSuccess "npx vldom compile" &
 
     cd assets
-        nodemon -e scss -x "sass styles.scss ../dist/styles.css"
+        nodemon -e scss -x "sass styles.scss ../dist/styles.css" &
     cd ..
 cd ..
 

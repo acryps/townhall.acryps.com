@@ -1,6 +1,7 @@
 {
     "name": "server-townhall",
     "dependencies": {
+        "node-fetch": "^2.6.6",
         "vlquery": "^4.9.2",
         "vlserver": "^4.0.2"
     }

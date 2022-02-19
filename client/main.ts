@@ -5,21 +5,23 @@ import { PageComponent } from "page.component";
 import { Component } from "node_modules/vldom/component";
 import { MapComponent } from "map/map.component";
 import { PropertyComponent } from "map/property.component";
+import { Point } from "map/point";
 
 export class Application {
     static router: Router;
 
+    static center = new Point(35, 184);
+
     static async main() {
         if (!location.hash) {
-            location.hash = `#/home`;
+            location.hash = `#/${Application.center.x}/${Application.center.y}/3`;
         }
 
         this.router = new Router(PageComponent, {
-            "/home": HomeComponent,
-            "/map": {
+            '/:x/:y/:zoom': {
                 component: MapComponent,
                 children: {
-                    "/property/:id": PropertyComponent,
+                    '/property/:id': PropertyComponent,
                     // "/borough/:id": BoroughViewModel
                 }
             }
@@ -29,5 +31,9 @@ export class Application {
 
         this.router.host(document.body);
         onhashchange = () => this.router.update();
+
+        (window as any).router = this.router;
+
+        console.log(this.router)
     }
 }

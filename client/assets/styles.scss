@@ -18,23 +18,25 @@
 	$page-dim-color: #000
 );
 
-ui-page[ui-menu-detail] {
-	height: 100vh;
-}
- 
-ui-logo {
-	display: block;
+ui-page {
+	display: flex;
 	width: 100%;
-	aspect-ratio: 1;
+	height: 100vh;
 
-	padding-top: 2rem;
+	ui-header {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: 100;
 
-	text-align: center;
-	font-size: 2rem;
-	font-weight: bold;
+		padding: 1rem;
 
-	background: url('/images/isometric');
-	background-size: 100%;
+		line-height: 1;
+		font-weight: bold;
+
+		background: #fff;
+	}
 }
 
 ui-map {
@@ -46,7 +48,7 @@ ui-map {
 
 	ui-controls {
 		position: absolute;
-		top: 1rem;
+		top: 4rem;
 		left: 1rem;
 
 		display: flex;
@@ -72,25 +74,27 @@ ui-map {
 			&:hover {
 				background: #ddd;
 			}
+
+			&[ui-active] {
+				background: #000;
+				color: #fff;
+			}
 		}
 	}
 
 	ui-location-tracker {
-		position: absolute;
-		bottom: -1px;
-		left: -1px;
-
-		padding: 0.5rem;
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		padding: 0.25rem 0.5rem;
 
 		background: white;
-		border: 1px solid black;
-
 		font-size: 0.75rem;
 	}
 
 	ui-panel {
-		position: absolute;
-		top: 1rem;
+		position: fixed;
+		top: 4rem;
 		right: 1rem;
 
 		width: 20rem;
@@ -102,6 +106,19 @@ ui-map {
 
 		&:empty {
 			display: none;
+		}
+
+		ui-panel-close {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			float: right;
+			width: 2rem;
+			height: 2rem;
+
+			font-size: 1.5rem;
+			cursor: pointer;
 		}
 	}
 
@@ -143,5 +160,92 @@ ui-map {
 				}
 			}
 		}
+	}
+}
+
+ui-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	height: 100%;
+	width: 100%;
+
+	ui-spinner {
+		width: 2rem;
+		height: 2rem;
+
+		border: 0.125rem solid #eee;
+		border-left-color: #000;
+		border-radius: 50%;
+
+		animation: 0.5s spin infinite linear;
+
+		@keyframes spin {
+			to { transform: rotate(360deg); }
+		}
+	}
+}
+
+ui-labeled-value {
+	display: flex;
+	margin-bottom: 0.5rem;
+
+	ui-label {
+		flex-grow: 1;
+	}
+
+	ui-value {
+		flex-shrink: 0;
+
+		font-weight: bold;
+	}
+}
+
+@media (max-width: 1000px) {
+	ui-map {
+		ui-panel {
+			top: unset;
+			left: 0;
+			right: 0;
+			bottom: 0;
+
+			width: unset;
+			height: unset;
+			max-height: 40vh;
+
+			overflow-x: hidden;
+			overflow-y: auto;
+
+			border: none;
+			border-top: 1px solid #000;
+		}
+
+		ui-controls {
+			top: 3rem;
+			left: 0;
+			right: 0;
+
+			flex-direction: row;
+			flex-grow: 1;
+
+			border: none;
+			background: #fff9;
+			backdrop-filter: blur(20px) grayscale(1);
+			-webkit-backdrop-filter: blur(20px) grayscale(1);
+			
+			ui-control {
+				padding: 0.5rem 1rem;
+				width: 100%;
+				height: unset;
+
+				font-size: 1rem;
+				border: none;
+			}
+		}
+	}
+	
+	ui-location-tracker {
+		display: none;
 	}
 }

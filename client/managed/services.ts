@@ -30,6 +30,19 @@ export class BoroughViewModel {
 	}
 }
 
+export class HistoryEntryViewModel {
+	name: string;
+	date: Date;
+
+	private static $build(raw) {
+		const item = new HistoryEntryViewModel();
+		item.name = raw.name === null ? null : `${raw.name}`
+		item.date = raw.date ? new Date(raw.date) : null
+		
+		return item;
+	}
+}
+
 export class PlayerViewModel {
 	id: string;
 	username: string;
@@ -107,6 +120,27 @@ export class MapService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : PropertyViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getHistory(): Promise<Array<HistoryEntryViewModel>> {
+		const data = new FormData();
+		
+
+		return await fetch(Service.toURL("oyOTdvb2V4aXw3eHhsNXdyZnp4aGk1bD"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : HistoryEntryViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

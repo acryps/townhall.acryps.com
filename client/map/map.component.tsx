@@ -1,15 +1,18 @@
 import { Application } from "main";
-import { MapService } from "managed/services";
+import { HistoryEntryViewModel, MapService } from "managed/services";
 import { Component } from "node_modules/vldom/component";
 import { Layer } from "./layer";
 import { Map } from "./map";
+import { MapImageComponent } from "./map-image.component";
 import { Point } from "./point";
 
 export class MapComponent extends Component {
+    onScroll: (() => void)[] = [];
+
     params: { x, y, zoom };
     rootNode: HTMLElement;
 
-    image: HTMLImageElement;
+    image: MapImageComponent;
     layerImages: SVGElement[] = [];
     mapInner: HTMLElement;
     locationTracker: HTMLElement;
@@ -17,8 +20,7 @@ export class MapComponent extends Component {
     map = new Map(4000, new Point(-2000, -2000), new Point(0, 0));
 
     loading = {
-        layers: true,
-        map: true
+        layers: true
     };
 
     layers: Layer[] = [];
@@ -26,27 +28,20 @@ export class MapComponent extends Component {
     lastRenderedZoom = 8;
 
     showBoroughs = false;
-    showProperties = true;
+    showProperties = false;
 
     draw: Layer;
 
+    selectedHistoryEntry: HistoryEntryViewModel;
+    history: HistoryEntryViewModel[];
+
     constructor() {
         super();
-
-        this.image = new Image();
-        
-        this.image.onload = () => {
-            this.loading.map = false;
-
-            if (this.rootNode) {
-                this.update();
-            }
-        };
-
-        this.image.src = `/images/map?v${Math.random()}`;
     }
 
     async onload() {
+        this.history = await new MapService().getHistory();
+        
         for (let layer of this.layers) {
             layer.svg?.remove();
         }
@@ -90,7 +85,7 @@ export class MapComponent extends Component {
     render(child) {
         console.log('render', this.params, child);
 
-        if (this.loading.layers || this.loading.map) {
+        if (this.loading.layers) {
             return <ui-loading>
                 <ui-spinner></ui-spinner>
             </ui-loading>;
@@ -98,8 +93,10 @@ export class MapComponent extends Component {
 
         if (!this.mapInner) {
             this.mapInner = <ui-map-inner>
-                {this.image}
+                {this.image = new MapImageComponent()}
             </ui-map-inner>;
+
+            this.updateMapImage();
 
             this.mapInner.onscroll = () => {
                 const box = this.rootNode.getBoundingClientRect();
@@ -111,6 +108,10 @@ export class MapComponent extends Component {
 
                 if (this.y != point.y) {
                     this.y = point.y;
+                }
+
+                for (let listener of this.onScroll) {
+                    listener();
                 }
             };
         }
@@ -206,7 +207,7 @@ export class MapComponent extends Component {
         const rect = this.mapInner.getBoundingClientRect();
         const position = this.translate(rect.x + rect.width / 2, rect.y + rect.height / 2, this.lastRenderedZoom);
 
-        this.image.width = this.map.size * this.zoom;
+        this.image.canvas.style.width = `${this.map.size * this.zoom}px`;
 
         this.focus(position);
 
@@ -222,6 +223,14 @@ export class MapComponent extends Component {
                     layer.removeAttribute("ui-active");
                 }
             }
+        }
+    }
+
+    updateMapImage() {
+        if (this.selectedHistoryEntry) {
+            this.image.load(`/images/map/${this.selectedHistoryEntry.name}`);
+        } else {
+            this.image.load(`/images/map`);
         }
     }
 

@@ -1,12 +1,15 @@
 import { BaseServer, ViewModel, Inject } from "vlserver";
 
 import { DbContext } from "././database";
+import { Proxy } from "././../proxy";
 import { BoroughViewModel } from "././../areas/borough.view";
+import { HistoryEntryViewModel } from "././../areas/history.view";
 import { PropertyViewModel } from "././../areas/property.view";
 import { MapService } from "././../areas/map.service";
 import { BoroughSummaryModel } from "./../areas/borough.summary";
 import { PlayerViewModel } from "./../areas/player.view";
 import { Borough } from "./../managed/database";
+import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
 import { Property } from "./../managed/database";
 
@@ -37,6 +40,15 @@ export class ManagedServer extends BaseServer {
 			{},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.getProperties(
+				
+			)
+		);
+
+		this.expose(
+			"oyOTdvb2V4aXw3eHhsNXdyZnp4aGk1bD",
+			{},
+			inject => inject.construct(MapService),
+			(controller, params) => controller.getHistory(
 				
 			)
 		);
@@ -142,6 +154,38 @@ ViewModel.mappings = {
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
 			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
+
+			return model;
+		}
+	},
+	HistoryEntryViewModel: class ComposedHistoryEntryViewModel extends HistoryEntryViewModel {
+		async map() {
+			return {
+				name: this.model.name,
+				date: this.model.date
+			}
+		};
+
+		static get items() { 
+			return {
+				name: true,
+				date: true
+			};
+		}
+
+		static toViewModel(data) {
+			const item = new HistoryEntryViewModel(null);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"date" in data && (item.date = data.date === null ? null : new Date(data.date));
+
+			return item;
+		}
+
+		static async toModel(viewModel: HistoryEntryViewModel) {
+			const model = new HistoryEntry();
+			
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"date" in viewModel && (model.date = viewModel.date === null ? null : new Date(viewModel.date));
 
 			return model;
 		}

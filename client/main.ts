@@ -6,6 +6,7 @@ import { Component } from "node_modules/vldom/component";
 import { MapComponent } from "map/map.component";
 import { PropertyComponent } from "map/property.component";
 import { Point } from "map/point";
+import { HistoryComponent } from "map/history.component";
 
 export class Application {
     static router: Router;
@@ -21,6 +22,7 @@ export class Application {
             '/:x/:y/:zoom': {
                 component: MapComponent,
                 children: {
+                    '/history': HistoryComponent, 
                     '/property/:id': PropertyComponent,
                     // "/borough/:id": BoroughViewModel
                 }

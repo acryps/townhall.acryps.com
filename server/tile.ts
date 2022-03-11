@@ -18,12 +18,8 @@ export class TileSet {
         await this.loader;
 
         if (this.cache[[x, y].join()]) {
-            console.log('cache hit', x, y);
-
             return this.cache[[x, y].join()];
         }
-
-        console.log('crop', x, y);
 
         try {
             // crop image
@@ -33,6 +29,10 @@ export class TileSet {
                 top: y * this.size,
                 left: x * this.size
             }).toBuffer();
+
+            setTimeout(() => {
+                delete this.cache[[x, y].join()];
+            }, 1000 * 60 * 5);
 
             return this.cache[[x, y].join()] = data;
         } catch {

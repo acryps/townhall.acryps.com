@@ -296,7 +296,7 @@ export class MapComponent extends Component {
                     this.reload();
                 }}>DW</ui-control>
 
-                {this.draw && <ui-control ui-click={() => {
+                {this.draw && this.showProperties && <ui-control ui-click={() => {
                     const property = new PropertyViewModel();
                     property.bounds = Point.pack(this.draw.points);
                     

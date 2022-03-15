@@ -1,6 +1,7 @@
 import { Application } from "main";
 import { HistoryEntryViewModel, MapService } from "managed/services";
 import { Component } from "node_modules/vldom/component";
+import { Label } from "./label";
 import { Layer } from "./layer";
 import { Map } from "./map";
 import { MapImageComponent } from "./map-image.component";
@@ -8,6 +9,7 @@ import { Point } from "./point";
 
 export class MapComponent extends Component {
     onScroll: (() => void)[] = [];
+    onZoom: (() => void)[] = [];
 
     params: { x, y, zoom };
     rootNode: HTMLElement;
@@ -16,6 +18,7 @@ export class MapComponent extends Component {
     layerImages: SVGElement[] = [];
     mapInner: HTMLElement;
     locationTracker: HTMLElement;
+    cursor: HTMLElement;
 
     map = new Map(4000, new Point(-2000, -2000), new Point(0, 0));
 
@@ -24,19 +27,26 @@ export class MapComponent extends Component {
     };
 
     layers: Layer[] = [];
+    labels: Label[] = [];
 
     lastRenderedZoom = 8;
 
     showBoroughs = false;
     showProperties = false;
+    showStreets = true;
 
     draw: Layer;
+    labelContainer: Layer;
 
     selectedHistoryEntry: HistoryEntryViewModel;
     history: HistoryEntryViewModel[];
 
     constructor() {
         super();
+
+        this.labelContainer = new Layer('.', [], '#fff', '#0000', false, 0, 1);
+        this.labelContainer.render(this.map);
+        this.labelContainer.svg.setAttributeNS(null, 'ui-labels', '');
     }
 
     async onload() {
@@ -46,7 +56,12 @@ export class MapComponent extends Component {
             layer.svg?.remove();
         }
 
+        for (let label of this.labels) {
+            label.element?.remove();
+        }
+
         this.layers = [];
+        this.labels = [];
 
         if (this.draw) {
             this.layers.push(this.draw);
@@ -54,12 +69,16 @@ export class MapComponent extends Component {
 
         this.loading.layers = true;
 
+        if (this.mapInner) {
+            this.mapInner.onscroll = null;
+        }
+
         requestAnimationFrame(async () => {
             if (this.showBoroughs) {
                 for (let borough of await new MapService().getBoroughs()) {
                     if (borough.bounds) {
                         this.layers.push(
-                            new Layer(borough.id, Point.unpack(borough.bounds), `${borough.color}80`, '#000', 0.5, 1)
+                            new Layer(borough.id, Point.unpack(borough.bounds), `${borough.color}30`, borough.color, true, 0.5, 1)
                         );
                     }
                 }
@@ -69,11 +88,42 @@ export class MapComponent extends Component {
                 for (let property of await new MapService().getProperties()) {
                     if (property.bounds) {
                         this.layers.push(
-                            new Layer(property.id, Point.unpack(property.bounds), property.owner ? "#fff" : "#0f0", "#000", 0.75, 0.8, () => {
+                            new Layer(property.id, Point.unpack(property.bounds), property.owner ? "#fff" : "#0f0", "#000", true, 0.75, 0.8, () => {
                                 this.navigate(`property/${property.id}`);
                             })
                         );
                     }
+                }
+            }
+
+            if (this.showStreets) {
+                for (let street of await new MapService().getStreets()) {
+                    const points = Point.unpack(street.path);
+                    const layer = new Layer(street.id, points, '#0000', `#eee`, false, street.size - 0.5, 1);
+
+                    for (let i = 1; i < points.length; i++) {
+                        const first = points[i - 1];
+                        const last = points[i];
+
+                        const length = Math.sqrt((first.x - last.x) ** 2 + (first.y - last.y) ** 2);
+                        const step = 30;
+
+                        for (let d = (length % step) * 0.5; d < length; d += step) {
+                            const label = this.addLabel(
+                                street.name,
+                                new Point(first.x + (last.x - first.x) * (1 / length * d), first.y + (last.y - first.y) * (1 / length * d)),
+                                street.size * 0.5, 
+                                Math.atan2(first.y - last.y, first.x - last.x), 
+                            );
+
+                            label.maxSize = {
+                                x: Math.abs(first.x - last.x) || Infinity,
+                                y: Math.abs(first.y - last.y) || Infinity
+                            };
+                        }
+                    }
+
+                    this.layers.push(layer);
                 }
             }
 
@@ -83,8 +133,6 @@ export class MapComponent extends Component {
     }
 
     render(child) {
-        console.log('render', this.params, child);
-
         if (this.loading.layers) {
             return <ui-loading>
                 <ui-spinner></ui-spinner>
@@ -94,39 +142,34 @@ export class MapComponent extends Component {
         if (!this.mapInner) {
             this.mapInner = <ui-map-inner>
                 {this.image = new MapImageComponent()}
+
+                {this.cursor = <ui-cursor></ui-cursor>}
             </ui-map-inner>;
 
             this.updateMapImage();
 
-            this.mapInner.onscroll = () => {
-                const box = this.rootNode.getBoundingClientRect();
-                const point = this.translate(box.width / 2 + box.left, box.height / 2);
-
-                if (this.x != point.x) {
-                    this.x = point.x;
-                }
-
-                if (this.y != point.y) {
-                    this.y = point.y;
-                }
-
-                for (let listener of this.onScroll) {
-                    listener();
-                }
-            };
+            this.mapInner.appendChild(this.labelContainer.svg);
         }
 
         requestAnimationFrame(() => {
             this.updateZoom();
 
             for (let layer of this.layers) {
-                this.mapInner.appendChild(layer.render(this.map));
+                this.mapInner.insertBefore(layer.render(this.map), this.labelContainer.svg);
+            }
+
+            for (let label of this.labels) {
+                label.update();
             }
 
             const map = this.rootNode as HTMLElement;
 
             map.onmousemove = event => {
-                this.locationTracker.textContent = this.translate(event.x, event.y).toString();
+                const position = this.translateMouse(event);
+                this.locationTracker.textContent = position.toString();
+
+                this.cursor.style.left = `${(position.x - this.map.offset.x) * this.zoom}px`;
+                this.cursor.style.top = `${(position.y - this.map.offset.y) * this.zoom}px`;
             };
 
             map.onmousedown = event => {
@@ -138,7 +181,7 @@ export class MapComponent extends Component {
                     }
                 }
 
-                const point = this.translate(event.x, event.y);
+                const point = this.translateMouse(event);
 
                 if (this.draw) {
                     this.draw.points.push(point);
@@ -149,6 +192,23 @@ export class MapComponent extends Component {
 
             requestAnimationFrame(() => {
                 this.focus(new Point(this.x, this.y));
+
+                this.mapInner.onscroll = () => {
+                    const box = this.rootNode.getBoundingClientRect();
+                    const point = this.translate(box.width / 2 + box.left, box.height / 2);
+    
+                    if (this.x != point.x) {
+                        this.x = point.x;
+                    }
+    
+                    if (this.y != point.y) {
+                        this.y = point.y;
+                    }
+    
+                    for (let listener of this.onScroll) {
+                        listener();
+                    }
+                };
             });
         });
 
@@ -173,6 +233,12 @@ export class MapComponent extends Component {
                 }}>-</ui-control>
 
                 <ui-control ui-click={() => {
+                    this.showStreets = !this.showStreets;
+
+                    this.reload();
+                }}>S{this.showStreets ? "✓" : "✗"}</ui-control>
+
+                <ui-control ui-click={() => {
                     this.showBoroughs = !this.showBoroughs;
 
                     this.reload();
@@ -187,10 +253,11 @@ export class MapComponent extends Component {
                 <ui-control ui-active={this.draw ? '' : null} ui-click={() => {
                     if (this.draw) {
                         alert(Point.pack(this.draw.points));
+                        console.log(Point.pack(this.draw.points));
 
                         this.draw = null;
                     } else {
-                        this.draw = new Layer(null, [], '#ffffff', '#000000', 1, 60, null);
+                        this.draw = new Layer(null, [], '#fff', '#000', true, 1, 60, null);
                     }
 
                     this.reload();
@@ -207,11 +274,16 @@ export class MapComponent extends Component {
         const rect = this.mapInner.getBoundingClientRect();
         const position = this.translate(rect.x + rect.width / 2, rect.y + rect.height / 2, this.lastRenderedZoom);
 
+        this.cursor.style.setProperty('--size', `${this.zoom}px`);
         this.image.canvas.style.width = `${this.map.size * this.zoom}px`;
 
         this.focus(position);
 
         this.lastRenderedZoom = this.zoom;
+
+        for (let listener of this.onZoom) {
+            listener();
+        }
     }
 
     updateHighlight() {
@@ -243,6 +315,16 @@ export class MapComponent extends Component {
         );
     }
 
+    addLabel(content: string, position: Point, size = 2, rotation = 0) {
+        const label = new Label(this, content, position, size, rotation);
+        this.labelContainer.svg.appendChild(label.element);
+        this.labels.push(label);
+
+        label.update();
+
+        return label;
+    }
+
     translate(x, y, zoom = this.zoom) {
         const rect = this.mapInner.getBoundingClientRect();
 
@@ -250,6 +332,12 @@ export class MapComponent extends Component {
             Math.round(this.map.size / (this.map.size * zoom) * (x - rect.left + this.mapInner.scrollLeft) + this.map.offset.x),
             Math.round(this.map.size / (this.map.size * zoom) * (y - rect.top + this.mapInner.scrollTop) + this.map.offset.y)
         );
+    }
+
+    translateMouse(event: MouseEvent) {
+        const source = this.translate(event.x, event.y);
+
+        return new Point(source.x - 1, source.y - 1);
     }
 
     get x() {

@@ -5,6 +5,7 @@ import { Proxy } from "././../proxy";
 import { BoroughViewModel } from "././../areas/borough.view";
 import { HistoryEntryViewModel } from "././../areas/history.view";
 import { PropertyViewModel } from "././../areas/property.view";
+import { StreetViewModel } from "././../areas/street.view";
 import { MapService } from "././../areas/map.service";
 import { BoroughSummaryModel } from "./../areas/borough.summary";
 import { PlayerViewModel } from "./../areas/player.view";
@@ -12,6 +13,7 @@ import { Borough } from "./../managed/database";
 import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
 import { Property } from "./../managed/database";
+import { Street } from "./../managed/database";
 
 Inject.mappings = {
 	"MapService": {
@@ -40,6 +42,15 @@ export class ManagedServer extends BaseServer {
 			{},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.getProperties(
+				
+			)
+		);
+
+		this.expose(
+			"k1M2B2amlvbmR4OGRvcnJ2Zn55OGcybG",
+			{},
+			inject => inject.construct(MapService),
+			(controller, params) => controller.getStreets(
 				
 			)
 		);
@@ -282,6 +293,56 @@ ViewModel.mappings = {
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
 			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
+
+			return model;
+		}
+	},
+	StreetViewModel: class ComposedStreetViewModel extends StreetViewModel {
+		async map() {
+			return {
+				id: this.model.id,
+				name: this.model.name,
+				shortName: this.model.shortName,
+				size: this.model.size,
+				path: this.model.path
+			}
+		};
+
+		static get items() { 
+			return {
+				id: true,
+				name: true,
+				shortName: true,
+				size: true,
+				path: true
+			};
+		}
+
+		static toViewModel(data) {
+			const item = new StreetViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"shortName" in data && (item.shortName = data.shortName === null ? null : `${data.shortName}`);
+			"size" in data && (item.size = data.size === null ? null : +data.size);
+			"path" in data && (item.path = data.path === null ? null : `${data.path}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: StreetViewModel) {
+			let model: Street;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Street).find(viewModel.id)
+			} else {
+				model = new Street();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"shortName" in viewModel && (model.shortName = viewModel.shortName === null ? null : `${viewModel.shortName}`);
+			"size" in viewModel && (model.size = viewModel.size === null ? null : +viewModel.size);
+			"path" in viewModel && (model.path = viewModel.path === null ? null : `${viewModel.path}`);
 
 			return model;
 		}

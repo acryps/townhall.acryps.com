@@ -31,8 +31,8 @@ export class TileSet {
             }).toBuffer();
 
             setTimeout(() => {
-                delete this.cache[[x, y].join()];
-            }, 1000 * 60 * 5);
+                this.cache.delete[[x, y].join()];
+            }, 1000 * 60);
 
             return this.cache[[x, y].join()] = data;
         } catch {

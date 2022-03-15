@@ -33,9 +33,5 @@ export class Application {
 
         this.router.host(document.body);
         onhashchange = () => this.router.update();
-
-        (window as any).router = this.router;
-
-        console.log(this.router)
     }
 }

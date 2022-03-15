@@ -32,8 +32,18 @@ CREATE TABLE property (
 
     bounds TEXT,
 
-    type 
-
     owner_id UUID CONSTRAINT owner__properties REFERENCES player (id),
     borough_id UUID CONSTRAINT borough__properties REFERENCES borough (id)
 );
+
+CREATE TABLE street (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+    name TEXT,
+    short_name TEXT,
+
+    size REAL,
+
+    path TEXT
+);
+

@@ -77,6 +77,25 @@ export class PropertyViewModel {
 	}
 }
 
+export class StreetViewModel {
+	id: string;
+	name: string;
+	shortName: string;
+	size: number;
+	path: string;
+
+	private static $build(raw) {
+		const item = new StreetViewModel();
+		item.id = raw.id === null ? null : `${raw.id}`
+		item.name = raw.name === null ? null : `${raw.name}`
+		item.shortName = raw.shortName === null ? null : `${raw.shortName}`
+		item.size = raw.size === null ? null : +raw.size
+		item.path = raw.path === null ? null : `${raw.path}`
+		
+		return item;
+	}
+}
+
 export class Service {
 	static baseUrl = "";
 
@@ -120,6 +139,27 @@ export class MapService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : PropertyViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getStreets(): Promise<Array<StreetViewModel>> {
+		const data = new FormData();
+		
+
+		return await fetch(Service.toURL("k1M2B2amlvbmR4OGRvcnJ2Zn55OGcybG"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : StreetViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

@@ -4,6 +4,7 @@ import { Proxy } from "../proxy";
 import { BoroughViewModel } from "./borough.view";
 import { HistoryEntryViewModel } from "./history.view";
 import { PropertyViewModel } from "./property.view";
+import { StreetViewModel } from "./street.view";
 
 export class MapService extends Service {
     constructor(
@@ -18,6 +19,10 @@ export class MapService extends Service {
 
     getProperties() {
         return PropertyViewModel.from(this.db.property);
+    }
+
+    getStreets() {
+        return StreetViewModel.from(this.db.street);
     }
 
     async getHistory() {

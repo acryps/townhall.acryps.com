@@ -9,10 +9,6 @@ export class PropertyComponent extends Component {
         this.property = await new MapService().getProperty(this.params.id);
     }
 
-    onparameterchange() {
-        console.log('params')
-    }
-
     render() {
         return <ui-panel>
             <ui-panel-close ui-href="../..">✗</ui-panel-close>

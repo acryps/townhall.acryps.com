@@ -270,6 +270,48 @@ export class Borough extends Entity<BoroughQueryProxy> {
 	bounds: string;
 }
 			
+export class StreetQueryProxy extends QueryProxy {
+	get name(): Partial<QueryString> {
+		throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime");
+	}
+					
+	get shortName(): Partial<QueryString> {
+		throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime");
+	}
+					
+	get size(): Partial<QueryNumber> {
+		throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime");
+	}
+					
+	get path(): Partial<QueryString> {
+		throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime");
+	}
+}
+
+export class Street extends Entity<StreetQueryProxy> {
+	$$meta = {
+		tableName: "street",
+		columns: {"id":{"type":"uuid","name":"id"},"name":{"type":"text","name":"name"},"shortName":{"type":"text","name":"short_name"},"size":{"type":"float4","name":"size"},"path":{"type":"text","name":"path"}},
+		get set(): DbSet<Street, StreetQueryProxy> {
+			// returns unbound dbset
+			return new DbSet<Street, StreetQueryProxy>(Street, null)
+		},
+		
+	};
+		
+	constructor() {
+		super();
+
+		
+	}
+
+	id: string;
+	name: string;
+	shortName: string;
+	size: number;
+	path: string;
+}
+			
 
 export class DbContext {
 	constructor(private runContext: RunContext) {}
@@ -288,4 +330,5 @@ export class DbContext {
 	company: DbSet<Company, CompanyQueryProxy> = new DbSet<Company, CompanyQueryProxy>(Company, this.runContext);
 	property: DbSet<Property, PropertyQueryProxy> = new DbSet<Property, PropertyQueryProxy>(Property, this.runContext);
 	borough: DbSet<Borough, BoroughQueryProxy> = new DbSet<Borough, BoroughQueryProxy>(Borough, this.runContext);
+	street: DbSet<Street, StreetQueryProxy> = new DbSet<Street, StreetQueryProxy>(Street, this.runContext);
 };

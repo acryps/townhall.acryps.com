@@ -76,6 +76,20 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.getProperty(
 				params["VjYnVwc3k5aToyb3FtcDN4c3pnM2RlMW"]
 			)
+		);
+
+		this.expose(
+			"VxbjByZmgxb3NvNDlvcTp0ODc0OW4zaz",
+			{
+				"F6Mml1d2dxdX0xamxpcDFyaXRuaXZ5NW": {
+					isArray: false,
+					type: PropertyViewModel
+				}
+			},
+			inject => inject.construct(MapService),
+			(controller, params) => controller.createProperty(
+				params["F6Mml1d2dxdX0xamxpcDFyaXRuaXZ5NW"]
+			)
 		)
 	}
 }

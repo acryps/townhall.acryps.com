@@ -1,5 +1,5 @@
 import { Application } from "main";
-import { HistoryEntryViewModel, MapService } from "managed/services";
+import { HistoryEntryViewModel, MapService, PropertyViewModel } from "managed/services";
 import { Component } from "node_modules/vldom/component";
 import { Label } from "./label";
 import { Layer } from "./layer";
@@ -31,6 +31,7 @@ export class MapComponent extends Component {
 
     lastRenderedZoom = 8;
 
+    mapStyle: 'normal' | 'gray' | 'hidden' = 'normal';
     showBoroughs = false;
     showProperties = false;
     showStreets = true;
@@ -77,21 +78,7 @@ export class MapComponent extends Component {
             if (this.showBoroughs) {
                 for (let borough of await new MapService().getBoroughs()) {
                     if (borough.bounds) {
-                        this.layers.push(
-                            new Layer(borough.id, Point.unpack(borough.bounds), `${borough.color}30`, borough.color, true, 0.5, 1)
-                        );
-                    }
-                }
-            }
-
-            if (this.showProperties) {
-                for (let property of await new MapService().getProperties()) {
-                    if (property.bounds) {
-                        this.layers.push(
-                            new Layer(property.id, Point.unpack(property.bounds), property.owner ? "#fff" : "#0f0", "#000", true, 0.75, 0.8, () => {
-                                this.navigate(`property/${property.id}`);
-                            })
-                        );
+                        this.layers.push(new Layer(borough.id, Point.unpack(borough.bounds), `${borough.color}30`, borough.color, true, 0.5, 1));
                     }
                 }
             }
@@ -124,6 +111,20 @@ export class MapComponent extends Component {
                     }
 
                     this.layers.push(layer);
+                }
+            }
+
+            if (this.showProperties) {
+                for (let property of await new MapService().getProperties()) {
+                    if (property.bounds) {
+                        const points = Point.unpack(property.bounds);
+                        
+                        this.layers.push(new Layer(property.id, points, property.owner ? "#fff" : "#0f0", "#000", true, 0.75, 0.8, () => {
+                            this.navigate(`property/${property.id}`);
+                        }));
+
+                        this.addLabel(property.borough ? `${property.borough.propertyPrefix}${property.code}` : `#${property.id.substring(0, 3)}`, Point.center(points), 1, 0);
+                    }
                 }
             }
 
@@ -163,6 +164,7 @@ export class MapComponent extends Component {
             }
 
             const map = this.rootNode as HTMLElement;
+            map.setAttribute('ui-style', this.mapStyle);
 
             map.onmousemove = event => {
                 const position = this.translateMouse(event);
@@ -232,6 +234,36 @@ export class MapComponent extends Component {
                     this.updateZoom();
                 }}>-</ui-control>
 
+                <ui-control>
+                    M
+
+                    <ui-control-extend>
+                        <ui-control ui-click={() => {
+                            this.mapStyle = 'normal';
+
+                            this.reload();
+                        }}>
+                            CO
+                        </ui-control>
+
+                        <ui-control ui-click={() => {
+                            this.mapStyle = 'gray';
+
+                            this.reload();
+                        }}>
+                            BW
+                        </ui-control>
+
+                        <ui-control ui-click={() => {
+                            this.mapStyle = 'hidden';
+
+                            this.reload();
+                        }}>
+                            ✗
+                        </ui-control>
+                    </ui-control-extend>
+                </ui-control>
+
                 <ui-control ui-click={() => {
                     this.showStreets = !this.showStreets;
 
@@ -250,6 +282,7 @@ export class MapComponent extends Component {
                     this.reload();
                 }}>P{this.showProperties ? "✓" : "✗"}</ui-control>
 
+
                 <ui-control ui-active={this.draw ? '' : null} ui-click={() => {
                     if (this.draw) {
                         alert(Point.pack(this.draw.points));
@@ -262,6 +295,17 @@ export class MapComponent extends Component {
 
                     this.reload();
                 }}>DW</ui-control>
+
+                {this.draw && <ui-control ui-click={() => {
+                    const property = new PropertyViewModel();
+                    property.bounds = Point.pack(this.draw.points);
+                    
+                    new MapService().createProperty(property).then(() => {
+                        this.draw = new Layer(null, [], '#fff', '#000', true, 1, 60, null);
+
+                        this.reload();
+                    });
+                }}>+P</ui-control>}
             </ui-controls>
 
             {child}

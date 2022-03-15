@@ -46,6 +46,14 @@ ui-map {
 	width: 100%;
 	height: 100%;
 
+	&[ui-style='gray'] ui-map-inner canvas {
+		filter: saturate(0) brightness(1.5) contrast(0.3);
+	}
+
+	&[ui-style='hidden'] ui-map-inner canvas {
+		visibility: hidden;
+	}
+
 	ui-controls {
 		position: absolute;
 		top: 4rem;
@@ -121,6 +129,7 @@ ui-map {
 		position: fixed;
 		top: 4rem;
 		right: 1rem;
+		z-index: 10000;
 
 		width: 20rem;
 		max-height: calc(100vh - 6rem);
@@ -128,6 +137,7 @@ ui-map {
 		overflow-x: hidden;
 		overflow-y: auto;
 
+		cursor: default;
 		background: white;
 		border: 1px solid black;
 

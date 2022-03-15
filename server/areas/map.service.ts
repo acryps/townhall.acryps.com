@@ -32,4 +32,10 @@ export class MapService extends Service {
     async getProperty(id: string) {
         return new PropertyViewModel(await this.db.property.find(id));
     }
+
+    async createProperty(propertyViewModel: PropertyViewModel) {
+        const property = await propertyViewModel.toModel();
+
+        await property.create();
+    }
 }

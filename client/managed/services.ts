@@ -209,4 +209,23 @@ export class MapService {
 			}
 		});
 	}
+
+	async createProperty(propertyViewModel: PropertyViewModel): Promise<void> {
+		const data = new FormData();
+		data.append("F6Mml1d2dxdX0xamxpcDFyaXRuaXZ5NW", JSON.stringify(propertyViewModel))
+
+		return await fetch(Service.toURL("VxbjByZmgxb3NvNDlvcTp0ODc0OW4zaz"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
 }

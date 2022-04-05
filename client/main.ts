@@ -11,7 +11,7 @@ import { HistoryComponent } from "map/history.component";
 export class Application {
     static router: Router;
 
-    static center = new Point(35, 184);
+    static center = new Point(15, 114);
 
     static async main() {
         if (!location.hash) {

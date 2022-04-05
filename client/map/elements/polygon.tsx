@@ -1,14 +1,11 @@
-import { Map } from "./map";
-import { Point } from "./point";
+import { Point } from "map/point";
+import { MapElement } from "./element";
+import { Layer } from "../layers/layer";
 
-export class Layer {
-    svg: SVGElement;
+export class MapPolygon implements MapElement {
     path: SVGPathElement;
 
-    static namespace = 'http://www.w3.org/2000/svg';
-
     constructor(
-        public id: string,
         public points: Point[], 
         public color: string,
         public stroke: string,
@@ -16,18 +13,12 @@ export class Layer {
         public strokeWidth: number,
         public opacity: number,
         public clickAction?: Function
-    ) {}
-
-    render(map: Map) {
-        this.svg = document.createElementNS(Layer.namespace, 'svg') as SVGElement;
-        this.svg.setAttributeNS(null, 'viewBox', `${map.offset.x - 0.5} ${map.offset.y - 0.5} ${map.size} ${map.size}`);
-
+    ) {
         this.path = document.createElementNS(Layer.namespace, 'path') as SVGPathElement;
-        this.update();
+    }
 
-        this.svg.appendChild(this.path);
-
-        return this.svg;
+    append(parent: SVGElement) {
+        parent.appendChild(this.path);
     }
 
     update() {
@@ -35,7 +26,12 @@ export class Layer {
         this.path.setAttributeNS(null, 'stroke-width', this.strokeWidth.toString());
         this.path.setAttributeNS(null, 'opacity', this.opacity.toString());
         this.path.setAttributeNS(null, 'fill', this.color);
-        this.path.setAttributeNS(null, 'd', `${this.points.map((point, index) => `${index ? "L" : "M"}${point.x} ${point.y}`)} ${this.close ? 'Z' : ''}`);
+
+        if (this.points.length > 1) {
+            this.path.setAttributeNS(null, 'd', `${this.points.map((point, index) => `${index ? "L" : "M"}${point.x} ${point.y}`)} ${this.close ? 'Z' : ''}`);
+        } else {
+            this.path.setAttributeNS(null, 'd', '');
+        }
 
         if (this.clickAction) {
             this.path.onclick = this.path.ontouchend = () => {
@@ -47,5 +43,5 @@ export class Layer {
             this.path.onclick = null;
             this.path.removeAttributeNS(null, 'ui-clickable');
         }
-    }
+    }    
 }

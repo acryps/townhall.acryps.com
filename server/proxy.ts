@@ -34,6 +34,29 @@ export class Proxy {
             res.send('invalid history item');
         });
 
+        let tubes;
+        
+        Proxy.getTubes().then(res => tubes = res);
+
+        setInterval(async () => {
+            tubes = await Proxy.getTubes();
+        }, 1000 * 60);
+
+        app.app.get('/images/tube/:z/:x/:y', async (req, res) => {
+            for (let entry of tubes || []) {
+                if (entry == req.params.z) {
+                    if (!tileSets[entry]) {
+                        tileSets[entry] = new TileSet(`${Proxy.source}/tube-${entry}.png`);
+                    }
+
+                    return tileSets[entry].read(+req.params.x, +req.params.y).then(r => res.end(r));
+                }
+            }
+
+            res.sendStatus(500);
+            res.send('invalid tube item');
+        });
+
         const map = new TileSet(`${Proxy.source}/map.png`);
 
         app.app.get('/images/map/:x/:y', (req, res) => map.read(+req.params.x, +req.params.y).then(tile => res.end(tile)));
@@ -60,6 +83,18 @@ export class Proxy {
             }
 
             return entries.sort((a, b) => a.path > b.path ? -1 : 1);
+        });
+    }
+
+    static getTubes(): Promise<number[]> {
+        return fetch(`${Proxy.source}/`).then(r => r.text()).then(html => {
+            const entries: number[] = [];
+
+            for (let name of html.match(/tube-[0-9]+/g)) {
+                entries.push(+name.split('-')[1]);
+            }
+
+            return entries.sort((a, b) => a - b).filter((c, i, a) => a.indexOf(c) == i);
         });
     }
 }

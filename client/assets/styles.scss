@@ -28,7 +28,7 @@ ui-page {
 		top: 0;
 		left: 0;
 		right: 0;
-		z-index: 100;
+		z-index: 50000;
 
 		padding: 1rem;
 
@@ -80,6 +80,7 @@ ui-map {
 			border-bottom: 1px solid black;
 			cursor: pointer;
 			user-select: none;
+			color: #000;
 
 			&:hover {
 				background: #ddd;
@@ -119,6 +120,8 @@ ui-map {
 		position: fixed;
 		bottom: 0;
 		left: 0;
+		z-index: 50000;
+
 		padding: 0.25rem 0.5rem;
 
 		background: white;
@@ -186,10 +189,34 @@ ui-map {
 			background: black;
 			pointer-events: none;
 
-			box-shadow: 0 var(--size) 0 #0004, 0 calc(var(--size) * 2) 0 #0002,
-						var(--size) 0 0 #0004, calc(var(--size) * 2) 0 0 #0002,
-						0 calc(var(--size) * -1) 0 #0004, 0 calc(var(--size) * -2) 0 #0002,
-						calc(var(--size) * -1) 0 0 #0004, calc(var(--size) * -2) 0 0 #0002,;
+			box-shadow: 0 var(--size) 0 #0008, 0 calc(var(--size) * 2) 0 #0004,
+						var(--size) 0 0 #0008, calc(var(--size) * 2) 0 0 #0004,
+						0 calc(var(--size) * -1) 0 #0008, 0 calc(var(--size) * -2) 0 #0004,
+						calc(var(--size) * -1) 0 0 #0008, calc(var(--size) * -2) 0 0 #0004;
+
+			&::before,
+			&::after {
+				content: '';
+				position: absolute;
+
+				background: #0002;
+			}
+
+			&::before {
+				top: 0;
+				left: -100vw;
+
+				height: var(--size);
+				width: 200vw;
+			}
+
+			&::after {
+				top: -100vh;
+				left: 0;
+
+				height: 200vh;
+				width: var(--size);
+			}
 		}
 
 		svg {
@@ -219,7 +246,9 @@ ui-map {
 			}
 
 			path {
-				stroke-linejoin: bevel;
+				&:not([fill]) {
+					stroke-linejoin: bevel;
+				}
 				
 				&[ui-clickable]:hover {
 					opacity: 0.7;

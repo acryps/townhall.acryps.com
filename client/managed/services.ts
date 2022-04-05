@@ -56,6 +56,21 @@ export class PlayerViewModel {
 	}
 }
 
+export class PropertySummaryModel {
+	id: string;
+	name: string;
+	bounds: string;
+
+	private static $build(raw) {
+		const item = new PropertySummaryModel();
+		item.id = raw.id === null ? null : `${raw.id}`
+		item.name = raw.name === null ? null : `${raw.name}`
+		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
+		
+		return item;
+	}
+}
+
 export class PropertyViewModel {
 	borough: BoroughSummaryModel;
 	owner: PlayerViewModel;
@@ -126,7 +141,7 @@ export class MapService {
 		});
 	}
 
-	async getProperties(): Promise<Array<PropertyViewModel>> {
+	async getProperties(): Promise<Array<PropertySummaryModel>> {
 		const data = new FormData();
 		
 
@@ -138,7 +153,7 @@ export class MapService {
 			if ("data" in r) {
 				const d = r.data;
 
-				return d.map(d => d === null ? null : PropertyViewModel["$build"](d));
+				return d.map(d => d === null ? null : PropertySummaryModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
@@ -189,6 +204,27 @@ export class MapService {
 		});
 	}
 
+	async getTubes(): Promise<Array<number>> {
+		const data = new FormData();
+		
+
+		return await fetch(Service.toURL("MwNT15bTI5ZDNubmZ5dW96Nj9qeGVwd3"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : +d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async getProperty(id: string): Promise<PropertyViewModel> {
 		const data = new FormData();
 		data.append("VjYnVwc3k5aToyb3FtcDN4c3pnM2RlMW", JSON.stringify(id))
@@ -215,6 +251,25 @@ export class MapService {
 		data.append("F6Mml1d2dxdX0xamxpcDFyaXRuaXZ5NW", JSON.stringify(propertyViewModel))
 
 		return await fetch(Service.toURL("VxbjByZmgxb3NvNDlvcTp0ODc0OW4zaz"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async createBorough(boroughViewModel: BoroughViewModel): Promise<void> {
+		const data = new FormData();
+		data.append("Mya2ltZGltbjcyeHdjdGcydGVpZDgyNT", JSON.stringify(boroughViewModel))
+
+		return await fetch(Service.toURL("J2c3hyNDQwNTdjeDs4c3htbWh2MWVnaG"), {
 			method: "post",
 			credentials: "include",
 			body: data

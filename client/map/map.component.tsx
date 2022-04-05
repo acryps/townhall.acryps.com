@@ -1,11 +1,16 @@
 import { Application } from "main";
-import { HistoryEntryViewModel, MapService, PropertyViewModel } from "managed/services";
+import { BoroughViewModel, HistoryEntryViewModel, MapService, PropertyViewModel } from "managed/services";
 import { Component } from "node_modules/vldom/component";
-import { Label } from "./label";
-import { Layer } from "./layer";
-import { Map } from "./map";
+import { MapLabel } from "./elements/label";
+import { Layer } from "./layers/layer";
+import { Map } from "./elements/map";
+import { MapPolygon } from "./elements/polygon";
 import { MapImageComponent } from "./map-image.component";
 import { Point } from "./point";
+import { DrawLayer } from "./layers/draw.layer";
+import { BoroughLayer } from "./layers/borough.layer";
+import { StreetLayer } from "./layers/street.layer";
+import { PropertyLayer } from "./layers/property.layer";
 
 export class MapComponent extends Component {
     onScroll: (() => void)[] = [];
@@ -22,124 +27,31 @@ export class MapComponent extends Component {
 
     map = new Map(4000, new Point(-2000, -2000), new Point(0, 0));
 
-    loading = {
-        layers: true
-    };
-
     layers: Layer[] = [];
-    labels: Label[] = [];
+    draw: DrawLayer;
 
     lastRenderedZoom = 8;
 
     mapStyle: 'normal' | 'gray' | 'hidden' = 'normal';
-    showBoroughs = false;
-    showProperties = false;
-    showStreets = true;
 
-    draw: Layer;
-    labelContainer: Layer;
+    tube?: number;
+    tubes: number[];
 
     selectedHistoryEntry: HistoryEntryViewModel;
     history: HistoryEntryViewModel[];
 
-    constructor() {
-        super();
-
-        this.labelContainer = new Layer('.', [], '#fff', '#0000', false, 0, 1);
-        this.labelContainer.render(this.map);
-        this.labelContainer.svg.setAttributeNS(null, 'ui-labels', '');
-    }
-
     async onload() {
         this.history = await new MapService().getHistory();
-        
-        for (let layer of this.layers) {
-            layer.svg?.remove();
-        }
+        this.tubes = await new MapService().getTubes();
+    }
 
-        for (let label of this.labels) {
-            label.element?.remove();
-        }
+    update(child?: Node) {
+        this.mapInner.onscroll = null;
 
-        this.layers = [];
-        this.labels = [];
-
-        if (this.draw) {
-            this.layers.push(this.draw);
-        }
-
-        this.loading.layers = true;
-
-        if (this.mapInner) {
-            this.mapInner.onscroll = null;
-        }
-
-        requestAnimationFrame(async () => {
-            if (this.showBoroughs) {
-                for (let borough of await new MapService().getBoroughs()) {
-                    if (borough.bounds) {
-                        this.layers.push(new Layer(borough.id, Point.unpack(borough.bounds), `${borough.color}30`, borough.color, true, 0.5, 1));
-                    }
-                }
-            }
-
-            if (this.showStreets) {
-                for (let street of await new MapService().getStreets()) {
-                    const points = Point.unpack(street.path);
-                    const layer = new Layer(street.id, points, '#0000', `#eee`, false, street.size - 0.5, 1);
-
-                    for (let i = 1; i < points.length; i++) {
-                        const first = points[i - 1];
-                        const last = points[i];
-
-                        const length = Math.sqrt((first.x - last.x) ** 2 + (first.y - last.y) ** 2);
-                        const step = 30;
-
-                        for (let d = (length % step) * 0.5; d < length; d += step) {
-                            const label = this.addLabel(
-                                street.name,
-                                new Point(first.x + (last.x - first.x) * (1 / length * d), first.y + (last.y - first.y) * (1 / length * d)),
-                                street.size * 0.5, 
-                                Math.atan2(first.y - last.y, first.x - last.x), 
-                            );
-
-                            label.maxSize = {
-                                x: Math.abs(first.x - last.x) || Infinity,
-                                y: Math.abs(first.y - last.y) || Infinity
-                            };
-                        }
-                    }
-
-                    this.layers.push(layer);
-                }
-            }
-
-            if (this.showProperties) {
-                for (let property of await new MapService().getProperties()) {
-                    if (property.bounds) {
-                        const points = Point.unpack(property.bounds);
-                        
-                        this.layers.push(new Layer(property.id, points, property.owner ? "#fff" : "#0f0", "#000", true, 0.75, 0.8, () => {
-                            this.navigate(`property/${property.id}`);
-                        }));
-
-                        this.addLabel(property.borough ? `${property.borough.propertyPrefix}${property.code}` : `#${property.id.substring(0, 3)}`, Point.center(points), 1, 0);
-                    }
-                }
-            }
-
-            this.loading.layers = false;
-            this.update();
-        });
+        return super.update(child);
     }
 
     render(child) {
-        if (this.loading.layers) {
-            return <ui-loading>
-                <ui-spinner></ui-spinner>
-            </ui-loading>;
-        }
-
         if (!this.mapInner) {
             this.mapInner = <ui-map-inner>
                 {this.image = new MapImageComponent()}
@@ -147,21 +59,11 @@ export class MapComponent extends Component {
                 {this.cursor = <ui-cursor></ui-cursor>}
             </ui-map-inner>;
 
-            this.updateMapImage();
-
-            this.mapInner.appendChild(this.labelContainer.svg);
+            requestAnimationFrame(() => this.updateMapImage());
         }
 
         requestAnimationFrame(() => {
             this.updateZoom();
-
-            for (let layer of this.layers) {
-                this.mapInner.insertBefore(layer.render(this.map), this.labelContainer.svg);
-            }
-
-            for (let label of this.labels) {
-                label.update();
-            }
 
             const map = this.rootNode as HTMLElement;
             map.setAttribute('ui-style', this.mapStyle);
@@ -183,35 +85,31 @@ export class MapComponent extends Component {
                     }
                 }
 
-                const point = this.translateMouse(event);
-
                 if (this.draw) {
-                    this.draw.points.push(point);
-
-                    this.draw.update();
+                    const point = this.translateMouse(event);
+                    
+                    this.draw.append(point);
                 }
             };
 
-            requestAnimationFrame(() => {
-                this.focus(new Point(this.x, this.y));
+            this.focus(new Point(this.x, this.y));
 
-                this.mapInner.onscroll = () => {
-                    const box = this.rootNode.getBoundingClientRect();
-                    const point = this.translate(box.width / 2 + box.left, box.height / 2);
-    
-                    if (this.x != point.x) {
-                        this.x = point.x;
-                    }
-    
-                    if (this.y != point.y) {
-                        this.y = point.y;
-                    }
-    
-                    for (let listener of this.onScroll) {
-                        listener();
-                    }
-                };
-            });
+            this.mapInner.onscroll = () => {
+                const box = this.rootNode.getBoundingClientRect();
+                const point = this.translate(box.width / 2 + box.left, box.height / 2);
+
+                if (this.x != point.x) {
+                    this.x = point.x;
+                }
+
+                if (this.y != point.y) {
+                    this.y = point.y;
+                }
+
+                for (let listener of this.onScroll) {
+                    listener();
+                }
+            };
         });
 
         return <ui-map>
@@ -264,54 +162,129 @@ export class MapComponent extends Component {
                     </ui-control-extend>
                 </ui-control>
 
-                <ui-control ui-click={() => {
-                    this.showStreets = !this.showStreets;
+                <ui-control ui-active={this.tube ? '' : null}>
+                    XR
 
-                    this.reload();
-                }}>S{this.showStreets ? "✓" : "✗"}</ui-control>
+                    <ui-control-extend>
+                        <ui-control ui-active={!this.tube ? '' : null} ui-click={() => {
+                            delete this.tube;
 
-                <ui-control ui-click={() => {
-                    this.showBoroughs = !this.showBoroughs;
+                            this.update();
+                            this.updateMapImage();
+                        }}>
+                            ✗
+                        </ui-control>
 
-                    this.reload();
-                }}>B{this.showBoroughs ? "✓" : "✗"}</ui-control>
+                        {this.tubes.map(tube => <ui-control ui-active={this.tube == tube ? '' : null} ui-click={() => {
+                            this.tube = tube;
 
-                <ui-control ui-click={() => {
-                    this.showProperties = !this.showProperties;
+                            this.update();
+                            this.updateMapImage();
+                        }}>
+                            {tube}
+                        </ui-control>)}
+                    </ui-control-extend>
+                </ui-control>
 
-                    this.reload();
-                }}>P{this.showProperties ? "✓" : "✗"}</ui-control>
+                <ui-control ui-active={this.findLayer(BoroughLayer) ? '' : null} ui-click={() => this.toggleLayer(new BoroughLayer(this.map))}>
+                    B
+                </ui-control>
+
+                <ui-control ui-active={this.findLayer(StreetLayer) ? '' : null} ui-click={() => this.toggleLayer(new StreetLayer(this.map))}>
+                    S
+                </ui-control>
+
+                <ui-control ui-active={this.findLayer(PropertyLayer) ? '' : null} ui-click={() => this.toggleLayer(new PropertyLayer(this.map))}>
+                    P
+                </ui-control>
 
 
                 <ui-control ui-active={this.draw ? '' : null} ui-click={() => {
                     if (this.draw) {
-                        alert(Point.pack(this.draw.points));
                         console.log(Point.pack(this.draw.points));
 
+                        this.removeLayer(this.draw);
                         this.draw = null;
                     } else {
-                        this.draw = new Layer(null, [], '#fff', '#000', true, 1, 60, null);
+                        this.draw = new DrawLayer(this.map);
+                        this.addLayer(this.draw);
                     }
 
-                    this.reload();
+                    this.update();
                 }}>DW</ui-control>
 
-                {this.draw && this.showProperties && <ui-control ui-click={() => {
-                    const property = new PropertyViewModel();
-                    property.bounds = Point.pack(this.draw.points);
-                    
-                    new MapService().createProperty(property).then(() => {
-                        this.draw = new Layer(null, [], '#fff', '#000', true, 1, 60, null);
+                {this.draw && this.findLayer(PropertyLayer) && <ui-control ui-click={() => {
+                    if (this.draw.points.length >= 3) {
+                        const property = new PropertyViewModel();
+                        property.bounds = Point.pack(this.draw.points);
 
-                        this.reload();
-                    });
+                        this.findLayer(PropertyLayer).add(new MapPolygon(this.draw.points, '#0f09', '#0f0', true, 1, 0.8));
+                            
+                        new MapService().createProperty(property).then(() => {
+                            this.draw.reset();
+
+                            this.reload();
+                        });
+                    }
                 }}>+P</ui-control>}
+
+                {this.draw && this.findLayer(BoroughLayer) && <ui-control ui-click={() => {
+                    if (this.draw.points.length >= 3) {
+                        const borough = new BoroughViewModel();
+                        borough.name = prompt('Borough name');
+                        borough.color = `#${Math.random().toString(16).substring(2, 4)}${Math.random().toString(16).substring(2, 4)}${Math.random().toString(16).substring(2, 4)}`;
+
+                        if (borough.name) {
+                            borough.bounds = Point.pack(this.draw.points);
+                            
+                            new MapService().createBorough(borough).then(() => {
+                                this.draw.reset();
+
+                                this.reload();
+                            });
+                        }
+                    }
+                }}>+B</ui-control>}
             </ui-controls>
 
             {child}
 
-            <ui-location-tracker id=".locationTracker"></ui-location-tracker>
+            {this.locationTracker = <ui-location-tracker></ui-location-tracker>}
         </ui-map>;
+    }
+
+    findLayer(layer: typeof Layer) {
+        return this.layers.find(existing => existing.constructor == layer);
+    }
+
+    toggleLayer(layer: Layer) {
+        const existing = this.findLayer(layer.constructor as typeof Layer);
+
+        if (existing) {
+            this.removeLayer(existing);
+        } else {
+            this.addLayer(layer);
+        }
+
+        this.update();
+    }
+
+    addLayer(layer: Layer) {
+        this.layers = [...this.layers, layer].sort((a, b) => a.order - b.order);
+
+        this.mapInner.appendChild(layer.container);
+
+        layer.load().then(() => {
+            layer.update();
+
+            layer.resize(this.zoom);
+        });
+    }
+
+    removeLayer(layer: Layer) {
+        this.layers.splice(this.layers.indexOf(layer), 1);
+
+        layer.container.remove();
     }
 
     updateZoom() {
@@ -328,6 +301,10 @@ export class MapComponent extends Component {
         for (let listener of this.onZoom) {
             listener();
         }
+
+        for (let layer of this.layers) {
+            layer.resize(this.zoom);
+        }
     }
 
     updateHighlight() {
@@ -343,11 +320,17 @@ export class MapComponent extends Component {
     }
 
     updateMapImage() {
+        let source = '/images/map';
+
         if (this.selectedHistoryEntry) {
-            this.image.load(`/images/map/${this.selectedHistoryEntry.name}`);
-        } else {
-            this.image.load(`/images/map`);
+            source = `/images/map/${this.selectedHistoryEntry.name}`;
         }
+        
+        if (this.tube) {
+            source = `/images/tube/${this.tube}`;
+        }
+            
+        this.image.load(source);
     }
 
     focus(position: Point) {
@@ -357,16 +340,6 @@ export class MapComponent extends Component {
             (position.x - this.map.offset.x) * this.zoom - rect.width / 2,
             (position.y - this.map.offset.y) * this.zoom - rect.height / 2
         );
-    }
-
-    addLabel(content: string, position: Point, size = 2, rotation = 0) {
-        const label = new Label(this, content, position, size, rotation);
-        this.labelContainer.svg.appendChild(label.element);
-        this.labels.push(label);
-
-        label.update();
-
-        return label;
     }
 
     translate(x, y, zoom = this.zoom) {

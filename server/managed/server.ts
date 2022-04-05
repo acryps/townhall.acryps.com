@@ -4,6 +4,7 @@ import { DbContext } from "././database";
 import { Proxy } from "././../proxy";
 import { BoroughViewModel } from "././../areas/borough.view";
 import { HistoryEntryViewModel } from "././../areas/history.view";
+import { PropertySummaryModel } from "././../areas/property.summary";
 import { PropertyViewModel } from "././../areas/property.view";
 import { StreetViewModel } from "././../areas/street.view";
 import { MapService } from "././../areas/map.service";
@@ -65,6 +66,15 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"MwNT15bTI5ZDNubmZ5dW96Nj9qeGVwd3",
+			{},
+			inject => inject.construct(MapService),
+			(controller, params) => controller.getTubes(
+				
+			)
+		);
+
+		this.expose(
 			"d1NTdqcWBiMWE5ZHg3ZndyM2UzNnMwNm",
 			{
 				"VjYnVwc3k5aToyb3FtcDN4c3pnM2RlMW": {
@@ -89,6 +99,20 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(MapService),
 			(controller, params) => controller.createProperty(
 				params["F6Mml1d2dxdX0xamxpcDFyaXRuaXZ5NW"]
+			)
+		);
+
+		this.expose(
+			"J2c3hyNDQwNTdjeDs4c3htbWh2MWVnaG",
+			{
+				"Mya2ltZGltbjcyeHdjdGcydGVpZDgyNT": {
+					isArray: false,
+					type: BoroughViewModel
+				}
+			},
+			inject => inject.construct(MapService),
+			(controller, params) => controller.createBorough(
+				params["Mya2ltZGltbjcyeHdjdGcydGVpZDgyNT"]
 			)
 		)
 	}
@@ -249,6 +273,48 @@ ViewModel.mappings = {
 			
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"username" in viewModel && (model.username = viewModel.username === null ? null : `${viewModel.username}`);
+
+			return model;
+		}
+	},
+	PropertySummaryModel: class ComposedPropertySummaryModel extends PropertySummaryModel {
+		async map() {
+			return {
+				id: this.model.id,
+				name: this.model.name,
+				bounds: this.model.bounds
+			}
+		};
+
+		static get items() { 
+			return {
+				id: true,
+				name: true,
+				bounds: true
+			};
+		}
+
+		static toViewModel(data) {
+			const item = new PropertySummaryModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PropertySummaryModel) {
+			let model: Property;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Property).find(viewModel.id)
+			} else {
+				model = new Property();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 
 			return model;
 		}

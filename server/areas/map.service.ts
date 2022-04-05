@@ -3,6 +3,7 @@ import { DbContext } from "../managed/database";
 import { Proxy } from "../proxy";
 import { BoroughViewModel } from "./borough.view";
 import { HistoryEntryViewModel } from "./history.view";
+import { PropertySummaryModel } from "./property.summary";
 import { PropertyViewModel } from "./property.view";
 import { StreetViewModel } from "./street.view";
 
@@ -18,7 +19,7 @@ export class MapService extends Service {
     }
 
     getProperties() {
-        return PropertyViewModel.from(this.db.property);
+        return PropertySummaryModel.from(this.db.property);
     }
 
     getStreets() {
@@ -29,6 +30,10 @@ export class MapService extends Service {
         return HistoryEntryViewModel.from(await Proxy.getHistory());
     }
 
+    async getTubes() {
+        return await Proxy.getTubes();
+    }
+
     async getProperty(id: string) {
         return new PropertyViewModel(await this.db.property.find(id));
     }
@@ -37,5 +42,11 @@ export class MapService extends Service {
         const property = await propertyViewModel.toModel();
 
         await property.create();
+    }
+
+    async createBorough(boroughViewModel: BoroughViewModel) {
+        const borough = await boroughViewModel.toModel();
+
+        await borough.create();
     }
 }

@@ -74,6 +74,10 @@ export class MapComponent extends Component {
 
                 this.cursor.style.left = `${(position.x - this.map.offset.x) * this.zoom}px`;
                 this.cursor.style.top = `${(position.y - this.map.offset.y) * this.zoom}px`;
+
+                if (this.draw) {
+                    this.draw.showCurrentPosition(position);
+                }
             };
 
             map.onmousedown = event => {

@@ -16,7 +16,7 @@ export class DrawLayer extends Layer {
     }
 
     get points() {
-        return this.polygon.points;
+        return this.polygon.points.filter(point => point != this.currentPosition);
     }
 
     append(point: Point) {
@@ -30,10 +30,31 @@ export class DrawLayer extends Layer {
     }
 
     showCurrentPosition(position: Point) {
-        this.polygon.points = this.polygon.points.filter(point => point != this.currentPosition);
+        this.polygon.points = this.points;
         this.polygon.points.push(position);
 
         this.currentPosition = position;
+
+        let isStraight = false;
+
+        if (this.polygon.points.length > 2) {
+            const last = this.polygon.points[this.polygon.points.length - 2];
+
+            if (this.currentPosition.x == last.x || this.currentPosition.y == last.y) {
+                isStraight = true;
+            } 
+
+            if (Math.abs(this.currentPosition.x - last.x) - Math.abs(this.currentPosition.y - last.y) == 0) {
+                isStraight = true;
+            }
+        }
+
+        if (isStraight) {
+            this.polygon.stroke = '#000';
+        } else {
+            this.polygon.stroke = '#f00';
+        }
+
         this.polygon.update();
     }
 }

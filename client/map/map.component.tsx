@@ -1,5 +1,5 @@
 import { Application } from "main";
-import { BoroughViewModel, HistoryEntryViewModel, MapService, PropertyViewModel } from "managed/services";
+import { BoroughViewModel, HistoryEntryViewModel, MapService, PropertyTypeViewModel, PropertyViewModel, SquareViewModel, WaterBodyViewModel } from "managed/services";
 import { Component } from "node_modules/vldom/component";
 import { MapLabel } from "./elements/label";
 import { Layer } from "./layers/layer";
@@ -11,6 +11,7 @@ import { DrawLayer } from "./layers/draw.layer";
 import { BoroughLayer } from "./layers/borough.layer";
 import { StreetLayer } from "./layers/street.layer";
 import { PropertyLayer } from "./layers/property.layer";
+import { WaterLayer } from "./layers/water.layer";
 
 export class MapComponent extends Component {
     onScroll: (() => void)[] = [];
@@ -37,12 +38,15 @@ export class MapComponent extends Component {
     tube?: number;
     tubes: number[];
 
+    propertyTypes: PropertyTypeViewModel[];
+
     selectedHistoryEntry: HistoryEntryViewModel;
     history: HistoryEntryViewModel[];
 
     async onload() {
         this.history = await new MapService().getHistory();
         this.tubes = await new MapService().getTubes();
+        this.propertyTypes = await new MapService().getPropertyTypes();
     }
 
     update(child?: Node) {
@@ -200,6 +204,20 @@ export class MapComponent extends Component {
 
                 <ui-control ui-active={this.findLayer(PropertyLayer) ? '' : null} ui-click={() => this.toggleLayer(new PropertyLayer(this.map))}>
                     P
+
+                    {this.findLayer(PropertyLayer) && <ui-control-extend>
+                        {this.propertyTypes.map(type => <ui-control ui-active={this.findLayer(PropertyLayer).activeType == type ? '' : null} ui-click={() => {
+                            this.findLayer(PropertyLayer).activeType = type;
+
+                            this.update();
+                        }}>
+                            {type.code}
+                        </ui-control>)}    
+                    </ui-control-extend>}
+                </ui-control>
+
+                <ui-control ui-active={this.findLayer(WaterLayer) ? '' : null} ui-click={() => this.toggleLayer(new WaterLayer(this.map))}>
+                    W
                 </ui-control>
 
 
@@ -249,6 +267,40 @@ export class MapComponent extends Component {
                         }
                     }
                 }}>+B</ui-control>}
+
+                {this.draw && this.findLayer(StreetLayer) && <ui-control ui-click={() => {
+                    if (this.draw.points.length >= 3) {
+                        const square = new SquareViewModel();
+                        square.name = prompt('Square name');
+
+                        if (square.name) {
+                            square.bounds = Point.pack(this.draw.points);
+                            
+                            new MapService().createSquare(square).then(() => {
+                                this.draw.reset();
+
+                                this.reload();
+                            });
+                        }
+                    }
+                }}>+S</ui-control>}
+
+                {this.draw && this.findLayer(WaterLayer) && <ui-control ui-click={() => {
+                    if (this.draw.points.length >= 3) {
+                        const waterBody = new WaterBodyViewModel();
+                        waterBody.name = prompt('Water Body name');
+
+                        if (waterBody.name) {
+                            waterBody.bounds = Point.pack(this.draw.points);
+                            
+                            new MapService().createWaterBody(waterBody).then(() => {
+                                this.draw.reset();
+
+                                this.reload();
+                            });
+                        }
+                    }
+                }}>+W</ui-control>}
             </ui-controls>
 
             {child}
@@ -257,8 +309,8 @@ export class MapComponent extends Component {
         </ui-map>;
     }
 
-    findLayer(layer: typeof Layer) {
-        return this.layers.find(existing => existing.constructor == layer);
+    findLayer<T extends typeof Layer>(layer: T) {
+        return this.layers.find(existing => existing.constructor == layer) as InstanceType<T>;
     }
 
     toggleLayer(layer: Layer) {

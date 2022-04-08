@@ -47,7 +47,7 @@ ui-map {
 	height: 100%;
 
 	&[ui-style='gray'] ui-map-inner canvas {
-		filter: saturate(0) brightness(1.5) contrast(0.3);
+		filter: saturate(0) contrast(0.2) brightness(2);
 	}
 
 	&[ui-style='hidden'] ui-map-inner canvas {

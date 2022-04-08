@@ -1,5 +1,5 @@
 import { DbClient, RunContext } from "vlquery"; 
-import { Inject, StaticFileRoute } from "vlserver";
+import { Inject, StaticFileRoute, ViewModel } from "vlserver";
 import { ManagedServer } from "./managed/server";
 import { DbContext } from "./managed/database";
 
@@ -14,6 +14,8 @@ DbClient.connectedClient.connect().then(() => {
 
     const app = new ManagedServer();
     const db = new DbContext(new RunContext());
+
+    ViewModel.globalFetchingContext = db;
 
     new Proxy(app);
 

@@ -4,7 +4,7 @@
         "js-md5": "^0.7.3",
         "node-fetch": "^2.6.6",
         "sharp": "^0.30.2",
-        "vlquery": "^4.9.2",
+        "vlquery": "^5.5.5",
         "vlserver": "^4.0.2"
     }
 }

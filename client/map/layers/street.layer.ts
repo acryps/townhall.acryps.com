@@ -5,15 +5,24 @@ import { Point } from "map/point";
 import { Layer } from "./layer";
 
 export class StreetLayer extends Layer {
-    order = 2;
+    order = 3;
+
+    streetColor = '#ddd';
 
     async load() {
         const streets = await new MapService().getStreets();
+        const squares = await new MapService().getSquares();
+
+        for (let square of squares) {
+            const bounds = Point.unpack(square.bounds);
+
+            this.add(new MapPolygon(bounds, '#eee', this.streetColor, true, 0.6, 1))
+        }
 
         for (let street of streets) {
             const path = Point.unpack(street.path);
 
-            this.add(new MapPolygon(path, '#0000', '#ddd', false, street.size - 0.4, 1));
+            this.add(new MapPolygon(path, '#0000', this.streetColor, false, street.size - 0.4, 1));
         }
 
         for (let street of streets) {
@@ -30,10 +39,14 @@ export class StreetLayer extends Layer {
             const step = street.name.length * street.size * 0.5 + 5;
 
             for (let i = (length % step) / 2; i < length; i += step) {
-                const label = new MapLabel(street.name, null, street.size * 0.5, path, 100 / length * i);
-
-                this.add(label);
+                this.add(new MapLabel(street.name, null, street.size * 0.5, path, 100 / length * i));
             }
+        }
+
+        for (let square of squares) {
+            const bounds = Point.unpack(square.bounds);
+
+            this.add(new MapLabel(square.name, Point.center(bounds), 3));
         }
     }
 }

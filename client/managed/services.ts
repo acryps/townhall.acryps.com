@@ -56,13 +56,32 @@ export class PlayerViewModel {
 	}
 }
 
+export class PropertyTypeViewModel {
+	id: string;
+	name: string;
+	color: string;
+	code: string;
+
+	private static $build(raw) {
+		const item = new PropertyTypeViewModel();
+		item.id = raw.id === null ? null : `${raw.id}`
+		item.name = raw.name === null ? null : `${raw.name}`
+		item.color = raw.color === null ? null : `${raw.color}`
+		item.code = raw.code === null ? null : `${raw.code}`
+		
+		return item;
+	}
+}
+
 export class PropertySummaryModel {
+	type: PropertyTypeViewModel;
 	id: string;
 	name: string;
 	bounds: string;
 
 	private static $build(raw) {
 		const item = new PropertySummaryModel();
+		item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
 		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
@@ -92,6 +111,23 @@ export class PropertyViewModel {
 	}
 }
 
+export class SquareViewModel {
+	borough: BoroughSummaryModel;
+	id: string;
+	name: string;
+	bounds: string;
+
+	private static $build(raw) {
+		const item = new SquareViewModel();
+		item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null
+		item.id = raw.id === null ? null : `${raw.id}`
+		item.name = raw.name === null ? null : `${raw.name}`
+		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
+		
+		return item;
+	}
+}
+
 export class StreetViewModel {
 	id: string;
 	name: string;
@@ -106,6 +142,23 @@ export class StreetViewModel {
 		item.shortName = raw.shortName === null ? null : `${raw.shortName}`
 		item.size = raw.size === null ? null : +raw.size
 		item.path = raw.path === null ? null : `${raw.path}`
+		
+		return item;
+	}
+}
+
+export class WaterBodyViewModel {
+	id: string;
+	name: string;
+	bounds: string;
+	namePath: string;
+
+	private static $build(raw) {
+		const item = new WaterBodyViewModel();
+		item.id = raw.id === null ? null : `${raw.id}`
+		item.name = raw.name === null ? null : `${raw.name}`
+		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
+		item.namePath = raw.namePath === null ? null : `${raw.namePath}`
 		
 		return item;
 	}
@@ -183,6 +236,48 @@ export class MapService {
 		});
 	}
 
+	async getSquares(): Promise<Array<SquareViewModel>> {
+		const data = new FormData();
+		
+
+		return await fetch(Service.toURL("hpejphODJldWo2b2NxaWVxdzx3c2V3bm"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : SquareViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getWaterBodies(): Promise<Array<WaterBodyViewModel>> {
+		const data = new FormData();
+		
+
+		return await fetch(Service.toURL("luMjgwbmc0MDFmNGEzZDNkbDcxOH04NG"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : WaterBodyViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async getHistory(): Promise<Array<HistoryEntryViewModel>> {
 		const data = new FormData();
 		
@@ -217,6 +312,27 @@ export class MapService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : +d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getPropertyTypes(): Promise<Array<PropertyTypeViewModel>> {
+		const data = new FormData();
+		
+
+		return await fetch(Service.toURL("U2eWZwcW41MGJxZGVndzdjNnhmZXFhMT"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : PropertyTypeViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
@@ -270,6 +386,63 @@ export class MapService {
 		data.append("Mya2ltZGltbjcyeHdjdGcydGVpZDgyNT", JSON.stringify(boroughViewModel))
 
 		return await fetch(Service.toURL("J2c3hyNDQwNTdjeDs4c3htbWh2MWVnaG"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async createSquare(squareViewModel: SquareViewModel): Promise<void> {
+		const data = new FormData();
+		data.append("FwZXk2OGVmcWRxeHdiZW9ucjhxcGE5cG", JSON.stringify(squareViewModel))
+
+		return await fetch(Service.toURL("RhZGo0ejpmdnJhZ3lla3I4bzB2M2F5cn"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async createWaterBody(waterBodyViewModel: WaterBodyViewModel): Promise<void> {
+		const data = new FormData();
+		data.append("hnMjgxamVveGk2czR6YjQ2aHdxaGJsaG", JSON.stringify(waterBodyViewModel))
+
+		return await fetch(Service.toURL("A1bX53enB1cHV0cmQzNTYxdDgzaH10an"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async saveProperty(propertyViewModel: PropertySummaryModel): Promise<void> {
+		const data = new FormData();
+		data.append("NycXNhenFjaGhvZDhsdWtlYzNtd2x4d3", JSON.stringify(propertyViewModel))
+
+		return await fetch(Service.toURL("dzb2prZ3QwYT8xZ2ZicXc5ZnN1cGFwZj"), {
 			method: "post",
 			credentials: "include",
 			body: data

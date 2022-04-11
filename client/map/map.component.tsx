@@ -12,6 +12,7 @@ import { BoroughLayer } from "./layers/borough.layer";
 import { StreetLayer } from "./layers/street.layer";
 import { PropertyLayer } from "./layers/property.layer";
 import { WaterLayer } from "./layers/water.layer";
+import { TrainLayer } from "./layers/train.layer";
 
 export class MapComponent extends Component {
     onScroll: (() => void)[] = [];
@@ -38,15 +39,12 @@ export class MapComponent extends Component {
     tube?: number;
     tubes: number[];
 
-    propertyTypes: PropertyTypeViewModel[];
-
     selectedHistoryEntry: HistoryEntryViewModel;
     history: HistoryEntryViewModel[];
 
     async onload() {
         this.history = await new MapService().getHistory();
         this.tubes = await new MapService().getTubes();
-        this.propertyTypes = await new MapService().getPropertyTypes();
     }
 
     update(child?: Node) {
@@ -194,29 +192,23 @@ export class MapComponent extends Component {
                     </ui-control-extend>
                 </ui-control>
 
-                <ui-control ui-active={this.findLayer(BoroughLayer) ? '' : null} ui-click={() => this.toggleLayer(new BoroughLayer(this.map))}>
+                <ui-control ui-active={this.findLayer(BoroughLayer) ? '' : null} ui-click={() => this.toggleLayer(new BoroughLayer(this.map, this))}>
                     B
                 </ui-control>
 
-                <ui-control ui-active={this.findLayer(StreetLayer) ? '' : null} ui-click={() => this.toggleLayer(new StreetLayer(this.map))}>
+                <ui-control ui-active={this.findLayer(StreetLayer) ? '' : null} ui-click={() => this.toggleLayer(new StreetLayer(this.map, this))}>
                     S
                 </ui-control>
 
-                <ui-control ui-active={this.findLayer(PropertyLayer) ? '' : null} ui-click={() => this.toggleLayer(new PropertyLayer(this.map))}>
-                    P
-
-                    {this.findLayer(PropertyLayer) && <ui-control-extend>
-                        {this.propertyTypes.map(type => <ui-control ui-active={this.findLayer(PropertyLayer).activeType == type ? '' : null} ui-click={() => {
-                            this.findLayer(PropertyLayer).activeType = type;
-
-                            this.update();
-                        }}>
-                            {type.code}
-                        </ui-control>)}    
-                    </ui-control-extend>}
+                <ui-control ui-active={this.findLayer(TrainLayer) ? '' : null} ui-click={() => this.toggleLayer(new TrainLayer(this.map, this))}>
+                    T
                 </ui-control>
 
-                <ui-control ui-active={this.findLayer(WaterLayer) ? '' : null} ui-click={() => this.toggleLayer(new WaterLayer(this.map))}>
+                <ui-control ui-active={this.findLayer(PropertyLayer) ? '' : null} ui-click={() => this.toggleLayer(new PropertyLayer(this.map, this))}>
+                    P
+                </ui-control>
+
+                <ui-control ui-active={this.findLayer(WaterLayer) ? '' : null} ui-click={() => this.toggleLayer(new WaterLayer(this.map, this))}>
                     W
                 </ui-control>
 
@@ -228,7 +220,7 @@ export class MapComponent extends Component {
                         this.removeLayer(this.draw);
                         this.draw = null;
                     } else {
-                        this.draw = new DrawLayer(this.map);
+                        this.draw = new DrawLayer(this.map, this);
                         this.addLayer(this.draw);
                     }
 

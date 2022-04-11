@@ -346,6 +346,189 @@ export class Property extends Entity<PropertyQueryProxy> {
 					
 }
 			
+export class TrainStationQueryProxy extends QueryProxy {
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get position(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class TrainStation extends Entity<TrainStationQueryProxy> {
+	exits: PrimaryReference<TrainStationExit, TrainStationExitQueryProxy>;
+		stops: PrimaryReference<TrainStop, TrainStopQueryProxy>;
+		id: string;
+	name: string;
+	position: string;
+	
+
+	$$meta = {
+		tableName: "train_station",
+
+		columns: {
+			id: { type: "uuid", name: "id" },
+			name: { type: "text", name: "name" },
+			position: { type: "text", name: "position" }
+		},
+
+		get set(): DbSet<TrainStation, TrainStationQueryProxy> { return new DbSet<TrainStation, TrainStationQueryProxy>(TrainStation, null) }
+	};
+	
+	constructor() {
+		super();
+		
+		this.exits = new PrimaryReference<TrainStationExit, TrainStationExitQueryProxy>(this, "stationId", TrainStationExit);
+		this.stops = new PrimaryReference<TrainStop, TrainStopQueryProxy>(this, "stationId", TrainStop);
+	}
+}
+			
+export class TrainStationExitQueryProxy extends QueryProxy {
+	get station(): Partial<TrainStationQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get inbound(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get position(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get stationId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class TrainStationExit extends Entity<TrainStationExitQueryProxy> {
+	get station(): Partial<ForeignReference<TrainStation>> { return this.$station; }
+	id: string;
+	inbound: boolean;
+	position: string;
+	stationId: string;
+	
+
+	$$meta = {
+		tableName: "train_station_exit",
+
+		columns: {
+			id: { type: "uuid", name: "id" },
+			inbound: { type: "bool", name: "inbound" },
+			position: { type: "text", name: "position" },
+			stationId: { type: "uuid", name: "station_id" }
+		},
+
+		get set(): DbSet<TrainStationExit, TrainStationExitQueryProxy> { return new DbSet<TrainStationExit, TrainStationExitQueryProxy>(TrainStationExit, null) }
+	};
+	
+	constructor() {
+		super();
+		
+		this.$station = new ForeignReference<TrainStation>(this, "stationId", TrainStation);
+	}
+	
+	
+	private $station: ForeignReference<TrainStation>;
+
+	set station(value: Partial<ForeignReference<TrainStation>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.stationId = value.id as string;
+		} else {
+			this.stationId = null;
+		}
+	}
+					
+}
+			
+export class TrainStopQueryProxy extends QueryProxy {
+	get route(): Partial<TrainRouteQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get station(): Partial<TrainStationQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get trackPosition(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get stationId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get routeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class TrainStop extends Entity<TrainStopQueryProxy> {
+	get route(): Partial<ForeignReference<TrainRoute>> { return this.$route; }
+	get station(): Partial<ForeignReference<TrainStation>> { return this.$station; }
+	id: string;
+	name: string;
+	trackPosition: string;
+	stationId: string;
+	routeId: string;
+	
+
+	$$meta = {
+		tableName: "train_stop",
+
+		columns: {
+			id: { type: "uuid", name: "id" },
+			name: { type: "text", name: "name" },
+			trackPosition: { type: "text", name: "track_position" },
+			stationId: { type: "uuid", name: "station_id" },
+			routeId: { type: "uuid", name: "route_id" }
+		},
+
+		get set(): DbSet<TrainStop, TrainStopQueryProxy> { return new DbSet<TrainStop, TrainStopQueryProxy>(TrainStop, null) }
+	};
+	
+	constructor() {
+		super();
+		
+		this.$route = new ForeignReference<TrainRoute>(this, "routeId", TrainRoute);
+		this.$station = new ForeignReference<TrainStation>(this, "stationId", TrainStation);
+	}
+	
+	
+	private $route: ForeignReference<TrainRoute>;
+
+	set route(value: Partial<ForeignReference<TrainRoute>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.routeId = value.id as string;
+		} else {
+			this.routeId = null;
+		}
+	}
+					
+	private $station: ForeignReference<TrainStation>;
+
+	set station(value: Partial<ForeignReference<TrainStation>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.stationId = value.id as string;
+		} else {
+			this.stationId = null;
+		}
+	}
+					
+}
+			
+export class TrainRouteQueryProxy extends QueryProxy {
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get path(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get color(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class TrainRoute extends Entity<TrainRouteQueryProxy> {
+	stops: PrimaryReference<TrainStop, TrainStopQueryProxy>;
+		id: string;
+	name: string;
+	path: string;
+	color: string;
+	
+
+	$$meta = {
+		tableName: "train_route",
+
+		columns: {
+			id: { type: "uuid", name: "id" },
+			name: { type: "text", name: "name" },
+			path: { type: "text", name: "path" },
+			color: { type: "text", name: "color" }
+		},
+
+		get set(): DbSet<TrainRoute, TrainRouteQueryProxy> { return new DbSet<TrainRoute, TrainRouteQueryProxy>(TrainRoute, null) }
+	};
+	
+	constructor() {
+		super();
+		
+		this.stops = new PrimaryReference<TrainStop, TrainStopQueryProxy>(this, "routeId", TrainStop);
+	}
+}
+			
 
 export class DbContext {
 	constructor(private runContext: RunContext) {}
@@ -368,4 +551,8 @@ export class DbContext {
 	square: DbSet<Square, SquareQueryProxy> = new DbSet<Square, SquareQueryProxy>(Square, this.runContext);
 	waterBody: DbSet<WaterBody, WaterBodyQueryProxy> = new DbSet<WaterBody, WaterBodyQueryProxy>(WaterBody, this.runContext);
 	property: DbSet<Property, PropertyQueryProxy> = new DbSet<Property, PropertyQueryProxy>(Property, this.runContext);
+	trainStation: DbSet<TrainStation, TrainStationQueryProxy> = new DbSet<TrainStation, TrainStationQueryProxy>(TrainStation, this.runContext);
+	trainStationExit: DbSet<TrainStationExit, TrainStationExitQueryProxy> = new DbSet<TrainStationExit, TrainStationExitQueryProxy>(TrainStationExit, this.runContext);
+	trainStop: DbSet<TrainStop, TrainStopQueryProxy> = new DbSet<TrainStop, TrainStopQueryProxy>(TrainStop, this.runContext);
+	trainRoute: DbSet<TrainRoute, TrainRouteQueryProxy> = new DbSet<TrainRoute, TrainRouteQueryProxy>(TrainRoute, this.runContext);
 };

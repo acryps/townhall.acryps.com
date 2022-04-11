@@ -235,16 +235,6 @@ ui-map {
 				}
 			}
 
-			&[ui-labels] {
-				text {
-					fill: #000;
-					
-					&[ui-hidden] {
-						display: none;
-					} 
-				}
-			}
-
 			path {
 				&:not([fill]) {
 					stroke-linejoin: bevel;
@@ -252,10 +242,16 @@ ui-map {
 				
 				&[ui-clickable]:hover {
 					opacity: 0.7;
+					cursor: pointer;
 					
 					stroke: black;
 					stroke-width: 1;
 				}
+			}
+
+			text {
+				stroke-linecap: square;
+				stroke-linejoin: bevel;
 			}
 		}
 	}

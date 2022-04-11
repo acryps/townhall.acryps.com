@@ -74,6 +74,7 @@ export class PropertyTypeViewModel {
 }
 
 export class PropertySummaryModel {
+	borough: BoroughSummaryModel;
 	type: PropertyTypeViewModel;
 	id: string;
 	name: string;
@@ -81,6 +82,7 @@ export class PropertySummaryModel {
 
 	private static $build(raw) {
 		const item = new PropertySummaryModel();
+		item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null
 		item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
@@ -93,6 +95,7 @@ export class PropertySummaryModel {
 export class PropertyViewModel {
 	borough: BoroughSummaryModel;
 	owner: PlayerViewModel;
+	type: PropertyTypeViewModel;
 	id: string;
 	name: string;
 	code: string;
@@ -102,6 +105,7 @@ export class PropertyViewModel {
 		const item = new PropertyViewModel();
 		item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null
 		item.owner = raw.owner ? PlayerViewModel["$build"](raw.owner) : null
+		item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
 		item.code = raw.code === null ? null : `${raw.code}`
@@ -142,6 +146,74 @@ export class StreetViewModel {
 		item.shortName = raw.shortName === null ? null : `${raw.shortName}`
 		item.size = raw.size === null ? null : +raw.size
 		item.path = raw.path === null ? null : `${raw.path}`
+		
+		return item;
+	}
+}
+
+export class TrainStationExitViewModel {
+	station: TrainStationViewModel;
+	id: string;
+	inbound: boolean;
+	position: string;
+
+	private static $build(raw) {
+		const item = new TrainStationExitViewModel();
+		item.station = raw.station ? TrainStationViewModel["$build"](raw.station) : null
+		item.id = raw.id === null ? null : `${raw.id}`
+		item.inbound = !!raw.inbound
+		item.position = raw.position === null ? null : `${raw.position}`
+		
+		return item;
+	}
+}
+
+export class TrainRouteViewModel {
+	stops: TrainStopViewModel[];
+	id: string;
+	name: string;
+	path: string;
+	color: string;
+
+	private static $build(raw) {
+		const item = new TrainRouteViewModel();
+		item.stops = raw.stops ? raw.stops.map(i => TrainStopViewModel["$build"](i)) : null
+		item.id = raw.id === null ? null : `${raw.id}`
+		item.name = raw.name === null ? null : `${raw.name}`
+		item.path = raw.path === null ? null : `${raw.path}`
+		item.color = raw.color === null ? null : `${raw.color}`
+		
+		return item;
+	}
+}
+
+export class TrainStationViewModel {
+	id: string;
+	name: string;
+	position: string;
+
+	private static $build(raw) {
+		const item = new TrainStationViewModel();
+		item.id = raw.id === null ? null : `${raw.id}`
+		item.name = raw.name === null ? null : `${raw.name}`
+		item.position = raw.position === null ? null : `${raw.position}`
+		
+		return item;
+	}
+}
+
+export class TrainStopViewModel {
+	id: string;
+	name: string;
+	trackPosition: string;
+	stationId: string;
+
+	private static $build(raw) {
+		const item = new TrainStopViewModel();
+		item.id = raw.id === null ? null : `${raw.id}`
+		item.name = raw.name === null ? null : `${raw.name}`
+		item.trackPosition = raw.trackPosition === null ? null : `${raw.trackPosition}`
+		item.stationId = raw.stationId === null ? null : `${raw.stationId}`
 		
 		return item;
 	}
@@ -453,6 +525,50 @@ export class MapService {
 
 			if ("aborted" in r) {
 				throw new Error("request aborted by server");
+			}
+		});
+	}
+}
+
+export class TrainService {
+	async getRoutes(): Promise<Array<TrainRouteViewModel>> {
+		const data = new FormData();
+		
+
+		return await fetch(Service.toURL("hsZXxsa2h0eG50MnVjazg1eHMyY3NiNW"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : TrainRouteViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getStations(): Promise<Array<TrainStationViewModel>> {
+		const data = new FormData();
+		
+
+		return await fetch(Service.toURL("N2YnloZWZwdGJ3M2pjZ3JidnM2eDE1d2"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : TrainStationViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
 			}
 		});
 	}

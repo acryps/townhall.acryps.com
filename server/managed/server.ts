@@ -11,8 +11,13 @@ import { SquareViewModel } from "././../areas/squre.view";
 import { StreetViewModel } from "././../areas/street.view";
 import { WaterBodyViewModel } from "././../areas/water-body.view";
 import { MapService } from "././../areas/map.service";
+import { TrainRouteViewModel } from "././../areas/train/route.view";
+import { TrainStationViewModel } from "././../areas/train/station.view";
+import { TrainService } from "././../areas/train/train.service";
 import { BoroughSummaryModel } from "./../areas/borough.summary";
 import { PlayerViewModel } from "./../areas/player.view";
+import { TrainStationExitViewModel } from "./../areas/train/exit.view";
+import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { Borough } from "./../managed/database";
 import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
@@ -20,6 +25,10 @@ import { PropertyType } from "./../managed/database";
 import { Property } from "./../managed/database";
 import { Square } from "./../managed/database";
 import { Street } from "./../managed/database";
+import { TrainStationExit } from "./../managed/database";
+import { TrainRoute } from "./../managed/database";
+import { TrainStation } from "./../managed/database";
+import { TrainStop } from "./../managed/database";
 import { WaterBody } from "./../managed/database";
 
 Inject.mappings = {
@@ -30,6 +39,10 @@ Inject.mappings = {
 	"DbContext": {
 		objectConstructor: DbContext,
 		parameters: ["RunContext"]
+	},
+	"TrainService": {
+		objectConstructor: TrainService,
+		parameters: ["DbContext"]
 	}
 };
 
@@ -188,6 +201,24 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(MapService),
 			(controller, params) => controller.saveProperty(
 				params["NycXNhenFjaGhvZDhsdWtlYzNtd2x4d3"]
+			)
+		);
+
+		this.expose(
+			"hsZXxsa2h0eG50MnVjazg1eHMyY3NiNW",
+			{},
+			inject => inject.construct(TrainService),
+			(controller, params) => controller.getRoutes(
+				
+			)
+		);
+
+		this.expose(
+			"N2YnloZWZwdGJ3M2pjZ3JidnM2eDE1d2",
+			{},
+			inject => inject.construct(TrainService),
+			(controller, params) => controller.getStations(
+				
 			)
 		)
 	}
@@ -401,6 +432,7 @@ ViewModel.mappings = {
 	PropertySummaryModel: class ComposedPropertySummaryModel extends PropertySummaryModel {
 		async map() {
 			return {
+				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.model.borough)),
 				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.model.type)),
 				id: this.model.id,
 				name: this.model.name,
@@ -410,6 +442,9 @@ ViewModel.mappings = {
 
 		static get items() { 
 			return {
+				get borough() { 
+					return ViewModel.mappings.BoroughSummaryModel.items;
+				},
 				get type() { 
 					return ViewModel.mappings.PropertyTypeViewModel.items;
 				},
@@ -421,6 +456,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new PropertySummaryModel(null);
+			"borough" in data && (item.borough = data.borough && ViewModel.mappings.BoroughSummaryModel.toViewModel(data.borough));
 			"type" in data && (item.type = data.type && ViewModel.mappings.PropertyTypeViewModel.toViewModel(data.type));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
@@ -438,6 +474,7 @@ ViewModel.mappings = {
 				model = new Property();
 			}
 			
+			"borough" in viewModel && (model.borough.id = viewModel.borough ? viewModel.borough.id : null);
 			"type" in viewModel && (model.type.id = viewModel.type ? viewModel.type.id : null);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
@@ -451,6 +488,7 @@ ViewModel.mappings = {
 			return {
 				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.model.borough)),
 				owner: new PlayerViewModel(await BaseServer.unwrap(this.model.owner)),
+				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.model.type)),
 				id: this.model.id,
 				name: this.model.name,
 				code: this.model.code,
@@ -466,6 +504,9 @@ ViewModel.mappings = {
 				get owner() { 
 					return ViewModel.mappings.PlayerViewModel.items;
 				},
+				get type() { 
+					return ViewModel.mappings.PropertyTypeViewModel.items;
+				},
 				id: true,
 				name: true,
 				code: true,
@@ -477,6 +518,7 @@ ViewModel.mappings = {
 			const item = new PropertyViewModel(null);
 			"borough" in data && (item.borough = data.borough && ViewModel.mappings.BoroughSummaryModel.toViewModel(data.borough));
 			"owner" in data && (item.owner = data.owner && ViewModel.mappings.PlayerViewModel.toViewModel(data.owner));
+			"type" in data && (item.type = data.type && ViewModel.mappings.PropertyTypeViewModel.toViewModel(data.type));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
@@ -496,6 +538,7 @@ ViewModel.mappings = {
 			
 			"borough" in viewModel && (model.borough.id = viewModel.borough ? viewModel.borough.id : null);
 			"owner" in viewModel && (model.owner.id = viewModel.owner ? viewModel.owner.id : null);
+			"type" in viewModel && (model.type.id = viewModel.type ? viewModel.type.id : null);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
@@ -598,6 +641,194 @@ ViewModel.mappings = {
 			"shortName" in viewModel && (model.shortName = viewModel.shortName === null ? null : `${viewModel.shortName}`);
 			"size" in viewModel && (model.size = viewModel.size === null ? null : +viewModel.size);
 			"path" in viewModel && (model.path = viewModel.path === null ? null : `${viewModel.path}`);
+
+			return model;
+		}
+	},
+	TrainStationExitViewModel: class ComposedTrainStationExitViewModel extends TrainStationExitViewModel {
+		async map() {
+			return {
+				station: new TrainStationViewModel(await BaseServer.unwrap(this.model.station)),
+				id: this.model.id,
+				inbound: this.model.inbound,
+				position: this.model.position
+			}
+		};
+
+		static get items() { 
+			return {
+				get station() { 
+					return ViewModel.mappings.TrainStationViewModel.items;
+				},
+				id: true,
+				inbound: true,
+				position: true
+			};
+		}
+
+		static toViewModel(data) {
+			const item = new TrainStationExitViewModel(null);
+			"station" in data && (item.station = data.station && ViewModel.mappings.TrainStationViewModel.toViewModel(data.station));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"inbound" in data && (item.inbound = !!data.inbound);
+			"position" in data && (item.position = data.position === null ? null : `${data.position}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: TrainStationExitViewModel) {
+			let model: TrainStationExit;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(TrainStationExit).find(viewModel.id)
+			} else {
+				model = new TrainStationExit();
+			}
+			
+			"station" in viewModel && (model.station.id = viewModel.station ? viewModel.station.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"inbound" in viewModel && (model.inbound = !!viewModel.inbound);
+			"position" in viewModel && (model.position = viewModel.position === null ? null : `${viewModel.position}`);
+
+			return model;
+		}
+	},
+	TrainRouteViewModel: class ComposedTrainRouteViewModel extends TrainRouteViewModel {
+		async map() {
+			return {
+				stops: (await this.model.stops.includeTree(ViewModel.mappings.TrainStopViewModel.items).toArray()).map(item => new TrainStopViewModel(item)),
+				id: this.model.id,
+				name: this.model.name,
+				path: this.model.path,
+				color: this.model.color
+			}
+		};
+
+		static get items() { 
+			return {
+				get stops() { 
+					return ViewModel.mappings.TrainStopViewModel.items;
+				},
+				id: true,
+				name: true,
+				path: true,
+				color: true
+			};
+		}
+
+		static toViewModel(data) {
+			const item = new TrainRouteViewModel(null);
+			"stops" in data && (item.stops = data.stops && [...data.stops].map(i => ViewModel.mappings.TrainStopViewModel.toViewModel(i)));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"path" in data && (item.path = data.path === null ? null : `${data.path}`);
+			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: TrainRouteViewModel) {
+			let model: TrainRoute;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(TrainRoute).find(viewModel.id)
+			} else {
+				model = new TrainRoute();
+			}
+			
+			"stops" in viewModel && (null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"path" in viewModel && (model.path = viewModel.path === null ? null : `${viewModel.path}`);
+			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
+
+			return model;
+		}
+	},
+	TrainStationViewModel: class ComposedTrainStationViewModel extends TrainStationViewModel {
+		async map() {
+			return {
+				id: this.model.id,
+				name: this.model.name,
+				position: this.model.position
+			}
+		};
+
+		static get items() { 
+			return {
+				id: true,
+				name: true,
+				position: true
+			};
+		}
+
+		static toViewModel(data) {
+			const item = new TrainStationViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"position" in data && (item.position = data.position === null ? null : `${data.position}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: TrainStationViewModel) {
+			let model: TrainStation;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(TrainStation).find(viewModel.id)
+			} else {
+				model = new TrainStation();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"position" in viewModel && (model.position = viewModel.position === null ? null : `${viewModel.position}`);
+
+			return model;
+		}
+	},
+	TrainStopViewModel: class ComposedTrainStopViewModel extends TrainStopViewModel {
+		async map() {
+			return {
+				id: this.model.id,
+				name: this.model.name,
+				trackPosition: this.model.trackPosition,
+				stationId: this.model.stationId
+			}
+		};
+
+		static get items() { 
+			return {
+				id: true,
+				name: true,
+				trackPosition: true,
+				stationId: true
+			};
+		}
+
+		static toViewModel(data) {
+			const item = new TrainStopViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"trackPosition" in data && (item.trackPosition = data.trackPosition === null ? null : `${data.trackPosition}`);
+			"stationId" in data && (item.stationId = data.stationId === null ? null : `${data.stationId}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: TrainStopViewModel) {
+			let model: TrainStop;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(TrainStop).find(viewModel.id)
+			} else {
+				model = new TrainStop();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"trackPosition" in viewModel && (model.trackPosition = viewModel.trackPosition === null ? null : `${viewModel.trackPosition}`);
+			"stationId" in viewModel && (model.stationId = viewModel.stationId === null ? null : `${viewModel.stationId}`);
 
 			return model;
 		}

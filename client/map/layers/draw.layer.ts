@@ -9,9 +9,7 @@ export class DrawLayer extends Layer {
     polygon = new MapPolygon([], '#0002', '#000', false, 0.5, 1);
     currentPosition: Point;
 
-    constructor(map: Map) {
-        super(map);
-
+    async load() {
         this.add(this.polygon);
     }
 

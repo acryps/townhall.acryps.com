@@ -66,34 +66,9 @@ export class MapLabel implements MapElement {
     }
 
     resize(zoom: number) {
-        console.log(zoom)
-
         this.element.setAttributeNS(null, 'font-size', `${this.size * 8 / zoom}px`);
         this.shadow.setAttributeNS(null, 'font-size', `${this.size * 8 / zoom}px`);
     }
-  
-    update() {
-        /*
-        this.element.removeAttributeNS(null, 'ui-hidden');
-        this.boundingBox = this.element.getBoundingClientRect();
 
-        if (this.maxSize) {
-            if (this.boundingBox.width > this.maxSize.x * this.parent.zoom || this.boundingBox.height > this.maxSize.y * this.parent.zoom) {
-                this.element.setAttributeNS(null, 'ui-hidden', '');
-
-                return;
-            }
-        }
-  
-        // intersect check
-        for (let label of this.parent.labels) {
-            if (label != this && label.boundingBox.top + label.boundingBox.height > this.boundingBox.top && label.boundingBox.left + label.boundingBox.width > this.boundingBox.left && label.boundingBox.bottom - label.boundingBox.height < this.boundingBox.bottom && label.boundingBox.right - this.boundingBox.width < this.boundingBox.right) {
-                if (this.size == label.size ? this.id > label.id : this.size < label.size) {
-                    this.element.setAttributeNS(null, 'ui-hidden', '');
-
-                    return;
-                }
-            }
-        }*/
-    }
+    update() {}
 }

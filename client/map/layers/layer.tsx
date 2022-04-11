@@ -1,6 +1,7 @@
 import { Map } from "../elements/map";
 import { Point } from "../point";
 import { MapElement } from "../elements/element";
+import { MapComponent } from "map/map.component";
 
 export class Layer {
     order: number;
@@ -11,7 +12,10 @@ export class Layer {
 
     elements: MapElement[] = [];
 
-    constructor(public map: Map) {
+    constructor(
+        public map: Map, 
+        public component: MapComponent
+    ) {
         this.container = document.createElementNS(Layer.namespace, 'svg') as SVGElement;
         this.container.setAttributeNS(null, 'viewBox', `${map.offset.x - 0.5} ${map.offset.y - 0.5} ${map.size} ${map.size}`);
 

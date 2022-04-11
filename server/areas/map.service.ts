@@ -78,8 +78,6 @@ export class MapService extends Service {
     }
 
     async saveProperty(propertyViewModel: PropertySummaryModel) {
-        console.log(propertyViewModel)
-
         const property = await propertyViewModel.toModel();
 
         await property.update();

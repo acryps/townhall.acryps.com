@@ -16,8 +16,34 @@ export class Point {
         return source.split(";").map(source => new Point(+source.split(",")[0], +source.split(",")[1]))
     }
 
+    static unpackSingle(source: string) {
+        return this.unpack(source)[0];
+    }
+
     static pack(points: Point[]) {
         return points.map(point => `${point.x},${point.y}`).join(";");
+    }
+
+    static bounding(points: Point[], offset = 0) {
+        const minX = Math.min(...points.map(point => point.x)) - offset;
+        const maxX = Math.max(...points.map(point => point.x)) + offset;
+
+        const minY = Math.min(...points.map(point => point.y)) - offset;
+        const maxY = Math.max(...points.map(point => point.y)) + offset;
+
+        return [
+            new Point(minX, minY),
+            new Point(maxX, minY),
+            new Point(maxX, maxY),
+            new Point(minX, maxY)
+        ];
+    }
+
+    static size(points: Point[]) {
+        return {
+            width: Math.max(...points.map(point => point.x)) - Math.min(...points.map(point => point.x)),
+            height: Math.max(...points.map(point => point.y)) - Math.min(...points.map(point => point.y))
+        }
     }
 
     static center(points: Point[]) {
@@ -32,6 +58,10 @@ export class Point {
 
     static topLeft(points: Point[]) {
         return [...points].sort((a, b) => (a.x + a.y) - (b.x + b.y))[0];
+    }
+
+    static bottomRight(points: Point[]) {
+        return [...points].sort((a, b) => (a.x + a.y) - (b.x + b.y)).pop();
     }
 
     static midsect(points: Point[], close: boolean) {

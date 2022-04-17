@@ -1,4 +1,5 @@
 import { Component } from "node_modules/vldom/component"
+import { blocks } from "./blocks";
 import { MapComponent } from "./map.component"
 
 export class MapImageComponent extends Component {
@@ -6,8 +7,10 @@ export class MapImageComponent extends Component {
 
     source: string;
 
-    size = 250;
+    size = 16;
     preload = 1;
+
+    perspective = 2;
 
     canvas: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
@@ -147,24 +150,49 @@ export class MapImageComponent extends Component {
         return tiles;
     }
 
-    loadTile(x: number, y: number) {
+    loadTile(tx: number, ty: number) {
         const source = this.source;
 
-        if (this.tiles[[x, y].join()]) {
+        if (this.tiles[[tx, ty].join()]) {
             return;
         }
 
-        return this.tiles[[x, y].join()] = fetch(`${this.source}/${x}/${y}`).then(res => res.blob()).then(res => {
-            if (source == this.source) {
-                const image = new Image();
+        const x = tx + this.parent.map.offset.x / 16;
+        const y = ty + this.parent.map.offset.y / 16;
 
-                image.onload = () => {
-                    if (source == this.source) {
-                        this.context.drawImage(image, x * this.size, y * this.size);
-                    }
-                };
+        console.log('->', tx, ty, x, y);
 
-                image.src = URL.createObjectURL(res);
+        return this.tiles[[tx, ty].join()] = fetch(`/chunk/${x}.${y}`).then(res => res.json()).then(async chunk => {
+            if (!chunk) {
+                return;
+            }
+
+            const length = chunk.blocks.length;
+
+            for (let i = 0; i < length; i++) {
+                const block = chunk.blocks[length - i - 1];
+                const type = chunk.palette[block[3]];
+
+                const color = [...(blocks[type] || [0xff, 0, 0xff, 0xff])];
+
+                this.context.fillStyle = `rgba(${Math.min(color[0], 0xff)}, ${Math.min(color[1], 0xff)}, ${Math.min(color[2], 0xff)}, ${Math.min(color[3], 0xff) / 0xff})`;
+
+                const bx = block[0] + x * 16;
+                const by = block[1] + y * 16;
+                const bz = block[2];
+
+                const mx = bx - by;
+                const my = (bx + by) / this.perspective - bz;
+
+                this.context.fillRect(mx - this.parent.map.offset.x, my - this.parent.map.offset.x, 1, 1);
+
+                if (i == 0) {
+                    console.log(x, y, mx, my)
+                }
+
+                if (i % 0xff == 0) {
+                    await new Promise(done => requestAnimationFrame(done));
+                }
             }
         });
     }

@@ -5,6 +5,7 @@ import { DbContext } from "./managed/database";
 
 import * as path from "path";
 import { Proxy } from "./proxy";
+import { Region } from "./game/region";
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });

@@ -27,7 +27,7 @@ export class MapComponent extends Component {
     locationTracker: HTMLElement;
     cursor: HTMLElement;
 
-    map = new Map(4000, new Point(-2000, -2000), new Point(0, 0));
+    map = new Map(4096, new Point(-2048, -2048), new Point(0, 0));
 
     layers: Layer[] = [];
     draw: DrawLayer;

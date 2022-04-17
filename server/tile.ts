@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 const sharp = require('sharp');
 
 export class TileSet {
-    size = 250;
+    size = 512;
 
     loader?: Promise<void>;
 

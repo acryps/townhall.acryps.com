@@ -3,10 +3,17 @@ import { HistoryEntry } from "./history";
 import { ManagedServer } from "./managed/server";
 import { TileSet } from "./tile";
 
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { join } from "path";
+import { Chunk } from "./game/chunk";
+
 const md5 = require('js-md5');
 
 export class Proxy {
+    static chunkCacheDirectory = '../.chunks';
+
     static source = process.env.TOWNHALL_SERVER_ADDRESS || 'http://10.30.0.3:8000/townhall';
+    static region = process.env.TOWNHALL_REGION_DIRECTORY || 'http://10.30.0.3:8000/minecraft/world/region';
 
     constructor(app: ManagedServer) {
         const tileSets = new Map<string, TileSet[]>();
@@ -60,8 +67,30 @@ export class Proxy {
         const map = new TileSet(`${Proxy.source}/map.png`);
 
         app.app.get('/images/map/:x/:y', (req, res) => map.read(+req.params.x, +req.params.y).then(tile => res.end(tile)));
-
         app.app.get('/images/map', (req, res) => fetch(`${Proxy.source}/map.png`).then(r => r.buffer()).then(r => res.end(r)));
+
+        app.app.get('/chunk/:x.:y', async (req, res) => {
+            const x = +req.params.x;
+            const y = +req.params.y;
+
+            const path = join(Proxy.chunkCacheDirectory, `${x}.${y}.json`);
+
+            if (existsSync(path)) {
+                return res.end(readFileSync(path));
+            }
+
+            const chunk = await Chunk.fetch(x, y);
+
+            if (!chunk) {
+                return res.json(null);
+            }
+            
+            const data = chunk.toJSON();
+            writeFileSync(path, JSON.stringify(data));
+
+            res.json(data);
+        });
+
         app.app.get('/images/isometric', (req, res) => fetch(`${Proxy.source}/isometric.png`).then(r => r.buffer()).then(r => res.end(r)));
     }
 
@@ -96,5 +125,28 @@ export class Proxy {
 
             return entries.sort((a, b) => a - b).filter((c, i, a) => a.indexOf(c) == i);
         });
+    }
+
+    static async readChunk(x: number, y: number) {
+        if (!existsSync(this.chunkCacheDirectory)) {
+            mkdirSync(this.chunkCacheDirectory);
+        }
+
+        const path = join(this.chunkCacheDirectory, `${x}.${y}.source.json`);
+
+        if (existsSync(path)) {
+            return JSON.parse(readFileSync(path).toString());
+        }
+
+        const data = await fetch(`${this.source}/world/${+x}.${+y}.json`).then(res => res.text());
+
+        try {
+            const chunk = JSON.parse(data);
+            writeFileSync(path, data);
+
+            return chunk;
+        } catch {
+            return null;
+        }
     }
 }

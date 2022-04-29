@@ -6,7 +6,7 @@ import { Layer } from "./layer";
 export class DrawLayer extends Layer {
     order = Infinity;
     
-    polygon = new MapPolygon([], '#0002', '#000', false, 0.5, 1);
+    polygon = new MapPolygon([], false, 'draw');
     currentPosition: Point;
 
     async load() {
@@ -48,9 +48,9 @@ export class DrawLayer extends Layer {
         }
 
         if (isStraight) {
-            this.polygon.stroke = '#000';
+            this.polygon.path.setAttribute('ui-straight', '');
         } else {
-            this.polygon.stroke = '#f00';
+            this.polygon.path.removeAttribute('ui-straight');
         }
 
         this.polygon.update();

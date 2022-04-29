@@ -30,6 +30,21 @@ export class BoroughViewModel {
 	}
 }
 
+export class BridgeViewModel {
+	id: string;
+	name: string;
+	path: string;
+
+	private static $build(raw) {
+		const item = new BridgeViewModel();
+		item.id = raw.id === null ? null : `${raw.id}`
+		item.name = raw.name === null ? null : `${raw.name}`
+		item.path = raw.path === null ? null : `${raw.path}`
+		
+		return item;
+	}
+}
+
 export class HistoryEntryViewModel {
 	name: string;
 	date: Date;
@@ -133,6 +148,7 @@ export class SquareViewModel {
 }
 
 export class StreetViewModel {
+	bridges: BridgeViewModel[];
 	id: string;
 	name: string;
 	shortName: string;
@@ -141,6 +157,7 @@ export class StreetViewModel {
 
 	private static $build(raw) {
 		const item = new StreetViewModel();
+		item.bridges = raw.bridges ? raw.bridges.map(i => BridgeViewModel["$build"](i)) : null
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
 		item.shortName = raw.shortName === null ? null : `${raw.shortName}`
@@ -515,6 +532,25 @@ export class MapService {
 		data.append("NycXNhenFjaGhvZDhsdWtlYzNtd2x4d3", JSON.stringify(propertyViewModel))
 
 		return await fetch(Service.toURL("dzb2prZ3QwYT8xZ2ZicXc5ZnN1cGFwZj"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async deleteProperty(propertyViewModel: PropertyViewModel): Promise<void> {
+		const data = new FormData();
+		data.append("ExMWt6cHEwZTJ0Y3N2cDs3ajYybXd0Zz", JSON.stringify(propertyViewModel))
+
+		return await fetch(Service.toURL("1nbWp4M21wOG1naTNoM3B1bWJvbTx1ej"), {
 			method: "post",
 			credentials: "include",
 			body: data

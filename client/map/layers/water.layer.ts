@@ -7,15 +7,13 @@ import { Layer } from "./layer";
 export class WaterLayer extends Layer {
     order = 1;
 
-    color = '#00f';
-
     async load() {
         for (let waterBody of await new MapService().getWaterBodies()) {
             const points = Point.unpack(waterBody.bounds);
 
-            this.add(new MapPolygon(points, `${this.color}8`, this.color, true, 0.8, 1));
+            this.add(new MapPolygon(points, true, 'water'));
 
-            const path = Point.unpack(waterBody.namePath);
+            const path = waterBody.namePath ? Point.unpack(waterBody.namePath) : [Point.center(points)];
 
             if (path.length == 1) {
                 this.add(new MapLabel(waterBody.name, path[0], 2));

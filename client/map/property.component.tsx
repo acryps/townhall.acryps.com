@@ -17,6 +17,10 @@ export class PropertyComponent extends Component {
         this.boroughs = await new MapService().getBoroughs();
     }
 
+    async onparameterchange() {
+        await this.reload();
+    }
+
     render() {
         const bounds = Point.unpack(this.property.bounds);
         const size = Point.size(bounds);
@@ -28,31 +32,31 @@ export class PropertyComponent extends Component {
                 {this.property.name || `Plot ${this.property.id.substring(0, 8)}`}
             </ui-title>
 
-            <ui-labeled-value>
-                <ui-label>Type</ui-label>
-                <ui-value>
-                    <ui-field>
-                        <select $ui-value={this.property.type} ui-change={() => new MapService().saveProperty(this.property)}>
-                            {this.types.map(type => <option ui-value={type}>
-                                {type.name} ({type.code.toUpperCase()})
-                            </option>)}
-                        </select>
-                    </ui-field>
-                </ui-value>
-            </ui-labeled-value>
+            <ui-field>
+                <input $ui-value={this.property.name} ui-change={() => new MapService().saveProperty(this.property)}></input>
 
-            <ui-labeled-value>
-                <ui-label>Borough</ui-label>
-                <ui-value>
-                    <ui-field>
-                        <select $ui-value={this.property.borough} ui-change={() => new MapService().saveProperty(this.property)}>
-                            {this.boroughs.map(borough => <option ui-value={borough}>
-                                {borough.name}
-                            </option>)}
-                        </select>
-                    </ui-field>
-                </ui-value>
-            </ui-labeled-value>
+                <label>Name</label>
+            </ui-field>
+
+            <ui-field>
+                <select $ui-value={this.property.type} ui-change={() => new MapService().saveProperty(this.property)}>
+                    {this.types.map(type => <option ui-value={type}>
+                        {type.name} ({type.code.toUpperCase()})
+                    </option>)}
+                </select>
+
+                <label>Type</label>
+            </ui-field>
+
+            <ui-field>
+                <select $ui-value={this.property.borough} ui-change={() => new MapService().saveProperty(this.property)}>
+                    {this.boroughs.map(borough => <option ui-value={borough}>
+                        {borough.name}
+                    </option>)}
+                </select>
+
+                <label>Borough</label>
+            </ui-field>
 
             {this.property.owner && <ui-labeled-value>
                 <ui-label>Owner</ui-label>
@@ -67,6 +71,14 @@ export class PropertyComponent extends Component {
                     {size.width} x {size.height}
                 </ui-value>
             </ui-labeled-value>
+
+            <ui-button ui-danger-outline ui-click={async () => {
+                await new MapService().deleteProperty(this.property);
+
+                this.navigate('../..');
+            }}>
+                Delete Property
+            </ui-button>
         </ui-panel>;
     }
 }

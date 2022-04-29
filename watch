@@ -13,5 +13,5 @@ cd client
 cd ..
 
 cd server
-    PGHOST=data1.w6.cloud.acryps.com PGUSER=townhall PGPASSWORD=townhall PGDATABASE=townhall VLQUERY_LOG_SQL=TRUE nodemon dist/main.js
+    PGHOST=10.22.0.1 PGUSER=townhall PGPASSWORD=townhall PGDATABASE=townhall VLQUERY_LOG_SQL=TRUE TOWNHALL_SERVER_ADDRESS=http://10.22.0.1:8000/townhall nodemon dist/main.js
 cd ..

@@ -14,7 +14,7 @@ export class BoroughLayer extends Layer {
         for (let borough of boroughts) {
             const bounds = Point.unpack(borough.bounds);
             
-            this.add(new MapPolygon(bounds, `${borough.color}30`, borough.color, true, 0.8, 1));
+            this.add(new MapPolygon(bounds, true, 'borough', borough.color));
         }
 
         for (let borough of boroughts) {

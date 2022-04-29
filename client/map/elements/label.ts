@@ -27,7 +27,7 @@ export class MapLabel implements MapElement {
         this.element.setAttributeNS(null, 'text-anchor', 'middle');
 
         if (this.path) {
-            this.pathPolygon = new MapPolygon(this.path, null, null, false, 0, 0);
+            this.pathPolygon = new MapPolygon(this.path, false, null);
             this.pathPolygon.update();
 
             const id = `p_${Math.random().toString(36).substring(2)}`;

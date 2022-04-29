@@ -9,27 +9,14 @@ import { Layer } from "./layer";
 export class PropertyLayer extends Layer {
     order = 4;
 
-    activeType: PropertyTypeViewModel;
-
     async load() {
         const properties = await new MapService().getProperties();
 
         for (let property of properties) {
             const bounds = Point.unpack(property.bounds);
 
-            const polygon = new MapPolygon(bounds, `${property.type?.color || '#ffffff'}cc`, '#000', true, 0.8, 1, () => {
-                console.log(property.id);
-
-                if (this.activeType) {
-                    property.type = this.activeType;
-                    polygon.color = property.type.color;
-
-                    new MapService().saveProperty(property);
-                    
-                    this.update();
-                } else {
-                    this.component.navigate(`property/${property.id}`);
-                }
+            const polygon = new MapPolygon(bounds, true, 'property', property.type?.color, () => {
+                this.component.navigate(`property/${property.id}`);
             });
 
             this.add(polygon);
@@ -48,6 +35,10 @@ export class PropertyLayer extends Layer {
                 label.push(property.borough.propertyPrefix);
             } else {
                 label.push('?B');
+            }
+
+            if (property.name) {
+                label.push(property.name);
             }
 
             if (label.length) {

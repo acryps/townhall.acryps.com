@@ -34,7 +34,7 @@ export class MapComponent extends Component {
 
     lastRenderedZoom = 8;
 
-    mapStyle: 'normal' | 'gray' | 'hidden' = 'normal';
+    mapStyle: 'normal' | 'gray' | 'admin' = 'normal';
 
     tube?: number;
     tubes: number[];
@@ -54,6 +54,8 @@ export class MapComponent extends Component {
     }
 
     render(child) {
+        console.log('>>', child);
+
         if (!this.mapInner) {
             this.mapInner = <ui-map-inner>
                 {this.image = new MapImageComponent()}
@@ -138,6 +140,51 @@ export class MapComponent extends Component {
                     this.updateZoom();
                 }}>-</ui-control>
 
+                <ui-control ui-click={async () => {
+                    const min = this.translate(0, 0);
+                    const max = this.translate(innerWidth, innerHeight);
+
+                    const scale = 10;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = (max.x - min.x) * scale;
+                    canvas.height = (max.y - min.y) * scale;
+
+                    const context = canvas.getContext('2d');
+                    context.scale(scale, scale);
+
+                    context.imageSmoothingEnabled = false;
+                    context.drawImage(this.image.canvas, this.map.offset.x - min.x, this.map.offset.y - min.y);
+
+                    context.imageSmoothingEnabled = true;
+
+                    for (let layer of this.layers) {
+                        await new Promise<void>(done => {
+                            const image = new Image();
+
+                            image.onload = () => {
+                                context.drawImage(image, this.map.offset.x - min.x, this.map.offset.y - min.y);
+
+                                done();
+                            };
+
+                            image.src = `data:image/svg+xml;base64,${btoa(new XMLSerializer().serializeToString(layer.container))}`;
+                        });
+                    }
+
+                    const a = document.createElement('a');
+                    
+                    canvas.toBlob(blob => {
+                        a.href = URL.createObjectURL(blob);
+                        a.target = '_blank';
+
+                        document.body.appendChild(a);
+
+                        a.click();
+                        a.remove();
+                    });
+                }}>E</ui-control>
+
                 <ui-control>
                     M
 
@@ -151,19 +198,19 @@ export class MapComponent extends Component {
                         </ui-control>
 
                         <ui-control ui-click={() => {
+                            this.mapStyle = 'admin';
+
+                            this.reload();
+                        }}>
+                            AM
+                        </ui-control>
+
+                        <ui-control ui-click={() => {
                             this.mapStyle = 'gray';
 
                             this.reload();
                         }}>
                             BW
-                        </ui-control>
-
-                        <ui-control ui-click={() => {
-                            this.mapStyle = 'hidden';
-
-                            this.reload();
-                        }}>
-                            ✗
                         </ui-control>
                     </ui-control-extend>
                 </ui-control>
@@ -232,7 +279,7 @@ export class MapComponent extends Component {
                         const property = new PropertyViewModel();
                         property.bounds = Point.pack(this.draw.points);
 
-                        this.findLayer(PropertyLayer).add(new MapPolygon(this.draw.points, '#0f09', '#0f0', true, 1, 0.8));
+                        this.findLayer(PropertyLayer).add(new MapPolygon(this.draw.points, true, 'property-new'));
                             
                         new MapService().createProperty(property).then(() => {
                             this.draw.reset();
@@ -275,7 +322,7 @@ export class MapComponent extends Component {
                             });
                         }
                     }
-                }}>+S</ui-control>}
+                }}>+SQ</ui-control>}
 
                 {this.draw && this.findLayer(WaterLayer) && <ui-control ui-click={() => {
                     if (this.draw.points.length >= 3) {

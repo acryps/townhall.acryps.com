@@ -1,5 +1,6 @@
 import { BaseServer, ViewModel, Inject } from "vlserver";
 
+import { Borough } from "././database";
 import { DbContext } from "././database";
 import { Proxy } from "././../proxy";
 import { BoroughViewModel } from "././../areas/borough.view";
@@ -15,10 +16,11 @@ import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
 import { BoroughSummaryModel } from "./../areas/borough.summary";
+import { BridgeViewModel } from "./../areas/bridge.view";
 import { PlayerViewModel } from "./../areas/player.view";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
-import { Borough } from "./../managed/database";
+import { Bridge } from "./../managed/database";
 import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
 import { PropertyType } from "./../managed/database";
@@ -205,6 +207,20 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"1nbWp4M21wOG1naTNoM3B1bWJvbTx1ej",
+			{
+				"ExMWt6cHEwZTJ0Y3N2cDs3ajYybXd0Zz": {
+					isArray: false,
+					type: PropertyViewModel
+				}
+			},
+			inject => inject.construct(MapService),
+			(controller, params) => controller.deleteProperty(
+				params["ExMWt6cHEwZTJ0Y3N2cDs3ajYybXd0Zz"]
+			)
+		);
+
+		this.expose(
 			"hsZXxsa2h0eG50MnVjazg1eHMyY3NiNW",
 			{},
 			inject => inject.construct(TrainService),
@@ -309,6 +325,48 @@ ViewModel.mappings = {
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
 			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
+
+			return model;
+		}
+	},
+	BridgeViewModel: class ComposedBridgeViewModel extends BridgeViewModel {
+		async map() {
+			return {
+				id: this.model.id,
+				name: this.model.name,
+				path: this.model.path
+			}
+		};
+
+		static get items() { 
+			return {
+				id: true,
+				name: true,
+				path: true
+			};
+		}
+
+		static toViewModel(data) {
+			const item = new BridgeViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"path" in data && (item.path = data.path === null ? null : `${data.path}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: BridgeViewModel) {
+			let model: Bridge;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Bridge).find(viewModel.id)
+			} else {
+				model = new Bridge();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"path" in viewModel && (model.path = viewModel.path === null ? null : `${viewModel.path}`);
 
 			return model;
 		}
@@ -598,6 +656,7 @@ ViewModel.mappings = {
 	StreetViewModel: class ComposedStreetViewModel extends StreetViewModel {
 		async map() {
 			return {
+				bridges: (await this.model.bridges.includeTree(ViewModel.mappings.BridgeViewModel.items).toArray()).map(item => new BridgeViewModel(item)),
 				id: this.model.id,
 				name: this.model.name,
 				shortName: this.model.shortName,
@@ -608,6 +667,9 @@ ViewModel.mappings = {
 
 		static get items() { 
 			return {
+				get bridges() { 
+					return ViewModel.mappings.BridgeViewModel.items;
+				},
 				id: true,
 				name: true,
 				shortName: true,
@@ -618,6 +680,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new StreetViewModel(null);
+			"bridges" in data && (item.bridges = data.bridges && [...data.bridges].map(i => ViewModel.mappings.BridgeViewModel.toViewModel(i)));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"shortName" in data && (item.shortName = data.shortName === null ? null : `${data.shortName}`);
@@ -636,6 +699,7 @@ ViewModel.mappings = {
 				model = new Street();
 			}
 			
+			"bridges" in viewModel && (null);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"shortName" in viewModel && (model.shortName = viewModel.shortName === null ? null : `${viewModel.shortName}`);

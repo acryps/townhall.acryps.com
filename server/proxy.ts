@@ -5,8 +5,10 @@ import { TileSet } from "./tile";
 
 const md5 = require('js-md5');
 
+const environmentName = 'TOWNHALL_SERVER_ADDRESS';
+
 export class Proxy {
-    static source = process.env.TOWNHALL_SERVER_ADDRESS || 'http://10.30.0.3:8000/townhall';
+    static source = process.env[environmentName];
 
     constructor(app: ManagedServer) {
         const tileSets = new Map<string, TileSet[]>();
@@ -97,4 +99,12 @@ export class Proxy {
             return entries.sort((a, b) => a - b).filter((c, i, a) => a.indexOf(c) == i);
         });
     }
+}
+
+if (environmentName in process.env) {
+    console.log(`running townhall for '${Proxy.source}'`);
+} else {
+    console.error(`no '${environmentName}' environment variable set! quitting`);
+
+    process.exit(1);
 }

@@ -7,22 +7,28 @@ import { Layer } from "./layer";
 export class StreetLayer extends Layer {
     order = 3;
 
-    streetColor = '#ddd';
-
     async load() {
         const streets = await new MapService().getStreets();
         const squares = await new MapService().getSquares();
 
-        for (let square of squares) {
-            const bounds = Point.unpack(square.bounds);
+        for (let street of streets) {
+            for (let bridge of street.bridges) {
+                const path = Point.unpack(bridge.path);
 
-            this.add(new MapPolygon(bounds, '#eee', this.streetColor, true, 0.6, 1))
+                this.add(new MapPolygon(path, false, 'bridge', { size: street.size }));
+            }
         }
 
         for (let street of streets) {
             const path = Point.unpack(street.path);
 
-            this.add(new MapPolygon(path, '#0000', this.streetColor, false, street.size - 0.4, 1));
+            this.add(new MapPolygon(path, false, 'street', { size: street.size }));
+        }
+
+        for (let square of squares) {
+            const bounds = Point.unpack(square.bounds);
+
+            this.add(new MapPolygon(bounds, false, 'square'))
         }
 
         for (let street of streets) {

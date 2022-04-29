@@ -152,36 +152,6 @@ export class Borough extends Entity<BoroughQueryProxy> {
 	}
 }
 			
-export class StreetQueryProxy extends QueryProxy {
-	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get shortName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get size(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get path(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-}
-
-export class Street extends Entity<StreetQueryProxy> {
-	id: string;
-	name: string;
-	shortName: string;
-	size: number;
-	path: string;
-	
-
-	$$meta = {
-		tableName: "street",
-
-		columns: {
-			id: { type: "uuid", name: "id" },
-			name: { type: "text", name: "name" },
-			shortName: { type: "text", name: "short_name" },
-			size: { type: "float4", name: "size" },
-			path: { type: "text", name: "path" }
-		},
-
-		get set(): DbSet<Street, StreetQueryProxy> { return new DbSet<Street, StreetQueryProxy>(Street, null) }
-	};
-}
-			
 export class SquareQueryProxy extends QueryProxy {
 	get borough(): Partial<BoroughQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -428,6 +398,43 @@ export class TrainStationExit extends Entity<TrainStationExitQueryProxy> {
 					
 }
 			
+export class StreetQueryProxy extends QueryProxy {
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get shortName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get size(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get path(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Street extends Entity<StreetQueryProxy> {
+	bridges: PrimaryReference<Bridge, BridgeQueryProxy>;
+		id: string;
+	name: string;
+	shortName: string;
+	size: number;
+	path: string;
+	
+
+	$$meta = {
+		tableName: "street",
+
+		columns: {
+			id: { type: "uuid", name: "id" },
+			name: { type: "text", name: "name" },
+			shortName: { type: "text", name: "short_name" },
+			size: { type: "float4", name: "size" },
+			path: { type: "text", name: "path" }
+		},
+
+		get set(): DbSet<Street, StreetQueryProxy> { return new DbSet<Street, StreetQueryProxy>(Street, null) }
+	};
+	
+	constructor() {
+		super();
+		
+		this.bridges = new PrimaryReference<Bridge, BridgeQueryProxy>(this, "streetId", Bridge);
+	}
+}
+			
 export class TrainStopQueryProxy extends QueryProxy {
 	get route(): Partial<TrainRouteQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get station(): Partial<TrainStationQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -529,6 +536,55 @@ export class TrainRoute extends Entity<TrainRouteQueryProxy> {
 	}
 }
 			
+export class BridgeQueryProxy extends QueryProxy {
+	get street(): Partial<StreetQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get path(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get streetId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Bridge extends Entity<BridgeQueryProxy> {
+	get street(): Partial<ForeignReference<Street>> { return this.$street; }
+	id: string;
+	name: string;
+	path: string;
+	streetId: string;
+	
+
+	$$meta = {
+		tableName: "bridge",
+
+		columns: {
+			id: { type: "uuid", name: "id" },
+			name: { type: "text", name: "name" },
+			path: { type: "text", name: "path" },
+			streetId: { type: "uuid", name: "street_id" }
+		},
+
+		get set(): DbSet<Bridge, BridgeQueryProxy> { return new DbSet<Bridge, BridgeQueryProxy>(Bridge, null) }
+	};
+	
+	constructor() {
+		super();
+		
+		this.$street = new ForeignReference<Street>(this, "streetId", Street);
+	}
+	
+	
+	private $street: ForeignReference<Street>;
+
+	set street(value: Partial<ForeignReference<Street>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.streetId = value.id as string;
+		} else {
+			this.streetId = null;
+		}
+	}
+					
+}
+			
 
 export class DbContext {
 	constructor(private runContext: RunContext) {}
@@ -547,12 +603,13 @@ export class DbContext {
 	company: DbSet<Company, CompanyQueryProxy> = new DbSet<Company, CompanyQueryProxy>(Company, this.runContext);
 	propertyType: DbSet<PropertyType, PropertyTypeQueryProxy> = new DbSet<PropertyType, PropertyTypeQueryProxy>(PropertyType, this.runContext);
 	borough: DbSet<Borough, BoroughQueryProxy> = new DbSet<Borough, BoroughQueryProxy>(Borough, this.runContext);
-	street: DbSet<Street, StreetQueryProxy> = new DbSet<Street, StreetQueryProxy>(Street, this.runContext);
 	square: DbSet<Square, SquareQueryProxy> = new DbSet<Square, SquareQueryProxy>(Square, this.runContext);
 	waterBody: DbSet<WaterBody, WaterBodyQueryProxy> = new DbSet<WaterBody, WaterBodyQueryProxy>(WaterBody, this.runContext);
 	property: DbSet<Property, PropertyQueryProxy> = new DbSet<Property, PropertyQueryProxy>(Property, this.runContext);
 	trainStation: DbSet<TrainStation, TrainStationQueryProxy> = new DbSet<TrainStation, TrainStationQueryProxy>(TrainStation, this.runContext);
 	trainStationExit: DbSet<TrainStationExit, TrainStationExitQueryProxy> = new DbSet<TrainStationExit, TrainStationExitQueryProxy>(TrainStationExit, this.runContext);
+	street: DbSet<Street, StreetQueryProxy> = new DbSet<Street, StreetQueryProxy>(Street, this.runContext);
 	trainStop: DbSet<TrainStop, TrainStopQueryProxy> = new DbSet<TrainStop, TrainStopQueryProxy>(TrainStop, this.runContext);
 	trainRoute: DbSet<TrainRoute, TrainRouteQueryProxy> = new DbSet<TrainRoute, TrainRouteQueryProxy>(TrainRoute, this.runContext);
+	bridge: DbSet<Bridge, BridgeQueryProxy> = new DbSet<Bridge, BridgeQueryProxy>(Bridge, this.runContext);
 };

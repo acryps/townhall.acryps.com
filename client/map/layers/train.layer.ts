@@ -24,13 +24,13 @@ export class TrainLayer extends Layer {
 
             const points = [Point.unpackSingle(station.position), ...stops.map(stop => Point.unpackSingle(stop.trackPosition))];
 
-            this.add(new MapPolygon(Point.bounding(points, 3), '#fff', '#000', true, 0.5, 1));
+            this.add(new MapPolygon(Point.bounding(points, 3), true, 'train-station'));
         }
 
         for (let route of routes) {
             const path = Point.unpack(route.path);
 
-            this.add(new MapPolygon(path, '#0000', route.color, false, 1.5, 1));
+            this.add(new MapPolygon(path, false, 'train-route', route.color));
 
             let length = 0;
 
@@ -57,7 +57,7 @@ export class TrainLayer extends Layer {
                     position.copy(-1, 1), 
                     position.copy(1, 1), 
                     position.copy(1, -1)
-                ], '#fff', route.color, true, 1, 1));
+                ], true, 'train-stop', route.color));
             }
         }
     }

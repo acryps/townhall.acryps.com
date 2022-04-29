@@ -1,5 +1,5 @@
 import { Service } from "vlserver";
-import { DbContext } from "../managed/database";
+import { Borough, DbContext } from "../managed/database";
 import { Proxy } from "../proxy";
 import { BoroughViewModel } from "./borough.view";
 import { HistoryEntryViewModel } from "./history.view";
@@ -18,23 +18,39 @@ export class MapService extends Service {
     }
 
     getBoroughs() {
-        return BoroughViewModel.from(this.db.borough);
+        return BoroughViewModel.from(
+            this.db.borough
+                .orderByAscending(borough => borough.name)
+        );
     }
 
     getProperties() {
-        return PropertySummaryModel.from(this.db.property);
+        return PropertySummaryModel.from(
+            this.db.property
+                .orderByAscending(property => property.code)
+        );
     }
 
     getStreets() {
-        return StreetViewModel.from(this.db.street);
+        return StreetViewModel.from(
+            this.db.street
+                .orderByAscending(street => street.size)
+                .orderByAscending(street => street.name)
+        );
     }
 
     getSquares() {
-        return SquareViewModel.from(this.db.square);
+        return SquareViewModel.from(
+            this.db.square
+                .orderByAscending(square => square.name)
+        );
     }
 
     getWaterBodies() {
-        return WaterBodyViewModel.from(this.db.waterBody);
+        return WaterBodyViewModel.from(
+            this.db.waterBody
+                .orderByAscending(body => body.name)
+        );
     }
 
     async getHistory() {
@@ -81,5 +97,11 @@ export class MapService extends Service {
         const property = await propertyViewModel.toModel();
 
         await property.update();
+    }
+
+    async deleteProperty(propertyViewModel: PropertyViewModel) {
+        const property = await propertyViewModel.toModel();
+
+        await property.delete();
     }
 }

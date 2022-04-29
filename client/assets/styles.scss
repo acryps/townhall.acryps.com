@@ -18,6 +18,8 @@
 	$page-dim-color: #000
 );
 
+@import "map.scss";
+
 ui-page {
 	display: flex;
 	width: 100%;
@@ -45,14 +47,6 @@ ui-map {
 	display: block;
 	width: 100%;
 	height: 100%;
-
-	&[ui-style='gray'] ui-map-inner canvas {
-		filter: saturate(0) contrast(0.2) brightness(2);
-	}
-
-	&[ui-style='hidden'] ui-map-inner canvas {
-		visibility: hidden;
-	}
 
 	ui-controls {
 		position: absolute;
@@ -136,7 +130,7 @@ ui-map {
 
 		width: 20rem;
 		max-height: calc(100vh - 6rem);
-		padding: 0.5rem;
+		padding: 1.5rem;
 		overflow-x: hidden;
 		overflow-y: auto;
 
@@ -152,6 +146,8 @@ ui-map {
 			display: flex;
 			align-items: center;
 			justify-content: center;
+			padding: 0.5rem;
+    		margin: 0 -0.5rem;
 
 			float: right;
 			width: 2rem;
@@ -159,6 +155,10 @@ ui-map {
 
 			font-size: 1.5rem;
 			cursor: pointer;
+		}
+
+		ui-title {
+			margin-bottom: 2rem;
 		}
 	}
 

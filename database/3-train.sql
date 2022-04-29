@@ -32,3 +32,12 @@ CREATE TABLE train_stop (
     station_id UUID CONSTRAINT station__stops REFERENCES train_station (id),
     route_id UUID CONSTRAINT route__stops REFERENCES train_route (id)
 );
+
+CREATE TABLE bridge (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+    name TEXT,
+    path TEXT,
+
+    street_id UUID CONSTRAINT street__bridges REFERENCES street (id)
+);

@@ -6,8 +6,19 @@ export class HistoryComponent extends Component {
     parent: MapComponent;
 
     render() {
+        requestAnimationFrame(() => {
+            if (active) {
+                const box = active.getBoundingClientRect();
+
+                scrollingContainer.scrollTo(box.x - scrollingContainer.clientWidth / 2 + box.width / 2, 0);
+            }
+        });
+
+        let active: HTMLElement;
+        let scrollingContainer: HTMLElement;
+
         return <ui-panel>
-            <ui-history>
+            {scrollingContainer = <ui-history>
                 {[null, ...this.parent.history].map(item => {
                     let element: HTMLElement;
 
@@ -23,17 +34,19 @@ export class HistoryComponent extends Component {
                         </ui-history-item>;
                     } else {
                         element = <ui-history-item ui-click={() => this.move()}>
-                            TODAY
+                            LATEST
                         </ui-history-item>
                     }
 
                     if (item?.name == this.parent.selectedHistoryEntry?.name) {
                         element.setAttribute('ui-active', '');
+
+                        active = element;
                     }
 
                     return element;
                 })}
-            </ui-history>
+            </ui-history>}
         </ui-panel>;
     }
 

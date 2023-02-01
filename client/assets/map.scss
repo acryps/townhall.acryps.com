@@ -18,6 +18,10 @@ ui-map[ui-style='normal'] {
         fill: var(--color, #fff);
         stroke: #000;
         stroke-width: 0.8;
+
+        &[ui-issue] {
+            stroke: #f00;
+        }
     }
 
     path[ui-style='water'] {

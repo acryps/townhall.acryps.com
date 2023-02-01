@@ -42,17 +42,17 @@ export class StreetLayer extends Layer {
                 length += Math.sqrt((first.x - last.x) ** 2 + (first.y - last.y) ** 2);
             }
 
-            const step = street.name.length * street.size * 0.5 + 5;
+            const step = street.name.length * 1.5;
 
             for (let i = (length % step) / 2; i < length; i += step) {
-                this.add(new MapLabel(street.name, null, street.size * 0.5, path, 100 / length * i));
+                this.add(new MapLabel(street.name, null, 1, path, 100 / length * i));
             }
         }
 
         for (let square of squares) {
             const bounds = Point.unpack(square.bounds);
 
-            this.add(new MapLabel(square.name, Point.center(bounds), 3));
+            this.add(new MapLabel(square.name, Point.center(bounds), 2));
         }
     }
 }

@@ -54,8 +54,6 @@ export class MapComponent extends Component {
     }
 
     render(child) {
-        console.log('>>', child);
-
         if (!this.mapInner) {
             this.mapInner = <ui-map-inner>
                 {this.image = new MapImageComponent()}
@@ -140,51 +138,6 @@ export class MapComponent extends Component {
                     this.updateZoom();
                 }}>-</ui-control>
 
-                <ui-control ui-click={async () => {
-                    const min = this.translate(0, 0);
-                    const max = this.translate(innerWidth, innerHeight);
-
-                    const scale = 10;
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = (max.x - min.x) * scale;
-                    canvas.height = (max.y - min.y) * scale;
-
-                    const context = canvas.getContext('2d');
-                    context.scale(scale, scale);
-
-                    context.imageSmoothingEnabled = false;
-                    context.drawImage(this.image.canvas, this.map.offset.x - min.x, this.map.offset.y - min.y);
-
-                    context.imageSmoothingEnabled = true;
-
-                    for (let layer of this.layers) {
-                        await new Promise<void>(done => {
-                            const image = new Image();
-
-                            image.onload = () => {
-                                context.drawImage(image, this.map.offset.x - min.x, this.map.offset.y - min.y);
-
-                                done();
-                            };
-
-                            image.src = `data:image/svg+xml;base64,${btoa(new XMLSerializer().serializeToString(layer.container))}`;
-                        });
-                    }
-
-                    const a = document.createElement('a');
-                    
-                    canvas.toBlob(blob => {
-                        a.href = URL.createObjectURL(blob);
-                        a.target = '_blank';
-
-                        document.body.appendChild(a);
-
-                        a.click();
-                        a.remove();
-                    });
-                }}>E</ui-control>
-
                 <ui-control>
                     M
 
@@ -225,7 +178,7 @@ export class MapComponent extends Component {
                             this.update();
                             this.updateMapImage();
                         }}>
-                            ✗
+                            X
                         </ui-control>
 
                         {this.tubes.map(tube => <ui-control ui-active={this.tube == tube ? '' : null} ui-click={() => {
@@ -245,10 +198,6 @@ export class MapComponent extends Component {
 
                 <ui-control ui-active={this.findLayer(StreetLayer) ? '' : null} ui-click={() => this.toggleLayer(new StreetLayer(this.map, this))}>
                     S
-                </ui-control>
-
-                <ui-control ui-active={this.findLayer(TrainLayer) ? '' : null} ui-click={() => this.toggleLayer(new TrainLayer(this.map, this))}>
-                    T
                 </ui-control>
 
                 <ui-control ui-active={this.findLayer(PropertyLayer) ? '' : null} ui-click={() => this.toggleLayer(new PropertyLayer(this.map, this))}>

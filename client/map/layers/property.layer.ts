@@ -19,6 +19,10 @@ export class PropertyLayer extends Layer {
                 this.component.navigate(`property/${property.id}`);
             });
 
+            if (!property.borough) {
+                polygon.path.setAttribute('ui-issue', '');
+            }
+
             this.add(polygon);
         }
 
@@ -33,8 +37,6 @@ export class PropertyLayer extends Layer {
 
             if (property.borough) {
                 label.push(property.borough.propertyPrefix);
-            } else {
-                label.push('?B');
             }
 
             if (property.name) {
@@ -42,7 +44,7 @@ export class PropertyLayer extends Layer {
             }
 
             if (label.length) {
-                this.add(new MapLabel(label.join(' '), Point.topLeft(bounds).copy(1, 1), 1));
+                this.add(new MapLabel(label.join(' '), Point.center(bounds), 1));
             }
         }
     }

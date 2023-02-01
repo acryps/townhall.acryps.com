@@ -27,6 +27,10 @@ export class MapLabel implements MapElement {
         this.element.setAttributeNS(null, 'text-anchor', 'middle');
 
         if (this.path) {
+            if (this.path[0].x > this.path[this.path.length - 1].x) {
+                this.path = [...this.path].reverse();
+            }
+
             this.pathPolygon = new MapPolygon(this.path, false, null);
             this.pathPolygon.update();
 

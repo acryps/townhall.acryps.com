@@ -1,24 +1,10 @@
-@use "../node_modules/vllayout/main" with (
-	$page-color: #000,
-	$page-background: #fff,
-	$page-border-color: #ccc,
-	$page-hover-background: #ddd,
-
-	$page-accent-background: #007afa,
-	$page-accent-color: #fff,
-	$page-accent-active-background: #007afa,
-	$page-accent-active-color: #fff,
-	$page-accent-hover-background: #466079,
-	$page-accent-hover-color: #fff,
-
-	$nav-background: #eee,
-	$nav-color: #000,
-
-	$page-dim-background: #eee,
-	$page-dim-color: #000
-);
-
 @import "map.scss";
+@import "fonts.scss";
+
+body {
+	margin: 0;
+	padding: 0;
+}
 
 ui-page {
 	display: flex;
@@ -27,17 +13,15 @@ ui-page {
 
 	ui-header {
 		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		z-index: 50000;
-
-		padding: 1rem;
+		top: 1rem;
+		left: 1rem;
+		right: 1rem;
+		z-index: 1;
 
 		line-height: 1;
-		font-weight: bold;
 
-		background: #fff;
+		font-size: 2rem;
+		text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff, 1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff; 
 	}
 }
 
@@ -114,19 +98,23 @@ ui-map {
 		position: fixed;
 		bottom: 0;
 		left: 0;
-		z-index: 50000;
+		z-index: 8;
 
 		padding: 0.25rem 0.5rem;
 
 		background: white;
 		font-size: 0.75rem;
+
+		&:empty {
+			display: none;
+		}
 	}
 
 	ui-panel {
 		position: fixed;
 		top: 4rem;
 		right: 1rem;
-		z-index: 10000;
+		z-index: 10;
 
 		width: 20rem;
 		max-height: calc(100vh - 6rem);
@@ -181,7 +169,7 @@ ui-map {
 		ui-cursor {
 			display: block;
 			position: absolute;
-			z-index: 1000;
+			z-index: 2;
 
 			width: var(--size);
 			height: var(--size);
@@ -299,22 +287,21 @@ ui-labeled-value {
 ui-history {
 	display: flex;
 	flex-direction: row;
-	margin: 1rem -0.5rem;
+	margin: -1.5rem;
 	overflow-x: auto;
 	overflow-y: hidden;
 
-	border: 1px solid black;
-	border-left: none;
-	border-right: none;
-
 	ui-history-item {
-		display: block;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+
 		padding: 0.5rem 0.75rem;
 
-		text-align: center;
-
 		&[ui-active] {
-			background: #f00;
+			background: #000;
+			color: #fff;
 		}
 
 		ui-date {
@@ -354,22 +341,35 @@ ui-history {
 			flex-grow: 1;
 
 			border: none;
-			background: #fff9;
-			backdrop-filter: blur(20px) grayscale(1);
-			-webkit-backdrop-filter: blur(20px) grayscale(1);
+			background: none;
 			
 			ui-control {
-				padding: 0.5rem 1rem;
+				padding: 0.5rem;
 				width: 100%;
 				height: unset;
 
 				font-size: 1rem;
 				border: none;
+
+				&:not([ui-active]) {
+					text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff, 1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
+				}
+
+				ui-control-extend {
+					flex-direction: column;
+
+					left: 0;
+					right: 0;
+					top: 100%;
+
+					ui-control {
+						padding: 0.5rem;
+						width: unset;
+
+						text-shadow: none;
+					}
+				}
 			}
 		}
-	}
-	
-	ui-location-tracker {
-		display: none;
 	}
 }

@@ -8,9 +8,12 @@ import { Point } from "map/point";
 import { HistoryComponent } from "map/history.component";
 import { PropertiesComponent } from "properties/index";
 import { PropertyComponent } from "property/index";
+import { GameService, MapService, PlayerViewModel } from "managed/services";
 
 export class Application {
     static router: Router;
+
+    static players: PlayerViewModel[];
 
     static center = new Point(101, 183);
 
@@ -18,6 +21,8 @@ export class Application {
         if (!location.hash) {
             location.hash = `#/map/${Application.center.x}/${Application.center.y}/3`;
         }
+
+        this.players = await new GameService().getPlayers();
 
         this.router = new Router(
             PageComponent

@@ -1,3 +1,4 @@
+import { Application } from "main";
 import { BoroughViewModel, MapService, PropertyTypeViewModel, PropertyViewModel } from "managed/services";
 import { Point } from "map/point";
 import { Component } from "node_modules/vldom/component";
@@ -49,18 +50,25 @@ export class PropertyComponent extends Component {
                 <label>Borough</label>
 
                 <select $ui-value={this.property.borough} ui-change={() => new MapService().saveProperty(this.property)}>
+                    <option ui-value={null}>No borough assigned</option>
+
                     {this.boroughs.map(borough => <option ui-value={borough}>
                         {borough.name}
                     </option>)}
                 </select>
             </ui-field>
 
-            {this.property.owner && <ui-labeled-value>
-                <ui-label>Owner</ui-label>
-                <ui-value>
-                    {this.property.owner.username}
-                </ui-value>
-            </ui-labeled-value>}
+            <ui-field>
+                <label>Owner</label>
+
+                <select $ui-value={this.property.owner} ui-change={() => new MapService().saveProperty(this.property)}>
+                    <option ui-value={null}>Unclaimed</option>
+
+                    {Application.players.map(player => <option ui-value={player}>
+                        {player.username}
+                    </option>)}
+                </select>
+            </ui-field>
 
             <ui-labeled-value>
                 <ui-label>Size</ui-label>

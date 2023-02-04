@@ -261,6 +261,29 @@ export class Service {
 	}
 }
 
+export class GameService {
+	async getPlayers(): Promise<Array<PlayerViewModel>> {
+		const data = new FormData();
+		
+
+		return await fetch(Service.toURL("pkYWNsZmA2MWVzdXhmYXF0ODVscjV0ZW"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : PlayerViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
 export class MapService {
 	async getBoroughs(): Promise<Array<BoroughViewModel>> {
 		const data = new FormData();

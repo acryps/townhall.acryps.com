@@ -1,7 +1,9 @@
 import { BaseServer, ViewModel, Inject } from "vlserver";
 
-import { Borough } from "././database";
 import { DbContext } from "././database";
+import { PlayerViewModel } from "././../areas/player.view";
+import { GameService } from "././../areas/game/game.service";
+import { Borough } from "././database";
 import { Proxy } from "././../proxy";
 import { BoroughViewModel } from "././../areas/borough.view";
 import { HistoryEntryViewModel } from "././../areas/history.view";
@@ -17,7 +19,6 @@ import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
 import { BoroughSummaryModel } from "./../areas/borough.summary";
 import { BridgeViewModel } from "./../areas/bridge.view";
-import { PlayerViewModel } from "./../areas/player.view";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { Bridge } from "./../managed/database";
@@ -34,13 +35,17 @@ import { TrainStop } from "./../managed/database";
 import { WaterBody } from "./../managed/database";
 
 Inject.mappings = {
-	"MapService": {
-		objectConstructor: MapService,
+	"GameService": {
+		objectConstructor: GameService,
 		parameters: ["DbContext"]
 	},
 	"DbContext": {
 		objectConstructor: DbContext,
 		parameters: ["RunContext"]
+	},
+	"MapService": {
+		objectConstructor: MapService,
+		parameters: ["DbContext"]
 	},
 	"TrainService": {
 		objectConstructor: TrainService,
@@ -50,6 +55,15 @@ Inject.mappings = {
 
 export class ManagedServer extends BaseServer {
 	prepareRoutes() {
+		this.expose(
+			"pkYWNsZmA2MWVzdXhmYXF0ODVscjV0ZW",
+			{},
+			inject => inject.construct(GameService),
+			(controller, params) => controller.getPlayers(
+				
+			)
+		);
+
 		this.expose(
 			"R2M2Z2Yjx4aGM4MzR1ZzcxdjI5Zzprbm",
 			{},

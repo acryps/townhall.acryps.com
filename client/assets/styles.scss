@@ -16,7 +16,7 @@ ui-page {
 		top: 1rem;
 		left: 1rem;
 		right: 1rem;
-		z-index: 1;
+		z-index: 100;
 
 		line-height: 1;
 
@@ -50,11 +50,13 @@ ui-field {
 }
 
 ui-map {
-	position: relative;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
 
 	display: block;
-	width: 100%;
-	height: 100%;
 
 	ui-controls {
 		position: absolute;

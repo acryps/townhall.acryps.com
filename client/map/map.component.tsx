@@ -21,6 +21,9 @@ export class MapComponent extends Component {
     declare params: { x, y, zoom };
     declare rootNode: HTMLElement;
 
+    private location = { x: 0, y: 0, zoom: 0 };
+    private locationParametersUpdateTimer = setTimeout(() => {});
+
     image: MapImageComponent;
     layerImages: SVGElement[] = [];
     mapInner: HTMLElement;
@@ -41,6 +44,10 @@ export class MapComponent extends Component {
     history: HistoryEntryViewModel[];
 
     async onload() {
+        this.location.x = +this.params.x;
+        this.location.y = +this.params.y;
+        this.location.zoom = +this.params.zoom;
+
         this.history = await new MapService().getHistory();
         this.tubes = await new MapService().getTubes();
     }
@@ -400,26 +407,42 @@ export class MapComponent extends Component {
     }
 
     get x() {
-        return +this.params.x;
+        return this.location.x;
     }
 
     set x(value) {
-        this.updateParameters({ x: value });
+        this.location.x = value;
+
+        this.setLocationUpdateTimer();
     }
 
     get y() {
-        return +this.params.y;
+        return this.location.y;
     }
 
     set y(value) {
-        this.updateParameters({ y: value });
+        this.location.y = value;
+
+        this.setLocationUpdateTimer();
     }
 
     get zoom() {
-        return +this.params.zoom;
+        return this.location.zoom;
     }
 
     set zoom(value) {
-        this.updateParameters({ zoom: value });
+        this.location.zoom = value;
+
+        this.setLocationUpdateTimer();
+    }
+
+    setLocationUpdateTimer() {
+        clearTimeout(this.locationParametersUpdateTimer);
+
+        this.locationParametersUpdateTimer = setTimeout(() => {
+            if (this.route.component == Application.router.getActiveRoute()?.clientRoute.component) {
+                this.updateParameters(this.location);
+            }
+        }, 1000);
     }
 }

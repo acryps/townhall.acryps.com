@@ -1,10 +1,10 @@
 {
 	"compileOnSave": false,
 	"compilerOptions": {
-		"jsx": "react",
 		"module": "System",
 		"outFile": "dist/scripts.js",
-		"target": "es6",
+		"target": "esnext",
+		"jsx": "react",
 		"jsxFactory": "Component.createElement",
 		"esModuleInterop": true,
 		"inlineSourceMap": true,

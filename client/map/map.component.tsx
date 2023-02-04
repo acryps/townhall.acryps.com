@@ -3,7 +3,7 @@ import { BoroughViewModel, HistoryEntryViewModel, MapService, PropertyTypeViewMo
 import { Component } from "node_modules/vldom/component";
 import { MapLabel } from "./elements/label";
 import { Layer } from "./layers/layer";
-import { Map } from "./elements/map";
+import { Map, world } from "./elements/map";
 import { MapPolygon } from "./elements/polygon";
 import { MapImageComponent } from "./map-image.component";
 import { Point } from "./point";
@@ -18,16 +18,14 @@ export class MapComponent extends Component {
     onScroll: (() => void)[] = [];
     onZoom: (() => void)[] = [];
 
-    params: { x, y, zoom };
-    rootNode: HTMLElement;
+    declare params: { x, y, zoom };
+    declare rootNode: HTMLElement;
 
     image: MapImageComponent;
     layerImages: SVGElement[] = [];
     mapInner: HTMLElement;
     locationTracker: HTMLElement;
     cursor: HTMLElement;
-
-    map = new Map(4000, new Point(-2000, -2000), new Point(0, 0));
 
     layers: Layer[] = [];
     draw: DrawLayer;
@@ -74,8 +72,8 @@ export class MapComponent extends Component {
                 const position = this.translateMouse(event);
                 this.locationTracker.textContent = position.toString();
 
-                this.cursor.style.left = `${(position.x - this.map.offset.x) * this.zoom}px`;
-                this.cursor.style.top = `${(position.y - this.map.offset.y) * this.zoom}px`;
+                this.cursor.style.left = `${(position.x - world.offset.x) * this.zoom}px`;
+                this.cursor.style.top = `${(position.y - world.offset.y) * this.zoom}px`;
 
                 if (this.draw) {
                     this.draw.showCurrentPosition(position);
@@ -192,19 +190,19 @@ export class MapComponent extends Component {
                     </ui-control-extend>
                 </ui-control>
 
-                <ui-control ui-active={this.findLayer(BoroughLayer) ? '' : null} ui-click={() => this.toggleLayer(new BoroughLayer(this.map, this))}>
+                <ui-control ui-active={this.findLayer(BoroughLayer) ? '' : null} ui-click={() => this.toggleLayer(new BoroughLayer(world, this))}>
                     B
                 </ui-control>
 
-                <ui-control ui-active={this.findLayer(StreetLayer) ? '' : null} ui-click={() => this.toggleLayer(new StreetLayer(this.map, this))}>
+                <ui-control ui-active={this.findLayer(StreetLayer) ? '' : null} ui-click={() => this.toggleLayer(new StreetLayer(world, this))}>
                     S
                 </ui-control>
 
-                <ui-control ui-active={this.findLayer(PropertyLayer) ? '' : null} ui-click={() => this.toggleLayer(new PropertyLayer(this.map, this))}>
+                <ui-control ui-active={this.findLayer(PropertyLayer) ? '' : null} ui-click={() => this.toggleLayer(new PropertyLayer(world, this))}>
                     P
                 </ui-control>
 
-                <ui-control ui-active={this.findLayer(WaterLayer) ? '' : null} ui-click={() => this.toggleLayer(new WaterLayer(this.map, this))}>
+                <ui-control ui-active={this.findLayer(WaterLayer) ? '' : null} ui-click={() => this.toggleLayer(new WaterLayer(world, this))}>
                     W
                 </ui-control>
 
@@ -216,7 +214,7 @@ export class MapComponent extends Component {
                         this.removeLayer(this.draw);
                         this.draw = null;
                     } else {
-                        this.draw = new DrawLayer(this.map, this);
+                        this.draw = new DrawLayer(world, this);
                         this.addLayer(this.draw);
                     }
 
@@ -336,7 +334,7 @@ export class MapComponent extends Component {
         const position = this.translate(rect.x + rect.width / 2, rect.y + rect.height / 2, this.lastRenderedZoom);
 
         this.cursor.style.setProperty('--size', `${this.zoom}px`);
-        this.image.canvas.style.width = `${this.map.size * this.zoom}px`;
+        this.image.canvas.style.width = `${world.size * this.zoom}px`;
 
         this.focus(position);
 
@@ -381,8 +379,8 @@ export class MapComponent extends Component {
         const rect = this.mapInner.getBoundingClientRect();
 
         this.mapInner.scrollTo(
-            (position.x - this.map.offset.x) * this.zoom - rect.width / 2,
-            (position.y - this.map.offset.y) * this.zoom - rect.height / 2
+            (position.x - world.offset.x) * this.zoom - rect.width / 2,
+            (position.y - world.offset.y) * this.zoom - rect.height / 2
         );
     }
 
@@ -390,8 +388,8 @@ export class MapComponent extends Component {
         const rect = this.mapInner.getBoundingClientRect();
 
         return new Point(
-            Math.round(this.map.size / (this.map.size * zoom) * (x - rect.left + this.mapInner.scrollLeft) + this.map.offset.x),
-            Math.round(this.map.size / (this.map.size * zoom) * (y - rect.top + this.mapInner.scrollTop) + this.map.offset.y)
+            Math.round(world.size / (world.size * zoom) * (x - rect.left + this.mapInner.scrollLeft) + world.offset.x),
+            Math.round(world.size / (world.size * zoom) * (y - rect.top + this.mapInner.scrollTop) + world.offset.y)
         );
     }
 

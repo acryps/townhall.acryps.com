@@ -16,7 +16,7 @@ export class PropertyLayer extends Layer {
             const bounds = Point.unpack(property.bounds);
 
             const polygon = new MapPolygon(bounds, true, 'property', property.type?.color, () => {
-                this.component.navigate(`property/${property.id}`);
+                open(`/#/property/${property.id}`);
             });
 
             if (!property.borough) {

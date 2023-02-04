@@ -3,7 +3,7 @@ import { Component } from "node_modules/vldom/component";
 import { MapComponent } from "./map.component";
 
 export class HistoryComponent extends Component {
-    parent: MapComponent;
+    declare parent: MapComponent;
 
     render() {
         requestAnimationFrame(() => {

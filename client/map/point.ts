@@ -25,18 +25,30 @@ export class Point {
     }
 
     static bounding(points: Point[], offset = 0) {
+        const box = this.bounds(points);
+
+        return [
+            new Point(box.x.min, box.y.min),
+            new Point(box.x.max, box.y.min),
+            new Point(box.x.max, box.y.max),
+            new Point(box.x.min, box.y.max)
+        ];
+    }
+
+    static bounds(points: Point[], offset = 0) {
         const minX = Math.min(...points.map(point => point.x)) - offset;
         const maxX = Math.max(...points.map(point => point.x)) + offset;
 
         const minY = Math.min(...points.map(point => point.y)) - offset;
         const maxY = Math.max(...points.map(point => point.y)) + offset;
 
-        return [
-            new Point(minX, minY),
-            new Point(maxX, minY),
-            new Point(maxX, maxY),
-            new Point(minX, maxY)
-        ];
+        return {
+            x: { min: minX, max: maxX },
+            y: { min: minY, max: maxY },
+
+            width: maxX - minX,
+            height: maxY - minY
+        };
     }
 
     static size(points: Point[]) {

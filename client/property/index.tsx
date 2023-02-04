@@ -1,9 +1,10 @@
 import { BoroughViewModel, MapService, PropertyTypeViewModel, PropertyViewModel } from "managed/services";
+import { Point } from "map/point";
 import { Component } from "node_modules/vldom/component";
-import { Point } from "./point";
+import { MapPreviewComponent } from "shared/map.preview";
 
 export class PropertyComponent extends Component {
-    params: { id };
+    declare params: { id: string };
 
     property: PropertyViewModel;
 
@@ -17,45 +18,41 @@ export class PropertyComponent extends Component {
         this.boroughs = await new MapService().getBoroughs();
     }
 
-    async onparameterchange() {
-        await this.reload();
-    }
-
     render() {
-        const bounds = Point.unpack(this.property.bounds);
-        const size = Point.size(bounds);
-
-        return <ui-panel>
-            <ui-panel-close ui-href="../..">✗</ui-panel-close>
+        const points = Point.unpack(this.property.bounds);
+        const size = Point.size(points);
+        
+        return <ui-property>
+            {new MapPreviewComponent(Point.unpack(this.property.bounds))}
 
             <ui-title>
                 {this.property.name || `Plot ${this.property.id.substring(0, 8)}`}
             </ui-title>
 
             <ui-field>
-                <input $ui-value={this.property.name} ui-change={() => new MapService().saveProperty(this.property)}></input>
-
                 <label>Name</label>
+
+                <input $ui-value={this.property.name} ui-change={() => new MapService().saveProperty(this.property)}></input>
             </ui-field>
 
             <ui-field>
+                <label>Type</label>
+
                 <select $ui-value={this.property.type} ui-change={() => new MapService().saveProperty(this.property)}>
                     {this.types.map(type => <option ui-value={type}>
                         {type.name} ({type.code.toUpperCase()})
                     </option>)}
                 </select>
-
-                <label>Type</label>
             </ui-field>
 
             <ui-field>
+                <label>Borough</label>
+
                 <select $ui-value={this.property.borough} ui-change={() => new MapService().saveProperty(this.property)}>
                     {this.boroughs.map(borough => <option ui-value={borough}>
                         {borough.name}
                     </option>)}
                 </select>
-
-                <label>Borough</label>
             </ui-field>
 
             {this.property.owner && <ui-labeled-value>
@@ -73,12 +70,14 @@ export class PropertyComponent extends Component {
             </ui-labeled-value>
 
             <ui-button ui-danger-outline ui-click={async () => {
-                await new MapService().deleteProperty(this.property);
+                if (confirm('delete property?')) {
+                    await new MapService().deleteProperty(this.property);
 
-                this.navigate('../..');
+                    history.back();
+                }
             }}>
                 Delete Property
             </ui-button>
-        </ui-panel>;
+        </ui-property>
     }
 }

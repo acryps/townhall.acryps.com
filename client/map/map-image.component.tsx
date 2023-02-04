@@ -1,8 +1,9 @@
 import { Component } from "node_modules/vldom/component"
+import { world } from "./elements/map";
 import { MapComponent } from "./map.component"
 
 export class MapImageComponent extends Component {
-    parent: MapComponent;
+    declare parent: MapComponent;
 
     source: string;
 
@@ -17,14 +18,14 @@ export class MapImageComponent extends Component {
     render() {
         if (!this.canvas) {
             this.canvas = document.createElement('canvas');
-            this.canvas.width = this.parent.map.size;
-            this.canvas.height = this.parent.map.size;
+            this.canvas.width = world.size;
+            this.canvas.height = world.size;
 
             this.context = this.canvas.getContext('2d');
             this.context.fillStyle = '#eee';
 
-            for (let y = 0; y < this.parent.map.size / this.size; y++) {
-                for (let x = 0; x < this.parent.map.size / this.size; x++) {
+            for (let y = 0; y < world.size / this.size; y++) {
+                for (let x = 0; x < world.size / this.size; x++) {
                     if ((x + y) % 2) {
                         this.context.rect(x * this.size, y * this.size, this.size, this.size);
                     }
@@ -67,11 +68,11 @@ export class MapImageComponent extends Component {
     async loadMissingTiles() {
         const box = this.parent.rootNode.getBoundingClientRect();
 
-        const left = ((this.parent.x - this.parent.map.offset.x - box.width / 2 / this.parent.zoom) / this.size) - this.preload;
-        const top = ((this.parent.y - this.parent.map.offset.y - box.height / 2 / this.parent.zoom) / this.size) - this.preload;
+        const left = ((this.parent.x - world.offset.x - box.width / 2 / this.parent.zoom) / this.size) - this.preload;
+        const top = ((this.parent.y - world.offset.y - box.height / 2 / this.parent.zoom) / this.size) - this.preload;
 
-        const x = ((this.parent.x - this.parent.map.offset.x) / this.size) - this.preload;
-        const y = ((this.parent.y - this.parent.map.offset.y) / this.size) - this.preload;        
+        const x = ((this.parent.x - world.offset.x) / this.size) - this.preload;
+        const y = ((this.parent.y - world.offset.y) / this.size) - this.preload;        
 
         const tiles = this.findMissingTiles(Math.max(left, 0), Math.max(top, 0), true, true);
         let unique: { x, y, distance }[] = [];
@@ -101,29 +102,29 @@ export class MapImageComponent extends Component {
     }
 
     findMissingTiles(x: number, y: number, moveX: boolean, moveY: boolean) {
-        if (x < 0 || y < 0 || x > this.parent.map.size / this.size || y > this.parent.map.size / this.size) {
+        if (x < 0 || y < 0 || x > world.size / this.size || y > world.size / this.size) {
             return [];
         }
 
         const box = this.parent.rootNode.getBoundingClientRect();
 
         // left
-        if (x + this.preload + 1 < (this.parent.x - this.parent.map.offset.x - box.width / 2 / this.parent.zoom) / this.size) {
+        if (x + this.preload + 1 < (this.parent.x - world.offset.x - box.width / 2 / this.parent.zoom) / this.size) {
             return [];
         }
 
         // right
-        if (x - this.preload - 1 > (this.parent.x - this.parent.map.offset.x + box.width / 2 / this.parent.zoom) / this.size) {
+        if (x - this.preload - 1 > (this.parent.x - world.offset.x + box.width / 2 / this.parent.zoom) / this.size) {
             return [];
         }
         
         // top
-        if (y + this.preload + 1 < (this.parent.y - this.parent.map.offset.y - box.height / 2 / this.parent.zoom) / this.size) {
+        if (y + this.preload + 1 < (this.parent.y - world.offset.y - box.height / 2 / this.parent.zoom) / this.size) {
             return [];
         }
 
         // bottom
-        if (y - this.preload - 1 > (this.parent.y - this.parent.map.offset.y + box.height / 2 / this.parent.zoom) / this.size) {
+        if (y - this.preload - 1 > (this.parent.y - world.offset.y + box.height / 2 / this.parent.zoom) / this.size) {
             return [];
         }
 

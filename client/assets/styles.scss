@@ -25,6 +25,30 @@ ui-page {
 	}
 }
 
+ui-button {
+	display: block;
+	padding: 1rem 2rem;
+	
+	border: 1px solid #000;
+}
+
+ui-field {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 1rem;
+
+	select, input {
+		padding: 0.75rem 1rem;
+
+		appearance: none;
+		color: inherit;
+		background: #eee;
+		border: 1px solid #000;
+		border-radius: 0;
+		font: inherit;
+	}
+}
+
 ui-map {
 	position: relative;
 
@@ -313,6 +337,107 @@ ui-history {
 		ui-time {
 			display: block;
 		}
+	}
+}
+
+ui-properties {
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap;
+
+	margin-top: 4rem;
+	margin-inline: 0.5rem;
+
+	ui-property {
+		display: block;
+		width: calc(50% - 2rem);
+		margin: 0.5rem;
+
+		border: 1px solid #000;
+
+		&[ui-incomplete] {
+			outline: 3px solid #f00;
+		}
+
+		ui-map-preview {
+			height: 6rem;
+		}
+
+		ui-property-tagline {
+			display: flex;
+			justify-content: space-between;
+			margin: 0.25rem 1rem;
+
+			font-size: 0.8rem;
+		}
+
+		ui-property-name {
+			display: block;
+			
+			margin-inline: 1rem;
+			margin-bottom: 0.25rem;
+
+			ui-property-generic-name {
+				font-style: italic;
+			}
+		}
+
+		ui-property-bounds {
+			display: flex;
+			justify-content: space-between;
+			margin-inline: 1rem;
+			margin-bottom: 0.5rem;
+
+			font-size: 0.8rem;
+		}
+	}
+}
+
+ui-page > ui-property {
+	display: block;
+	flex-grow: 1;
+	padding: 1rem;
+
+	ui-map-preview {
+		margin: -1rem;
+		margin-bottom: 1rem;
+
+		width: calc(100% + 2rem);
+		max-height: 15rem;
+	}
+}
+
+ui-map-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	overflow: hidden;
+
+	background: linear-gradient(-45deg, #fff, #ccc);
+
+	canvas {
+		width: 100%;
+		height: 100%;
+
+		object-fit: cover;
+
+		image-rendering: pixelated;
+	}
+
+	ui-map-expand {
+		position: absolute;
+		bottom: 0;
+		right: 0;
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		width: 1.5rem;
+		height: 1.5rem;
+
+		background: #fff8;
 	}
 }
 

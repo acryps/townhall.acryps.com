@@ -39,4 +39,30 @@ export class TileSet {
             console.log('invalid tile', x, y);
         }
     }
+
+    async area(x: number, y: number, width: number, height: number) {
+        await this.loader;
+
+        if (this.cache[[x, y, width, height].join()]) {
+            return this.cache[[x, y, width, height].join()];
+        }
+
+        try {
+            // crop image
+            const data = await sharp(this.image).extract({
+                width: width,
+                height: height,
+                top: y,
+                left: x
+            }).toBuffer();
+
+            setTimeout(() => {
+                this.cache.delete[[x, y, width, height].join()];
+            }, 1000 * 60);
+
+            return this.cache[[x, y, width, height].join()] = data;
+        } catch {
+            console.log('invalid tile', x, y);
+        }
+    }
 }

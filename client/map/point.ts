@@ -25,7 +25,7 @@ export class Point {
     }
 
     static bounding(points: Point[], offset = 0) {
-        const box = this.bounds(points);
+        const box = this.bounds(points, offset);
 
         return [
             new Point(box.x.min, box.y.min),

@@ -2,6 +2,7 @@ import { Service } from "vlserver";
 import { Borough, DbContext } from "../managed/database";
 import { Proxy } from "../proxy";
 import { BoroughViewModel } from "./borough.view";
+import { BridgeViewModel } from "./bridge.view";
 import { HistoryEntryViewModel } from "./history.view";
 import { PropertyTypeViewModel } from "./property-type.view";
 import { PropertySummaryModel } from "./property.summary";
@@ -50,6 +51,13 @@ export class MapService extends Service {
         return WaterBodyViewModel.from(
             this.db.waterBody
                 .orderByAscending(body => body.name)
+        );
+    }
+
+    getBridges() {
+        return BridgeViewModel.from(
+            this.db.bridge
+                .orderByAscending(bridge => bridge.name)
         );
     }
 

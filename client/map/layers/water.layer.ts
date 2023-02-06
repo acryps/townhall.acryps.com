@@ -34,5 +34,12 @@ export class WaterLayer extends Layer {
                 }
             }
         }
+
+        for (let bridge of await new MapService().getBridges()) {
+            const path = Point.unpack(bridge.path);
+
+            this.add(new MapPolygon(path, true, 'bridge'));
+            this.add(new MapLabel(bridge.name, Point.center(path), null, path));
+        }
     }
 }

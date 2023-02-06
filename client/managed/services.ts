@@ -390,6 +390,27 @@ export class MapService {
 		});
 	}
 
+	async getBridges(): Promise<Array<BridgeViewModel>> {
+		const data = new FormData();
+		
+
+		return await fetch(Service.toURL("k3M2I0czloYWQzZT93N3pzemFzaGRiaW"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : BridgeViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async getHistory(): Promise<Array<HistoryEntryViewModel>> {
 		const data = new FormData();
 		

@@ -48,7 +48,7 @@ export class MapPreviewComponent extends Component {
         return <ui-map-preview>
             {canvas = <canvas></canvas>}
 
-            <ui-map-expand ui-href={`/map/${box.x.min + box.width / 2}/${box.y.min + box.height / 2}/3`}>+</ui-map-expand>
+            <ui-map-expand ui-href={`/map/${Math.floor(box.x.min + box.width / 2)}/${Math.floor(box.y.min + box.height / 2)}/3`}>+</ui-map-expand>
         </ui-map-preview>;
     }
 }

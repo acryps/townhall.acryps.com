@@ -103,6 +103,10 @@ export class MapComponent extends Component {
                 }
             };
 
+            map.onclick = event => {
+                navigator.clipboard.writeText(Point.pack([this.translateMouse(event)]));
+            };
+
             this.focus(new Point(this.x, this.y));
 
             this.mapInner.onscroll = () => {
@@ -150,7 +154,7 @@ export class MapComponent extends Component {
                         <ui-control ui-click={() => {
                             this.mapStyle = 'normal';
 
-                            this.reload();
+                            this.update();
                         }}>
                             CO
                         </ui-control>
@@ -158,7 +162,7 @@ export class MapComponent extends Component {
                         <ui-control ui-click={() => {
                             this.mapStyle = 'admin';
 
-                            this.reload();
+                            this.update();
                         }}>
                             AM
                         </ui-control>
@@ -166,7 +170,7 @@ export class MapComponent extends Component {
                         <ui-control ui-click={() => {
                             this.mapStyle = 'gray';
 
-                            this.reload();
+                            this.update();
                         }}>
                             BW
                         </ui-control>
@@ -207,6 +211,10 @@ export class MapComponent extends Component {
 
                 <ui-control ui-active={this.findLayer(PropertyLayer) ? '' : null} ui-click={() => this.toggleLayer(new PropertyLayer(world, this))}>
                     P
+                </ui-control>
+
+                <ui-control ui-active={this.findLayer(TrainLayer) ? '' : null} ui-click={() => this.toggleLayer(new TrainLayer(world, this))}>
+                    T
                 </ui-control>
 
                 <ui-control ui-active={this.findLayer(WaterLayer) ? '' : null} ui-click={() => this.toggleLayer(new WaterLayer(world, this))}>

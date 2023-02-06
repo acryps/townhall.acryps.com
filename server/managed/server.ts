@@ -6,6 +6,7 @@ import { GameService } from "././../areas/game/game.service";
 import { Borough } from "././database";
 import { Proxy } from "././../proxy";
 import { BoroughViewModel } from "././../areas/borough.view";
+import { BridgeViewModel } from "././../areas/bridge.view";
 import { HistoryEntryViewModel } from "././../areas/history.view";
 import { PropertyTypeViewModel } from "././../areas/property-type.view";
 import { PropertySummaryModel } from "././../areas/property.summary";
@@ -18,7 +19,6 @@ import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
 import { BoroughSummaryModel } from "./../areas/borough.summary";
-import { BridgeViewModel } from "./../areas/bridge.view";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { Bridge } from "./../managed/database";
@@ -105,6 +105,15 @@ export class ManagedServer extends BaseServer {
 			{},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.getWaterBodies(
+				
+			)
+		);
+
+		this.expose(
+			"k3M2I0czloYWQzZT93N3pzemFzaGRiaW",
+			{},
+			inject => inject.construct(MapService),
+			(controller, params) => controller.getBridges(
 				
 			)
 		);

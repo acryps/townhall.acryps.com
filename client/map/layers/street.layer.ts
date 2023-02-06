@@ -16,6 +16,7 @@ export class StreetLayer extends Layer {
                 const path = Point.unpack(bridge.path);
 
                 this.add(new MapPolygon(path, false, 'bridge', { size: street.size }));
+                this.add(new MapLabel(bridge.name, Point.center(path), null, Point.unpack(street.path)));
             }
         }
 

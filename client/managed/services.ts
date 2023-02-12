@@ -533,6 +533,25 @@ export class MapService {
 		});
 	}
 
+	async createStreet(streetViewModel: StreetViewModel): Promise<void> {
+		const data = new FormData();
+		data.append("YwNnJhZnZycjNzNGU3emQ0Y2RtNnhmZG", JSON.stringify(streetViewModel))
+
+		return await fetch(Service.toURL("VsbndnaTI4bTllbnh0endpaHdkM3w1MD"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
 	async createSquare(squareViewModel: SquareViewModel): Promise<void> {
 		const data = new FormData();
 		data.append("FwZXk2OGVmcWRxeHdiZW9ucjhxcGE5cG", JSON.stringify(squareViewModel))

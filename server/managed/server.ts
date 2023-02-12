@@ -188,6 +188,20 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"VsbndnaTI4bTllbnh0endpaHdkM3w1MD",
+			{
+				"YwNnJhZnZycjNzNGU3emQ0Y2RtNnhmZG": {
+					isArray: false,
+					type: StreetViewModel
+				}
+			},
+			inject => inject.construct(MapService),
+			(controller, params) => controller.createStreet(
+				params["YwNnJhZnZycjNzNGU3emQ0Y2RtNnhmZG"]
+			)
+		);
+
+		this.expose(
 			"RhZGo0ejpmdnJhZ3lla3I4bzB2M2F5cn",
 			{
 				"FwZXk2OGVmcWRxeHdiZW9ucjhxcGE5cG": {

@@ -285,7 +285,7 @@ export class MapComponent extends Component {
                             });
                         }
                     }
-                }}>+SQ</ui-control>}
+                }}>+S</ui-control>}
 
                 {this.draw && this.findLayer(StreetLayer) && <ui-control ui-click={() => {
                     if (this.draw.points.length >= 3) {

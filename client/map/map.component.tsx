@@ -270,7 +270,7 @@ export class MapComponent extends Component {
                 }}>+B</ui-control>}
 
                 {this.draw && this.findLayer(StreetLayer) && <ui-control ui-click={() => {
-                    if (this.draw.points.length >= 3) {
+                    if (this.draw.points.length >= 2) {
                         const street = new StreetViewModel();
                         street.name = prompt('Street name');
                         street.size = +prompt('Street size');

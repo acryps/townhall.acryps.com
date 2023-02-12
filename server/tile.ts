@@ -5,13 +5,20 @@ export class TileSet {
     size = 250;
 
     loader?: Promise<void>;
-
     image: Buffer;
-    
-    cache = new Map<string, Buffer>();
+    cache: Map<string, Buffer>;
 
     constructor(public source: string) {
-        this.loader = fetch(source).then(res => res.buffer()).then(res => this.image = res);
+        this.loader = this.reload();
+    }
+
+    reload() {
+        setTimeout(() => this.reload(), 1000 * 60);
+
+        return fetch(this.source).then(res => res.buffer()).then(res => {
+            this.image = res;
+            this.cache = new Map<string, Buffer>();
+        });
     }
 
     async read(x: number, y: number) {
@@ -29,10 +36,6 @@ export class TileSet {
                 top: y * this.size,
                 left: x * this.size
             }).toBuffer();
-
-            setTimeout(() => {
-                delete this.cache[[x, y].join()];
-            }, 1000 * 60);
 
             return this.cache[[x, y].join()] = data;
         } catch {
@@ -56,13 +59,9 @@ export class TileSet {
                 left: x
             }).toBuffer();
 
-            setTimeout(() => {
-                delete this.cache[[x, y, width, height].join()];
-            }, 1000 * 60);
-
             return this.cache[[x, y, width, height].join()] = data;
         } catch {
-            console.log('invalid tile', x, y);
+            console.log('invalid area', x, y, width, height);
         }
     }
 }

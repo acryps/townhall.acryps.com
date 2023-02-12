@@ -24,8 +24,10 @@ export class TileSet {
     async read(x: number, y: number) {
         await this.loader;
 
-        if (this.cache[[x, y].join()]) {
-            return this.cache[[x, y].join()];
+        const id = [x, y].join();
+
+        if (id in this.cache) {
+            return this.cache[id];
         }
 
         try {
@@ -37,7 +39,7 @@ export class TileSet {
                 left: x * this.size
             }).toBuffer();
 
-            return this.cache[[x, y].join()] = data;
+            return this.cache[id] = data;
         } catch {
             console.log('invalid tile', x, y);
         }
@@ -46,8 +48,10 @@ export class TileSet {
     async area(x: number, y: number, width: number, height: number) {
         await this.loader;
 
-        if (this.cache[[x, y, width, height].join()]) {
-            return this.cache[[x, y, width, height].join()];
+        const id = [x, y, width, height].join();
+
+        if (id in this.cache) {
+            return this.cache[id];
         }
 
         try {
@@ -59,7 +63,7 @@ export class TileSet {
                 left: x
             }).toBuffer();
 
-            return this.cache[[x, y, width, height].join()] = data;
+            return this.cache[id] = data;
         } catch {
             console.log('invalid area', x, y, width, height);
         }

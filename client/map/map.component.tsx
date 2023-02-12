@@ -272,10 +272,10 @@ export class MapComponent extends Component {
                 {this.draw && this.findLayer(StreetLayer) && <ui-control ui-click={() => {
                     if (this.draw.points.length >= 3) {
                         const street = new StreetViewModel();
-                        street.name = prompt('Square name');
-                        
+                        street.name = prompt('Street name');
+                        street.size = +prompt('Street size');
 
-                        if (street.name) {
+                        if (street.name && street.size) {
                             street.path = Point.pack(this.draw.points);
                             
                             new MapService().createStreet(street).then(() => {

@@ -1,5 +1,5 @@
 import { Application } from "main";
-import { BoroughViewModel, HistoryEntryViewModel, MapService, PropertyTypeViewModel, PropertyViewModel, SquareViewModel, WaterBodyViewModel } from "managed/services";
+import { BoroughViewModel, HistoryEntryViewModel, MapService, PropertyTypeViewModel, PropertyViewModel, SquareViewModel, StreetViewModel, WaterBodyViewModel } from "managed/services";
 import { Component } from "node_modules/vldom/component";
 import { MapLabel } from "./elements/label";
 import { Layer } from "./layers/layer";
@@ -268,6 +268,24 @@ export class MapComponent extends Component {
                         }
                     }
                 }}>+B</ui-control>}
+
+                {this.draw && this.findLayer(StreetLayer) && <ui-control ui-click={() => {
+                    if (this.draw.points.length >= 3) {
+                        const street = new StreetViewModel();
+                        street.name = prompt('Square name');
+                        
+
+                        if (street.name) {
+                            street.path = Point.pack(this.draw.points);
+                            
+                            new MapService().createStreet(street).then(() => {
+                                this.draw.reset();
+
+                                this.reload();
+                            });
+                        }
+                    }
+                }}>+SQ</ui-control>}
 
                 {this.draw && this.findLayer(StreetLayer) && <ui-control ui-click={() => {
                     if (this.draw.points.length >= 3) {

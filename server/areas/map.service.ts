@@ -89,6 +89,12 @@ export class MapService extends Service {
         await borough.create();
     }
 
+    async createStreet(streetViewModel: StreetViewModel) {
+        const street = await streetViewModel.toModel();
+
+        await street.create();
+    }
+
     async createSquare(squareViewModel: SquareViewModel) {
         const square = await squareViewModel.toModel();
 

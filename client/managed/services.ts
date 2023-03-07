@@ -45,6 +45,53 @@ export class BridgeViewModel {
 	}
 }
 
+export class HistoricListingGradeViewModel {
+	id: string;
+	grade: number;
+	name: string;
+	description: string;
+
+	private static $build(raw) {
+		const item = new HistoricListingGradeViewModel();
+		item.id = raw.id === null ? null : `${raw.id}`
+		item.grade = raw.grade === null ? null : +raw.grade
+		item.name = raw.name === null ? null : `${raw.name}`
+		item.description = raw.description === null ? null : `${raw.description}`
+		
+		return item;
+	}
+}
+
+export class PropertyHistoricListingModifierViewModel {
+	historicListingModifier: HistoricListingModifierViewModel;
+	id: string;
+
+	private static $build(raw) {
+		const item = new PropertyHistoricListingModifierViewModel();
+		item.historicListingModifier = raw.historicListingModifier ? HistoricListingModifierViewModel["$build"](raw.historicListingModifier) : null
+		item.id = raw.id === null ? null : `${raw.id}`
+		
+		return item;
+	}
+}
+
+export class HistoricListingModifierViewModel {
+	id: string;
+	shortName: string;
+	name: string;
+	description: string;
+
+	private static $build(raw) {
+		const item = new HistoricListingModifierViewModel();
+		item.id = raw.id === null ? null : `${raw.id}`
+		item.shortName = raw.shortName === null ? null : `${raw.shortName}`
+		item.name = raw.name === null ? null : `${raw.name}`
+		item.description = raw.description === null ? null : `${raw.description}`
+		
+		return item;
+	}
+}
+
 export class HistoryEntryViewModel {
 	name: string;
 	date: Date;
@@ -90,6 +137,7 @@ export class PropertyTypeViewModel {
 
 export class PropertySummaryModel {
 	borough: BoroughSummaryModel;
+	historicListingGrade: HistoricListingGradeViewModel;
 	type: PropertyTypeViewModel;
 	id: string;
 	name: string;
@@ -98,6 +146,7 @@ export class PropertySummaryModel {
 	private static $build(raw) {
 		const item = new PropertySummaryModel();
 		item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null
+		item.historicListingGrade = raw.historicListingGrade ? HistoricListingGradeViewModel["$build"](raw.historicListingGrade) : null
 		item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
@@ -109,22 +158,28 @@ export class PropertySummaryModel {
 
 export class PropertyViewModel {
 	borough: BoroughSummaryModel;
+	historicListingGrade: HistoricListingGradeViewModel;
 	owner: PlayerViewModel;
+	historicListingModifiers: PropertyHistoricListingModifierViewModel[];
 	type: PropertyTypeViewModel;
 	id: string;
 	name: string;
 	code: string;
 	bounds: string;
+	historicListingRegisteredAt: Date;
 
 	private static $build(raw) {
 		const item = new PropertyViewModel();
 		item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null
+		item.historicListingGrade = raw.historicListingGrade ? HistoricListingGradeViewModel["$build"](raw.historicListingGrade) : null
 		item.owner = raw.owner ? PlayerViewModel["$build"](raw.owner) : null
+		item.historicListingModifiers = raw.historicListingModifiers ? raw.historicListingModifiers.map(i => PropertyHistoricListingModifierViewModel["$build"](i)) : null
 		item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
 		item.code = raw.code === null ? null : `${raw.code}`
 		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
+		item.historicListingRegisteredAt = raw.historicListingRegisteredAt ? new Date(raw.historicListingRegisteredAt) : null
 		
 		return item;
 	}
@@ -279,6 +334,111 @@ export class GameService {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
 				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class HistoricListingService {
+	async getGrades(): Promise<Array<HistoricListingGradeViewModel>> {
+		const data = new FormData();
+		
+
+		return await fetch(Service.toURL("pzazpkdHZiZTFlcHVqYTZhZ2puM2kyZ2"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : HistoricListingGradeViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getModifiers(): Promise<Array<HistoricListingModifierViewModel>> {
+		const data = new FormData();
+		
+
+		return await fetch(Service.toURL("h5dHl6dTNxOHtnbGZ6YWNsYzdlYWBxNX"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : HistoricListingModifierViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async addListing(propertyViewModel: PropertyViewModel, grade: HistoricListingGradeViewModel): Promise<void> {
+		const data = new FormData();
+		data.append("QzZTg0Y3Jza2VxY3E5azlvdzVoaDkyMj", JSON.stringify(propertyViewModel))
+		data.append("Y5aHJ4b2UwZ2pkZ3R1N285MDkxZnV2c3", JSON.stringify(grade))
+
+		return await fetch(Service.toURL("YzcjNuOWlqM3VzYWJpdT5lN39xYmZzNz"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async addModifier(propertyId: string, modifierId: string): Promise<PropertyHistoricListingModifierViewModel> {
+		const data = new FormData();
+		data.append("FyMXVia29sNjN3ZG1naT1teHZzdWN0ej", JSON.stringify(propertyId))
+		data.append("M2MTNoNWFqbWAybGxrb3M0Z2U0azF4cG", JSON.stringify(modifierId))
+
+		return await fetch(Service.toURL("hmc3RueXJneWJ1MnB1Zzd3cmx5aWZsc2"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : PropertyHistoricListingModifierViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async removeModifier(linkId: string): Promise<void> {
+		const data = new FormData();
+		data.append("kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn", JSON.stringify(linkId))
+
+		return await fetch(Service.toURL("IwaWRoOGpwcTdjb3NxeWpxaWtwZTY3M3"), {
+			method: "post",
+			credentials: "include",
+			body: data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
 			}
 		});
 	}

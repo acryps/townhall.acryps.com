@@ -23,6 +23,10 @@ export class PropertyLayer extends Layer {
                 polygon.path.setAttribute('ui-issue', '');
             }
 
+            if (property.historicListingGrade) {
+                polygon.path.setAttribute('ui-historically-listed', '');
+            }
+
             this.add(polygon);
         }
 
@@ -30,6 +34,10 @@ export class PropertyLayer extends Layer {
             const bounds = Point.unpack(property.bounds);
 
             let label = [];
+
+            if (property.historicListingGrade) {
+                label.push(property.historicListingGrade.grade);
+            }
             
             if (property.type) {
                 label.push(property.type.code);

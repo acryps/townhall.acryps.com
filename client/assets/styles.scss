@@ -25,6 +25,11 @@ ui-page {
 	}
 }
 
+ui-paragraph {
+	display: block;
+	margin-bottom: 1rem;
+}
+
 ui-button {
 	display: block;
 	padding: 1rem 2rem;
@@ -34,18 +39,84 @@ ui-button {
 
 ui-field {
 	display: flex;
-	flex-direction: column;
 	margin-bottom: 1rem;
 
-	select, input {
-		padding: 0.75rem 1rem;
+	&:has(input[type=checkbox]) {
+		flex-wrap: wrap;
 
-		appearance: none;
-		color: inherit;
-		background: #eee;
-		border: 1px solid #000;
-		border-radius: 0;
-		font: inherit;
+		input {
+			order: 1;
+
+			width: 1rem;
+			height: 1rem;
+			margin: 0;
+			padding: 0;
+			margin-right: 1rem;
+			position: relative;
+
+			appearance: none;
+			border: 1px solid #000;
+			background: #fff;
+
+			&:checked {
+				background: #000;
+			}
+
+			&:checked::after {
+				content: 'X';
+				
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+
+				color: #fff;
+				line-height: 1;
+				text-align: center;
+			}
+		}
+
+		label {
+			order: 2;
+
+			margin-top: -0.125rem;
+		}
+
+		ui-hint {
+			order: 3;
+
+			margin-left: 2rem;
+			width: 100%;
+		}
+	}
+
+	&:not(:has(input[type=checkbox])) {
+		flex-direction: column;
+
+		label {
+			margin-bottom: 0.25rem;
+		}
+
+		select, input:not([type=checkbox]) {
+			padding: 0.5rem 1rem;
+
+			appearance: none;
+			color: inherit;
+			background: #eee;
+			border: 1px solid #000;
+			border-radius: 0;
+			font: inherit;
+		}
+
+		ui-hint {
+			margin-top: 0.125rem;
+		}
+	}
+
+	ui-hint {
+		display: block;
+		font-size: 0.8em;
 	}
 }
 
@@ -406,6 +477,25 @@ ui-page > ui-property {
 
 		width: calc(100% + 2rem);
 		max-height: 15rem;
+	}
+
+	ui-section {
+		display: block;
+		margin-bottom: 1rem;
+		padding: 1rem;
+
+		background: #eee;
+
+		> ui-title {
+			display: block;
+			margin-bottom: 1rem;
+
+			font-weight: bold;
+		}
+
+		> :last-child {
+			margin-bottom: 0;
+		}
 	}
 }
 

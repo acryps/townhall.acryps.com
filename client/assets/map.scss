@@ -22,6 +22,10 @@ ui-map[ui-style='normal'] {
         &[ui-issue] {
             stroke: #f00;
         }
+
+        &[ui-historically-listed] {
+            stroke-dasharray: 1px 1px;
+        }
     }
 
     path[ui-style='water'] {

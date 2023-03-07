@@ -8,7 +8,7 @@
 			"options": {
 				"cwd": "server/",
 				"env": {
-					"PGHOST": "data1.w6.cloud.acryps.com",
+					"PGHOST": "10.22.0.1",
 					"PGUSER": "townhall",
 					"PGPASSWORD": "townhall",
 					"PGDATABASE": "townhall"

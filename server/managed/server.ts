@@ -3,6 +3,12 @@ import { BaseServer, ViewModel, Inject } from "vlserver";
 import { DbContext } from "././database";
 import { PlayerViewModel } from "././../areas/player.view";
 import { GameService } from "././../areas/game/game.service";
+import { PropertyHistoricListingModifier } from "././database";
+import { PropertyViewModel } from "././../areas/property.view";
+import { HistoricListingGradeViewModel } from "././../areas/history-listing/grade.view";
+import { PropertyHistoricListingModifierViewModel } from "././../areas/history-listing/link.view";
+import { HistoricListingModifierViewModel } from "././../areas/history-listing/modifier.view";
+import { HistoricListingService } from "././../areas/history-listing/listing.service";
 import { Borough } from "././database";
 import { Proxy } from "././../proxy";
 import { BoroughViewModel } from "././../areas/borough.view";
@@ -10,7 +16,6 @@ import { BridgeViewModel } from "././../areas/bridge.view";
 import { HistoryEntryViewModel } from "././../areas/history.view";
 import { PropertyTypeViewModel } from "././../areas/property-type.view";
 import { PropertySummaryModel } from "././../areas/property.summary";
-import { PropertyViewModel } from "././../areas/property.view";
 import { SquareViewModel } from "././../areas/squre.view";
 import { StreetViewModel } from "././../areas/street.view";
 import { WaterBodyViewModel } from "././../areas/water-body.view";
@@ -22,6 +27,8 @@ import { BoroughSummaryModel } from "./../areas/borough.summary";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { Bridge } from "./../managed/database";
+import { HistoricListingGrade } from "./../managed/database";
+import { HistoricListingModifier } from "./../managed/database";
 import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
 import { PropertyType } from "./../managed/database";
@@ -43,6 +50,10 @@ Inject.mappings = {
 		objectConstructor: DbContext,
 		parameters: ["RunContext"]
 	},
+	"HistoricListingService": {
+		objectConstructor: HistoricListingService,
+		parameters: ["DbContext"]
+	},
 	"MapService": {
 		objectConstructor: MapService,
 		parameters: ["DbContext"]
@@ -61,6 +72,74 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(GameService),
 			(controller, params) => controller.getPlayers(
 				
+			)
+		);
+
+		this.expose(
+			"pzazpkdHZiZTFlcHVqYTZhZ2puM2kyZ2",
+			{},
+			inject => inject.construct(HistoricListingService),
+			(controller, params) => controller.getGrades(
+				
+			)
+		);
+
+		this.expose(
+			"h5dHl6dTNxOHtnbGZ6YWNsYzdlYWBxNX",
+			{},
+			inject => inject.construct(HistoricListingService),
+			(controller, params) => controller.getModifiers(
+				
+			)
+		);
+
+		this.expose(
+			"YzcjNuOWlqM3VzYWJpdT5lN39xYmZzNz",
+			{
+				"QzZTg0Y3Jza2VxY3E5azlvdzVoaDkyMj": {
+					isArray: false,
+					type: PropertyViewModel
+				},"Y5aHJ4b2UwZ2pkZ3R1N285MDkxZnV2c3": {
+					isArray: false,
+					type: HistoricListingGradeViewModel
+				}
+			},
+			inject => inject.construct(HistoricListingService),
+			(controller, params) => controller.addListing(
+				params["QzZTg0Y3Jza2VxY3E5azlvdzVoaDkyMj"],
+				params["Y5aHJ4b2UwZ2pkZ3R1N285MDkxZnV2c3"]
+			)
+		);
+
+		this.expose(
+			"hmc3RueXJneWJ1MnB1Zzd3cmx5aWZsc2",
+			{
+				"FyMXVia29sNjN3ZG1naT1teHZzdWN0ej": {
+					isArray: false,
+					type: "string"
+				},"M2MTNoNWFqbWAybGxrb3M0Z2U0azF4cG": {
+					isArray: false,
+					type: "string"
+				}
+			},
+			inject => inject.construct(HistoricListingService),
+			(controller, params) => controller.addModifier(
+				params["FyMXVia29sNjN3ZG1naT1teHZzdWN0ej"],
+				params["M2MTNoNWFqbWAybGxrb3M0Z2U0azF4cG"]
+			)
+		);
+
+		this.expose(
+			"IwaWRoOGpwcTdjb3NxeWpxaWtwZTY3M3",
+			{
+				"kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn": {
+					isArray: false,
+					type: "string"
+				}
+			},
+			inject => inject.construct(HistoricListingService),
+			(controller, params) => controller.removeModifier(
+				params["kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn"]
 			)
 		);
 
@@ -408,6 +487,138 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	HistoricListingGradeViewModel: class ComposedHistoricListingGradeViewModel extends HistoricListingGradeViewModel {
+		async map() {
+			return {
+				id: this.model.id,
+				grade: this.model.grade,
+				name: this.model.name,
+				description: this.model.description
+			}
+		};
+
+		static get items() { 
+			return {
+				id: true,
+				grade: true,
+				name: true,
+				description: true
+			};
+		}
+
+		static toViewModel(data) {
+			const item = new HistoricListingGradeViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"grade" in data && (item.grade = data.grade === null ? null : +data.grade);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: HistoricListingGradeViewModel) {
+			let model: HistoricListingGrade;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(HistoricListingGrade).find(viewModel.id)
+			} else {
+				model = new HistoricListingGrade();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"grade" in viewModel && (model.grade = viewModel.grade === null ? null : +viewModel.grade);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+
+			return model;
+		}
+	},
+	PropertyHistoricListingModifierViewModel: class ComposedPropertyHistoricListingModifierViewModel extends PropertyHistoricListingModifierViewModel {
+		async map() {
+			return {
+				historicListingModifier: new HistoricListingModifierViewModel(await BaseServer.unwrap(this.model.historicListingModifier)),
+				id: this.model.id
+			}
+		};
+
+		static get items() { 
+			return {
+				get historicListingModifier() { 
+					return ViewModel.mappings.HistoricListingModifierViewModel.items;
+				},
+				id: true
+			};
+		}
+
+		static toViewModel(data) {
+			const item = new PropertyHistoricListingModifierViewModel(null);
+			"historicListingModifier" in data && (item.historicListingModifier = data.historicListingModifier && ViewModel.mappings.HistoricListingModifierViewModel.toViewModel(data.historicListingModifier));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PropertyHistoricListingModifierViewModel) {
+			let model: PropertyHistoricListingModifier;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(PropertyHistoricListingModifier).find(viewModel.id)
+			} else {
+				model = new PropertyHistoricListingModifier();
+			}
+			
+			"historicListingModifier" in viewModel && (model.historicListingModifier.id = viewModel.historicListingModifier ? viewModel.historicListingModifier.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+
+			return model;
+		}
+	},
+	HistoricListingModifierViewModel: class ComposedHistoricListingModifierViewModel extends HistoricListingModifierViewModel {
+		async map() {
+			return {
+				id: this.model.id,
+				shortName: this.model.shortName,
+				name: this.model.name,
+				description: this.model.description
+			}
+		};
+
+		static get items() { 
+			return {
+				id: true,
+				shortName: true,
+				name: true,
+				description: true
+			};
+		}
+
+		static toViewModel(data) {
+			const item = new HistoricListingModifierViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"shortName" in data && (item.shortName = data.shortName === null ? null : `${data.shortName}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: HistoricListingModifierViewModel) {
+			let model: HistoricListingModifier;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(HistoricListingModifier).find(viewModel.id)
+			} else {
+				model = new HistoricListingModifier();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"shortName" in viewModel && (model.shortName = viewModel.shortName === null ? null : `${viewModel.shortName}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+
+			return model;
+		}
+	},
 	HistoryEntryViewModel: class ComposedHistoryEntryViewModel extends HistoryEntryViewModel {
 		async map() {
 			return {
@@ -528,6 +739,7 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.model.borough)),
+				historicListingGrade: new HistoricListingGradeViewModel(await BaseServer.unwrap(this.model.historicListingGrade)),
 				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.model.type)),
 				id: this.model.id,
 				name: this.model.name,
@@ -539,6 +751,9 @@ ViewModel.mappings = {
 			return {
 				get borough() { 
 					return ViewModel.mappings.BoroughSummaryModel.items;
+				},
+				get historicListingGrade() { 
+					return ViewModel.mappings.HistoricListingGradeViewModel.items;
 				},
 				get type() { 
 					return ViewModel.mappings.PropertyTypeViewModel.items;
@@ -552,6 +767,7 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new PropertySummaryModel(null);
 			"borough" in data && (item.borough = data.borough && ViewModel.mappings.BoroughSummaryModel.toViewModel(data.borough));
+			"historicListingGrade" in data && (item.historicListingGrade = data.historicListingGrade && ViewModel.mappings.HistoricListingGradeViewModel.toViewModel(data.historicListingGrade));
 			"type" in data && (item.type = data.type && ViewModel.mappings.PropertyTypeViewModel.toViewModel(data.type));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
@@ -570,6 +786,7 @@ ViewModel.mappings = {
 			}
 			
 			"borough" in viewModel && (model.borough.id = viewModel.borough ? viewModel.borough.id : null);
+			"historicListingGrade" in viewModel && (model.historicListingGrade.id = viewModel.historicListingGrade ? viewModel.historicListingGrade.id : null);
 			"type" in viewModel && (model.type.id = viewModel.type ? viewModel.type.id : null);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
@@ -582,12 +799,15 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.model.borough)),
+				historicListingGrade: new HistoricListingGradeViewModel(await BaseServer.unwrap(this.model.historicListingGrade)),
 				owner: new PlayerViewModel(await BaseServer.unwrap(this.model.owner)),
+				historicListingModifiers: (await this.model.historicListingModifiers.includeTree(ViewModel.mappings.PropertyHistoricListingModifierViewModel.items).toArray()).map(item => new PropertyHistoricListingModifierViewModel(item)),
 				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.model.type)),
 				id: this.model.id,
 				name: this.model.name,
 				code: this.model.code,
-				bounds: this.model.bounds
+				bounds: this.model.bounds,
+				historicListingRegisteredAt: this.model.historicListingRegisteredAt
 			}
 		};
 
@@ -596,8 +816,14 @@ ViewModel.mappings = {
 				get borough() { 
 					return ViewModel.mappings.BoroughSummaryModel.items;
 				},
+				get historicListingGrade() { 
+					return ViewModel.mappings.HistoricListingGradeViewModel.items;
+				},
 				get owner() { 
 					return ViewModel.mappings.PlayerViewModel.items;
+				},
+				get historicListingModifiers() { 
+					return ViewModel.mappings.PropertyHistoricListingModifierViewModel.items;
 				},
 				get type() { 
 					return ViewModel.mappings.PropertyTypeViewModel.items;
@@ -605,19 +831,23 @@ ViewModel.mappings = {
 				id: true,
 				name: true,
 				code: true,
-				bounds: true
+				bounds: true,
+				historicListingRegisteredAt: true
 			};
 		}
 
 		static toViewModel(data) {
 			const item = new PropertyViewModel(null);
 			"borough" in data && (item.borough = data.borough && ViewModel.mappings.BoroughSummaryModel.toViewModel(data.borough));
+			"historicListingGrade" in data && (item.historicListingGrade = data.historicListingGrade && ViewModel.mappings.HistoricListingGradeViewModel.toViewModel(data.historicListingGrade));
 			"owner" in data && (item.owner = data.owner && ViewModel.mappings.PlayerViewModel.toViewModel(data.owner));
+			"historicListingModifiers" in data && (item.historicListingModifiers = data.historicListingModifiers && [...data.historicListingModifiers].map(i => ViewModel.mappings.PropertyHistoricListingModifierViewModel.toViewModel(i)));
 			"type" in data && (item.type = data.type && ViewModel.mappings.PropertyTypeViewModel.toViewModel(data.type));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
 			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
+			"historicListingRegisteredAt" in data && (item.historicListingRegisteredAt = data.historicListingRegisteredAt === null ? null : new Date(data.historicListingRegisteredAt));
 
 			return item;
 		}
@@ -632,12 +862,15 @@ ViewModel.mappings = {
 			}
 			
 			"borough" in viewModel && (model.borough.id = viewModel.borough ? viewModel.borough.id : null);
+			"historicListingGrade" in viewModel && (model.historicListingGrade.id = viewModel.historicListingGrade ? viewModel.historicListingGrade.id : null);
 			"owner" in viewModel && (model.owner.id = viewModel.owner ? viewModel.owner.id : null);
+			"historicListingModifiers" in viewModel && (null);
 			"type" in viewModel && (model.type.id = viewModel.type ? viewModel.type.id : null);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
 			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
+			"historicListingRegisteredAt" in viewModel && (model.historicListingRegisteredAt = viewModel.historicListingRegisteredAt === null ? null : new Date(viewModel.historicListingRegisteredAt));
 
 			return model;
 		}

@@ -28,7 +28,8 @@ export class MapService extends Service {
     getProperties() {
         return PropertySummaryModel.from(
             this.db.property
-                .orderByAscending(property => property.code)
+                .orderByDescending(property => property.borough)
+                .orderByDescending(property => property.type)
         );
     }
 

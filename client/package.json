@@ -1,10 +1,17 @@
 {
     "name": "client-townhall",
+    "scripts": {
+        "build": "tsc && vldom compile && cd assets && sass styles.scss ../dist/styles.css && cd .."
+    },
     "dependencies": {
         "estraverse": "^5.3.0",
         "systemjs": "^5.0.0",
         "vldom": "^9.1.4",
         "vldom-default-directives": "^1.0.2",
         "vllayout": "^1.13.1"
+    },
+    "devDependencies": {
+        "sass": "^1.68.0",
+        "typescript": "^5.2.2"
     }
 }

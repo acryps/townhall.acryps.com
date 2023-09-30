@@ -10,35 +10,35 @@ import { Component } from "@acryps/page/built/component";
 import { registerDirectives } from "@acryps/page-default-directives/built/index";
 
 export class Application {
-    static router: Router;
+	static router: Router;
 
-    static players: PlayerViewModel[];
+	static players: PlayerViewModel[];
 
-    static center = new Point(101, 183);
+	static center = new Point(101, 183);
 
-    static async main() {
-        Service.baseUrl = '/';
+	static async main() {
+		Service.baseUrl = '/';
 
-        if (location.pathname == '/') {
-            location.pathname = `/map/${Application.center.x}/${Application.center.y}/3`;
-        }
+		if (location.pathname == '/') {
+			location.pathname = `/map/${Application.center.x}/${Application.center.y}/3`;
+		}
 
-        this.players = await new GameService().getPlayers();
+		this.players = await new GameService().getPlayers();
 
-        this.router = new PathRouter(
-            PageComponent
-                .route('/map/:x/:y/:zoom', MapComponent
-                    .route('/history', HistoryComponent)
-                )
+		this.router = new PathRouter(
+			PageComponent
+				.route('/map/:x/:y/:zoom', MapComponent
+					.route('/history', HistoryComponent)
+				)
 
-                .route('/properties', PropertiesComponent)
-                .route('/property/:id', PropertyComponent)
-        );
+				.route('/properties', PropertiesComponent)
+				.route('/property/:id', PropertyComponent)
+		);
 
-        registerDirectives(Component, this.router);
+		registerDirectives(Component, this.router);
 
-        this.router.host(document.body);
-    }
+		this.router.host(document.body);
+	}
 }
 
 Application.main();

@@ -3,15 +3,15 @@ import { DbContext } from "../../managed/database";
 import { PlayerViewModel } from "../player.view";
 
 export class GameService extends Service {
-    constructor(
-        private db: DbContext
-    ) {
-        super();
-    }
+	constructor(
+		private db: DbContext
+	) {
+		super();
+	}
 
-    getPlayers() {
-        return PlayerViewModel.from(
-            this.db.player.orderByAscending(player => player.username)
-        );
-    }
+	getPlayers() {
+		return PlayerViewModel.from(
+			this.db.player.orderByAscending(player => player.username)
+		);
+	}
 }

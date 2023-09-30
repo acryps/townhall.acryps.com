@@ -2,9 +2,9 @@ import { ViewModel } from "vlserver";
 import { WaterBody } from "../managed/database";
 
 export class WaterBodyViewModel extends ViewModel<WaterBody> {
-    id;
+	id;
 
-    name;
-    bounds;
-    namePath;
+	name;
+	bounds;
+	namePath;
 }

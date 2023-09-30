@@ -3,10 +3,10 @@ import { TrainRoute } from "../../managed/database";
 import { TrainStopViewModel } from "./stop.view";
 
 export class TrainRouteViewModel extends ViewModel<TrainRoute> {
-    id;
+	id;
 	name;
 	path;
 	color;
 
-    stops: TrainStopViewModel[];
+	stops: TrainStopViewModel[];
 }

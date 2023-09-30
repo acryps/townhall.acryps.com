@@ -4,17 +4,17 @@ import { TrainRouteViewModel } from "./route.view";
 import { TrainStationViewModel } from "./station.view";
 
 export class TrainService extends Service {
-    constructor(
-        private db: DbContext
-    ) {
-        super();
-    }
+	constructor(
+		private db: DbContext
+	) {
+		super();
+	}
 
-    getRoutes() {
-        return TrainRouteViewModel.from(this.db.trainRoute);
-    }
+	getRoutes() {
+		return TrainRouteViewModel.from(this.db.trainRoute);
+	}
 
-    getStations() {
-        return TrainStationViewModel.from(this.db.trainStation);
-    }
+	getStations() {
+		return TrainStationViewModel.from(this.db.trainStation);
+	}
 }

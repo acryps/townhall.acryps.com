@@ -3,10 +3,10 @@ import { Square } from "../managed/database";
 import { BoroughSummaryModel } from "./borough.summary";
 
 export class SquareViewModel extends ViewModel<Square> {
-    id;
+	id;
 
-    name;
-    bounds;
+	name;
+	bounds;
 
-    borough: BoroughSummaryModel;
+	borough: BoroughSummaryModel;
 }

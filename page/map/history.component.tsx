@@ -3,57 +3,57 @@ import { MapComponent } from "./map.component";
 import { Component } from "@acryps/page";
 
 export class HistoryComponent extends Component {
-    declare parent: MapComponent;
+	declare parent: MapComponent;
 
-    render() {
-        requestAnimationFrame(() => {
-            if (active) {
-                const box = active.getBoundingClientRect();
+	render() {
+		requestAnimationFrame(() => {
+			if (active) {
+				const box = active.getBoundingClientRect();
 
-                scrollingContainer.scrollTo(box.x - scrollingContainer.clientWidth / 2 + box.width / 2, 0);
-            }
-        });
+				scrollingContainer.scrollTo(box.x - scrollingContainer.clientWidth / 2 + box.width / 2, 0);
+			}
+		});
 
-        let active: HTMLElement;
-        let scrollingContainer: HTMLElement;
+		let active: HTMLElement;
+		let scrollingContainer: HTMLElement;
 
-        return <ui-panel>
-            {scrollingContainer = <ui-history>
-                {[null, ...this.parent.history].map(item => {
-                    let element: HTMLElement;
+		return <ui-panel>
+			{scrollingContainer = <ui-history>
+				{[null, ...this.parent.history].map(item => {
+					let element: HTMLElement;
 
-                    if (item) {
-                        element = <ui-history-item ui-click={() => this.move(item)}>
-                            <ui-date>
-                                {item.date.toLocaleDateString()}
-                            </ui-date>
+					if (item) {
+						element = <ui-history-item ui-click={() => this.move(item)}>
+							<ui-date>
+								{item.date.toLocaleDateString()}
+							</ui-date>
 
-                            <ui-time>
-                                {item.date.toLocaleTimeString()}
-                            </ui-time>
-                        </ui-history-item>;
-                    } else {
-                        element = <ui-history-item ui-click={() => this.move()}>
-                            LATEST
-                        </ui-history-item>
-                    }
+							<ui-time>
+								{item.date.toLocaleTimeString()}
+							</ui-time>
+						</ui-history-item>;
+					} else {
+						element = <ui-history-item ui-click={() => this.move()}>
+							LATEST
+						</ui-history-item>
+					}
 
-                    if (item?.name == this.parent.selectedHistoryEntry?.name) {
-                        element.setAttribute('ui-active', '');
+					if (item?.name == this.parent.selectedHistoryEntry?.name) {
+						element.setAttribute('ui-active', '');
 
-                        active = element;
-                    }
+						active = element;
+					}
 
-                    return element;
-                })}
-            </ui-history>}
-        </ui-panel>;
-    }
+					return element;
+				})}
+			</ui-history>}
+		</ui-panel>;
+	}
 
-    move(history?: HistoryEntryViewModel) {
-        this.parent.selectedHistoryEntry = history;
+	move(history?: HistoryEntryViewModel) {
+		this.parent.selectedHistoryEntry = history;
 
-        this.parent.updateMapImage();
-        this.update();
-    }
+		this.parent.updateMapImage();
+		this.update();
+	}
 }

@@ -5,12 +5,12 @@ import { HistoricListingGradeViewModel } from "./history-listing/grade.view";
 import { PropertyTypeViewModel } from "./property-type.view";
 
 export class PropertySummaryModel extends ViewModel<Property> {
-    id;
-    
-    name;
-    bounds;
+	id;
+	
+	name;
+	bounds;
 
-    type: PropertyTypeViewModel;
-    borough: BoroughSummaryModel;
-    historicListingGrade: HistoricListingGradeViewModel;
+	type: PropertyTypeViewModel;
+	borough: BoroughSummaryModel;
+	historicListingGrade: HistoricListingGradeViewModel;
 }

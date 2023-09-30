@@ -7,18 +7,18 @@ import { PlayerViewModel } from "./player.view";
 import { PropertyTypeViewModel } from "./property-type.view";
 
 export class PropertyViewModel extends ViewModel<Property> {
-    id;
+	id;
 
-    name;
-    code;
+	name;
+	code;
 
-    bounds;
+	bounds;
 
-    historicListingRegisteredAt;
-    historicListingGrade: HistoricListingGradeViewModel;
-    historicListingModifiers: PropertyHistoricListingModifierViewModel[];
+	historicListingRegisteredAt;
+	historicListingGrade: HistoricListingGradeViewModel;
+	historicListingModifiers: PropertyHistoricListingModifierViewModel[];
 
-    owner: PlayerViewModel;
-    borough: BoroughSummaryModel;
-    type: PropertyTypeViewModel;
+	owner: PlayerViewModel;
+	borough: BoroughSummaryModel;
+	type: PropertyTypeViewModel;
 }

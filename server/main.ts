@@ -10,22 +10,22 @@ console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
 
 DbClient.connectedClient.connect().then(() => {
-    console.log("connected to database!");
+	console.log("connected to database!");
 
-    const app = new ManagedServer();
-    const db = new DbContext(new RunContext());
+	const app = new ManagedServer();
+	const db = new DbContext(new RunContext());
 
-    ViewModel.globalFetchingContext = db;
+	ViewModel.globalFetchingContext = db;
 
-    new Proxy(app);
+	new Proxy(app);
 
-    app.createInjector = context => new Inject({
-        Context: context,
-        DbContext: db
-    });
+	app.createInjector = context => new Inject({
+		Context: context,
+		DbContext: db
+	});
 
-    app.use(new StaticFileRoute("/", path.join(__dirname, "..", "..", "page", "dist")));
-    app.use(new StaticFileRoute("*", path.join(__dirname, "..", "..", "page", "dist", "index.html")));
+	app.use(new StaticFileRoute("/", path.join(__dirname, "..", "..", "page", "dist")));
+	app.use(new StaticFileRoute("*", path.join(__dirname, "..", "..", "page", "dist", "index.html")));
 
-    app.start(+process.env.PORT || 7420);
+	app.start(+process.env.PORT || 7420);
 });

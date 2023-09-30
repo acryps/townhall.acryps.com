@@ -5,41 +5,41 @@ import { Point } from "../point";
 import { Layer } from "./layer";
 
 export class WaterLayer extends Layer {
-    order = 1;
+	order = 1;
 
-    async load() {
-        for (let waterBody of await new MapService().getWaterBodies()) {
-            const points = Point.unpack(waterBody.bounds);
+	async load() {
+		for (let waterBody of await new MapService().getWaterBodies()) {
+			const points = Point.unpack(waterBody.bounds);
 
-            this.add(new MapPolygon(points, true, 'water'));
+			this.add(new MapPolygon(points, true, 'water'));
 
-            const path = waterBody.namePath ? Point.unpack(waterBody.namePath) : [Point.center(points)];
+			const path = waterBody.namePath ? Point.unpack(waterBody.namePath) : [Point.center(points)];
 
-            if (path.length == 1) {
-                this.add(new MapLabel(waterBody.name, path[0], 2));
-            } else {
-                let length = 0;
+			if (path.length == 1) {
+				this.add(new MapLabel(waterBody.name, path[0], 2));
+			} else {
+				let length = 0;
 
-                for (let i = 1; i < path.length; i++) {
-                    const first = path[i - 1];
-                    const last = path[i];
+				for (let i = 1; i < path.length; i++) {
+					const first = path[i - 1];
+					const last = path[i];
 
-                    length += Math.sqrt((first.x - last.x) ** 2 + (first.y - last.y) ** 2);
-                }
+					length += Math.sqrt((first.x - last.x) ** 2 + (first.y - last.y) ** 2);
+				}
 
-                const step = waterBody.name.length * 3 + 20;
+				const step = waterBody.name.length * 3 + 20;
 
-                for (let i = (length % step) / 2; i < length; i += step) {
-                    this.add(new MapLabel(waterBody.name, null, 2, path, 100 / length * i));
-                }
-            }
-        }
+				for (let i = (length % step) / 2; i < length; i += step) {
+					this.add(new MapLabel(waterBody.name, null, 2, path, 100 / length * i));
+				}
+			}
+		}
 
-        for (let bridge of await new MapService().getBridges()) {
-            const path = Point.unpack(bridge.path);
+		for (let bridge of await new MapService().getBridges()) {
+			const path = Point.unpack(bridge.path);
 
-            this.add(new MapPolygon(path, true, 'bridge'));
-            this.add(new MapLabel(bridge.name, Point.center(path), null, path));
-        }
-    }
+			this.add(new MapPolygon(path, true, 'bridge'));
+			this.add(new MapLabel(bridge.name, Point.center(path), null, path));
+		}
+	}
 }

@@ -12,111 +12,111 @@ import { StreetViewModel } from "./street.view";
 import { WaterBodyViewModel } from "./water-body.view";
 
 export class MapService extends Service {
-    constructor(
-        private db: DbContext
-    ) {
-        super();
-    }
+	constructor(
+		private db: DbContext
+	) {
+		super();
+	}
 
-    getBoroughs() {
-        return BoroughViewModel.from(
-            this.db.borough
-                .orderByAscending(borough => borough.name)
-        );
-    }
+	getBoroughs() {
+		return BoroughViewModel.from(
+			this.db.borough
+				.orderByAscending(borough => borough.name)
+		);
+	}
 
-    getProperties() {
-        return PropertySummaryModel.from(
-            this.db.property
-                .orderByDescending(property => property.borough)
-                .orderByDescending(property => property.type)
-        );
-    }
+	getProperties() {
+		return PropertySummaryModel.from(
+			this.db.property
+				.orderByDescending(property => property.borough)
+				.orderByDescending(property => property.type)
+		);
+	}
 
-    getStreets() {
-        return StreetViewModel.from(
-            this.db.street
-                .orderByAscending(street => street.size)
-                .orderByAscending(street => street.name)
-        );
-    }
+	getStreets() {
+		return StreetViewModel.from(
+			this.db.street
+				.orderByAscending(street => street.size)
+				.orderByAscending(street => street.name)
+		);
+	}
 
-    getSquares() {
-        return SquareViewModel.from(
-            this.db.square
-                .orderByAscending(square => square.name)
-        );
-    }
+	getSquares() {
+		return SquareViewModel.from(
+			this.db.square
+				.orderByAscending(square => square.name)
+		);
+	}
 
-    getWaterBodies() {
-        return WaterBodyViewModel.from(
-            this.db.waterBody
-                .orderByAscending(body => body.name)
-        );
-    }
+	getWaterBodies() {
+		return WaterBodyViewModel.from(
+			this.db.waterBody
+				.orderByAscending(body => body.name)
+		);
+	}
 
-    getBridges() {
-        return BridgeViewModel.from(
-            this.db.bridge
-                .orderByAscending(bridge => bridge.name)
-        );
-    }
+	getBridges() {
+		return BridgeViewModel.from(
+			this.db.bridge
+				.orderByAscending(bridge => bridge.name)
+		);
+	}
 
-    async getHistory() {
-        return HistoryEntryViewModel.from(await Proxy.getHistory());
-    }
+	async getHistory() {
+		return HistoryEntryViewModel.from(await Proxy.getHistory());
+	}
 
-    async getTubes() {
-        return await Proxy.getTubes();
-    }
+	async getTubes() {
+		return await Proxy.getTubes();
+	}
 
-    async getPropertyTypes() {
-        return PropertyTypeViewModel.from(this.db.propertyType.orderByAscending(type => type.code));
-    }
+	async getPropertyTypes() {
+		return PropertyTypeViewModel.from(this.db.propertyType.orderByAscending(type => type.code));
+	}
 
-    async getProperty(id: string) {
-        return new PropertyViewModel(await this.db.property.find(id));
-    }
+	async getProperty(id: string) {
+		return new PropertyViewModel(await this.db.property.find(id));
+	}
 
-    async createProperty(propertyViewModel: PropertyViewModel) {
-        const property = await propertyViewModel.toModel();
+	async createProperty(propertyViewModel: PropertyViewModel) {
+		const property = await propertyViewModel.toModel();
 
-        await property.create();
-    }
+		await property.create();
+	}
 
-    async createBorough(boroughViewModel: BoroughViewModel) {
-        const borough = await boroughViewModel.toModel();
+	async createBorough(boroughViewModel: BoroughViewModel) {
+		const borough = await boroughViewModel.toModel();
 
-        await borough.create();
-    }
+		await borough.create();
+	}
 
-    async createStreet(streetViewModel: StreetViewModel) {
-        const street = await streetViewModel.toModel();
+	async createStreet(streetViewModel: StreetViewModel) {
+		const street = await streetViewModel.toModel();
 
-        await street.create();
-    }
+		await street.create();
+	}
 
-    async createSquare(squareViewModel: SquareViewModel) {
-        const square = await squareViewModel.toModel();
+	async createSquare(squareViewModel: SquareViewModel) {
+		const square = await squareViewModel.toModel();
 
-        await square.create();
-    }
+		await square.create();
+	}
 
-    async createWaterBody(waterBodyViewModel: WaterBodyViewModel) {
-        const waterBody = await waterBodyViewModel.toModel();
+	async createWaterBody(waterBodyViewModel: WaterBodyViewModel) {
+		const waterBody = await waterBodyViewModel.toModel();
 
-        await waterBody.create();
-    }
+		await waterBody.create();
+	}
 
-    async saveProperty(propertyViewModel: PropertySummaryModel) {
-        const property = await propertyViewModel.toModel();
+	async saveProperty(propertyViewModel: PropertySummaryModel) {
+		const property = await propertyViewModel.toModel();
 
-        await property.update();
-    }
+		await property.update();
+	}
 
-    async deleteProperty(propertyViewModel: PropertyViewModel) {
-        const property = await propertyViewModel.toModel();
+	async deleteProperty(propertyViewModel: PropertyViewModel) {
+		const property = await propertyViewModel.toModel();
 
-        await property.delete();
-    }
+		await property.delete();
+	}
 }

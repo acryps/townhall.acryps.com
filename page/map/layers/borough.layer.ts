@@ -6,21 +6,21 @@ import { Point } from "../point";
 import { Layer } from "./layer";
 
 export class BoroughLayer extends Layer {
-    order = 2;
+	order = 2;
 
-    async load() {
-        const boroughts = await new MapService().getBoroughs();
+	async load() {
+		const boroughts = await new MapService().getBoroughs();
 
-        for (let borough of boroughts) {
-            const bounds = Point.unpack(borough.bounds);
-            
-            this.add(new MapPolygon(bounds, true, 'borough', borough.color));
-        }
+		for (let borough of boroughts) {
+			const bounds = Point.unpack(borough.bounds);
+			
+			this.add(new MapPolygon(bounds, true, 'borough', borough.color));
+		}
 
-        for (let borough of boroughts) {
-            const bounds = Point.unpack(borough.bounds);
-        
-            this.add(new MapLabel(borough.name, Point.center(bounds), 5))
-        }
-    }
+		for (let borough of boroughts) {
+			const bounds = Point.unpack(borough.bounds);
+		
+			this.add(new MapLabel(borough.name, Point.center(bounds), 5))
+		}
+	}
 }

@@ -10,5 +10,5 @@ export class PageComponent extends Component {
 
 			{child}
 		</ui-page>;
-    }
+	}
 }

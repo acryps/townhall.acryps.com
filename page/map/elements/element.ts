@@ -1,6 +1,6 @@
 export interface MapElement {
-    append(element: SVGElement);
-    update();
-    
-    resize?(zoom: number);
+	append(element: SVGElement);
+	update();
+	
+	resize?(zoom: number);
 }

@@ -3,10 +3,10 @@ import { TrainStop } from "../../managed/database";
 import { TrainStationViewModel } from "./station.view";
 
 export class TrainStopViewModel extends ViewModel<TrainStop> {
-    id;
-    name;
+	id;
+	name;
 
-    trackPosition;
+	trackPosition;
 
-    stationId;
+	stationId;
 }

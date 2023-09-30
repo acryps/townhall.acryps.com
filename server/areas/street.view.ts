@@ -3,13 +3,13 @@ import { Street } from "../managed/database";
 import { BridgeViewModel } from "./bridge.view";
 
 export class StreetViewModel extends ViewModel<Street> {
-    id;
+	id;
 
-    name;
-    shortName;
+	name;
+	shortName;
 
-    path;
-    size;
+	path;
+	size;
 
-    bridges: BridgeViewModel[];
+	bridges: BridgeViewModel[];
 }

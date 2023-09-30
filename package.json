@@ -2,6 +2,6 @@
     "name": "townhall",
     "version": "2.3.4",
     "scripts": {
-        "build": "cd server && npm run build && cd .. && cd client && npm run build && cd .."
+        "build": "cd server && npm run build && cd .. && cd page && npm run build && cd .."
     }
 }

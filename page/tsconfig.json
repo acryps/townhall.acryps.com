@@ -1,0 +1,9 @@
+{
+	"compilerOptions": {
+		"outDir": "dist",
+		"moduleResolution": "node",
+		"target": "esnext",
+		"jsx": "react",
+		"jsxFactory": "Component.createElement"
+	}
+}

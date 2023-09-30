@@ -1,16 +1,25 @@
 {
-    "name": "server-townhall",
-    "scripts": {
-        "build": "vlserver compile && tsc && vlquery compile"
-    },
-    "dependencies": {
-        "js-md5": "^0.7.3",
-        "node-fetch": "^2.6.6",
-        "sharp": "^0.30.2",
-        "vlquery": "^5.5.5",
-        "vlserver": "^4.0.2"
-    },
-    "devDependencies": {
-        "typescript": "^5.2.2"
-    }
+	"name": "server-townhall",
+	"scripts": {
+		"build": "vlserver compile && tsc && vlquery compile",
+		"start": "vlserver compile && tsc && vlquery compile && environment node dist/main.js"
+	},
+	"environment": {
+		"pghost": "Postgres host",
+		"pgdatabase": "Postgres database",
+		"pguser": "Postgres user",
+		"pgpassword": "Postgres password",
+		"townhallServerAddress": "Minecraft File Server Location"
+	},
+	"dependencies": {
+		"@acryps/environment": "^2.4.0",
+		"js-md5": "^0.7.3",
+		"node-fetch": "^2.6.6",
+		"sharp": "^0.30.2",
+		"vlquery": "^5.5.5",
+		"vlserver": "^4.0.2"
+	},
+	"devDependencies": {
+		"typescript": "^5.2.2"
+	}
 }

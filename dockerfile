@@ -5,7 +5,7 @@ COPY . .
 
 RUN npm install
 RUN cd server && npm install && cd ..
-RUN cd client && npm install && cd ..
+RUN cd page && npm install && cd ..
 RUN npm run build
 
 CMD [ "node", "server/dist/main.js" ]

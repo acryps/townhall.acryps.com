@@ -24,10 +24,8 @@ DbClient.connectedClient.connect().then(() => {
         DbContext: db
     });
 
-    app.use(new StaticFileRoute("/scripts", path.join(__dirname, "..", "..", "client", "dist", "scripts.js")));
-    app.use(new StaticFileRoute("/styles", path.join(__dirname, "..", "..", "client", "dist", "styles.css")));
-    app.use(new StaticFileRoute("/node_modules", path.join(__dirname, "..", "..", "client", "node_modules")));
-    app.use(new StaticFileRoute("/", path.join(__dirname, "..", "..", "client", "assets")));
+    app.use(new StaticFileRoute("/", path.join(__dirname, "..", "..", "page", "dist")));
+    app.use(new StaticFileRoute("*", path.join(__dirname, "..", "..", "page", "dist", "index.html")));
 
     app.start(+process.env.PORT || 7420);
 });

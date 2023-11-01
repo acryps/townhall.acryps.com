@@ -10,56 +10,20 @@ export class MapImageComponent extends Component {
 	size = 250;
 	preload = 1;
 
-	canvas: HTMLCanvasElement;
-	context: CanvasRenderingContext2D;
-
 	tiles = new Map<string, Promise<void>>();
 
 	render() {
-		if (!this.canvas) {
-			this.canvas = document.createElement('canvas');
-			this.canvas.width = world.size;
-			this.canvas.height = world.size;
-
-			this.context = this.canvas.getContext('2d');
-			this.context.fillStyle = '#eee';
-
-			for (let y = 0; y < world.size / this.size; y++) {
-				for (let x = 0; x < world.size / this.size; x++) {
-					if ((x + y) % 2) {
-						this.context.rect(x * this.size, y * this.size, this.size, this.size);
-					}
-				}
-			}
-
-			this.context.fill();
-		}
-
 		this.parent.onScroll.push(() => {
 			this.loadMissingTiles();
 		});
 
-		return this.canvas;
+		return <ui-map-image style={`--tile-size: ${this.size}; --world-size: ${world.size}`}></ui-map-image>;
 	}
 
 	load(source: string) {
 		this.source = source;
 
-		if (this.context) {
-			const border = 2;
-
-			this.context.beginPath();
-			this.context.strokeStyle = '#fff';
-			this.context.lineWidth = border;
-
-			for (let key in this.tiles) {
-				const [ x, y ] = key.split(',');
-
-				this.context.rect(+x * this.size + border, +y * this.size + border, this.size - border * 2, this.size - border * 2);
-			}
-
-			this.context.stroke();
-		}
+		// TODO add reloading indicator
 
 		this.tiles = new Map<string, Promise<void>>();
 		this.loadMissingTiles();
@@ -161,7 +125,17 @@ export class MapImageComponent extends Component {
 
 				image.onload = () => {
 					if (source == this.source) {
-						this.context.drawImage(image, x * this.size, y * this.size);
+						const canvas = document.createElement('canvas');
+						canvas.width = this.size;
+						canvas.height = this.size;
+
+						canvas.style.setProperty('--x', x.toString());
+						canvas.style.setProperty('--y', y.toString());
+
+						this.rootNode.appendChild(canvas);
+
+						const context = canvas.getContext('2d');
+						context.drawImage(image, 0, 0);
 					}
 				};
 

@@ -366,7 +366,7 @@ export class MapComponent extends Component {
 		const position = this.translate(rect.x + rect.width / 2, rect.y + rect.height / 2, this.lastRenderedZoom);
 
 		this.cursor.style.setProperty('--size', `${this.zoom}px`);
-		this.image.canvas.style.width = `${world.size * this.zoom}px`;
+		this.rootNode.style.setProperty('--map-zoomed-size', `${world.size * this.zoom}px`);
 
 		this.focus(position);
 

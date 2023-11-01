@@ -256,11 +256,30 @@ ui-map {
 
 		overflow: scroll;
 
-		canvas {
-			grid-column: 1;
-  			grid-row: 1;
+		ui-map-image {
+			--tile-zoomed-size: calc(var(--map-zoomed-size) / var(--world-size) * var(--tile-size));
 
-			image-rendering: pixelated;
+			position: relative;
+
+			grid-column: 1;
+			grid-row: 1;
+
+			width: var(--map-zoomed-size);
+			height: var(--map-zoomed-size);
+
+			background: linear-gradient(45deg, #ccc, #fff);
+			background-repeat: repeat;
+			background-size: var(--tile-zoomed-size) var(--tile-zoomed-size);
+
+			canvas {
+				position: absolute;
+				left: calc(var(--tile-zoomed-size) * var(--x));
+				top: calc(var(--tile-zoomed-size) * var(--y));
+
+				width: vaR(--tile-zoomed-size);
+				
+				image-rendering: pixelated;
+			}
 		}
 
 		ui-cursor {

@@ -2,7 +2,8 @@
 	"name": "server-townhall",
 	"scripts": {
 		"build": "vlserver compile && tsc && vlquery compile",
-		"start": "vlserver compile && tsc && vlquery compile && environment node dist/main.js"
+		"start": "vlserver compile && tsc && vlquery compile && environment node dist/main.js",
+		"update:database": "environment vlquery create-context"
 	},
 	"environment": {
 		"pghost": "Postgres host",

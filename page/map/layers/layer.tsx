@@ -1,7 +1,6 @@
 import { Map } from "../elements/map";
-import { Point } from "../point";
 import { MapElement } from "../elements/element";
-import { MapComponent } from "map/map.component";
+import { MapComponent } from "../map.component";
 
 export class Layer {
 	order: number;

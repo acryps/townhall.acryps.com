@@ -402,28 +402,28 @@ ViewModel.mappings = {
 	BoroughViewModel: class ComposedBoroughViewModel extends BoroughViewModel {
 		async map() {
 			return {
-				id: this.model.id,
-				name: this.model.name,
+				bounds: this.model.bounds,
 				color: this.model.color,
-				bounds: this.model.bounds
+				id: this.model.id,
+				name: this.model.name
 			}
 		};
 
 		static get items() { 
 			return {
-				id: true,
-				name: true,
+				bounds: true,
 				color: true,
-				bounds: true
+				id: true,
+				name: true
 			};
 		}
 
 		static toViewModel(data) {
 			const item = new BoroughViewModel(null);
+			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
+			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
-			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 
 			return item;
 		}
@@ -437,10 +437,10 @@ ViewModel.mappings = {
 				model = new Borough();
 			}
 			
+			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
+			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
-			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 
 			return model;
 		}
@@ -490,28 +490,28 @@ ViewModel.mappings = {
 	HistoricListingGradeViewModel: class ComposedHistoricListingGradeViewModel extends HistoricListingGradeViewModel {
 		async map() {
 			return {
-				id: this.model.id,
+				description: this.model.description,
 				grade: this.model.grade,
-				name: this.model.name,
-				description: this.model.description
+				id: this.model.id,
+				name: this.model.name
 			}
 		};
 
 		static get items() { 
 			return {
-				id: true,
+				description: true,
 				grade: true,
-				name: true,
-				description: true
+				id: true,
+				name: true
 			};
 		}
 
 		static toViewModel(data) {
 			const item = new HistoricListingGradeViewModel(null);
-			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
-			"grade" in data && (item.grade = data.grade === null ? null : +data.grade);
-			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			"grade" in data && (item.grade = data.grade === null ? null : +data.grade);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 
 			return item;
 		}
@@ -525,10 +525,10 @@ ViewModel.mappings = {
 				model = new HistoricListingGrade();
 			}
 			
-			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
-			"grade" in viewModel && (model.grade = viewModel.grade === null ? null : +viewModel.grade);
-			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+			"grade" in viewModel && (model.grade = viewModel.grade === null ? null : +viewModel.grade);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 
 			return model;
 		}
@@ -576,28 +576,28 @@ ViewModel.mappings = {
 	HistoricListingModifierViewModel: class ComposedHistoricListingModifierViewModel extends HistoricListingModifierViewModel {
 		async map() {
 			return {
+				description: this.model.description,
 				id: this.model.id,
-				shortName: this.model.shortName,
 				name: this.model.name,
-				description: this.model.description
+				shortName: this.model.shortName
 			}
 		};
 
 		static get items() { 
 			return {
+				description: true,
 				id: true,
-				shortName: true,
 				name: true,
-				description: true
+				shortName: true
 			};
 		}
 
 		static toViewModel(data) {
 			const item = new HistoricListingModifierViewModel(null);
-			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
-			"shortName" in data && (item.shortName = data.shortName === null ? null : `${data.shortName}`);
-			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"shortName" in data && (item.shortName = data.shortName === null ? null : `${data.shortName}`);
 
 			return item;
 		}
@@ -611,10 +611,10 @@ ViewModel.mappings = {
 				model = new HistoricListingModifier();
 			}
 			
-			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
-			"shortName" in viewModel && (model.shortName = viewModel.shortName === null ? null : `${viewModel.shortName}`);
-			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"shortName" in viewModel && (model.shortName = viewModel.shortName === null ? null : `${viewModel.shortName}`);
 
 			return model;
 		}
@@ -692,28 +692,28 @@ ViewModel.mappings = {
 	PropertyTypeViewModel: class ComposedPropertyTypeViewModel extends PropertyTypeViewModel {
 		async map() {
 			return {
-				id: this.model.id,
-				name: this.model.name,
+				code: this.model.code,
 				color: this.model.color,
-				code: this.model.code
+				id: this.model.id,
+				name: this.model.name
 			}
 		};
 
 		static get items() { 
 			return {
-				id: true,
-				name: true,
+				code: true,
 				color: true,
-				code: true
+				id: true,
+				name: true
 			};
 		}
 
 		static toViewModel(data) {
 			const item = new PropertyTypeViewModel(null);
+			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
+			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
-			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
 
 			return item;
 		}
@@ -727,10 +727,10 @@ ViewModel.mappings = {
 				model = new PropertyType();
 			}
 			
+			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
+			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
-			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
 
 			return model;
 		}
@@ -741,9 +741,9 @@ ViewModel.mappings = {
 				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.model.borough)),
 				historicListingGrade: new HistoricListingGradeViewModel(await BaseServer.unwrap(this.model.historicListingGrade)),
 				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.model.type)),
+				bounds: this.model.bounds,
 				id: this.model.id,
-				name: this.model.name,
-				bounds: this.model.bounds
+				name: this.model.name
 			}
 		};
 
@@ -758,9 +758,9 @@ ViewModel.mappings = {
 				get type() { 
 					return ViewModel.mappings.PropertyTypeViewModel.items;
 				},
+				bounds: true,
 				id: true,
-				name: true,
-				bounds: true
+				name: true
 			};
 		}
 
@@ -769,9 +769,9 @@ ViewModel.mappings = {
 			"borough" in data && (item.borough = data.borough && ViewModel.mappings.BoroughSummaryModel.toViewModel(data.borough));
 			"historicListingGrade" in data && (item.historicListingGrade = data.historicListingGrade && ViewModel.mappings.HistoricListingGradeViewModel.toViewModel(data.historicListingGrade));
 			"type" in data && (item.type = data.type && ViewModel.mappings.PropertyTypeViewModel.toViewModel(data.type));
+			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 
 			return item;
 		}
@@ -788,9 +788,9 @@ ViewModel.mappings = {
 			"borough" in viewModel && (model.borough.id = viewModel.borough ? viewModel.borough.id : null);
 			"historicListingGrade" in viewModel && (model.historicListingGrade.id = viewModel.historicListingGrade ? viewModel.historicListingGrade.id : null);
 			"type" in viewModel && (model.type.id = viewModel.type ? viewModel.type.id : null);
+			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 
 			return model;
 		}
@@ -803,11 +803,11 @@ ViewModel.mappings = {
 				owner: new PlayerViewModel(await BaseServer.unwrap(this.model.owner)),
 				historicListingModifiers: (await this.model.historicListingModifiers.includeTree(ViewModel.mappings.PropertyHistoricListingModifierViewModel.items).toArray()).map(item => new PropertyHistoricListingModifierViewModel(item)),
 				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.model.type)),
-				id: this.model.id,
-				name: this.model.name,
-				code: this.model.code,
 				bounds: this.model.bounds,
-				historicListingRegisteredAt: this.model.historicListingRegisteredAt
+				code: this.model.code,
+				historicListingRegisteredAt: this.model.historicListingRegisteredAt,
+				id: this.model.id,
+				name: this.model.name
 			}
 		};
 
@@ -828,11 +828,11 @@ ViewModel.mappings = {
 				get type() { 
 					return ViewModel.mappings.PropertyTypeViewModel.items;
 				},
-				id: true,
-				name: true,
-				code: true,
 				bounds: true,
-				historicListingRegisteredAt: true
+				code: true,
+				historicListingRegisteredAt: true,
+				id: true,
+				name: true
 			};
 		}
 
@@ -843,11 +843,11 @@ ViewModel.mappings = {
 			"owner" in data && (item.owner = data.owner && ViewModel.mappings.PlayerViewModel.toViewModel(data.owner));
 			"historicListingModifiers" in data && (item.historicListingModifiers = data.historicListingModifiers && [...data.historicListingModifiers].map(i => ViewModel.mappings.PropertyHistoricListingModifierViewModel.toViewModel(i)));
 			"type" in data && (item.type = data.type && ViewModel.mappings.PropertyTypeViewModel.toViewModel(data.type));
+			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
+			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
+			"historicListingRegisteredAt" in data && (item.historicListingRegisteredAt = data.historicListingRegisteredAt === null ? null : new Date(data.historicListingRegisteredAt));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
-			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
-			"historicListingRegisteredAt" in data && (item.historicListingRegisteredAt = data.historicListingRegisteredAt === null ? null : new Date(data.historicListingRegisteredAt));
 
 			return item;
 		}
@@ -866,11 +866,11 @@ ViewModel.mappings = {
 			"owner" in viewModel && (model.owner.id = viewModel.owner ? viewModel.owner.id : null);
 			"historicListingModifiers" in viewModel && (null);
 			"type" in viewModel && (model.type.id = viewModel.type ? viewModel.type.id : null);
+			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
+			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
+			"historicListingRegisteredAt" in viewModel && (model.historicListingRegisteredAt = viewModel.historicListingRegisteredAt === null ? null : new Date(viewModel.historicListingRegisteredAt));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
-			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
-			"historicListingRegisteredAt" in viewModel && (model.historicListingRegisteredAt = viewModel.historicListingRegisteredAt === null ? null : new Date(viewModel.historicListingRegisteredAt));
 
 			return model;
 		}
@@ -879,9 +879,9 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.model.borough)),
+				bounds: this.model.bounds,
 				id: this.model.id,
-				name: this.model.name,
-				bounds: this.model.bounds
+				name: this.model.name
 			}
 		};
 
@@ -890,18 +890,18 @@ ViewModel.mappings = {
 				get borough() { 
 					return ViewModel.mappings.BoroughSummaryModel.items;
 				},
+				bounds: true,
 				id: true,
-				name: true,
-				bounds: true
+				name: true
 			};
 		}
 
 		static toViewModel(data) {
 			const item = new SquareViewModel(null);
 			"borough" in data && (item.borough = data.borough && ViewModel.mappings.BoroughSummaryModel.toViewModel(data.borough));
+			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 
 			return item;
 		}
@@ -916,9 +916,9 @@ ViewModel.mappings = {
 			}
 			
 			"borough" in viewModel && (model.borough.id = viewModel.borough ? viewModel.borough.id : null);
+			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 
 			return model;
 		}
@@ -929,9 +929,9 @@ ViewModel.mappings = {
 				bridges: (await this.model.bridges.includeTree(ViewModel.mappings.BridgeViewModel.items).toArray()).map(item => new BridgeViewModel(item)),
 				id: this.model.id,
 				name: this.model.name,
+				path: this.model.path,
 				shortName: this.model.shortName,
-				size: this.model.size,
-				path: this.model.path
+				size: this.model.size
 			}
 		};
 
@@ -942,9 +942,9 @@ ViewModel.mappings = {
 				},
 				id: true,
 				name: true,
+				path: true,
 				shortName: true,
-				size: true,
-				path: true
+				size: true
 			};
 		}
 
@@ -953,9 +953,9 @@ ViewModel.mappings = {
 			"bridges" in data && (item.bridges = data.bridges && [...data.bridges].map(i => ViewModel.mappings.BridgeViewModel.toViewModel(i)));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"path" in data && (item.path = data.path === null ? null : `${data.path}`);
 			"shortName" in data && (item.shortName = data.shortName === null ? null : `${data.shortName}`);
 			"size" in data && (item.size = data.size === null ? null : +data.size);
-			"path" in data && (item.path = data.path === null ? null : `${data.path}`);
 
 			return item;
 		}
@@ -972,9 +972,9 @@ ViewModel.mappings = {
 			"bridges" in viewModel && (null);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"path" in viewModel && (model.path = viewModel.path === null ? null : `${viewModel.path}`);
 			"shortName" in viewModel && (model.shortName = viewModel.shortName === null ? null : `${viewModel.shortName}`);
 			"size" in viewModel && (model.size = viewModel.size === null ? null : +viewModel.size);
-			"path" in viewModel && (model.path = viewModel.path === null ? null : `${viewModel.path}`);
 
 			return model;
 		}
@@ -1031,10 +1031,10 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				stops: (await this.model.stops.includeTree(ViewModel.mappings.TrainStopViewModel.items).toArray()).map(item => new TrainStopViewModel(item)),
+				color: this.model.color,
 				id: this.model.id,
 				name: this.model.name,
-				path: this.model.path,
-				color: this.model.color
+				path: this.model.path
 			}
 		};
 
@@ -1043,20 +1043,20 @@ ViewModel.mappings = {
 				get stops() { 
 					return ViewModel.mappings.TrainStopViewModel.items;
 				},
+				color: true,
 				id: true,
 				name: true,
-				path: true,
-				color: true
+				path: true
 			};
 		}
 
 		static toViewModel(data) {
 			const item = new TrainRouteViewModel(null);
 			"stops" in data && (item.stops = data.stops && [...data.stops].map(i => ViewModel.mappings.TrainStopViewModel.toViewModel(i)));
+			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"path" in data && (item.path = data.path === null ? null : `${data.path}`);
-			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
 
 			return item;
 		}
@@ -1071,10 +1071,10 @@ ViewModel.mappings = {
 			}
 			
 			"stops" in viewModel && (null);
+			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"path" in viewModel && (model.path = viewModel.path === null ? null : `${viewModel.path}`);
-			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
 
 			return model;
 		}
@@ -1126,8 +1126,8 @@ ViewModel.mappings = {
 			return {
 				id: this.model.id,
 				name: this.model.name,
-				trackPosition: this.model.trackPosition,
-				stationId: this.model.stationId
+				stationId: this.model.stationId,
+				trackPosition: this.model.trackPosition
 			}
 		};
 
@@ -1135,8 +1135,8 @@ ViewModel.mappings = {
 			return {
 				id: true,
 				name: true,
-				trackPosition: true,
-				stationId: true
+				stationId: true,
+				trackPosition: true
 			};
 		}
 
@@ -1144,8 +1144,8 @@ ViewModel.mappings = {
 			const item = new TrainStopViewModel(null);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"trackPosition" in data && (item.trackPosition = data.trackPosition === null ? null : `${data.trackPosition}`);
 			"stationId" in data && (item.stationId = data.stationId === null ? null : `${data.stationId}`);
+			"trackPosition" in data && (item.trackPosition = data.trackPosition === null ? null : `${data.trackPosition}`);
 
 			return item;
 		}
@@ -1161,8 +1161,8 @@ ViewModel.mappings = {
 			
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"trackPosition" in viewModel && (model.trackPosition = viewModel.trackPosition === null ? null : `${viewModel.trackPosition}`);
 			"stationId" in viewModel && (model.stationId = viewModel.stationId === null ? null : `${viewModel.stationId}`);
+			"trackPosition" in viewModel && (model.trackPosition = viewModel.trackPosition === null ? null : `${viewModel.trackPosition}`);
 
 			return model;
 		}
@@ -1170,27 +1170,27 @@ ViewModel.mappings = {
 	WaterBodyViewModel: class ComposedWaterBodyViewModel extends WaterBodyViewModel {
 		async map() {
 			return {
+				bounds: this.model.bounds,
 				id: this.model.id,
 				name: this.model.name,
-				bounds: this.model.bounds,
 				namePath: this.model.namePath
 			}
 		};
 
 		static get items() { 
 			return {
+				bounds: true,
 				id: true,
 				name: true,
-				bounds: true,
 				namePath: true
 			};
 		}
 
 		static toViewModel(data) {
 			const item = new WaterBodyViewModel(null);
+			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"namePath" in data && (item.namePath = data.namePath === null ? null : `${data.namePath}`);
 
 			return item;
@@ -1205,9 +1205,9 @@ ViewModel.mappings = {
 				model = new WaterBody();
 			}
 			
+			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 			"namePath" in viewModel && (model.namePath = viewModel.namePath === null ? null : `${viewModel.namePath}`);
 
 			return model;

@@ -8,4 +8,4 @@ export class Map {
 	) {}
 }
 
-export const world = new Map(4000, new Point(-2000, -2000), new Point(0, 0));
+export const world = new Map(8000, new Point(-4000, -4000), new Point(0, 0));

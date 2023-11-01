@@ -14,17 +14,17 @@ export class BoroughSummaryModel {
 }
 
 export class BoroughViewModel {
+	bounds: string;
+	color: string;
 	id: string;
 	name: string;
-	color: string;
-	bounds: string;
 
 	private static $build(raw) {
 		const item = new BoroughViewModel();
+		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
+		item.color = raw.color === null ? null : `${raw.color}`
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
-		item.color = raw.color === null ? null : `${raw.color}`
-		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
 		
 		return item;
 	}
@@ -46,17 +46,17 @@ export class BridgeViewModel {
 }
 
 export class HistoricListingGradeViewModel {
-	id: string;
-	grade: number;
-	name: string;
 	description: string;
+	grade: number;
+	id: string;
+	name: string;
 
 	private static $build(raw) {
 		const item = new HistoricListingGradeViewModel();
-		item.id = raw.id === null ? null : `${raw.id}`
-		item.grade = raw.grade === null ? null : +raw.grade
-		item.name = raw.name === null ? null : `${raw.name}`
 		item.description = raw.description === null ? null : `${raw.description}`
+		item.grade = raw.grade === null ? null : +raw.grade
+		item.id = raw.id === null ? null : `${raw.id}`
+		item.name = raw.name === null ? null : `${raw.name}`
 		
 		return item;
 	}
@@ -76,17 +76,17 @@ export class PropertyHistoricListingModifierViewModel {
 }
 
 export class HistoricListingModifierViewModel {
-	id: string;
-	shortName: string;
-	name: string;
 	description: string;
+	id: string;
+	name: string;
+	shortName: string;
 
 	private static $build(raw) {
 		const item = new HistoricListingModifierViewModel();
-		item.id = raw.id === null ? null : `${raw.id}`
-		item.shortName = raw.shortName === null ? null : `${raw.shortName}`
-		item.name = raw.name === null ? null : `${raw.name}`
 		item.description = raw.description === null ? null : `${raw.description}`
+		item.id = raw.id === null ? null : `${raw.id}`
+		item.name = raw.name === null ? null : `${raw.name}`
+		item.shortName = raw.shortName === null ? null : `${raw.shortName}`
 		
 		return item;
 	}
@@ -119,17 +119,17 @@ export class PlayerViewModel {
 }
 
 export class PropertyTypeViewModel {
+	code: string;
+	color: string;
 	id: string;
 	name: string;
-	color: string;
-	code: string;
 
 	private static $build(raw) {
 		const item = new PropertyTypeViewModel();
+		item.code = raw.code === null ? null : `${raw.code}`
+		item.color = raw.color === null ? null : `${raw.color}`
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
-		item.color = raw.color === null ? null : `${raw.color}`
-		item.code = raw.code === null ? null : `${raw.code}`
 		
 		return item;
 	}
@@ -139,18 +139,18 @@ export class PropertySummaryModel {
 	borough: BoroughSummaryModel;
 	historicListingGrade: HistoricListingGradeViewModel;
 	type: PropertyTypeViewModel;
+	bounds: string;
 	id: string;
 	name: string;
-	bounds: string;
 
 	private static $build(raw) {
 		const item = new PropertySummaryModel();
 		item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null
 		item.historicListingGrade = raw.historicListingGrade ? HistoricListingGradeViewModel["$build"](raw.historicListingGrade) : null
 		item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null
+		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
-		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
 		
 		return item;
 	}
@@ -162,11 +162,11 @@ export class PropertyViewModel {
 	owner: PlayerViewModel;
 	historicListingModifiers: PropertyHistoricListingModifierViewModel[];
 	type: PropertyTypeViewModel;
+	bounds: string;
+	code: string;
+	historicListingRegisteredAt: Date;
 	id: string;
 	name: string;
-	code: string;
-	bounds: string;
-	historicListingRegisteredAt: Date;
 
 	private static $build(raw) {
 		const item = new PropertyViewModel();
@@ -175,11 +175,11 @@ export class PropertyViewModel {
 		item.owner = raw.owner ? PlayerViewModel["$build"](raw.owner) : null
 		item.historicListingModifiers = raw.historicListingModifiers ? raw.historicListingModifiers.map(i => PropertyHistoricListingModifierViewModel["$build"](i)) : null
 		item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null
+		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
+		item.code = raw.code === null ? null : `${raw.code}`
+		item.historicListingRegisteredAt = raw.historicListingRegisteredAt ? new Date(raw.historicListingRegisteredAt) : null
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
-		item.code = raw.code === null ? null : `${raw.code}`
-		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
-		item.historicListingRegisteredAt = raw.historicListingRegisteredAt ? new Date(raw.historicListingRegisteredAt) : null
 		
 		return item;
 	}
@@ -187,16 +187,16 @@ export class PropertyViewModel {
 
 export class SquareViewModel {
 	borough: BoroughSummaryModel;
+	bounds: string;
 	id: string;
 	name: string;
-	bounds: string;
 
 	private static $build(raw) {
 		const item = new SquareViewModel();
 		item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null
+		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
-		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
 		
 		return item;
 	}
@@ -206,18 +206,18 @@ export class StreetViewModel {
 	bridges: BridgeViewModel[];
 	id: string;
 	name: string;
+	path: string;
 	shortName: string;
 	size: number;
-	path: string;
 
 	private static $build(raw) {
 		const item = new StreetViewModel();
 		item.bridges = raw.bridges ? raw.bridges.map(i => BridgeViewModel["$build"](i)) : null
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
+		item.path = raw.path === null ? null : `${raw.path}`
 		item.shortName = raw.shortName === null ? null : `${raw.shortName}`
 		item.size = raw.size === null ? null : +raw.size
-		item.path = raw.path === null ? null : `${raw.path}`
 		
 		return item;
 	}
@@ -242,18 +242,18 @@ export class TrainStationExitViewModel {
 
 export class TrainRouteViewModel {
 	stops: TrainStopViewModel[];
+	color: string;
 	id: string;
 	name: string;
 	path: string;
-	color: string;
 
 	private static $build(raw) {
 		const item = new TrainRouteViewModel();
 		item.stops = raw.stops ? raw.stops.map(i => TrainStopViewModel["$build"](i)) : null
+		item.color = raw.color === null ? null : `${raw.color}`
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
 		item.path = raw.path === null ? null : `${raw.path}`
-		item.color = raw.color === null ? null : `${raw.color}`
 		
 		return item;
 	}
@@ -277,31 +277,31 @@ export class TrainStationViewModel {
 export class TrainStopViewModel {
 	id: string;
 	name: string;
-	trackPosition: string;
 	stationId: string;
+	trackPosition: string;
 
 	private static $build(raw) {
 		const item = new TrainStopViewModel();
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
-		item.trackPosition = raw.trackPosition === null ? null : `${raw.trackPosition}`
 		item.stationId = raw.stationId === null ? null : `${raw.stationId}`
+		item.trackPosition = raw.trackPosition === null ? null : `${raw.trackPosition}`
 		
 		return item;
 	}
 }
 
 export class WaterBodyViewModel {
+	bounds: string;
 	id: string;
 	name: string;
-	bounds: string;
 	namePath: string;
 
 	private static $build(raw) {
 		const item = new WaterBodyViewModel();
+		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
 		item.id = raw.id === null ? null : `${raw.id}`
 		item.name = raw.name === null ? null : `${raw.name}`
-		item.bounds = raw.bounds === null ? null : `${raw.bounds}`
 		item.namePath = raw.namePath === null ? null : `${raw.namePath}`
 		
 		return item;

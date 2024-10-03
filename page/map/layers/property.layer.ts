@@ -13,7 +13,10 @@ export class PropertyLayer extends Layer {
 		for (let property of properties) {
 			const bounds = Point.unpack(property.bounds);
 
-			const polygon = new MapPolygon(bounds, true, 'property', property.type?.color, () => {
+			const polygon = new MapPolygon(bounds, true, 'property', {
+				type: property.type?.color,
+				borough: property.borough?.color
+			}, () => {
 				open(`/property/${property.id}`);
 			});
 

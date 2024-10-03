@@ -6,4 +6,5 @@ export class BoroughSummaryModel extends ViewModel<Borough> {
 
 	name;
 	propertyPrefix;
+	color;
 }

@@ -9,13 +9,14 @@ path[ui-style='draw'] {
 }
 
 ui-map[ui-style='gray'],
-ui-map[ui-style='normal'] {
+ui-map[ui-style='normal'],
+ui-map[ui-style='borough'] {
 	&[ui-style='gray'] ui-map-inner canvas {
 		filter: saturate(0) contrast(0.2) brightness(2);
 	}
 
 	path[ui-style='property'] {
-		fill: var(--color, #fff);
+		fill: var(--type, #fff);
 		stroke: #000;
 		stroke-width: 0.8;
 
@@ -73,14 +74,28 @@ ui-map[ui-style='normal'] {
 	}
 }
 
+ui-map[ui-style='borough'] {
+	path[ui-style='property'] {
+		fill: var(--borough, #fff);
+	}
+	
+	path[ui-style='borough'] {
+		fill: var(--color);
+		stroke: #000;
+		stroke-width: 0.8;
+	}
+}
+
 ui-map[ui-style='admin'] {
 	ui-map-inner {
-		background: linear-gradient(45deg, #000 25%, #fff 25%);
-		background-size: 4px 4px;
-		background-attachment: local;
+		background: #fff;
 
-		canvas {
-			opacity: 0;
+		ui-map-image {
+			background: #fff;
+		
+			canvas {
+				opacity: 0;
+			}
 		}
 	}
 
@@ -99,7 +114,7 @@ ui-map[ui-style='admin'] {
 
 	path[ui-style='street'] {
 		fill: none;
-		stroke: #fff;
+		stroke: #000;
 		stroke-width: var(--size);
 	}
 
@@ -110,8 +125,8 @@ ui-map[ui-style='admin'] {
 	}
 
 	path[ui-style='square'] {
-		fill: #fff;
-		stroke: #fff;
+		fill: #000;
+		stroke: #000;
 		stroke-width: var(--size);
 	}
 

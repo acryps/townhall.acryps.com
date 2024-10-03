@@ -34,7 +34,7 @@ export class MapComponent extends Component {
 
 	lastRenderedZoom = 8;
 
-	mapStyle: 'normal' | 'gray' | 'admin' = 'normal';
+	mapStyle: 'normal' | 'gray' | 'admin' | 'borough' = 'normal';
 
 	tube?: number;
 	tubes: number[];
@@ -172,6 +172,14 @@ export class MapComponent extends Component {
 							this.update();
 						}}>
 							BW
+						</ui-control>
+						
+						<ui-control ui-click={() => {
+							this.mapStyle = 'borough';
+
+							this.update();
+						}}>
+							BR
 						</ui-control>
 					</ui-control-extend>
 				</ui-control>

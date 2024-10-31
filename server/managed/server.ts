@@ -1,25 +1,25 @@
 import { BaseServer, ViewModel, Inject } from "vlserver";
 
-import { Borough } from "././database";
 import { DbContext } from "././database";
+import { PlayerViewModel } from "././../areas/player.view";
+import { GameService } from "././../areas/game/game.service";
+import { PropertyHistoricListingModifier } from "././database";
+import { PropertyViewModel } from "././../areas/property.view";
+import { HistoricListingGradeViewModel } from "././../areas/history-listing/grade.view";
+import { PropertyHistoricListingModifierViewModel } from "././../areas/history-listing/link.view";
+import { HistoricListingModifierViewModel } from "././../areas/history-listing/modifier.view";
+import { HistoricListingService } from "././../areas/history-listing/listing.service";
+import { Borough } from "././database";
 import { Proxy } from "././../proxy";
 import { BoroughViewModel } from "././../areas/borough.view";
 import { BridgeViewModel } from "././../areas/bridge.view";
 import { HistoryEntryViewModel } from "././../areas/history.view";
 import { PropertyTypeViewModel } from "././../areas/property-type.view";
 import { PropertySummaryModel } from "././../areas/property.summary";
-import { PropertyViewModel } from "././../areas/property.view";
 import { SquareViewModel } from "././../areas/squre.view";
 import { StreetViewModel } from "././../areas/street.view";
 import { WaterBodyViewModel } from "././../areas/water-body.view";
 import { MapService } from "././../areas/map.service";
-import { PlayerViewModel } from "././../areas/player.view";
-import { GameService } from "././../areas/game/game.service";
-import { PropertyHistoricListingModifier } from "././database";
-import { HistoricListingGradeViewModel } from "././../areas/history-listing/grade.view";
-import { PropertyHistoricListingModifierViewModel } from "././../areas/history-listing/link.view";
-import { HistoricListingModifierViewModel } from "././../areas/history-listing/modifier.view";
-import { HistoricListingService } from "././../areas/history-listing/listing.service";
 import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
@@ -27,35 +27,35 @@ import { BoroughSummaryModel } from "./../areas/borough.summary";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { Bridge } from "./../managed/database";
+import { HistoricListingGrade } from "./../managed/database";
+import { HistoricListingModifier } from "./../managed/database";
 import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
 import { PropertyType } from "./../managed/database";
 import { Property } from "./../managed/database";
 import { Square } from "./../managed/database";
 import { Street } from "./../managed/database";
-import { WaterBody } from "./../managed/database";
-import { HistoricListingGrade } from "./../managed/database";
-import { HistoricListingModifier } from "./../managed/database";
 import { TrainStationExit } from "./../managed/database";
 import { TrainRoute } from "./../managed/database";
 import { TrainStation } from "./../managed/database";
 import { TrainStop } from "./../managed/database";
+import { WaterBody } from "./../managed/database";
 
 Inject.mappings = {
-	"MapService": {
-		objectConstructor: MapService,
+	"GameService": {
+		objectConstructor: GameService,
 		parameters: ["DbContext"]
 	},
 	"DbContext": {
 		objectConstructor: DbContext,
 		parameters: ["RunContext"]
 	},
-	"GameService": {
-		objectConstructor: GameService,
-		parameters: ["DbContext"]
-	},
 	"HistoricListingService": {
 		objectConstructor: HistoricListingService,
+		parameters: ["DbContext"]
+	},
+	"MapService": {
+		objectConstructor: MapService,
 		parameters: ["DbContext"]
 	},
 	"TrainService": {
@@ -66,6 +66,83 @@ Inject.mappings = {
 
 export class ManagedServer extends BaseServer {
 	prepareRoutes() {
+		this.expose(
+			"pkYWNsZmA2MWVzdXhmYXF0ODVscjV0ZW",
+			{},
+			inject => inject.construct(GameService),
+			(controller, params) => controller.getPlayers(
+				
+			)
+		);
+
+		this.expose(
+			"pzazpkdHZiZTFlcHVqYTZhZ2puM2kyZ2",
+			{},
+			inject => inject.construct(HistoricListingService),
+			(controller, params) => controller.getGrades(
+				
+			)
+		);
+
+		this.expose(
+			"h5dHl6dTNxOHtnbGZ6YWNsYzdlYWBxNX",
+			{},
+			inject => inject.construct(HistoricListingService),
+			(controller, params) => controller.getModifiers(
+				
+			)
+		);
+
+		this.expose(
+			"YzcjNuOWlqM3VzYWJpdT5lN39xYmZzNz",
+			{
+				"QzZTg0Y3Jza2VxY3E5azlvdzVoaDkyMj": {
+					isArray: false,
+					type: PropertyViewModel
+				},"Y5aHJ4b2UwZ2pkZ3R1N285MDkxZnV2c3": {
+					isArray: false,
+					type: HistoricListingGradeViewModel
+				}
+			},
+			inject => inject.construct(HistoricListingService),
+			(controller, params) => controller.addListing(
+				params["QzZTg0Y3Jza2VxY3E5azlvdzVoaDkyMj"],
+				params["Y5aHJ4b2UwZ2pkZ3R1N285MDkxZnV2c3"]
+			)
+		);
+
+		this.expose(
+			"hmc3RueXJneWJ1MnB1Zzd3cmx5aWZsc2",
+			{
+				"FyMXVia29sNjN3ZG1naT1teHZzdWN0ej": {
+					isArray: false,
+					type: "string"
+				},"M2MTNoNWFqbWAybGxrb3M0Z2U0azF4cG": {
+					isArray: false,
+					type: "string"
+				}
+			},
+			inject => inject.construct(HistoricListingService),
+			(controller, params) => controller.addModifier(
+				params["FyMXVia29sNjN3ZG1naT1teHZzdWN0ej"],
+				params["M2MTNoNWFqbWAybGxrb3M0Z2U0azF4cG"]
+			)
+		);
+
+		this.expose(
+			"IwaWRoOGpwcTdjb3NxeWpxaWtwZTY3M3",
+			{
+				"kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn": {
+					isArray: false,
+					type: "string"
+				}
+			},
+			inject => inject.construct(HistoricListingService),
+			(controller, params) => controller.removeModifier(
+				params["kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn"]
+			)
+		);
+
 		this.expose(
 			"R2M2Z2Yjx4aGM4MzR1ZzcxdjI5Zzprbm",
 			{},
@@ -260,83 +337,6 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"pkYWNsZmA2MWVzdXhmYXF0ODVscjV0ZW",
-			{},
-			inject => inject.construct(GameService),
-			(controller, params) => controller.getPlayers(
-				
-			)
-		);
-
-		this.expose(
-			"pzazpkdHZiZTFlcHVqYTZhZ2puM2kyZ2",
-			{},
-			inject => inject.construct(HistoricListingService),
-			(controller, params) => controller.getGrades(
-				
-			)
-		);
-
-		this.expose(
-			"h5dHl6dTNxOHtnbGZ6YWNsYzdlYWBxNX",
-			{},
-			inject => inject.construct(HistoricListingService),
-			(controller, params) => controller.getModifiers(
-				
-			)
-		);
-
-		this.expose(
-			"YzcjNuOWlqM3VzYWJpdT5lN39xYmZzNz",
-			{
-				"QzZTg0Y3Jza2VxY3E5azlvdzVoaDkyMj": {
-					isArray: false,
-					type: PropertyViewModel
-				},"Y5aHJ4b2UwZ2pkZ3R1N285MDkxZnV2c3": {
-					isArray: false,
-					type: HistoricListingGradeViewModel
-				}
-			},
-			inject => inject.construct(HistoricListingService),
-			(controller, params) => controller.addListing(
-				params["QzZTg0Y3Jza2VxY3E5azlvdzVoaDkyMj"],
-				params["Y5aHJ4b2UwZ2pkZ3R1N285MDkxZnV2c3"]
-			)
-		);
-
-		this.expose(
-			"hmc3RueXJneWJ1MnB1Zzd3cmx5aWZsc2",
-			{
-				"FyMXVia29sNjN3ZG1naT1teHZzdWN0ej": {
-					isArray: false,
-					type: "string"
-				},"M2MTNoNWFqbWAybGxrb3M0Z2U0azF4cG": {
-					isArray: false,
-					type: "string"
-				}
-			},
-			inject => inject.construct(HistoricListingService),
-			(controller, params) => controller.addModifier(
-				params["FyMXVia29sNjN3ZG1naT1teHZzdWN0ej"],
-				params["M2MTNoNWFqbWAybGxrb3M0Z2U0azF4cG"]
-			)
-		);
-
-		this.expose(
-			"IwaWRoOGpwcTdjb3NxeWpxaWtwZTY3M3",
-			{
-				"kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn": {
-					isArray: false,
-					type: "string"
-				}
-			},
-			inject => inject.construct(HistoricListingService),
-			(controller, params) => controller.removeModifier(
-				params["kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn"]
-			)
-		);
-
-		this.expose(
 			"hsZXxsa2h0eG50MnVjazg1eHMyY3NiNW",
 			{},
 			inject => inject.construct(TrainService),
@@ -360,45 +360,21 @@ ViewModel.mappings = {
 	BoroughSummaryModel: class ComposedBoroughSummaryModel extends BoroughSummaryModel {
 		async map() {
 			return {
-				color: this.$$model.color,
-				id: this.$$model.id,
-				name: this.$$model.name,
-				propertyPrefix: this.$$model.propertyPrefix
+				color: this.model.color,
+				id: this.model.id,
+				name: this.model.name,
+				propertyPrefix: this.model.propertyPrefix
 			}
 		};
 
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
+		static get items() { 
 			return {
 				color: true,
 				id: true,
 				name: true,
 				propertyPrefix: true
 			};
-		};
+		}
 
 		static toViewModel(data) {
 			const item = new BoroughSummaryModel(null);
@@ -430,45 +406,21 @@ ViewModel.mappings = {
 	BoroughViewModel: class ComposedBoroughViewModel extends BoroughViewModel {
 		async map() {
 			return {
-				bounds: this.$$model.bounds,
-				color: this.$$model.color,
-				id: this.$$model.id,
-				name: this.$$model.name
+				bounds: this.model.bounds,
+				color: this.model.color,
+				id: this.model.id,
+				name: this.model.name
 			}
 		};
 
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
+		static get items() { 
 			return {
 				bounds: true,
 				color: true,
 				id: true,
 				name: true
 			};
-		};
+		}
 
 		static toViewModel(data) {
 			const item = new BoroughViewModel(null);
@@ -500,43 +452,19 @@ ViewModel.mappings = {
 	BridgeViewModel: class ComposedBridgeViewModel extends BridgeViewModel {
 		async map() {
 			return {
-				id: this.$$model.id,
-				name: this.$$model.name,
-				path: this.$$model.path
+				id: this.model.id,
+				name: this.model.name,
+				path: this.model.path
 			}
 		};
 
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
+		static get items() { 
 			return {
 				id: true,
 				name: true,
 				path: true
 			};
-		};
+		}
 
 		static toViewModel(data) {
 			const item = new BridgeViewModel(null);
@@ -563,44 +491,152 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	HistoryEntryViewModel: class ComposedHistoryEntryViewModel extends HistoryEntryViewModel {
+	HistoricListingGradeViewModel: class ComposedHistoricListingGradeViewModel extends HistoricListingGradeViewModel {
 		async map() {
 			return {
-				name: this.$$model.name,
-				date: this.$$model.date
+				description: this.model.description,
+				grade: this.model.grade,
+				id: this.model.id,
+				name: this.model.name
 			}
 		};
 
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		static get items() { 
+			return {
+				description: true,
+				grade: true,
+				id: true,
+				name: true
+			};
 		}
 
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
+		static toViewModel(data) {
+			const item = new HistoricListingGradeViewModel(null);
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			"grade" in data && (item.grade = data.grade === null ? null : +data.grade);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
+			return item;
+		}
+
+		static async toModel(viewModel: HistoricListingGradeViewModel) {
+			let model: HistoricListingGrade;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(HistoricListingGrade).find(viewModel.id)
+			} else {
+				model = new HistoricListingGrade();
 			}
+			
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+			"grade" in viewModel && (model.grade = viewModel.grade === null ? null : +viewModel.grade);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 
-			if (repeats) {
-				level--;
+			return model;
+		}
+	},
+	PropertyHistoricListingModifierViewModel: class ComposedPropertyHistoricListingModifierViewModel extends PropertyHistoricListingModifierViewModel {
+		async map() {
+			return {
+				historicListingModifier: new HistoricListingModifierViewModel(await BaseServer.unwrap(this.model.historicListingModifier)),
+				id: this.model.id
 			}
+		};
 
-			if (!level) {
-				return {};
+		static get items() { 
+			return {
+				get historicListingModifier() { 
+					return ViewModel.mappings.HistoricListingModifierViewModel.items;
+				},
+				id: true
+			};
+		}
+
+		static toViewModel(data) {
+			const item = new PropertyHistoricListingModifierViewModel(null);
+			"historicListingModifier" in data && (item.historicListingModifier = data.historicListingModifier && ViewModel.mappings.HistoricListingModifierViewModel.toViewModel(data.historicListingModifier));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PropertyHistoricListingModifierViewModel) {
+			let model: PropertyHistoricListingModifier;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(PropertyHistoricListingModifier).find(viewModel.id)
+			} else {
+				model = new PropertyHistoricListingModifier();
 			}
+			
+			"historicListingModifier" in viewModel && (model.historicListingModifier.id = viewModel.historicListingModifier ? viewModel.historicListingModifier.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 
+			return model;
+		}
+	},
+	HistoricListingModifierViewModel: class ComposedHistoricListingModifierViewModel extends HistoricListingModifierViewModel {
+		async map() {
+			return {
+				description: this.model.description,
+				id: this.model.id,
+				name: this.model.name,
+				shortName: this.model.shortName
+			}
+		};
+
+		static get items() { 
+			return {
+				description: true,
+				id: true,
+				name: true,
+				shortName: true
+			};
+		}
+
+		static toViewModel(data) {
+			const item = new HistoricListingModifierViewModel(null);
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"shortName" in data && (item.shortName = data.shortName === null ? null : `${data.shortName}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: HistoricListingModifierViewModel) {
+			let model: HistoricListingModifier;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(HistoricListingModifier).find(viewModel.id)
+			} else {
+				model = new HistoricListingModifier();
+			}
+			
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"shortName" in viewModel && (model.shortName = viewModel.shortName === null ? null : `${viewModel.shortName}`);
+
+			return model;
+		}
+	},
+	HistoryEntryViewModel: class ComposedHistoryEntryViewModel extends HistoryEntryViewModel {
+		async map() {
+			return {
+				name: this.model.name,
+				date: this.model.date
+			}
+		};
+
+		static get items() { 
 			return {
 				name: true,
 				date: true
 			};
-		};
+		}
 
 		static toViewModel(data) {
 			const item = new HistoryEntryViewModel(null);
@@ -622,41 +658,17 @@ ViewModel.mappings = {
 	PlayerViewModel: class ComposedPlayerViewModel extends PlayerViewModel {
 		async map() {
 			return {
-				id: this.$$model.id,
-				username: this.$$model.username
+				id: this.model.id,
+				username: this.model.username
 			}
 		};
 
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
+		static get items() { 
 			return {
 				id: true,
 				username: true
 			};
-		};
+		}
 
 		static toViewModel(data) {
 			const item = new PlayerViewModel(null);
@@ -684,45 +696,21 @@ ViewModel.mappings = {
 	PropertyTypeViewModel: class ComposedPropertyTypeViewModel extends PropertyTypeViewModel {
 		async map() {
 			return {
-				code: this.$$model.code,
-				color: this.$$model.color,
-				id: this.$$model.id,
-				name: this.$$model.name
+				code: this.model.code,
+				color: this.model.color,
+				id: this.model.id,
+				name: this.model.name
 			}
 		};
 
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
+		static get items() { 
 			return {
 				code: true,
 				color: true,
 				id: true,
 				name: true
 			};
-		};
+		}
 
 		static toViewModel(data) {
 			const item = new PropertyTypeViewModel(null);
@@ -754,64 +742,31 @@ ViewModel.mappings = {
 	PropertySummaryModel: class ComposedPropertySummaryModel extends PropertySummaryModel {
 		async map() {
 			return {
-				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.$$model.borough)),
-				historicListingGrade: new HistoricListingGradeViewModel(await BaseServer.unwrap(this.$$model.historicListingGrade)),
-				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.$$model.type)),
-				bounds: this.$$model.bounds,
-				id: this.$$model.id,
-				name: this.$$model.name
+				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.model.borough)),
+				historicListingGrade: new HistoricListingGradeViewModel(await BaseServer.unwrap(this.model.historicListingGrade)),
+				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.model.type)),
+				bounds: this.model.bounds,
+				id: this.model.id,
+				name: this.model.name
 			}
 		};
 
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
+		static get items() { 
 			return {
-				get borough() {
-					return ViewModel.mappings.BoroughSummaryModel.getPrefetchingProperties(
-						level,
-						[...parents, "borough-PropertySummaryModel"]
-					);
+				get borough() { 
+					return ViewModel.mappings.BoroughSummaryModel.items;
 				},
-				get historicListingGrade() {
-					return ViewModel.mappings.HistoricListingGradeViewModel.getPrefetchingProperties(
-						level,
-						[...parents, "historicListingGrade-PropertySummaryModel"]
-					);
+				get historicListingGrade() { 
+					return ViewModel.mappings.HistoricListingGradeViewModel.items;
 				},
-				get type() {
-					return ViewModel.mappings.PropertyTypeViewModel.getPrefetchingProperties(
-						level,
-						[...parents, "type-PropertySummaryModel"]
-					);
+				get type() { 
+					return ViewModel.mappings.PropertyTypeViewModel.items;
 				},
 				bounds: true,
 				id: true,
 				name: true
 			};
-		};
+		}
 
 		static toViewModel(data) {
 			const item = new PropertySummaryModel(null);
@@ -847,74 +802,35 @@ ViewModel.mappings = {
 	PropertyViewModel: class ComposedPropertyViewModel extends PropertyViewModel {
 		async map() {
 			return {
-				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.$$model.borough)),
-				historicListingGrade: new HistoricListingGradeViewModel(await BaseServer.unwrap(this.$$model.historicListingGrade)),
-				owner: new PlayerViewModel(await BaseServer.unwrap(this.$$model.owner)),
-				historicListingModifiers: (await this.$$model.historicListingModifiers.includeTree(ViewModel.mappings.PropertyHistoricListingModifierViewModel.items).toArray()).map(item => new PropertyHistoricListingModifierViewModel(item)),
-				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.$$model.type)),
-				bounds: this.$$model.bounds,
-				code: this.$$model.code,
-				historicListingRegisteredAt: this.$$model.historicListingRegisteredAt,
-				id: this.$$model.id,
-				name: this.$$model.name
+				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.model.borough)),
+				historicListingGrade: new HistoricListingGradeViewModel(await BaseServer.unwrap(this.model.historicListingGrade)),
+				owner: new PlayerViewModel(await BaseServer.unwrap(this.model.owner)),
+				historicListingModifiers: (await this.model.historicListingModifiers.includeTree(ViewModel.mappings.PropertyHistoricListingModifierViewModel.items).toArray()).map(item => new PropertyHistoricListingModifierViewModel(item)),
+				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.model.type)),
+				bounds: this.model.bounds,
+				code: this.model.code,
+				historicListingRegisteredAt: this.model.historicListingRegisteredAt,
+				id: this.model.id,
+				name: this.model.name
 			}
 		};
 
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
+		static get items() { 
 			return {
-				get borough() {
-					return ViewModel.mappings.BoroughSummaryModel.getPrefetchingProperties(
-						level,
-						[...parents, "borough-PropertyViewModel"]
-					);
+				get borough() { 
+					return ViewModel.mappings.BoroughSummaryModel.items;
 				},
-				get historicListingGrade() {
-					return ViewModel.mappings.HistoricListingGradeViewModel.getPrefetchingProperties(
-						level,
-						[...parents, "historicListingGrade-PropertyViewModel"]
-					);
+				get historicListingGrade() { 
+					return ViewModel.mappings.HistoricListingGradeViewModel.items;
 				},
-				get owner() {
-					return ViewModel.mappings.PlayerViewModel.getPrefetchingProperties(
-						level,
-						[...parents, "owner-PropertyViewModel"]
-					);
+				get owner() { 
+					return ViewModel.mappings.PlayerViewModel.items;
 				},
-				get historicListingModifiers() {
-					return ViewModel.mappings.PropertyHistoricListingModifierViewModel.getPrefetchingProperties(
-						level,
-						[...parents, "historicListingModifiers-PropertyViewModel"]
-					);
+				get historicListingModifiers() { 
+					return ViewModel.mappings.PropertyHistoricListingModifierViewModel.items;
 				},
-				get type() {
-					return ViewModel.mappings.PropertyTypeViewModel.getPrefetchingProperties(
-						level,
-						[...parents, "type-PropertyViewModel"]
-					);
+				get type() { 
+					return ViewModel.mappings.PropertyTypeViewModel.items;
 				},
 				bounds: true,
 				code: true,
@@ -922,7 +838,7 @@ ViewModel.mappings = {
 				id: true,
 				name: true
 			};
-		};
+		}
 
 		static toViewModel(data) {
 			const item = new PropertyViewModel(null);
@@ -966,50 +882,23 @@ ViewModel.mappings = {
 	SquareViewModel: class ComposedSquareViewModel extends SquareViewModel {
 		async map() {
 			return {
-				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.$$model.borough)),
-				bounds: this.$$model.bounds,
-				id: this.$$model.id,
-				name: this.$$model.name
+				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.model.borough)),
+				bounds: this.model.bounds,
+				id: this.model.id,
+				name: this.model.name
 			}
 		};
 
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
+		static get items() { 
 			return {
-				get borough() {
-					return ViewModel.mappings.BoroughSummaryModel.getPrefetchingProperties(
-						level,
-						[...parents, "borough-SquareViewModel"]
-					);
+				get borough() { 
+					return ViewModel.mappings.BoroughSummaryModel.items;
 				},
 				bounds: true,
 				id: true,
 				name: true
 			};
-		};
+		}
 
 		static toViewModel(data) {
 			const item = new SquareViewModel(null);
@@ -1041,46 +930,19 @@ ViewModel.mappings = {
 	StreetViewModel: class ComposedStreetViewModel extends StreetViewModel {
 		async map() {
 			return {
-				bridges: (await this.$$model.bridges.includeTree(ViewModel.mappings.BridgeViewModel.items).toArray()).map(item => new BridgeViewModel(item)),
-				id: this.$$model.id,
-				name: this.$$model.name,
-				path: this.$$model.path,
-				shortName: this.$$model.shortName,
-				size: this.$$model.size
+				bridges: (await this.model.bridges.includeTree(ViewModel.mappings.BridgeViewModel.items).toArray()).map(item => new BridgeViewModel(item)),
+				id: this.model.id,
+				name: this.model.name,
+				path: this.model.path,
+				shortName: this.model.shortName,
+				size: this.model.size
 			}
 		};
 
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
+		static get items() { 
 			return {
-				get bridges() {
-					return ViewModel.mappings.BridgeViewModel.getPrefetchingProperties(
-						level,
-						[...parents, "bridges-StreetViewModel"]
-					);
+				get bridges() { 
+					return ViewModel.mappings.BridgeViewModel.items;
 				},
 				id: true,
 				name: true,
@@ -1088,7 +950,7 @@ ViewModel.mappings = {
 				shortName: true,
 				size: true
 			};
-		};
+		}
 
 		static toViewModel(data) {
 			const item = new StreetViewModel(null);
@@ -1121,330 +983,26 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	WaterBodyViewModel: class ComposedWaterBodyViewModel extends WaterBodyViewModel {
-		async map() {
-			return {
-				bounds: this.$$model.bounds,
-				id: this.$$model.id,
-				name: this.$$model.name,
-				namePath: this.$$model.namePath
-			}
-		};
-
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
-			return {
-				bounds: true,
-				id: true,
-				name: true,
-				namePath: true
-			};
-		};
-
-		static toViewModel(data) {
-			const item = new WaterBodyViewModel(null);
-			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
-			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
-			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"namePath" in data && (item.namePath = data.namePath === null ? null : `${data.namePath}`);
-
-			return item;
-		}
-
-		static async toModel(viewModel: WaterBodyViewModel) {
-			let model: WaterBody;
-			
-			if (viewModel.id) {
-				model = await ViewModel.globalFetchingContext.findSet(WaterBody).find(viewModel.id)
-			} else {
-				model = new WaterBody();
-			}
-			
-			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
-			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
-			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"namePath" in viewModel && (model.namePath = viewModel.namePath === null ? null : `${viewModel.namePath}`);
-
-			return model;
-		}
-	},
-	HistoricListingGradeViewModel: class ComposedHistoricListingGradeViewModel extends HistoricListingGradeViewModel {
-		async map() {
-			return {
-				description: this.$$model.description,
-				grade: this.$$model.grade,
-				id: this.$$model.id,
-				name: this.$$model.name
-			}
-		};
-
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
-			return {
-				description: true,
-				grade: true,
-				id: true,
-				name: true
-			};
-		};
-
-		static toViewModel(data) {
-			const item = new HistoricListingGradeViewModel(null);
-			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
-			"grade" in data && (item.grade = data.grade === null ? null : +data.grade);
-			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
-			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-
-			return item;
-		}
-
-		static async toModel(viewModel: HistoricListingGradeViewModel) {
-			let model: HistoricListingGrade;
-			
-			if (viewModel.id) {
-				model = await ViewModel.globalFetchingContext.findSet(HistoricListingGrade).find(viewModel.id)
-			} else {
-				model = new HistoricListingGrade();
-			}
-			
-			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
-			"grade" in viewModel && (model.grade = viewModel.grade === null ? null : +viewModel.grade);
-			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
-			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-
-			return model;
-		}
-	},
-	PropertyHistoricListingModifierViewModel: class ComposedPropertyHistoricListingModifierViewModel extends PropertyHistoricListingModifierViewModel {
-		async map() {
-			return {
-				historicListingModifier: new HistoricListingModifierViewModel(await BaseServer.unwrap(this.$$model.historicListingModifier)),
-				id: this.$$model.id
-			}
-		};
-
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
-			return {
-				get historicListingModifier() {
-					return ViewModel.mappings.HistoricListingModifierViewModel.getPrefetchingProperties(
-						level,
-						[...parents, "historicListingModifier-PropertyHistoricListingModifierViewModel"]
-					);
-				},
-				id: true
-			};
-		};
-
-		static toViewModel(data) {
-			const item = new PropertyHistoricListingModifierViewModel(null);
-			"historicListingModifier" in data && (item.historicListingModifier = data.historicListingModifier && ViewModel.mappings.HistoricListingModifierViewModel.toViewModel(data.historicListingModifier));
-			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
-
-			return item;
-		}
-
-		static async toModel(viewModel: PropertyHistoricListingModifierViewModel) {
-			let model: PropertyHistoricListingModifier;
-			
-			if (viewModel.id) {
-				model = await ViewModel.globalFetchingContext.findSet(PropertyHistoricListingModifier).find(viewModel.id)
-			} else {
-				model = new PropertyHistoricListingModifier();
-			}
-			
-			"historicListingModifier" in viewModel && (model.historicListingModifier.id = viewModel.historicListingModifier ? viewModel.historicListingModifier.id : null);
-			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
-
-			return model;
-		}
-	},
-	HistoricListingModifierViewModel: class ComposedHistoricListingModifierViewModel extends HistoricListingModifierViewModel {
-		async map() {
-			return {
-				description: this.$$model.description,
-				id: this.$$model.id,
-				name: this.$$model.name,
-				shortName: this.$$model.shortName
-			}
-		};
-
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
-			return {
-				description: true,
-				id: true,
-				name: true,
-				shortName: true
-			};
-		};
-
-		static toViewModel(data) {
-			const item = new HistoricListingModifierViewModel(null);
-			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
-			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
-			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"shortName" in data && (item.shortName = data.shortName === null ? null : `${data.shortName}`);
-
-			return item;
-		}
-
-		static async toModel(viewModel: HistoricListingModifierViewModel) {
-			let model: HistoricListingModifier;
-			
-			if (viewModel.id) {
-				model = await ViewModel.globalFetchingContext.findSet(HistoricListingModifier).find(viewModel.id)
-			} else {
-				model = new HistoricListingModifier();
-			}
-			
-			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
-			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
-			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"shortName" in viewModel && (model.shortName = viewModel.shortName === null ? null : `${viewModel.shortName}`);
-
-			return model;
-		}
-	},
 	TrainStationExitViewModel: class ComposedTrainStationExitViewModel extends TrainStationExitViewModel {
 		async map() {
 			return {
-				station: new TrainStationViewModel(await BaseServer.unwrap(this.$$model.station)),
-				id: this.$$model.id,
-				inbound: this.$$model.inbound,
-				position: this.$$model.position
+				station: new TrainStationViewModel(await BaseServer.unwrap(this.model.station)),
+				id: this.model.id,
+				inbound: this.model.inbound,
+				position: this.model.position
 			}
 		};
 
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
+		static get items() { 
 			return {
-				get station() {
-					return ViewModel.mappings.TrainStationViewModel.getPrefetchingProperties(
-						level,
-						[...parents, "station-TrainStationExitViewModel"]
-					);
+				get station() { 
+					return ViewModel.mappings.TrainStationViewModel.items;
 				},
 				id: true,
 				inbound: true,
 				position: true
 			};
-		};
+		}
 
 		static toViewModel(data) {
 			const item = new TrainStationExitViewModel(null);
@@ -1476,52 +1034,25 @@ ViewModel.mappings = {
 	TrainRouteViewModel: class ComposedTrainRouteViewModel extends TrainRouteViewModel {
 		async map() {
 			return {
-				stops: (await this.$$model.stops.includeTree(ViewModel.mappings.TrainStopViewModel.items).toArray()).map(item => new TrainStopViewModel(item)),
-				color: this.$$model.color,
-				id: this.$$model.id,
-				name: this.$$model.name,
-				path: this.$$model.path
+				stops: (await this.model.stops.includeTree(ViewModel.mappings.TrainStopViewModel.items).toArray()).map(item => new TrainStopViewModel(item)),
+				color: this.model.color,
+				id: this.model.id,
+				name: this.model.name,
+				path: this.model.path
 			}
 		};
 
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
+		static get items() { 
 			return {
-				get stops() {
-					return ViewModel.mappings.TrainStopViewModel.getPrefetchingProperties(
-						level,
-						[...parents, "stops-TrainRouteViewModel"]
-					);
+				get stops() { 
+					return ViewModel.mappings.TrainStopViewModel.items;
 				},
 				color: true,
 				id: true,
 				name: true,
 				path: true
 			};
-		};
+		}
 
 		static toViewModel(data) {
 			const item = new TrainRouteViewModel(null);
@@ -1555,43 +1086,19 @@ ViewModel.mappings = {
 	TrainStationViewModel: class ComposedTrainStationViewModel extends TrainStationViewModel {
 		async map() {
 			return {
-				id: this.$$model.id,
-				name: this.$$model.name,
-				position: this.$$model.position
+				id: this.model.id,
+				name: this.model.name,
+				position: this.model.position
 			}
 		};
 
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
+		static get items() { 
 			return {
 				id: true,
 				name: true,
 				position: true
 			};
-		};
+		}
 
 		static toViewModel(data) {
 			const item = new TrainStationViewModel(null);
@@ -1621,45 +1128,21 @@ ViewModel.mappings = {
 	TrainStopViewModel: class ComposedTrainStopViewModel extends TrainStopViewModel {
 		async map() {
 			return {
-				id: this.$$model.id,
-				name: this.$$model.name,
-				stationId: this.$$model.stationId,
-				trackPosition: this.$$model.trackPosition
+				id: this.model.id,
+				name: this.model.name,
+				stationId: this.model.stationId,
+				trackPosition: this.model.trackPosition
 			}
 		};
 
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
+		static get items() { 
 			return {
 				id: true,
 				name: true,
 				stationId: true,
 				trackPosition: true
 			};
-		};
+		}
 
 		static toViewModel(data) {
 			const item = new TrainStopViewModel(null);
@@ -1684,6 +1167,52 @@ ViewModel.mappings = {
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"stationId" in viewModel && (model.stationId = viewModel.stationId === null ? null : `${viewModel.stationId}`);
 			"trackPosition" in viewModel && (model.trackPosition = viewModel.trackPosition === null ? null : `${viewModel.trackPosition}`);
+
+			return model;
+		}
+	},
+	WaterBodyViewModel: class ComposedWaterBodyViewModel extends WaterBodyViewModel {
+		async map() {
+			return {
+				bounds: this.model.bounds,
+				id: this.model.id,
+				name: this.model.name,
+				namePath: this.model.namePath
+			}
+		};
+
+		static get items() { 
+			return {
+				bounds: true,
+				id: true,
+				name: true,
+				namePath: true
+			};
+		}
+
+		static toViewModel(data) {
+			const item = new WaterBodyViewModel(null);
+			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"namePath" in data && (item.namePath = data.namePath === null ? null : `${data.namePath}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: WaterBodyViewModel) {
+			let model: WaterBody;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(WaterBody).find(viewModel.id)
+			} else {
+				model = new WaterBody();
+			}
+			
+			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"namePath" in viewModel && (model.namePath = viewModel.namePath === null ? null : `${viewModel.namePath}`);
 
 			return model;
 		}

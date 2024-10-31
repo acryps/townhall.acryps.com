@@ -1,7 +1,7 @@
 import { DbClient, RunContext } from "vlquery"; 
 import { Inject, StaticFileRoute, ViewModel } from "vlserver";
 import { ManagedServer } from "./managed/server";
-import { Bridge, DbContext } from "./managed/database";
+import { DbContext } from "./managed/database";
 
 import * as path from "path";
 import { Proxy } from "./proxy";
@@ -18,7 +18,6 @@ DbClient.connectedClient.connect().then(() => {
 	ViewModel.globalFetchingContext = db;
 
 	new Proxy(app);
-	new Bridge(app);
 
 	app.createInjector = context => new Inject({
 		Context: context,

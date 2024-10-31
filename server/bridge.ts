@@ -1,7 +1,7 @@
 import { DbContext, Player } from "./managed/database";
 import { ManagedServer } from "./managed/server";
 
-export class Proxy {
+export class GameBridge {
 	constructor(
 		app: ManagedServer,
 		database: DbContext

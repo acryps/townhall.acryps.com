@@ -49,6 +49,32 @@ export class GameBridge {
 			response.end();
 		});
 		
+		app.app.get('/in/drive/:uuid/:x/:y', async (request, response) => {
+			const player = await database.player.first(player => player.gameUuid.valueOf() == request.params.uuid);
+			
+			if (!player) {
+				response.sendStatus(404).end();
+				
+				return;
+			}
+			
+			player.x = +request.params.x;
+			player.y = +request.params.y;
+			
+			await player.update();
+			
+			const movement = new Movement();
+			movement.time = new Date();
+			movement.x = player.x;
+			movement.y = player.y;
+			movement.player = player;
+			movement.driving = true;
+			
+			movement.create();
+			
+			response.end();
+		});
+		
 		app.app.get('/in/leave/:uuid', async (request, response) => {
 			let player = await database.player.first(player => player.gameUuid.valueOf() == request.params.uuid);
 			

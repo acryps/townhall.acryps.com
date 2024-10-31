@@ -213,6 +213,7 @@ export class HistoricListingModifier extends Entity<HistoricListingModifierQuery
 			
 export class MovementQueryProxy extends QueryProxy {
 	get player(): Partial<PlayerQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get driving(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get playerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get time(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get x(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -221,6 +222,7 @@ export class MovementQueryProxy extends QueryProxy {
 
 export class Movement extends Entity<MovementQueryProxy> {
 	get player(): Partial<ForeignReference<Player>> { return this.$player; }
+	driving: boolean;
 	declare id: string;
 	playerId: string;
 	time: Date;
@@ -230,6 +232,7 @@ export class Movement extends Entity<MovementQueryProxy> {
 	$$meta = {
 		source: "movement",
 		columns: {
+			driving: { type: "bool", name: "driving" },
 			id: { type: "uuid", name: "id" },
 			playerId: { type: "uuid", name: "player_id" },
 			time: { type: "timestamp", name: "time" },

@@ -150,10 +150,7 @@ export class ManagedServer extends BaseServer {
 		this.expose(
 			"d1NTdqcWBiMWE5ZHg3ZndyM2UzNnMwNm",
 			{
-				"VjYnVwc3k5aToyb3FtcDN4c3pnM2RlMW": {
-					isArray: false,
-					type: "string"
-				}
+			"VjYnVwc3k5aToyb3FtcDN4c3pnM2RlMW": { type: "string", isArray: false, isOptional: false }
 			},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.getProperty(
@@ -164,10 +161,7 @@ export class ManagedServer extends BaseServer {
 		this.expose(
 			"VxbjByZmgxb3NvNDlvcTp0ODc0OW4zaz",
 			{
-				"F6Mml1d2dxdX0xamxpcDFyaXRuaXZ5NW": {
-					isArray: false,
-					type: PropertyViewModel
-				}
+			"F6Mml1d2dxdX0xamxpcDFyaXRuaXZ5NW": { type: PropertyViewModel, isArray: false, isOptional: false }
 			},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.createProperty(
@@ -178,10 +172,7 @@ export class ManagedServer extends BaseServer {
 		this.expose(
 			"J2c3hyNDQwNTdjeDs4c3htbWh2MWVnaG",
 			{
-				"Mya2ltZGltbjcyeHdjdGcydGVpZDgyNT": {
-					isArray: false,
-					type: BoroughViewModel
-				}
+			"Mya2ltZGltbjcyeHdjdGcydGVpZDgyNT": { type: BoroughViewModel, isArray: false, isOptional: false }
 			},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.createBorough(
@@ -192,10 +183,7 @@ export class ManagedServer extends BaseServer {
 		this.expose(
 			"VsbndnaTI4bTllbnh0endpaHdkM3w1MD",
 			{
-				"YwNnJhZnZycjNzNGU3emQ0Y2RtNnhmZG": {
-					isArray: false,
-					type: StreetViewModel
-				}
+			"YwNnJhZnZycjNzNGU3emQ0Y2RtNnhmZG": { type: StreetViewModel, isArray: false, isOptional: false }
 			},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.createStreet(
@@ -206,10 +194,7 @@ export class ManagedServer extends BaseServer {
 		this.expose(
 			"RhZGo0ejpmdnJhZ3lla3I4bzB2M2F5cn",
 			{
-				"FwZXk2OGVmcWRxeHdiZW9ucjhxcGE5cG": {
-					isArray: false,
-					type: SquareViewModel
-				}
+			"FwZXk2OGVmcWRxeHdiZW9ucjhxcGE5cG": { type: SquareViewModel, isArray: false, isOptional: false }
 			},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.createSquare(
@@ -220,10 +205,7 @@ export class ManagedServer extends BaseServer {
 		this.expose(
 			"A1bX53enB1cHV0cmQzNTYxdDgzaH10an",
 			{
-				"hnMjgxamVveGk2czR6YjQ2aHdxaGJsaG": {
-					isArray: false,
-					type: WaterBodyViewModel
-				}
+			"hnMjgxamVveGk2czR6YjQ2aHdxaGJsaG": { type: WaterBodyViewModel, isArray: false, isOptional: false }
 			},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.createWaterBody(
@@ -234,10 +216,7 @@ export class ManagedServer extends BaseServer {
 		this.expose(
 			"dzb2prZ3QwYT8xZ2ZicXc5ZnN1cGFwZj",
 			{
-				"NycXNhenFjaGhvZDhsdWtlYzNtd2x4d3": {
-					isArray: false,
-					type: PropertySummaryModel
-				}
+			"NycXNhenFjaGhvZDhsdWtlYzNtd2x4d3": { type: PropertySummaryModel, isArray: false, isOptional: false }
 			},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.saveProperty(
@@ -248,10 +227,7 @@ export class ManagedServer extends BaseServer {
 		this.expose(
 			"1nbWp4M21wOG1naTNoM3B1bWJvbTx1ej",
 			{
-				"ExMWt6cHEwZTJ0Y3N2cDs3ajYybXd0Zz": {
-					isArray: false,
-					type: PropertyViewModel
-				}
+			"ExMWt6cHEwZTJ0Y3N2cDs3ajYybXd0Zz": { type: PropertyViewModel, isArray: false, isOptional: false }
 			},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.deleteProperty(
@@ -264,6 +240,15 @@ export class ManagedServer extends BaseServer {
 			{},
 			inject => inject.construct(GameService),
 			(controller, params) => controller.getPlayers(
+				
+			)
+		);
+
+		this.expose(
+			"FxanB4eTFwbHRmYTFxaGw4dWA5Z2wzYj",
+			{},
+			inject => inject.construct(GameService),
+			(controller, params) => controller.getOnlinePlayers(
 				
 			)
 		);
@@ -289,13 +274,8 @@ export class ManagedServer extends BaseServer {
 		this.expose(
 			"YzcjNuOWlqM3VzYWJpdT5lN39xYmZzNz",
 			{
-				"QzZTg0Y3Jza2VxY3E5azlvdzVoaDkyMj": {
-					isArray: false,
-					type: PropertyViewModel
-				},"Y5aHJ4b2UwZ2pkZ3R1N285MDkxZnV2c3": {
-					isArray: false,
-					type: HistoricListingGradeViewModel
-				}
+			"QzZTg0Y3Jza2VxY3E5azlvdzVoaDkyMj": { type: PropertyViewModel, isArray: false, isOptional: false },
+				"Y5aHJ4b2UwZ2pkZ3R1N285MDkxZnV2c3": { type: HistoricListingGradeViewModel, isArray: false, isOptional: false }
 			},
 			inject => inject.construct(HistoricListingService),
 			(controller, params) => controller.addListing(
@@ -307,13 +287,8 @@ export class ManagedServer extends BaseServer {
 		this.expose(
 			"hmc3RueXJneWJ1MnB1Zzd3cmx5aWZsc2",
 			{
-				"FyMXVia29sNjN3ZG1naT1teHZzdWN0ej": {
-					isArray: false,
-					type: "string"
-				},"M2MTNoNWFqbWAybGxrb3M0Z2U0azF4cG": {
-					isArray: false,
-					type: "string"
-				}
+			"FyMXVia29sNjN3ZG1naT1teHZzdWN0ej": { type: "string", isArray: false, isOptional: false },
+				"M2MTNoNWFqbWAybGxrb3M0Z2U0azF4cG": { type: "string", isArray: false, isOptional: false }
 			},
 			inject => inject.construct(HistoricListingService),
 			(controller, params) => controller.addModifier(
@@ -325,10 +300,7 @@ export class ManagedServer extends BaseServer {
 		this.expose(
 			"IwaWRoOGpwcTdjb3NxeWpxaWtwZTY3M3",
 			{
-				"kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn": {
-					isArray: false,
-					type: "string"
-				}
+			"kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn": { type: "string", isArray: false, isOptional: false }
 			},
 			inject => inject.construct(HistoricListingService),
 			(controller, params) => controller.removeModifier(
@@ -357,7 +329,7 @@ export class ManagedServer extends BaseServer {
 }
 
 ViewModel.mappings = {
-	BoroughSummaryModel: class ComposedBoroughSummaryModel extends BoroughSummaryModel {
+	[BoroughSummaryModel.name]: class ComposedBoroughSummaryModel extends BoroughSummaryModel {
 		async map() {
 			return {
 				color: this.$$model.color,
@@ -427,7 +399,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	BoroughViewModel: class ComposedBoroughViewModel extends BoroughViewModel {
+	[BoroughViewModel.name]: class ComposedBoroughViewModel extends BoroughViewModel {
 		async map() {
 			return {
 				bounds: this.$$model.bounds,
@@ -497,7 +469,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	BridgeViewModel: class ComposedBridgeViewModel extends BridgeViewModel {
+	[BridgeViewModel.name]: class ComposedBridgeViewModel extends BridgeViewModel {
 		async map() {
 			return {
 				id: this.$$model.id,
@@ -563,7 +535,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	HistoryEntryViewModel: class ComposedHistoryEntryViewModel extends HistoryEntryViewModel {
+	[HistoryEntryViewModel.name]: class ComposedHistoryEntryViewModel extends HistoryEntryViewModel {
 		async map() {
 			return {
 				name: this.$$model.name,
@@ -619,7 +591,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	PlayerViewModel: class ComposedPlayerViewModel extends PlayerViewModel {
+	[PlayerViewModel.name]: class ComposedPlayerViewModel extends PlayerViewModel {
 		async map() {
 			return {
 				id: this.$$model.id,
@@ -681,7 +653,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	PropertyTypeViewModel: class ComposedPropertyTypeViewModel extends PropertyTypeViewModel {
+	[PropertyTypeViewModel.name]: class ComposedPropertyTypeViewModel extends PropertyTypeViewModel {
 		async map() {
 			return {
 				code: this.$$model.code,
@@ -751,7 +723,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	PropertySummaryModel: class ComposedPropertySummaryModel extends PropertySummaryModel {
+	[PropertySummaryModel.name]: class ComposedPropertySummaryModel extends PropertySummaryModel {
 		async map() {
 			return {
 				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.$$model.borough)),
@@ -790,19 +762,19 @@ ViewModel.mappings = {
 
 			return {
 				get borough() {
-					return ViewModel.mappings.BoroughSummaryModel.getPrefetchingProperties(
+					return ViewModel.mappings[BoroughSummaryModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "borough-PropertySummaryModel"]
 					);
 				},
 				get historicListingGrade() {
-					return ViewModel.mappings.HistoricListingGradeViewModel.getPrefetchingProperties(
+					return ViewModel.mappings[HistoricListingGradeViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "historicListingGrade-PropertySummaryModel"]
 					);
 				},
 				get type() {
-					return ViewModel.mappings.PropertyTypeViewModel.getPrefetchingProperties(
+					return ViewModel.mappings[PropertyTypeViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "type-PropertySummaryModel"]
 					);
@@ -815,9 +787,9 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new PropertySummaryModel(null);
-			"borough" in data && (item.borough = data.borough && ViewModel.mappings.BoroughSummaryModel.toViewModel(data.borough));
-			"historicListingGrade" in data && (item.historicListingGrade = data.historicListingGrade && ViewModel.mappings.HistoricListingGradeViewModel.toViewModel(data.historicListingGrade));
-			"type" in data && (item.type = data.type && ViewModel.mappings.PropertyTypeViewModel.toViewModel(data.type));
+			"borough" in data && (item.borough = data.borough && ViewModel.mappings[BoroughSummaryModel.name].toViewModel(data.borough));
+			"historicListingGrade" in data && (item.historicListingGrade = data.historicListingGrade && ViewModel.mappings[HistoricListingGradeViewModel.name].toViewModel(data.historicListingGrade));
+			"type" in data && (item.type = data.type && ViewModel.mappings[PropertyTypeViewModel.name].toViewModel(data.type));
 			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
@@ -844,13 +816,13 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	PropertyViewModel: class ComposedPropertyViewModel extends PropertyViewModel {
+	[PropertyViewModel.name]: class ComposedPropertyViewModel extends PropertyViewModel {
 		async map() {
 			return {
 				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.$$model.borough)),
 				historicListingGrade: new HistoricListingGradeViewModel(await BaseServer.unwrap(this.$$model.historicListingGrade)),
 				owner: new PlayerViewModel(await BaseServer.unwrap(this.$$model.owner)),
-				historicListingModifiers: (await this.$$model.historicListingModifiers.includeTree(ViewModel.mappings.PropertyHistoricListingModifierViewModel.items).toArray()).map(item => new PropertyHistoricListingModifierViewModel(item)),
+				historicListingModifiers: (await this.$$model.historicListingModifiers.includeTree(ViewModel.mappings[PropertyHistoricListingModifierViewModel.name].items).toArray()).map(item => new PropertyHistoricListingModifierViewModel(item)),
 				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.$$model.type)),
 				bounds: this.$$model.bounds,
 				code: this.$$model.code,
@@ -887,31 +859,31 @@ ViewModel.mappings = {
 
 			return {
 				get borough() {
-					return ViewModel.mappings.BoroughSummaryModel.getPrefetchingProperties(
+					return ViewModel.mappings[BoroughSummaryModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "borough-PropertyViewModel"]
 					);
 				},
 				get historicListingGrade() {
-					return ViewModel.mappings.HistoricListingGradeViewModel.getPrefetchingProperties(
+					return ViewModel.mappings[HistoricListingGradeViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "historicListingGrade-PropertyViewModel"]
 					);
 				},
 				get owner() {
-					return ViewModel.mappings.PlayerViewModel.getPrefetchingProperties(
+					return ViewModel.mappings[PlayerViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "owner-PropertyViewModel"]
 					);
 				},
 				get historicListingModifiers() {
-					return ViewModel.mappings.PropertyHistoricListingModifierViewModel.getPrefetchingProperties(
+					return ViewModel.mappings[PropertyHistoricListingModifierViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "historicListingModifiers-PropertyViewModel"]
 					);
 				},
 				get type() {
-					return ViewModel.mappings.PropertyTypeViewModel.getPrefetchingProperties(
+					return ViewModel.mappings[PropertyTypeViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "type-PropertyViewModel"]
 					);
@@ -926,11 +898,11 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new PropertyViewModel(null);
-			"borough" in data && (item.borough = data.borough && ViewModel.mappings.BoroughSummaryModel.toViewModel(data.borough));
-			"historicListingGrade" in data && (item.historicListingGrade = data.historicListingGrade && ViewModel.mappings.HistoricListingGradeViewModel.toViewModel(data.historicListingGrade));
-			"owner" in data && (item.owner = data.owner && ViewModel.mappings.PlayerViewModel.toViewModel(data.owner));
-			"historicListingModifiers" in data && (item.historicListingModifiers = data.historicListingModifiers && [...data.historicListingModifiers].map(i => ViewModel.mappings.PropertyHistoricListingModifierViewModel.toViewModel(i)));
-			"type" in data && (item.type = data.type && ViewModel.mappings.PropertyTypeViewModel.toViewModel(data.type));
+			"borough" in data && (item.borough = data.borough && ViewModel.mappings[BoroughSummaryModel.name].toViewModel(data.borough));
+			"historicListingGrade" in data && (item.historicListingGrade = data.historicListingGrade && ViewModel.mappings[HistoricListingGradeViewModel.name].toViewModel(data.historicListingGrade));
+			"owner" in data && (item.owner = data.owner && ViewModel.mappings[PlayerViewModel.name].toViewModel(data.owner));
+			"historicListingModifiers" in data && (item.historicListingModifiers = data.historicListingModifiers && [...data.historicListingModifiers].map(i => ViewModel.mappings[PropertyHistoricListingModifierViewModel.name].toViewModel(i)));
+			"type" in data && (item.type = data.type && ViewModel.mappings[PropertyTypeViewModel.name].toViewModel(data.type));
 			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
 			"historicListingRegisteredAt" in data && (item.historicListingRegisteredAt = data.historicListingRegisteredAt === null ? null : new Date(data.historicListingRegisteredAt));
@@ -963,7 +935,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	SquareViewModel: class ComposedSquareViewModel extends SquareViewModel {
+	[SquareViewModel.name]: class ComposedSquareViewModel extends SquareViewModel {
 		async map() {
 			return {
 				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.$$model.borough)),
@@ -1000,7 +972,7 @@ ViewModel.mappings = {
 
 			return {
 				get borough() {
-					return ViewModel.mappings.BoroughSummaryModel.getPrefetchingProperties(
+					return ViewModel.mappings[BoroughSummaryModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "borough-SquareViewModel"]
 					);
@@ -1013,7 +985,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new SquareViewModel(null);
-			"borough" in data && (item.borough = data.borough && ViewModel.mappings.BoroughSummaryModel.toViewModel(data.borough));
+			"borough" in data && (item.borough = data.borough && ViewModel.mappings[BoroughSummaryModel.name].toViewModel(data.borough));
 			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
@@ -1038,10 +1010,10 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	StreetViewModel: class ComposedStreetViewModel extends StreetViewModel {
+	[StreetViewModel.name]: class ComposedStreetViewModel extends StreetViewModel {
 		async map() {
 			return {
-				bridges: (await this.$$model.bridges.includeTree(ViewModel.mappings.BridgeViewModel.items).toArray()).map(item => new BridgeViewModel(item)),
+				bridges: (await this.$$model.bridges.includeTree(ViewModel.mappings[BridgeViewModel.name].items).toArray()).map(item => new BridgeViewModel(item)),
 				id: this.$$model.id,
 				name: this.$$model.name,
 				path: this.$$model.path,
@@ -1077,7 +1049,7 @@ ViewModel.mappings = {
 
 			return {
 				get bridges() {
-					return ViewModel.mappings.BridgeViewModel.getPrefetchingProperties(
+					return ViewModel.mappings[BridgeViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "bridges-StreetViewModel"]
 					);
@@ -1092,7 +1064,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new StreetViewModel(null);
-			"bridges" in data && (item.bridges = data.bridges && [...data.bridges].map(i => ViewModel.mappings.BridgeViewModel.toViewModel(i)));
+			"bridges" in data && (item.bridges = data.bridges && [...data.bridges].map(i => ViewModel.mappings[BridgeViewModel.name].toViewModel(i)));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"path" in data && (item.path = data.path === null ? null : `${data.path}`);
@@ -1121,7 +1093,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	WaterBodyViewModel: class ComposedWaterBodyViewModel extends WaterBodyViewModel {
+	[WaterBodyViewModel.name]: class ComposedWaterBodyViewModel extends WaterBodyViewModel {
 		async map() {
 			return {
 				bounds: this.$$model.bounds,
@@ -1191,7 +1163,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	HistoricListingGradeViewModel: class ComposedHistoricListingGradeViewModel extends HistoricListingGradeViewModel {
+	[HistoricListingGradeViewModel.name]: class ComposedHistoricListingGradeViewModel extends HistoricListingGradeViewModel {
 		async map() {
 			return {
 				description: this.$$model.description,
@@ -1261,7 +1233,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	PropertyHistoricListingModifierViewModel: class ComposedPropertyHistoricListingModifierViewModel extends PropertyHistoricListingModifierViewModel {
+	[PropertyHistoricListingModifierViewModel.name]: class ComposedPropertyHistoricListingModifierViewModel extends PropertyHistoricListingModifierViewModel {
 		async map() {
 			return {
 				historicListingModifier: new HistoricListingModifierViewModel(await BaseServer.unwrap(this.$$model.historicListingModifier)),
@@ -1296,7 +1268,7 @@ ViewModel.mappings = {
 
 			return {
 				get historicListingModifier() {
-					return ViewModel.mappings.HistoricListingModifierViewModel.getPrefetchingProperties(
+					return ViewModel.mappings[HistoricListingModifierViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "historicListingModifier-PropertyHistoricListingModifierViewModel"]
 					);
@@ -1307,7 +1279,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new PropertyHistoricListingModifierViewModel(null);
-			"historicListingModifier" in data && (item.historicListingModifier = data.historicListingModifier && ViewModel.mappings.HistoricListingModifierViewModel.toViewModel(data.historicListingModifier));
+			"historicListingModifier" in data && (item.historicListingModifier = data.historicListingModifier && ViewModel.mappings[HistoricListingModifierViewModel.name].toViewModel(data.historicListingModifier));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 
 			return item;
@@ -1328,7 +1300,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	HistoricListingModifierViewModel: class ComposedHistoricListingModifierViewModel extends HistoricListingModifierViewModel {
+	[HistoricListingModifierViewModel.name]: class ComposedHistoricListingModifierViewModel extends HistoricListingModifierViewModel {
 		async map() {
 			return {
 				description: this.$$model.description,
@@ -1398,7 +1370,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	TrainStationExitViewModel: class ComposedTrainStationExitViewModel extends TrainStationExitViewModel {
+	[TrainStationExitViewModel.name]: class ComposedTrainStationExitViewModel extends TrainStationExitViewModel {
 		async map() {
 			return {
 				station: new TrainStationViewModel(await BaseServer.unwrap(this.$$model.station)),
@@ -1435,7 +1407,7 @@ ViewModel.mappings = {
 
 			return {
 				get station() {
-					return ViewModel.mappings.TrainStationViewModel.getPrefetchingProperties(
+					return ViewModel.mappings[TrainStationViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "station-TrainStationExitViewModel"]
 					);
@@ -1448,7 +1420,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new TrainStationExitViewModel(null);
-			"station" in data && (item.station = data.station && ViewModel.mappings.TrainStationViewModel.toViewModel(data.station));
+			"station" in data && (item.station = data.station && ViewModel.mappings[TrainStationViewModel.name].toViewModel(data.station));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"inbound" in data && (item.inbound = !!data.inbound);
 			"position" in data && (item.position = data.position === null ? null : `${data.position}`);
@@ -1473,10 +1445,10 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	TrainRouteViewModel: class ComposedTrainRouteViewModel extends TrainRouteViewModel {
+	[TrainRouteViewModel.name]: class ComposedTrainRouteViewModel extends TrainRouteViewModel {
 		async map() {
 			return {
-				stops: (await this.$$model.stops.includeTree(ViewModel.mappings.TrainStopViewModel.items).toArray()).map(item => new TrainStopViewModel(item)),
+				stops: (await this.$$model.stops.includeTree(ViewModel.mappings[TrainStopViewModel.name].items).toArray()).map(item => new TrainStopViewModel(item)),
 				color: this.$$model.color,
 				id: this.$$model.id,
 				name: this.$$model.name,
@@ -1511,7 +1483,7 @@ ViewModel.mappings = {
 
 			return {
 				get stops() {
-					return ViewModel.mappings.TrainStopViewModel.getPrefetchingProperties(
+					return ViewModel.mappings[TrainStopViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "stops-TrainRouteViewModel"]
 					);
@@ -1525,7 +1497,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new TrainRouteViewModel(null);
-			"stops" in data && (item.stops = data.stops && [...data.stops].map(i => ViewModel.mappings.TrainStopViewModel.toViewModel(i)));
+			"stops" in data && (item.stops = data.stops && [...data.stops].map(i => ViewModel.mappings[TrainStopViewModel.name].toViewModel(i)));
 			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
@@ -1552,7 +1524,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	TrainStationViewModel: class ComposedTrainStationViewModel extends TrainStationViewModel {
+	[TrainStationViewModel.name]: class ComposedTrainStationViewModel extends TrainStationViewModel {
 		async map() {
 			return {
 				id: this.$$model.id,
@@ -1618,7 +1590,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	TrainStopViewModel: class ComposedTrainStopViewModel extends TrainStopViewModel {
+	[TrainStopViewModel.name]: class ComposedTrainStopViewModel extends TrainStopViewModel {
 		async map() {
 			return {
 				id: this.$$model.id,

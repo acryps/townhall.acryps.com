@@ -11,6 +11,7 @@ CREATE TABLE movement (
 	
 	x REAL,
 	y REAL,
+	driving BOOLEAN,
 	
 	player_id UUID CONSTRAINT player__movements REFERENCES player (id)
 );

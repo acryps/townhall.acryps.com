@@ -7,7 +7,7 @@ export class MovementHeatmap {
 	
 	// how far pixles should be incremented
 	// will always be *2+1
-	spread = 3;
+	spread = 2;
 	
 	constructor(
 		private database: DbContext
@@ -48,12 +48,13 @@ export class MovementHeatmap {
 		for (let y = 0; y < this.size; y++) {
 			for (let x = 0; x < this.size; x++) {
 				const offset = y * this.size + x;
-				const color = this.intensityToColor(map[offset] / highest);
+				const intensity = map[offset] / highest;
+				const color = this.intensityToColor(intensity);
 				
 				buffer.data[offset * 4] = color.red;
 				buffer.data[offset * 4 + 1] = color.green;
 				buffer.data[offset * 4 + 2] = color.blue;
-				buffer.data[offset * 4 + 3] = 0xff;
+				buffer.data[offset * 4 + 3] = Math.min(intensity * 4, 1) * 0xff;
 			}
 		}
 		

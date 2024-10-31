@@ -316,6 +316,34 @@ export class Service {
 	static toURL(request) {
 		return `${this.baseUrl}${request}`;
 	}
+	
+	static stringify(object) {
+		if (Array.isArray(object)) {
+			return '[' + object.map(item => this.stringify(item)).join(',') + ']';
+		}
+	
+		return JSON.stringify(object, (key, value) => {
+			if (value instanceof Date) {
+				return value.toISOString();
+			}
+			
+			if (value === null) {
+				return null;
+			}
+			
+			if (typeof value === 'object' && key !== '') {
+				if (value && 'id' in value) {
+					return {
+						id: value.id
+					};
+				}
+			
+				return undefined;
+			}
+			
+			return value;
+		});
+	}
 }
 
 export class MapService {
@@ -510,7 +538,7 @@ export class MapService {
 
 	async getProperty(id: string): Promise<PropertyViewModel> {
 		const $data = new FormData();
-		$data.append("VjYnVwc3k5aToyb3FtcDN4c3pnM2RlMW", JSON.stringify(id))
+		$data.append("VjYnVwc3k5aToyb3FtcDN4c3pnM2RlMW", Service.stringify(id))
 
 		return await fetch(Service.toURL("d1NTdqcWBiMWE5ZHg3ZndyM2UzNnMwNm"), {
 			method: "post",
@@ -531,7 +559,7 @@ export class MapService {
 
 	async createProperty(propertyViewModel: PropertyViewModel): Promise<void> {
 		const $data = new FormData();
-		$data.append("F6Mml1d2dxdX0xamxpcDFyaXRuaXZ5NW", JSON.stringify(propertyViewModel))
+		$data.append("F6Mml1d2dxdX0xamxpcDFyaXRuaXZ5NW", Service.stringify(propertyViewModel))
 
 		return await fetch(Service.toURL("VxbjByZmgxb3NvNDlvcTp0ODc0OW4zaz"), {
 			method: "post",
@@ -550,7 +578,7 @@ export class MapService {
 
 	async createBorough(boroughViewModel: BoroughViewModel): Promise<void> {
 		const $data = new FormData();
-		$data.append("Mya2ltZGltbjcyeHdjdGcydGVpZDgyNT", JSON.stringify(boroughViewModel))
+		$data.append("Mya2ltZGltbjcyeHdjdGcydGVpZDgyNT", Service.stringify(boroughViewModel))
 
 		return await fetch(Service.toURL("J2c3hyNDQwNTdjeDs4c3htbWh2MWVnaG"), {
 			method: "post",
@@ -569,7 +597,7 @@ export class MapService {
 
 	async createStreet(streetViewModel: StreetViewModel): Promise<void> {
 		const $data = new FormData();
-		$data.append("YwNnJhZnZycjNzNGU3emQ0Y2RtNnhmZG", JSON.stringify(streetViewModel))
+		$data.append("YwNnJhZnZycjNzNGU3emQ0Y2RtNnhmZG", Service.stringify(streetViewModel))
 
 		return await fetch(Service.toURL("VsbndnaTI4bTllbnh0endpaHdkM3w1MD"), {
 			method: "post",
@@ -588,7 +616,7 @@ export class MapService {
 
 	async createSquare(squareViewModel: SquareViewModel): Promise<void> {
 		const $data = new FormData();
-		$data.append("FwZXk2OGVmcWRxeHdiZW9ucjhxcGE5cG", JSON.stringify(squareViewModel))
+		$data.append("FwZXk2OGVmcWRxeHdiZW9ucjhxcGE5cG", Service.stringify(squareViewModel))
 
 		return await fetch(Service.toURL("RhZGo0ejpmdnJhZ3lla3I4bzB2M2F5cn"), {
 			method: "post",
@@ -607,7 +635,7 @@ export class MapService {
 
 	async createWaterBody(waterBodyViewModel: WaterBodyViewModel): Promise<void> {
 		const $data = new FormData();
-		$data.append("hnMjgxamVveGk2czR6YjQ2aHdxaGJsaG", JSON.stringify(waterBodyViewModel))
+		$data.append("hnMjgxamVveGk2czR6YjQ2aHdxaGJsaG", Service.stringify(waterBodyViewModel))
 
 		return await fetch(Service.toURL("A1bX53enB1cHV0cmQzNTYxdDgzaH10an"), {
 			method: "post",
@@ -626,7 +654,7 @@ export class MapService {
 
 	async saveProperty(propertyViewModel: PropertySummaryModel): Promise<void> {
 		const $data = new FormData();
-		$data.append("NycXNhenFjaGhvZDhsdWtlYzNtd2x4d3", JSON.stringify(propertyViewModel))
+		$data.append("NycXNhenFjaGhvZDhsdWtlYzNtd2x4d3", Service.stringify(propertyViewModel))
 
 		return await fetch(Service.toURL("dzb2prZ3QwYT8xZ2ZicXc5ZnN1cGFwZj"), {
 			method: "post",
@@ -645,7 +673,7 @@ export class MapService {
 
 	async deleteProperty(propertyViewModel: PropertyViewModel): Promise<void> {
 		const $data = new FormData();
-		$data.append("ExMWt6cHEwZTJ0Y3N2cDs3ajYybXd0Zz", JSON.stringify(propertyViewModel))
+		$data.append("ExMWt6cHEwZTJ0Y3N2cDs3ajYybXd0Zz", Service.stringify(propertyViewModel))
 
 		return await fetch(Service.toURL("1nbWp4M21wOG1naTNoM3B1bWJvbTx1ej"), {
 			method: "post",
@@ -669,6 +697,27 @@ export class GameService {
 		
 
 		return await fetch(Service.toURL("pkYWNsZmA2MWVzdXhmYXF0ODVscjV0ZW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : PlayerViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getOnlinePlayers(): Promise<Array<PlayerViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("FxanB4eTFwbHRmYTFxaGw4dWA5Z2wzYj"), {
 			method: "post",
 			credentials: "include",
 			body: $data
@@ -731,8 +780,8 @@ export class HistoricListingService {
 
 	async addListing(propertyViewModel: PropertyViewModel, grade: HistoricListingGradeViewModel): Promise<void> {
 		const $data = new FormData();
-		$data.append("QzZTg0Y3Jza2VxY3E5azlvdzVoaDkyMj", JSON.stringify(propertyViewModel))
-		$data.append("Y5aHJ4b2UwZ2pkZ3R1N285MDkxZnV2c3", JSON.stringify(grade))
+		$data.append("QzZTg0Y3Jza2VxY3E5azlvdzVoaDkyMj", Service.stringify(propertyViewModel))
+		$data.append("Y5aHJ4b2UwZ2pkZ3R1N285MDkxZnV2c3", Service.stringify(grade))
 
 		return await fetch(Service.toURL("YzcjNuOWlqM3VzYWJpdT5lN39xYmZzNz"), {
 			method: "post",
@@ -751,8 +800,8 @@ export class HistoricListingService {
 
 	async addModifier(propertyId: string, modifierId: string): Promise<PropertyHistoricListingModifierViewModel> {
 		const $data = new FormData();
-		$data.append("FyMXVia29sNjN3ZG1naT1teHZzdWN0ej", JSON.stringify(propertyId))
-		$data.append("M2MTNoNWFqbWAybGxrb3M0Z2U0azF4cG", JSON.stringify(modifierId))
+		$data.append("FyMXVia29sNjN3ZG1naT1teHZzdWN0ej", Service.stringify(propertyId))
+		$data.append("M2MTNoNWFqbWAybGxrb3M0Z2U0azF4cG", Service.stringify(modifierId))
 
 		return await fetch(Service.toURL("hmc3RueXJneWJ1MnB1Zzd3cmx5aWZsc2"), {
 			method: "post",
@@ -773,7 +822,7 @@ export class HistoricListingService {
 
 	async removeModifier(linkId: string): Promise<void> {
 		const $data = new FormData();
-		$data.append("kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn", JSON.stringify(linkId))
+		$data.append("kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn", Service.stringify(linkId))
 
 		return await fetch(Service.toURL("IwaWRoOGpwcTdjb3NxeWpxaWtwZTY3M3"), {
 			method: "post",

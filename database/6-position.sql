@@ -1,0 +1,5 @@
+ALTER TABLE player ADD x REAL;
+ALTER TABLE player ADD y REAL;
+ALTER TABLE player ADD online BOOLEAN;
+
+ALTER TABLE player ADD game_uuid TEXT;

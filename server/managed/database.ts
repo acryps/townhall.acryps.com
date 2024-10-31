@@ -1,10 +1,5 @@
 import { Entity, DbSet, RunContext, QueryUUID, QueryProxy, QueryString, QueryJSON, QueryTimeStamp, QueryNumber, QueryTime, QueryDate, QueryBoolean, QueryBuffer, QueryEnum, ForeignReference, PrimaryReference, View, ViewSet } from 'vlquery';
 
-export class CompanyType extends QueryEnum {
-	static readonly company = "company";
-	static readonly governmentCompany = "government_company";
-}
-
 export class BoroughQueryProxy extends QueryProxy {
 	get bounds(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get color(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -96,28 +91,22 @@ export class Bridge extends Entity<BridgeQueryProxy> {
 			
 export class CompanyQueryProxy extends QueryProxy {
 	get owner(): Partial<PlayerQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get ownerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get type(): "company" | "government_company" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class Company extends Entity<CompanyQueryProxy> {
 	get owner(): Partial<ForeignReference<Player>> { return this.$owner; }
-	created: Date;
 	declare id: string;
 	name: string;
 	ownerId: string;
-	type: CompanyType;
 	
 	$$meta = {
 		source: "company",
 		columns: {
-			created: { type: "timestamp", name: "created" },
 			id: { type: "uuid", name: "id" },
 			name: { type: "text", name: "name" },
-			ownerId: { type: "uuid", name: "owner_id" },
-			type: { type: "company_type", name: "type" }
+			ownerId: { type: "uuid", name: "owner_id" }
 		},
 		get set(): DbSet<Company, CompanyQueryProxy> { 
 			return new DbSet<Company, CompanyQueryProxy>(Company, null);
@@ -211,85 +200,21 @@ export class HistoricListingModifier extends Entity<HistoricListingModifierQuery
 	}
 }
 			
-export class MovementQueryProxy extends QueryProxy {
-	get player(): Partial<PlayerQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get playerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get time(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get x(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get y(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-}
-
-export class Movement extends Entity<MovementQueryProxy> {
-	get player(): Partial<ForeignReference<Player>> { return this.$player; }
-	declare id: string;
-	playerId: string;
-	time: Date;
-	x: number;
-	y: number;
-	
-	$$meta = {
-		source: "movement",
-		columns: {
-			id: { type: "uuid", name: "id" },
-			playerId: { type: "uuid", name: "player_id" },
-			time: { type: "timestamp", name: "time" },
-			x: { type: "float4", name: "x" },
-			y: { type: "float4", name: "y" }
-		},
-		get set(): DbSet<Movement, MovementQueryProxy> { 
-			return new DbSet<Movement, MovementQueryProxy>(Movement, null);
-		}
-	};
-	
-	constructor() {
-		super();
-		
-		this.$player = new ForeignReference<Player>(this, "playerId", Player);
-	}
-	
-	private $player: ForeignReference<Player>;
-
-	set player(value: Partial<ForeignReference<Player>>) {
-		if (value) {
-			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
-
-			this.playerId = value.id as string;
-		} else {
-			this.playerId = null;
-		}
-	}
-
-	
-}
-			
 export class PlayerQueryProxy extends QueryProxy {
-	get gameUuid(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get online(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get username(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get x(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get y(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class Player extends Entity<PlayerQueryProxy> {
 	companies: PrimaryReference<Company, CompanyQueryProxy>;
 		properties: PrimaryReference<Property, PropertyQueryProxy>;
-		movements: PrimaryReference<Movement, MovementQueryProxy>;
-		gameUuid: string;
-	declare id: string;
-	online: boolean;
+		declare id: string;
 	username: string;
-	x: number;
-	y: number;
 	
 	$$meta = {
 		source: "player",
 		columns: {
-			gameUuid: { type: "text", name: "game_uuid" },
 			id: { type: "uuid", name: "id" },
-			online: { type: "bool", name: "online" },
-			username: { type: "text", name: "username" },
-			x: { type: "float4", name: "x" },
-			y: { type: "float4", name: "y" }
+			username: { type: "text", name: "username" }
 		},
 		get set(): DbSet<Player, PlayerQueryProxy> { 
 			return new DbSet<Player, PlayerQueryProxy>(Player, null);
@@ -301,7 +226,6 @@ export class Player extends Entity<PlayerQueryProxy> {
 		
 		this.companies = new PrimaryReference<Company, CompanyQueryProxy>(this, "ownerId", Company);
 		this.properties = new PrimaryReference<Property, PropertyQueryProxy>(this, "ownerId", Property);
-		this.movements = new PrimaryReference<Movement, MovementQueryProxy>(this, "playerId", Movement);
 	}
 }
 			
@@ -804,7 +728,6 @@ export class DbContext {
 	company: DbSet<Company, CompanyQueryProxy>;
 	historicListingGrade: DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>;
 	historicListingModifier: DbSet<HistoricListingModifier, HistoricListingModifierQueryProxy>;
-	movement: DbSet<Movement, MovementQueryProxy>;
 	player: DbSet<Player, PlayerQueryProxy>;
 	property: DbSet<Property, PropertyQueryProxy>;
 	propertyHistoricListingModifier: DbSet<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>;
@@ -823,7 +746,6 @@ export class DbContext {
 		this.company = new DbSet<Company, CompanyQueryProxy>(Company, this.runContext);
 		this.historicListingGrade = new DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>(HistoricListingGrade, this.runContext);
 		this.historicListingModifier = new DbSet<HistoricListingModifier, HistoricListingModifierQueryProxy>(HistoricListingModifier, this.runContext);
-		this.movement = new DbSet<Movement, MovementQueryProxy>(Movement, this.runContext);
 		this.player = new DbSet<Player, PlayerQueryProxy>(Player, this.runContext);
 		this.property = new DbSet<Property, PropertyQueryProxy>(Property, this.runContext);
 		this.propertyHistoricListingModifier = new DbSet<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>(PropertyHistoricListingModifier, this.runContext);

@@ -5,7 +5,6 @@ import { DbContext } from "./managed/database";
 
 import * as path from "path";
 import { Proxy } from "./proxy";
-import { GameBridge } from "./bridge";
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
@@ -19,7 +18,6 @@ DbClient.connectedClient.connect().then(() => {
 	ViewModel.globalFetchingContext = db;
 
 	new Proxy(app);
-	new GameBridge(app, db);
 
 	app.createInjector = context => new Inject({
 		Context: context,

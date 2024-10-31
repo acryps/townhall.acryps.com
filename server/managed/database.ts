@@ -1,10 +1,5 @@
 import { Entity, DbSet, RunContext, QueryUUID, QueryProxy, QueryString, QueryJSON, QueryTimeStamp, QueryNumber, QueryTime, QueryDate, QueryBoolean, QueryBuffer, QueryEnum, ForeignReference, PrimaryReference, View, ViewSet } from 'vlquery';
 
-export class CompanyType extends QueryEnum {
-	static readonly company = "company";
-	static readonly governmentCompany = "government_company";
-}
-
 export class BoroughQueryProxy extends QueryProxy {
 	get bounds(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get color(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -96,28 +91,22 @@ export class Bridge extends Entity<BridgeQueryProxy> {
 			
 export class CompanyQueryProxy extends QueryProxy {
 	get owner(): Partial<PlayerQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get ownerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get type(): "company" | "government_company" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class Company extends Entity<CompanyQueryProxy> {
 	get owner(): Partial<ForeignReference<Player>> { return this.$owner; }
-	created: Date;
 	declare id: string;
 	name: string;
 	ownerId: string;
-	type: CompanyType;
 	
 	$$meta = {
 		source: "company",
 		columns: {
-			created: { type: "timestamp", name: "created" },
 			id: { type: "uuid", name: "id" },
 			name: { type: "text", name: "name" },
-			ownerId: { type: "uuid", name: "owner_id" },
-			type: { type: "company_type", name: "type" }
+			ownerId: { type: "uuid", name: "owner_id" }
 		},
 		get set(): DbSet<Company, CompanyQueryProxy> { 
 			return new DbSet<Company, CompanyQueryProxy>(Company, null);
@@ -212,32 +201,20 @@ export class HistoricListingModifier extends Entity<HistoricListingModifierQuery
 }
 			
 export class PlayerQueryProxy extends QueryProxy {
-	get gameUuid(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get online(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get username(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get x(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get y(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class Player extends Entity<PlayerQueryProxy> {
 	companies: PrimaryReference<Company, CompanyQueryProxy>;
 		properties: PrimaryReference<Property, PropertyQueryProxy>;
-		gameUuid: string;
-	declare id: string;
-	online: boolean;
+		declare id: string;
 	username: string;
-	x: number;
-	y: number;
 	
 	$$meta = {
 		source: "player",
 		columns: {
-			gameUuid: { type: "text", name: "game_uuid" },
 			id: { type: "uuid", name: "id" },
-			online: { type: "bool", name: "online" },
-			username: { type: "text", name: "username" },
-			x: { type: "float4", name: "x" },
-			y: { type: "float4", name: "y" }
+			username: { type: "text", name: "username" }
 		},
 		get set(): DbSet<Player, PlayerQueryProxy> { 
 			return new DbSet<Player, PlayerQueryProxy>(Player, null);

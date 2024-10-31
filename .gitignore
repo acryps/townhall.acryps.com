@@ -1,2 +1,4 @@
 node_modules
-.built
+dist
+
+.parcel-cache

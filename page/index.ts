@@ -8,9 +8,6 @@ import { GameService, PlayerViewModel, Service } from "./managed/services";
 import { PathRouter, Router } from "@acryps/page/built/router";
 import { Component } from "@acryps/page/built/component";
 import { registerDirectives } from "@acryps/page-default-directives/built/index";
-import { HomePage } from "./home";
-import { pageStyle } from "./index.style";
-import { GameBridge } from "./bridge";
 
 export class Application {
 	static router: Router;
@@ -18,11 +15,13 @@ export class Application {
 	static players: PlayerViewModel[];
 
 	static center = new Point(101, 183);
-	
-	static bridge = new GameBridge();
 
 	static async main() {
 		Service.baseUrl = '/';
+
+		if (location.pathname == '/') {
+			location.pathname = `/map/${Application.center.x}/${Application.center.y}/3`;
+		}
 
 		this.players = await new GameService().getPlayers();
 
@@ -34,20 +33,11 @@ export class Application {
 
 				.route('/properties', PropertiesComponent)
 				.route('/property/:id', PropertyComponent)
-			
-				.route('/', HomePage)
 		);
 
 		registerDirectives(Component, this.router);
 
-		pageStyle().apply();
 		this.router.host(document.body);
-	}
-	
-	static serverTime() {
-		const date = +new Date() - (150 * 365.4 * 24 * 60 * 60);
-		
-		return new Date(date);
 	}
 }
 

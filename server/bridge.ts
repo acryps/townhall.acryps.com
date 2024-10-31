@@ -1,13 +1,10 @@
-import { JoinMessage, LeaveMessage, Message, MoveMessage } from "../interface";
-import { PlayerViewModel } from "./areas/player.view";
-import { DbContext, Movement, Player } from "./managed/database";
+import { DbContext, Player } from "./managed/database";
 import { ManagedServer } from "./managed/server";
 
 export class GameBridge {
 	constructor(
 		app: ManagedServer,
-		database: DbContext,
-		broadcast: (message: Message) => void
+		database: DbContext
 	) {
 		app.app.get('/in/join/:uuid/:displayName', async (request, response) => {
 			let player = await database.player.first(player => player.gameUuid.valueOf() == request.params.uuid);
@@ -22,11 +19,6 @@ export class GameBridge {
 			
 			player.online = true;
 			await player.update();
-			
-			const join = new JoinMessage();
-			join.player = await new PlayerViewModel(player).resolveToJSON();
-			
-			broadcast(join);
 			
 			response.end();
 		});
@@ -45,21 +37,6 @@ export class GameBridge {
 			
 			await player.update();
 			
-			const move = new MoveMessage();
-			move.id = player.id;
-			move.x = player.x;
-			move.y = player.y;
-			
-			broadcast(move);
-			
-			const movement = new Movement();
-			movement.time = new Date();
-			movement.x = player.x;
-			movement.y = player.y;
-			movement.player = player;
-			
-			movement.create();
-			
 			response.end();
 		});
 		
@@ -74,13 +51,6 @@ export class GameBridge {
 			
 			player.online = false;
 			await player.update();
-			
-			const leave = new LeaveMessage();
-			leave.id = player.id;
-			
-			broadcast(leave);
-			
-			response.end();
 		});
 	}
 }

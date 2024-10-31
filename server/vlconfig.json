@@ -13,10 +13,6 @@
             {
                 "type": "native",
                 "outFile": "../page/managed/services.ts"
-            },
-            {
-            	"type": "interface",
-             	"outFile": "../interface/models.ts"
             }
         ]
     }

@@ -1,7 +1,7 @@
 {
-	"name": "townhall",
-	"version": "2.3.4",
-	"scripts": {
-		"build": "cd page; npm run build; cd ..; cd server; npm run build; cd .."
-	}
+    "name": "townhall",
+    "version": "2.3.4",
+    "scripts": {
+        "build": "cd server && npm run build && cd .. && cd page && npm run build && cd .."
+    }
 }

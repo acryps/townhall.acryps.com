@@ -1,17 +1,17 @@
 {
-	"compilerOptions": {
-		"outDir": ".built",
-		"module": "esnext",
-		"moduleResolution": "node",
-		"target": "es6",
-		"allowSyntheticDefaultImports": true
-	},
-	"include": [
-		".",
-		"../interface"
-	],
-	"exclude": [
-		"dist",
-		"node_modules"
-	]
+    "compilerOptions": {
+        "module": "CommonJS",
+        "outDir": "dist",
+        "target": "es6",
+        "types": [
+            "node"
+        ],
+        "lib": [
+            "ESNext"
+        ]
+    },
+    "exclude": [
+        "dist",
+        "node_modules"
+    ]
 }

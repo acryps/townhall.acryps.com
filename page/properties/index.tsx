@@ -16,7 +16,7 @@ export class PropertiesComponent extends Component {
 				const points = Point.unpack(property.bounds);
 				const size = Point.size(points);
 
-				return <ui-property ui-incomplete={!property.borough || !property.type} ui-href={`/property/${property.id}`}>
+				return <ui-property ui-incomplete={(property.borough && property.type) ? null : ''} ui-href={`/property/${property.id}`}>
 					{new MapPreviewComponent(Point.unpack(property.bounds))}
 
 					<ui-property-tagline>

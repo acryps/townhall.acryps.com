@@ -1,32 +1,42 @@
 export class BoroughSummaryModel {
+	banner: string;
 	color: string;
 	id: string;
 	name: string;
 	propertyPrefix: string;
+	tag: string;
 
 	private static $build(raw) {
 		const item = new BoroughSummaryModel();
+		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
 		raw.color === undefined || (item.color = raw.color === null ? null : `${raw.color}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.propertyPrefix === undefined || (item.propertyPrefix = raw.propertyPrefix === null ? null : `${raw.propertyPrefix}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		
 		return item;
 	}
 }
 
 export class BoroughViewModel {
+	banner: string;
 	bounds: string;
 	color: string;
+	description: string;
 	id: string;
 	name: string;
+	tag: string;
 
 	private static $build(raw) {
 		const item = new BoroughViewModel();
+		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
 		raw.bounds === undefined || (item.bounds = raw.bounds === null ? null : `${raw.bounds}`)
 		raw.color === undefined || (item.color = raw.color === null ? null : `${raw.color}`)
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		
 		return item;
 	}
@@ -686,6 +696,50 @@ export class MapService {
 
 			if ("aborted" in r) {
 				throw new Error("request aborted by server");
+			}
+		});
+	}
+}
+
+export class BoroughService {
+	async get(tag: string): Promise<BoroughViewModel> {
+		const $data = new FormData();
+		$data.append("M5endlbjBxeGJtZHIwdzBudX12c3lrdG", Service.stringify(tag))
+
+		return await fetch(Service.toURL("ZsMjFkanx6MGp3OHl0Z2hmcGdnMXQ1cj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : BoroughViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async list(): Promise<Array<BoroughSummaryModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("J4amhucmNzdWdkM3gybmlvZjV4NnFodX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : BoroughSummaryModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
 			}
 		});
 	}

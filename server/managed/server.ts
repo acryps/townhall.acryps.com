@@ -13,6 +13,8 @@ import { SquareViewModel } from "././../areas/squre.view";
 import { StreetViewModel } from "././../areas/street.view";
 import { WaterBodyViewModel } from "././../areas/water-body.view";
 import { MapService } from "././../areas/map.service";
+import { BoroughSummaryModel } from "././../areas/borough.summary";
+import { BoroughService } from "././../areas/borough/service";
 import { PlayerViewModel } from "././../areas/player.view";
 import { GameService } from "././../areas/game/game.service";
 import { PropertyHistoricListingModifier } from "././database";
@@ -23,7 +25,6 @@ import { HistoricListingService } from "././../areas/history-listing/listing.ser
 import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
-import { BoroughSummaryModel } from "./../areas/borough.summary";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { Bridge } from "./../managed/database";
@@ -49,6 +50,10 @@ Inject.mappings = {
 	"DbContext": {
 		objectConstructor: DbContext,
 		parameters: ["RunContext"]
+	},
+	"BoroughService": {
+		objectConstructor: BoroughService,
+		parameters: ["DbContext"]
 	},
 	"GameService": {
 		objectConstructor: GameService,
@@ -236,6 +241,26 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"ZsMjFkanx6MGp3OHl0Z2hmcGdnMXQ1cj",
+			{
+			"M5endlbjBxeGJtZHIwdzBudX12c3lrdG": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(BoroughService),
+			(controller, params) => controller.get(
+				params["M5endlbjBxeGJtZHIwdzBudX12c3lrdG"]
+			)
+		);
+
+		this.expose(
+			"J4amhucmNzdWdkM3gybmlvZjV4NnFodX",
+			{},
+			inject => inject.construct(BoroughService),
+			(controller, params) => controller.list(
+				
+			)
+		);
+
+		this.expose(
 			"pkYWNsZmA2MWVzdXhmYXF0ODVscjV0ZW",
 			{},
 			inject => inject.construct(GameService),
@@ -332,10 +357,12 @@ ViewModel.mappings = {
 	[BoroughSummaryModel.name]: class ComposedBoroughSummaryModel extends BoroughSummaryModel {
 		async map() {
 			return {
+				banner: this.$$model.banner,
 				color: this.$$model.color,
 				id: this.$$model.id,
 				name: this.$$model.name,
-				propertyPrefix: this.$$model.propertyPrefix
+				propertyPrefix: this.$$model.propertyPrefix,
+				tag: this.$$model.tag
 			}
 		};
 
@@ -365,19 +392,23 @@ ViewModel.mappings = {
 			}
 
 			return {
+				banner: true,
 				color: true,
 				id: true,
 				name: true,
-				propertyPrefix: true
+				propertyPrefix: true,
+				tag: true
 			};
 		};
 
 		static toViewModel(data) {
 			const item = new BoroughSummaryModel(null);
+			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
 			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"propertyPrefix" in data && (item.propertyPrefix = data.propertyPrefix === null ? null : `${data.propertyPrefix}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 
 			return item;
 		}
@@ -391,10 +422,12 @@ ViewModel.mappings = {
 				model = new Borough();
 			}
 			
+			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
 			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"propertyPrefix" in viewModel && (model.propertyPrefix = viewModel.propertyPrefix === null ? null : `${viewModel.propertyPrefix}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 
 			return model;
 		}
@@ -402,10 +435,13 @@ ViewModel.mappings = {
 	[BoroughViewModel.name]: class ComposedBoroughViewModel extends BoroughViewModel {
 		async map() {
 			return {
+				banner: this.$$model.banner,
 				bounds: this.$$model.bounds,
 				color: this.$$model.color,
+				description: this.$$model.description,
 				id: this.$$model.id,
-				name: this.$$model.name
+				name: this.$$model.name,
+				tag: this.$$model.tag
 			}
 		};
 
@@ -435,19 +471,25 @@ ViewModel.mappings = {
 			}
 
 			return {
+				banner: true,
 				bounds: true,
 				color: true,
+				description: true,
 				id: true,
-				name: true
+				name: true,
+				tag: true
 			};
 		};
 
 		static toViewModel(data) {
 			const item = new BoroughViewModel(null);
+			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
 			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 
 			return item;
 		}
@@ -461,10 +503,13 @@ ViewModel.mappings = {
 				model = new Borough();
 			}
 			
+			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
 			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 
 			return model;
 		}

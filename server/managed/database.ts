@@ -5,33 +5,62 @@ export class CompanyType extends QueryEnum {
 	static readonly governmentCompany = "government_company";
 }
 
+export class MapType extends QueryEnum {
+	static readonly night = "night";
+	static readonly overworld = "overworld";
+}
+
 export class BoroughQueryProxy extends QueryProxy {
+	get aiDescription(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get aiSummary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get banner(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get bounds(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get color(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get incorporation(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get propertyPrefix(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get shortName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get survey(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get ttsDescription(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class Borough extends Entity<BoroughQueryProxy> {
 	properties: PrimaryReference<Property, PropertyQueryProxy>;
 		squares: PrimaryReference<Square, SquareQueryProxy>;
-		bounds: string;
+		aiDescription: string;
+	aiSummary: string;
+	banner: string;
+	bounds: string;
 	color: string;
+	description: string;
 	declare id: string;
+	incorporation: Date;
 	name: string;
 	propertyPrefix: string;
 	shortName: string;
+	survey: boolean;
+	tag: string;
+	ttsDescription: string;
 	
 	$$meta = {
 		source: "borough",
 		columns: {
+			aiDescription: { type: "text", name: "ai_description" },
+			aiSummary: { type: "text", name: "ai_summary" },
+			banner: { type: "text", name: "banner" },
 			bounds: { type: "text", name: "bounds" },
 			color: { type: "text", name: "color" },
+			description: { type: "text", name: "description" },
 			id: { type: "uuid", name: "id" },
+			incorporation: { type: "timestamp", name: "incorporation" },
 			name: { type: "text", name: "name" },
 			propertyPrefix: { type: "text", name: "property_prefix" },
-			shortName: { type: "text", name: "short_name" }
+			shortName: { type: "text", name: "short_name" },
+			survey: { type: "bool", name: "survey" },
+			tag: { type: "text", name: "tag" },
+			ttsDescription: { type: "text", name: "tts_description" }
 		},
 		get set(): DbSet<Borough, BoroughQueryProxy> { 
 			return new DbSet<Borough, BoroughQueryProxy>(Borough, null);
@@ -209,6 +238,44 @@ export class HistoricListingModifier extends Entity<HistoricListingModifierQuery
 		
 		this.listedProperties = new PrimaryReference<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>(this, "historicListingModifierId", PropertyHistoricListingModifier);
 	}
+}
+			
+export class MapTileQueryProxy extends QueryProxy {
+	get captured(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get complete(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get hash(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get image(): Partial<QueryBuffer> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get regionX(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get regionY(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get type(): "night" | "overworld" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class MapTile extends Entity<MapTileQueryProxy> {
+	captured: Date;
+	complete: boolean;
+	hash: string;
+	declare id: string;
+	image: Buffer;
+	regionX: number;
+	regionY: number;
+	type: MapType;
+	
+	$$meta = {
+		source: "map_tile",
+		columns: {
+			captured: { type: "timestamp", name: "captured" },
+			complete: { type: "bool", name: "complete" },
+			hash: { type: "text", name: "hash" },
+			id: { type: "uuid", name: "id" },
+			image: { type: "bytea", name: "image" },
+			regionX: { type: "int4", name: "region_x" },
+			regionY: { type: "int4", name: "region_y" },
+			type: { type: "map_type", name: "type" }
+		},
+		get set(): DbSet<MapTile, MapTileQueryProxy> { 
+			return new DbSet<MapTile, MapTileQueryProxy>(MapTile, null);
+		}
+	};
 }
 			
 export class MovementQueryProxy extends QueryProxy {
@@ -807,6 +874,7 @@ export class DbContext {
 	company: DbSet<Company, CompanyQueryProxy>;
 	historicListingGrade: DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>;
 	historicListingModifier: DbSet<HistoricListingModifier, HistoricListingModifierQueryProxy>;
+	mapTile: DbSet<MapTile, MapTileQueryProxy>;
 	movement: DbSet<Movement, MovementQueryProxy>;
 	player: DbSet<Player, PlayerQueryProxy>;
 	property: DbSet<Property, PropertyQueryProxy>;
@@ -826,6 +894,7 @@ export class DbContext {
 		this.company = new DbSet<Company, CompanyQueryProxy>(Company, this.runContext);
 		this.historicListingGrade = new DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>(HistoricListingGrade, this.runContext);
 		this.historicListingModifier = new DbSet<HistoricListingModifier, HistoricListingModifierQueryProxy>(HistoricListingModifier, this.runContext);
+		this.mapTile = new DbSet<MapTile, MapTileQueryProxy>(MapTile, this.runContext);
 		this.movement = new DbSet<Movement, MovementQueryProxy>(Movement, this.runContext);
 		this.player = new DbSet<Player, PlayerQueryProxy>(Player, this.runContext);
 		this.property = new DbSet<Property, PropertyQueryProxy>(Property, this.runContext);

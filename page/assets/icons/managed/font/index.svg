@@ -1,0 +1,18 @@
+<?xml version="1.0" standalone="no"?> 
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
+<svg xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <font id="iconfont" horiz-adv-x="32">
+    <font-face font-family="iconfont"
+      units-per-em="32" ascent="32"
+      descent="0" />
+    <missing-glyph horiz-adv-x="0" />
+    <glyph glyph-name="delete"
+      unicode="&#xF101;"
+      horiz-adv-x="32" d=" M13 29L13 28L4 28L4 26L6 26L6 4L26 4L26 26L28 26L28 28L19 28L19 29L13 29zM8 26L24 26L24 6L8 6L8 26zM11 23L11 9L13 9L13 23L11 23zM19 23L19 9L21 9L21 23L19 23z" />
+    <glyph glyph-name="explore"
+      unicode="&#xF102;"
+      horiz-adv-x="32" d=" M8 27L8 25L14 25L14 27L8 27zM18 27L18 25L24 25L24 27L18 27zM8 23L8 21L6 21L6 19L12 19L12 11L4 11L4 15L2 15L2 7L2 6L2 5L14 5L14 6L14 7L14 11L18 11L18 7L18 6L18 5L30 5L30 6L30 7L30 15L28 15L28 11L20 11L20 19L26 19L26 21L24 21L24 23L22 23L22 21L20 21L20 23L18 23L18 19L14 19L14 23L12 23L12 21L10 21L10 23L8 23zM26 19L26 15L28 15L28 19L26 19zM4 15L6 15L6 19L4 19L4 15zM14 17L18 17L18 13L14 13L14 17zM4 9L12 9L12 7L4 7L4 9zM20 9L28 9L28 7L20 7L20 9z" />
+  </font>
+</defs>
+</svg>

@@ -54,7 +54,11 @@ export class Point {
 	static size(points: Point[]) {
 		return {
 			width: Math.max(...points.map(point => point.x)) - Math.min(...points.map(point => point.x)),
-			height: Math.max(...points.map(point => point.y)) - Math.min(...points.map(point => point.y))
+			height: Math.max(...points.map(point => point.y)) - Math.min(...points.map(point => point.y)),
+
+			get max() {
+				return Math.max(this.width, this.height);
+			}
 		}
 	}
 
@@ -64,7 +68,7 @@ export class Point {
 
 		const minY = Math.min(...points.map(point => point.y));
 		const maxY = Math.max(...points.map(point => point.y));
-			  
+
 		return new Point(minX + (maxX - minX) * 0.5, minY + (maxY - minY) * 0.5);
 	}
 

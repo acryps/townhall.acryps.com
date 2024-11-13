@@ -1,15 +1,20 @@
 export interface BoroughSummaryModel {
-    color: string;
-	id: string;
-	name: string;
-	propertyPrefix: string;
-}
-
-export interface BoroughViewModel {
-    bounds: string;
+    banner: string;
 	color: string;
 	id: string;
 	name: string;
+	propertyPrefix: string;
+	tag: string;
+}
+
+export interface BoroughViewModel {
+    banner: string;
+	bounds: string;
+	color: string;
+	description: string;
+	id: string;
+	name: string;
+	tag: string;
 }
 
 export interface BridgeViewModel {

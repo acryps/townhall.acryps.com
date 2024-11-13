@@ -4,27 +4,31 @@ import { Point } from "./map/point";
 import { HistoryComponent } from "./map/history.component";
 import { PropertiesComponent } from "./properties/index";
 import { PropertyComponent } from "./property/index";
-import { GameService, PlayerViewModel, Service } from "./managed/services";
+import { BoroughService, BoroughViewModel, GameService, PlayerViewModel, Service } from "./managed/services";
 import { PathRouter, Router } from "@acryps/page/built/router";
 import { Component } from "@acryps/page/built/component";
 import { registerDirectives } from "@acryps/page-default-directives/built/index";
 import { HomePage } from "./home";
 import { pageStyle } from "./index.style";
 import { GameBridge } from "./bridge";
+import { BoroughPage } from "./borough";
+import { CreateBannerComponent } from "./banner/create";
 
 export class Application {
 	static router: Router;
 
 	static players: PlayerViewModel[];
+	static boroughs: BoroughViewModel[];
 
 	static center = new Point(101, 183);
-	
+
 	static bridge = new GameBridge();
 
 	static async main() {
 		Service.baseUrl = '/';
 
 		this.players = await new GameService().getPlayers();
+		this.boroughs = await new BoroughService().list();
 
 		this.router = new PathRouter(
 			PageComponent
@@ -34,7 +38,12 @@ export class Application {
 
 				.route('/properties', PropertiesComponent)
 				.route('/property/:id', PropertyComponent)
-			
+
+				.route('/borough/:tag', BoroughPage)
+
+				.route('/create-banner', CreateBannerComponent)
+				.route('/create-banner/:code', CreateBannerComponent)
+
 				.route('/', HomePage)
 		);
 
@@ -43,10 +52,10 @@ export class Application {
 		pageStyle().apply();
 		this.router.host(document.body);
 	}
-	
+
 	static serverTime() {
 		const date = +new Date() - (150 * 365.4 * 24 * 60 * 60);
-		
+
 		return new Date(date);
 	}
 }

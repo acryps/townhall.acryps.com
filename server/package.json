@@ -14,7 +14,7 @@
 		"townhallServerAddress": "Minecraft File Server Location"
 	},
 	"dependencies": {
-		"@acryps/environment": "^2.4.0",
+		"@acryps/environment": "^2.7.2",
 		"canvas": "^2.11.2",
 		"express-ws": "^5.0.2",
 		"js-md5": "^0.7.3",

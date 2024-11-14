@@ -1,9 +1,10 @@
 export interface BoroughSummaryModel {
     banner: string;
+	bounds: string;
 	color: string;
 	id: string;
+	incorporation: Date;
 	name: string;
-	propertyPrefix: string;
 	tag: string;
 }
 
@@ -13,6 +14,7 @@ export interface BoroughViewModel {
 	color: string;
 	description: string;
 	id: string;
+	incorporation: Date;
 	name: string;
 	tag: string;
 }

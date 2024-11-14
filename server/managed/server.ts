@@ -358,10 +358,11 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				banner: this.$$model.banner,
+				bounds: this.$$model.bounds,
 				color: this.$$model.color,
 				id: this.$$model.id,
+				incorporation: this.$$model.incorporation,
 				name: this.$$model.name,
-				propertyPrefix: this.$$model.propertyPrefix,
 				tag: this.$$model.tag
 			}
 		};
@@ -393,10 +394,11 @@ ViewModel.mappings = {
 
 			return {
 				banner: true,
+				bounds: true,
 				color: true,
 				id: true,
+				incorporation: true,
 				name: true,
-				propertyPrefix: true,
 				tag: true
 			};
 		};
@@ -404,10 +406,11 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new BoroughSummaryModel(null);
 			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
+			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"incorporation" in data && (item.incorporation = data.incorporation === null ? null : new Date(data.incorporation));
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"propertyPrefix" in data && (item.propertyPrefix = data.propertyPrefix === null ? null : `${data.propertyPrefix}`);
 			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 
 			return item;
@@ -423,10 +426,11 @@ ViewModel.mappings = {
 			}
 			
 			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
+			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"incorporation" in viewModel && (model.incorporation = viewModel.incorporation === null ? null : new Date(viewModel.incorporation));
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"propertyPrefix" in viewModel && (model.propertyPrefix = viewModel.propertyPrefix === null ? null : `${viewModel.propertyPrefix}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 
 			return model;
@@ -440,6 +444,7 @@ ViewModel.mappings = {
 				color: this.$$model.color,
 				description: this.$$model.description,
 				id: this.$$model.id,
+				incorporation: this.$$model.incorporation,
 				name: this.$$model.name,
 				tag: this.$$model.tag
 			}
@@ -476,6 +481,7 @@ ViewModel.mappings = {
 				color: true,
 				description: true,
 				id: true,
+				incorporation: true,
 				name: true,
 				tag: true
 			};
@@ -488,6 +494,7 @@ ViewModel.mappings = {
 			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"incorporation" in data && (item.incorporation = data.incorporation === null ? null : new Date(data.incorporation));
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 
@@ -508,6 +515,7 @@ ViewModel.mappings = {
 			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
 			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"incorporation" in viewModel && (model.incorporation = viewModel.incorporation === null ? null : new Date(viewModel.incorporation));
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 

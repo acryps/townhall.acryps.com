@@ -1,18 +1,20 @@
 export class BoroughSummaryModel {
 	banner: string;
+	bounds: string;
 	color: string;
 	id: string;
+	incorporation: Date;
 	name: string;
-	propertyPrefix: string;
 	tag: string;
 
 	private static $build(raw) {
 		const item = new BoroughSummaryModel();
 		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
+		raw.bounds === undefined || (item.bounds = raw.bounds === null ? null : `${raw.bounds}`)
 		raw.color === undefined || (item.color = raw.color === null ? null : `${raw.color}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.incorporation === undefined || (item.incorporation = raw.incorporation ? new Date(raw.incorporation) : null)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
-		raw.propertyPrefix === undefined || (item.propertyPrefix = raw.propertyPrefix === null ? null : `${raw.propertyPrefix}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		
 		return item;
@@ -25,6 +27,7 @@ export class BoroughViewModel {
 	color: string;
 	description: string;
 	id: string;
+	incorporation: Date;
 	name: string;
 	tag: string;
 
@@ -35,6 +38,7 @@ export class BoroughViewModel {
 		raw.color === undefined || (item.color = raw.color === null ? null : `${raw.color}`)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.incorporation === undefined || (item.incorporation = raw.incorporation ? new Date(raw.incorporation) : null)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		

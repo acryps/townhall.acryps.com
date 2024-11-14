@@ -4,7 +4,7 @@ import { Point } from "./map/point";
 import { HistoryComponent } from "./map/history.component";
 import { PropertiesComponent } from "./properties/index";
 import { PropertyComponent } from "./property/index";
-import { BoroughService, BoroughViewModel, GameService, PlayerViewModel, Service } from "./managed/services";
+import { BoroughService, BoroughSummaryModel, BoroughViewModel, GameService, PlayerViewModel, Service } from "./managed/services";
 import { PathRouter, Router } from "@acryps/page/built/router";
 import { Component } from "@acryps/page/built/component";
 import { registerDirectives } from "@acryps/page-default-directives/built/index";
@@ -13,14 +13,15 @@ import { pageStyle } from "./index.style";
 import { GameBridge } from "./bridge";
 import { BoroughPage } from "./borough";
 import { CreateBannerComponent } from "./banner/create";
+import './shared/polyfills';
 
 export class Application {
 	static router: Router;
 
 	static players: PlayerViewModel[];
-	static boroughs: BoroughViewModel[];
+	static boroughs: BoroughSummaryModel[];
 
-	static center = new Point(101, 183);
+	static center = new Point(23, 183);
 
 	static bridge = new GameBridge();
 

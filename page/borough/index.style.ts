@@ -1,4 +1,4 @@
-import { child, display, fontSize, height, imageRendering, justifyContent, marginBottom, marginInline, maxWidth, min, paddingInline, percentage, rem, textAlign, vh, whiteSpace, width } from "@acryps/style";
+import { border, child, display, fontSize, height, hex, imageRendering, justifyContent, marginBottom, marginInline, maxWidth, min, paddingInline, percentage, px, rem, textAlign, vh, whiteSpace, width } from "@acryps/style";
 
 export const boroughStyle = () => child('ui-borough',
 	display('block'),
@@ -12,7 +12,9 @@ export const boroughStyle = () => child('ui-borough',
 		marginBottom(rem(1)),
 
 		child('canvas',
-			height(min(vh(20), rem(10)))
+			height(min(vh(20), rem(10))),
+
+			border(px(1), 'solid', hex('000'))
 		)
 	),
 
@@ -21,6 +23,13 @@ export const boroughStyle = () => child('ui-borough',
 		marginBottom(rem(1)),
 
 		fontSize(rem(2)),
+		textAlign('center')
+	),
+
+	child('ui-incorporation',
+		display('block'),
+		marginBottom(rem(1)),
+
 		textAlign('center')
 	),
 

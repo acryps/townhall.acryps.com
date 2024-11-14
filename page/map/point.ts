@@ -12,6 +12,10 @@ export class Point {
 		return new Point(this.x + x, this.y + y);
 	}
 
+	distance(peer: Point) {
+		return Math.hypot(this.x - peer.x, this.y - peer.y);
+	}
+
 	static unpack(source: string) {
 		return source.split(";").map(source => new Point(+source.split(",")[0], +source.split(",")[1]))
 	}
@@ -60,6 +64,24 @@ export class Point {
 				return Math.max(this.width, this.height);
 			}
 		}
+	}
+
+	static area(points: Point[]) {
+		const length = points.length;
+
+		if (length < 3) {
+			return 0;
+		}
+
+		let area = 0;
+
+		for (let index = 0; index < length; index++) {
+			const nextIndex = (index + 1) % length;
+			area += points[index].x * points[nextIndex].y;
+			area -= points[index].y * points[nextIndex].x;
+		}
+
+		return Math.abs(area) / 2.0;
 	}
 
 	static center(points: Point[]) {

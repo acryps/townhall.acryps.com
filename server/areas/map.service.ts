@@ -86,6 +86,7 @@ export class MapService extends Service {
 
 	async createBorough(boroughViewModel: BoroughViewModel) {
 		const borough = await boroughViewModel.toModel();
+		borough.incorporation = new Date();
 
 		await borough.create();
 	}

@@ -7,3 +7,4 @@ ALTER TABLE borough ADD tag TEXT UNIQUE;
 UPDATE borough SET tag = REPLACE(LOWER(name), ' ', '-');
 
 ALTER TABLE borough ADD banner TEXT;
+ALTER TABLE borough ADD incorporation TIMESTAMP;

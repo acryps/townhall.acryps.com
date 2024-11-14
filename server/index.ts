@@ -1,24 +1,106 @@
 import { DbClient, RunContext } from "vlquery";
 import { Inject, StaticFileRoute, ViewModel } from "vlserver";
 import { ManagedServer } from "./managed/server";
-import { Bridge, DbContext, MapType, Movement } from "./managed/database";
+import { Article, ArticleImage, ArticleMedia, Bridge, DbContext, MapType, Movement } from "./managed/database";
 import ws from 'express-ws';
 import { join } from "path";
 import { Proxy } from "./proxy";
 import { GameBridge } from "./bridge";
 import { Message } from "../interface";
 import { MovementHeatmap } from "./movement-heatmap";
+import { existsSync, readdirSync, readFileSync } from "fs";
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
 
-DbClient.connectedClient.connect().then(() => {
+DbClient.connectedClient.connect().then(async () => {
 	console.log("connected to database!");
 
 	const app = new ManagedServer();
 	ws(app.app);
 
 	const db = new DbContext(new RunContext());
+
+	const base = '/Users/levvij/Documents/pilegron news';
+
+	for (let file of readdirSync(base).filter(s => s.endsWith('.txt'))) {
+		const date = file.replace('.txt', '');
+		console.group(new Date(date));
+
+		const articles = readFileSync(join(base, file)).toString().replaceAll('<span class="Apple-converted-space"> </span>', ' ').split(/<p class="p[0-3]"><b>/).slice(2);
+
+		for (let source of articles) {
+			const title = source.split('</b>')[0].trim();
+
+			if (title) {
+				let content = source.split('</b></p>').slice(1).join('</b></p>');
+
+				// images
+				content = content.replace(/<img src="file\:\/\/\/IMG_[0-9]+.jpeg" alt="IMG_[0-9]+.jpeg"><\/p>/g, '\n\n');
+
+				// tags
+				content = content.replace(/<\/?[a-z]+(\s+[a-z]+\=\"(.*)\")*>/g, '\n\n');
+
+				while (content.match(/ [ \n]+/)) {
+					content = content.replace(/ [ \n]+/, ' ');
+				}
+
+				while (content.includes('\n\n\n')) {
+					content = content.replace('\n\n\n', '\n\n');
+				}
+
+				content = content.trim();
+
+				console.group(title);
+				console.log(content)
+				console.groupEnd();
+
+				const article = new Article();
+				article.title = title;
+				article.body = content;
+				article.published = new Date(date);
+
+				await article.create();
+
+				if (existsSync(join(base, date))) {
+					const files = existsSync(join(base, date, 'images')) ? readdirSync(join(base, date, 'images')).map(i => join(join(base, date, 'images'), i)) : [join(base, date, readdirSync(join(base, date))[0])];
+
+					for (let file of files) {
+						const content = readFileSync(file);
+
+						const image = new ArticleImage();
+						image.data = content;
+						image.article = article;
+
+						await image.create();
+					}
+				}
+			}
+		}
+
+		if (existsSync(join(base, date))) {
+
+		}
+
+		console.groupEnd();
+	}
+
+
+	console.log('DONE');
+	while (1) { }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	ViewModel.globalFetchingContext = db;
 

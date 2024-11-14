@@ -10,6 +10,87 @@ export class MapType extends QueryEnum {
 	static readonly overworld = "overworld";
 }
 
+export class ArticleQueryProxy extends QueryProxy {
+	get body(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get published(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get title(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Article extends Entity<ArticleQueryProxy> {
+	images: PrimaryReference<ArticleImage, ArticleImageQueryProxy>;
+		body: string;
+	declare id: string;
+	published: Date;
+	title: string;
+	
+	$$meta = {
+		source: "article",
+		columns: {
+			body: { type: "text", name: "body" },
+			id: { type: "uuid", name: "id" },
+			published: { type: "timestamp", name: "published" },
+			title: { type: "text", name: "title" }
+		},
+		get set(): DbSet<Article, ArticleQueryProxy> { 
+			return new DbSet<Article, ArticleQueryProxy>(Article, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.images = new PrimaryReference<ArticleImage, ArticleImageQueryProxy>(this, "articleId", ArticleImage);
+	}
+}
+			
+export class ArticleImageQueryProxy extends QueryProxy {
+	get article(): Partial<ArticleQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get articleId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get caption(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get data(): Partial<QueryBuffer> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class ArticleImage extends Entity<ArticleImageQueryProxy> {
+	get article(): Partial<ForeignReference<Article>> { return this.$article; }
+	articleId: string;
+	caption: string;
+	data: Buffer;
+	declare id: string;
+	
+	$$meta = {
+		source: "article_image",
+		columns: {
+			articleId: { type: "uuid", name: "article_id" },
+			caption: { type: "text", name: "caption" },
+			data: { type: "bytea", name: "data" },
+			id: { type: "uuid", name: "id" }
+		},
+		get set(): DbSet<ArticleImage, ArticleImageQueryProxy> { 
+			return new DbSet<ArticleImage, ArticleImageQueryProxy>(ArticleImage, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$article = new ForeignReference<Article>(this, "articleId", Article);
+	}
+	
+	private $article: ForeignReference<Article>;
+
+	set article(value: Partial<ForeignReference<Article>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.articleId = value.id as string;
+		} else {
+			this.articleId = null;
+		}
+	}
+
+	
+}
+			
 export class BoroughQueryProxy extends QueryProxy {
 	get aiDescription(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get aiSummary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -578,6 +659,63 @@ export class PropertyType extends Entity<PropertyTypeQueryProxy> {
 	}
 }
 			
+export class PublicationQueryProxy extends QueryProxy {
+	get mainOffice(): Partial<PropertyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get incorporation(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get legalName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get mainOfficeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Publication extends Entity<PublicationQueryProxy> {
+	get mainOffice(): Partial<ForeignReference<Property>> { return this.$mainOffice; }
+	description: string;
+	declare id: string;
+	incorporation: Date;
+	legalName: string;
+	mainOfficeId: string;
+	name: string;
+	tag: string;
+	
+	$$meta = {
+		source: "publication",
+		columns: {
+			description: { type: "text", name: "description" },
+			id: { type: "uuid", name: "id" },
+			incorporation: { type: "timestamp", name: "incorporation" },
+			legalName: { type: "text", name: "legal_name" },
+			mainOfficeId: { type: "uuid", name: "main_office_id" },
+			name: { type: "text", name: "name" },
+			tag: { type: "text", name: "tag" }
+		},
+		get set(): DbSet<Publication, PublicationQueryProxy> { 
+			return new DbSet<Publication, PublicationQueryProxy>(Publication, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$mainOffice = new ForeignReference<Property>(this, "mainOfficeId", Property);
+	}
+	
+	private $mainOffice: ForeignReference<Property>;
+
+	set mainOffice(value: Partial<ForeignReference<Property>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.mainOfficeId = value.id as string;
+		} else {
+			this.mainOfficeId = null;
+		}
+	}
+
+	
+}
+			
 export class SquareQueryProxy extends QueryProxy {
 	get borough(): Partial<BoroughQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get boroughId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -869,6 +1007,8 @@ export class WaterBody extends Entity<WaterBodyQueryProxy> {
 			
 
 export class DbContext {
+	article: DbSet<Article, ArticleQueryProxy>;
+	articleImage: DbSet<ArticleImage, ArticleImageQueryProxy>;
 	borough: DbSet<Borough, BoroughQueryProxy>;
 	bridge: DbSet<Bridge, BridgeQueryProxy>;
 	company: DbSet<Company, CompanyQueryProxy>;
@@ -880,6 +1020,7 @@ export class DbContext {
 	property: DbSet<Property, PropertyQueryProxy>;
 	propertyHistoricListingModifier: DbSet<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>;
 	propertyType: DbSet<PropertyType, PropertyTypeQueryProxy>;
+	publication: DbSet<Publication, PublicationQueryProxy>;
 	square: DbSet<Square, SquareQueryProxy>;
 	street: DbSet<Street, StreetQueryProxy>;
 	trainRoute: DbSet<TrainRoute, TrainRouteQueryProxy>;
@@ -889,6 +1030,8 @@ export class DbContext {
 	waterBody: DbSet<WaterBody, WaterBodyQueryProxy>;
 
 	constructor(private runContext: RunContext) {
+		this.article = new DbSet<Article, ArticleQueryProxy>(Article, this.runContext);
+		this.articleImage = new DbSet<ArticleImage, ArticleImageQueryProxy>(ArticleImage, this.runContext);
 		this.borough = new DbSet<Borough, BoroughQueryProxy>(Borough, this.runContext);
 		this.bridge = new DbSet<Bridge, BridgeQueryProxy>(Bridge, this.runContext);
 		this.company = new DbSet<Company, CompanyQueryProxy>(Company, this.runContext);
@@ -900,6 +1043,7 @@ export class DbContext {
 		this.property = new DbSet<Property, PropertyQueryProxy>(Property, this.runContext);
 		this.propertyHistoricListingModifier = new DbSet<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>(PropertyHistoricListingModifier, this.runContext);
 		this.propertyType = new DbSet<PropertyType, PropertyTypeQueryProxy>(PropertyType, this.runContext);
+		this.publication = new DbSet<Publication, PublicationQueryProxy>(Publication, this.runContext);
 		this.square = new DbSet<Square, SquareQueryProxy>(Square, this.runContext);
 		this.street = new DbSet<Street, StreetQueryProxy>(Street, this.runContext);
 		this.trainRoute = new DbSet<TrainRoute, TrainRouteQueryProxy>(TrainRoute, this.runContext);

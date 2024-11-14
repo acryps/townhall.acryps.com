@@ -20,7 +20,7 @@ CREATE TABLE article (
 	published TIMESTAMP
 );
 
-CREATE TABLE article_media (
+CREATE TABLE article_image (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
 	caption TEXT,

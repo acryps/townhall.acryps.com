@@ -6,7 +6,7 @@ import { boroughColor } from "./index.style";
 import { border, hex } from "@acryps/style";
 import { BannerComponent } from "../banner";
 import { Point } from "../map/point";
-import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, propertyRegisterIcon, publicationIcon } from "../assets/icons/managed";
+import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, propertyRegisterIcon, publicationIcon, residentIcon } from "../assets/icons/managed";
 
 export class HomePage extends Component {
 	render() {
@@ -72,6 +72,18 @@ export class HomePage extends Component {
 
 					<ui-description>
 						View bills and watch residents vote live
+					</ui-description>
+				</ui-topic>
+
+				<ui-topic ui-href='residents'>
+					{residentIcon()}
+
+					<ui-name>
+						Residents
+					</ui-name>
+
+					<ui-description>
+						View all residents living in Pilegron
 					</ui-description>
 				</ui-topic>
 

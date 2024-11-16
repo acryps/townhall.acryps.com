@@ -256,6 +256,63 @@ export class HistoricListingModifierViewModel {
 	}
 }
 
+export class ResidentSummaryModel {
+	birthday: Date;
+	familyName: string;
+	givenName: string;
+	id: string;
+
+	private static $build(raw) {
+		const item = new ResidentSummaryModel();
+		raw.birthday === undefined || (item.birthday = raw.birthday ? new Date(raw.birthday) : null)
+		raw.familyName === undefined || (item.familyName = raw.familyName === null ? null : `${raw.familyName}`)
+		raw.givenName === undefined || (item.givenName = raw.givenName === null ? null : `${raw.givenName}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		
+		return item;
+	}
+}
+
+export class ResidentViewModel {
+	biography: string;
+	birthday: Date;
+	familyName: string;
+	givenName: string;
+	id: string;
+
+	private static $build(raw) {
+		const item = new ResidentViewModel();
+		raw.biography === undefined || (item.biography = raw.biography === null ? null : `${raw.biography}`)
+		raw.birthday === undefined || (item.birthday = raw.birthday ? new Date(raw.birthday) : null)
+		raw.familyName === undefined || (item.familyName = raw.familyName === null ? null : `${raw.familyName}`)
+		raw.givenName === undefined || (item.givenName = raw.givenName === null ? null : `${raw.givenName}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		
+		return item;
+	}
+}
+
+export class ResidentRelationViewModel {
+	bonded: Date;
+	conflict: string;
+	connection: string;
+	ended: Date;
+	id: string;
+	purpose: string;
+
+	private static $build(raw) {
+		const item = new ResidentRelationViewModel();
+		raw.bonded === undefined || (item.bonded = raw.bonded ? new Date(raw.bonded) : null)
+		raw.conflict === undefined || (item.conflict = raw.conflict === null ? null : `${raw.conflict}`)
+		raw.connection === undefined || (item.connection = raw.connection === null ? null : `${raw.connection}`)
+		raw.ended === undefined || (item.ended = raw.ended ? new Date(raw.ended) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.purpose === undefined || (item.purpose = raw.purpose === null ? null : `${raw.purpose}`)
+		
+		return item;
+	}
+}
+
 export class ArticleViewModel {
 	images: ArticleImageViewModel[];
 	publication: PublicationSummaryModel;
@@ -965,6 +1022,50 @@ export class HistoricListingService {
 
 			if ("aborted" in r) {
 				throw new Error("request aborted by server");
+			}
+		});
+	}
+}
+
+export class LifeService {
+	async getResident(id: string): Promise<ResidentViewModel> {
+		const $data = new FormData();
+		$data.append("xlOXR0N2ZuamB4d2MydnZud3U1Y3RjdT", Service.stringify(id))
+
+		return await fetch(Service.toURL("U5MnFmMTpxaGM4a3J6YTZma2BoYnthNH"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : ResidentViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async listResidents(page: number): Promise<Array<ResidentSummaryModel>> {
+		const $data = new FormData();
+		$data.append("J1aTRnbHQ4YmMxdWQwZzUycDlheHMydX", Service.stringify(page))
+
+		return await fetch(Service.toURL("huMGxqZmMyZD16eHtmaXIxOTo0aTVqeT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ResidentSummaryModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
 			}
 		});
 	}

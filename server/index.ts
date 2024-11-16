@@ -51,7 +51,8 @@ DbClient.connectedClient.connect().then(async () => {
 
 	app.createInjector = context => new Inject({
 		Context: context,
-		DbContext: db
+		DbContext: db,
+		Life: life
 	});
 
 	app.prepareRoutes();

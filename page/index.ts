@@ -16,6 +16,8 @@ import { CreateBannerComponent } from "./banner/create";
 import './shared/polyfills';
 import { NewsPage } from "./news";
 import { ArticePage } from "./news/article";
+import { ResidentsPage } from "./residents";
+import { ResidentPage } from "./resident";
 
 export class Application {
 	static router: Router;
@@ -46,6 +48,9 @@ export class Application {
 
 				.route('/news/article/:id', ArticePage)
 				.route('/news', NewsPage)
+
+				.route('/residents/:id', ResidentPage)
+				.route('/residents', ResidentsPage)
 
 				.route('/create-banner', CreateBannerComponent)
 				.route('/create-banner/:code', CreateBannerComponent)

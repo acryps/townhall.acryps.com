@@ -106,6 +106,30 @@ export interface HistoricListingModifierViewModel {
 	shortName: string;
 }
 
+export interface ResidentSummaryModel {
+    birthday: Date;
+	familyName: string;
+	givenName: string;
+	id: string;
+}
+
+export interface ResidentViewModel {
+    biography: string;
+	birthday: Date;
+	familyName: string;
+	givenName: string;
+	id: string;
+}
+
+export interface ResidentRelationViewModel {
+    bonded: Date;
+	conflict: string;
+	connection: string;
+	ended: Date;
+	id: string;
+	purpose: string;
+}
+
 export interface ArticleViewModel {
     images: ArticleImageViewModel[];
 	publication: PublicationSummaryModel;

@@ -5,6 +5,8 @@ import { boroughStyle } from "./borough/index.style";
 import { bannerStyle, createBannerStyle } from "./banner/index.style";
 import { iconFont, icons } from "./assets/icons/managed";
 import { articleStyle, newsStyle } from "./news/index.style";
+import { residentsStyle } from "./residents/index.style";
+import { residentStyle } from "./resident/index.style";
 
 export const pageStyle = () => root(
 	bold,
@@ -27,6 +29,9 @@ export const pageStyle = () => root(
 
 			newsStyle(),
 			articleStyle(),
+
+			residentStyle(),
+			residentsStyle(),
 
 			createBannerStyle()
 		)

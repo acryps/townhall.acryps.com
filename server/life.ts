@@ -2,6 +2,7 @@ import ollama from "ollama"
 import { Borough, DbContext, Resident, ResidentRelationship } from "./managed/database";
 import { Message } from "../interface";
 import { writeFileSync } from "fs";
+import { toSimulatedTime } from "../interface/time";
 
 export class Life {
 	// weights, of how many people do what on a tick
@@ -93,8 +94,7 @@ export class Life {
 		const resident = new Resident();
 		resident.birthday = birthday;
 
-		const age = this.toSimulatedTime(new Date()).getFullYear() - this.toSimulatedTime(birthday).getFullYear();
-		console.log(this.toSimulatedTime(new Date()).getFullYear(), this.toSimulatedTime(birthday).getFullYear())
+		const age = toSimulatedTime(new Date()).getFullYear() - toSimulatedTime(birthday).getFullYear();
 
 		// there are more women in the world...
 		const pronoun = Math.random() > 0.51 ? 'he' : 'she';
@@ -107,7 +107,7 @@ export class Life {
 			come up with a biography of this person.
 			${pronoun} appeared in ${place.name} and is ${age} years old.
 			${pronoun} social standing is ${standing}, where 0 is the worst and 1 is the best.
-			it is currently ${this.toSimulatedTime(new Date()).toDateString()}.
+			it is currently ${toSimulatedTime(new Date()).toDateString()}.
 			we are in europe, in a place like england, but it is not england.
 			well known world events, like the world wars, did not happen here.
 			when mentioning dates, always use YYYY-MM-DD format.
@@ -181,14 +181,8 @@ export class Life {
 		return resident;
 	}
 
-	// convert current real-life time into server time
-	// using simulated time makes prompts more accurate
-	toSimulatedTime(date: Date) {
-		return new Date(+date * 20 - 4350 * 356 * 24 * 1000 * 1000);
-	}
-
 	private async confirm(instruction: string, ...data: string[]) {
-		const token = Math.random().toString(36).substr(2);
+		const token = Math.random().toString(36).substring(2);
 		const response = await this.respond(`${instruction} if this applies, respond with ${token}`, ...data);
 
 		return response!.includes(token);

@@ -22,12 +22,17 @@ import { HistoricListingGradeViewModel } from "././../areas/history-listing/grad
 import { PropertyHistoricListingModifierViewModel } from "././../areas/history-listing/link.view";
 import { HistoricListingModifierViewModel } from "././../areas/history-listing/modifier.view";
 import { HistoricListingService } from "././../areas/history-listing/listing.service";
+import { Life } from "././../life";
+import { ResidentSummaryModel } from "././../areas/life/resident";
+import { ResidentViewModel } from "././../areas/life/resident";
+import { LifeService } from "././../areas/life/service";
 import { ArticleViewModel } from "././../areas/publication/article";
 import { PublicationViewModel } from "././../areas/publication/publication";
 import { PublicationService } from "././../areas/publication/service";
 import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
+import { ResidentRelationViewModel } from "./../areas/life/resident";
 import { ArticleImageViewModel } from "./../areas/publication/article";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
@@ -42,6 +47,8 @@ import { Street } from "./../managed/database";
 import { WaterBody } from "./../managed/database";
 import { HistoricListingGrade } from "./../managed/database";
 import { HistoricListingModifier } from "./../managed/database";
+import { Resident } from "./../managed/database";
+import { ResidentRelationship } from "./../managed/database";
 import { Article } from "./../managed/database";
 import { ArticleImage } from "./../managed/database";
 import { Publication } from "./../managed/database";
@@ -69,6 +76,10 @@ Inject.mappings = {
 	},
 	"HistoricListingService": {
 		objectConstructor: HistoricListingService,
+		parameters: ["DbContext"]
+	},
+	"LifeService": {
+		objectConstructor: LifeService,
 		parameters: ["DbContext"]
 	},
 	"PublicationService": {
@@ -342,6 +353,28 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(HistoricListingService),
 			(controller, params) => controller.removeModifier(
 				params["kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn"]
+			)
+		);
+
+		this.expose(
+			"U5MnFmMTpxaGM4a3J6YTZma2BoYnthNH",
+			{
+			"xlOXR0N2ZuamB4d2MydnZud3U1Y3RjdT": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LifeService),
+			(controller, params) => controller.getResident(
+				params["xlOXR0N2ZuamB4d2MydnZud3U1Y3RjdT"]
+			)
+		);
+
+		this.expose(
+			"huMGxqZmMyZD16eHtmaXIxOTo0aTVqeT",
+			{
+			"J1aTRnbHQ4YmMxdWQwZzUycDlheHMydX": { type: "number", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LifeService),
+			(controller, params) => controller.listResidents(
+				params["J1aTRnbHQ4YmMxdWQwZzUycDlheHMydX"]
 			)
 		);
 
@@ -1462,6 +1495,228 @@ ViewModel.mappings = {
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"shortName" in viewModel && (model.shortName = viewModel.shortName === null ? null : `${viewModel.shortName}`);
+
+			return model;
+		}
+	},
+	[ResidentSummaryModel.name]: class ComposedResidentSummaryModel extends ResidentSummaryModel {
+		async map() {
+			return {
+				birthday: this.$$model.birthday,
+				familyName: this.$$model.familyName,
+				givenName: this.$$model.givenName,
+				id: this.$$model.id
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				birthday: true,
+				familyName: true,
+				givenName: true,
+				id: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ResidentSummaryModel(null);
+			"birthday" in data && (item.birthday = data.birthday === null ? null : new Date(data.birthday));
+			"familyName" in data && (item.familyName = data.familyName === null ? null : `${data.familyName}`);
+			"givenName" in data && (item.givenName = data.givenName === null ? null : `${data.givenName}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ResidentSummaryModel) {
+			let model: Resident;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Resident).find(viewModel.id)
+			} else {
+				model = new Resident();
+			}
+			
+			"birthday" in viewModel && (model.birthday = viewModel.birthday === null ? null : new Date(viewModel.birthday));
+			"familyName" in viewModel && (model.familyName = viewModel.familyName === null ? null : `${viewModel.familyName}`);
+			"givenName" in viewModel && (model.givenName = viewModel.givenName === null ? null : `${viewModel.givenName}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+
+			return model;
+		}
+	},
+	[ResidentViewModel.name]: class ComposedResidentViewModel extends ResidentViewModel {
+		async map() {
+			return {
+				biography: this.$$model.biography,
+				birthday: this.$$model.birthday,
+				familyName: this.$$model.familyName,
+				givenName: this.$$model.givenName,
+				id: this.$$model.id
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				biography: true,
+				birthday: true,
+				familyName: true,
+				givenName: true,
+				id: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ResidentViewModel(null);
+			"biography" in data && (item.biography = data.biography === null ? null : `${data.biography}`);
+			"birthday" in data && (item.birthday = data.birthday === null ? null : new Date(data.birthday));
+			"familyName" in data && (item.familyName = data.familyName === null ? null : `${data.familyName}`);
+			"givenName" in data && (item.givenName = data.givenName === null ? null : `${data.givenName}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ResidentViewModel) {
+			let model: Resident;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Resident).find(viewModel.id)
+			} else {
+				model = new Resident();
+			}
+			
+			"biography" in viewModel && (model.biography = viewModel.biography === null ? null : `${viewModel.biography}`);
+			"birthday" in viewModel && (model.birthday = viewModel.birthday === null ? null : new Date(viewModel.birthday));
+			"familyName" in viewModel && (model.familyName = viewModel.familyName === null ? null : `${viewModel.familyName}`);
+			"givenName" in viewModel && (model.givenName = viewModel.givenName === null ? null : `${viewModel.givenName}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+
+			return model;
+		}
+	},
+	[ResidentRelationViewModel.name]: class ComposedResidentRelationViewModel extends ResidentRelationViewModel {
+		async map() {
+			return {
+				bonded: this.$$model.bonded,
+				conflict: this.$$model.conflict,
+				connection: this.$$model.connection,
+				ended: this.$$model.ended,
+				id: this.$$model.id,
+				purpose: this.$$model.purpose
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				bonded: true,
+				conflict: true,
+				connection: true,
+				ended: true,
+				id: true,
+				purpose: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ResidentRelationViewModel(null);
+			"bonded" in data && (item.bonded = data.bonded === null ? null : new Date(data.bonded));
+			"conflict" in data && (item.conflict = data.conflict === null ? null : `${data.conflict}`);
+			"connection" in data && (item.connection = data.connection === null ? null : `${data.connection}`);
+			"ended" in data && (item.ended = data.ended === null ? null : new Date(data.ended));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"purpose" in data && (item.purpose = data.purpose === null ? null : `${data.purpose}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ResidentRelationViewModel) {
+			let model: ResidentRelationship;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ResidentRelationship).find(viewModel.id)
+			} else {
+				model = new ResidentRelationship();
+			}
+			
+			"bonded" in viewModel && (model.bonded = viewModel.bonded === null ? null : new Date(viewModel.bonded));
+			"conflict" in viewModel && (model.conflict = viewModel.conflict === null ? null : `${viewModel.conflict}`);
+			"connection" in viewModel && (model.connection = viewModel.connection === null ? null : `${viewModel.connection}`);
+			"ended" in viewModel && (model.ended = viewModel.ended === null ? null : new Date(viewModel.ended));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"purpose" in viewModel && (model.purpose = viewModel.purpose === null ? null : `${viewModel.purpose}`);
 
 			return model;
 		}

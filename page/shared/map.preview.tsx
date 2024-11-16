@@ -16,7 +16,7 @@ export class MapPreviewComponent extends Component {
 		// render output to image instead of canvas to allow saving by user
 		const outputImage = new Image();
 
-		const margin = Math.max(10, Math.floor(Point.size(this.shape).max / 5));
+		const margin = 50; // Math.max(10, Math.floor(Point.size(this.shape).max / 5));
 		const box = Point.bounds(this.shape, margin);
 
 		requestAnimationFrame(async () => {
@@ -41,7 +41,9 @@ export class MapPreviewComponent extends Component {
 			image.onload = async () => {
 				context.save();
 
-				if ('filter' in context as any) {
+				context.drawImage(image, 0, 0);
+
+				/*if ('filter' in context as any) {
 					context.filter = this.backgroundFilter;
 					context.drawImage(image, 0, 0);
 				} else {
@@ -62,7 +64,7 @@ export class MapPreviewComponent extends Component {
 					}
 
 					context.putImageData(imageData, 0, 0);
-				}
+					}*/
 
 				context.restore();
 				context.lineWidth = 2;

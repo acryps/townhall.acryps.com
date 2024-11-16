@@ -25,6 +25,8 @@ import { HistoricListingService } from "././../areas/history-listing/listing.ser
 import { Life } from "././../life";
 import { ResidentSummaryModel } from "././../areas/life/resident";
 import { ResidentViewModel } from "././../areas/life/resident";
+import { Dwelling } from "././database";
+import { Property } from "././database";
 import { LifeService } from "././../areas/life/service";
 import { ArticleViewModel } from "././../areas/publication/article";
 import { PublicationViewModel } from "././../areas/publication/publication";
@@ -41,7 +43,6 @@ import { Bridge } from "./../managed/database";
 import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
 import { PropertyType } from "./../managed/database";
-import { Property } from "./../managed/database";
 import { Square } from "./../managed/database";
 import { Street } from "./../managed/database";
 import { WaterBody } from "./../managed/database";
@@ -375,6 +376,28 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(LifeService),
 			(controller, params) => controller.listResidents(
 				params["J1aTRnbHQ4YmMxdWQwZzUycDlheHMydX"]
+			)
+		);
+
+		this.expose(
+			"kxeGV1YjJ6enhjeXBuZDYzY2l3cmJlYz",
+			{},
+			inject => inject.construct(LifeService),
+			(controller, params) => controller.getNextEmptyProperty(
+				
+			)
+		);
+
+		this.expose(
+			"pwaHFycDM4dGM0cWAydzZ1bT00NGZ5Zj",
+			{
+			"AzaWd3anE1M3doYTczcWxoeWVzNGwzZG": { type: "string", isArray: false, isOptional: false },
+				"JuM2J6aWI5OWVpcm81eXd1bmJ5YT5ndn": { type: "number", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LifeService),
+			(controller, params) => controller.dwell(
+				params["AzaWd3anE1M3doYTczcWxoeWVzNGwzZG"],
+				params["JuM2J6aWI5OWVpcm81eXd1bmJ5YT5ndn"]
 			)
 		);
 

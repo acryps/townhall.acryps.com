@@ -18,6 +18,7 @@ import { NewsPage } from "./news";
 import { ArticePage } from "./news/article";
 import { ResidentsPage } from "./residents";
 import { ResidentPage } from "./resident";
+import { AssertHomePage } from "./ASSERT_HOME";
 
 export class Application {
 	static router: Router;
@@ -37,6 +38,8 @@ export class Application {
 
 		this.router = new PathRouter(
 			PageComponent
+				.route('/assert', AssertHomePage)
+
 				.route('/map/:x/:y/:zoom', MapComponent
 					.route('/history', HistoryComponent)
 				)

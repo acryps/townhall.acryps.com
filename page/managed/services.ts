@@ -1069,6 +1069,47 @@ export class LifeService {
 			}
 		});
 	}
+
+	async getNextEmptyProperty(): Promise<PropertyViewModel> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("kxeGV1YjJ6enhjeXBuZDYzY2l3cmJlYz"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : PropertyViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async dwell(houseId: string, dwellings: number): Promise<void> {
+		const $data = new FormData();
+		$data.append("AzaWd3anE1M3doYTczcWxoeWVzNGwzZG", Service.stringify(houseId))
+		$data.append("JuM2J6aWI5OWVpcm81eXd1bmJ5YT5ndn", Service.stringify(dwellings))
+
+		return await fetch(Service.toURL("pwaHFycDM4dGM0cWAydzZ1bT00NGZ5Zj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
 }
 
 export class PublicationService {

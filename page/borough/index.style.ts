@@ -1,9 +1,8 @@
 import { border, child, display, fontSize, height, hex, imageRendering, justifyContent, marginBottom, marginInline, maxWidth, min, paddingInline, percentage, px, rem, textAlign, vh, whiteSpace, width } from "@acryps/style";
+import { boxed } from "../shared/boxed.style";
 
 export const boroughStyle = () => child('ui-borough',
-	display('block'),
-	maxWidth(rem(50)),
-	marginInline('auto'),
+	boxed(),
 	paddingInline(rem(1)),
 
 	child('ui-banner',

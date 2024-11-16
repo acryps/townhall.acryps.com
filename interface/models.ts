@@ -106,6 +106,36 @@ export interface HistoricListingModifierViewModel {
 	shortName: string;
 }
 
+export interface ArticleViewModel {
+    images: ArticleImageViewModel[];
+	publication: PublicationSummaryModel;
+	body: string;
+	id: string;
+	published: Date;
+	title: string;
+}
+
+export interface ArticleImageViewModel {
+    caption: string;
+	id: string;
+}
+
+export interface PublicationSummaryModel {
+    id: string;
+	name: string;
+	tag: string;
+}
+
+export interface PublicationViewModel {
+    articles: ArticleViewModel[];
+	id: string;
+	incorporation: Date;
+	legalName: string;
+	mainOfficeId: string;
+	name: string;
+	tag: string;
+}
+
 export interface TrainStationExitViewModel {
     station: TrainStationViewModel;
 	id: string;

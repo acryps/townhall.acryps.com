@@ -22,9 +22,14 @@ import { HistoricListingGradeViewModel } from "././../areas/history-listing/grad
 import { PropertyHistoricListingModifierViewModel } from "././../areas/history-listing/link.view";
 import { HistoricListingModifierViewModel } from "././../areas/history-listing/modifier.view";
 import { HistoricListingService } from "././../areas/history-listing/listing.service";
+import { ArticleViewModel } from "././../areas/publication/article";
+import { PublicationViewModel } from "././../areas/publication/publication";
+import { PublicationService } from "././../areas/publication/service";
 import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
+import { ArticleImageViewModel } from "./../areas/publication/article";
+import { PublicationSummaryModel } from "./../areas/publication/publication";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { Bridge } from "./../managed/database";
@@ -37,6 +42,9 @@ import { Street } from "./../managed/database";
 import { WaterBody } from "./../managed/database";
 import { HistoricListingGrade } from "./../managed/database";
 import { HistoricListingModifier } from "./../managed/database";
+import { Article } from "./../managed/database";
+import { ArticleImage } from "./../managed/database";
+import { Publication } from "./../managed/database";
 import { TrainStationExit } from "./../managed/database";
 import { TrainRoute } from "./../managed/database";
 import { TrainStation } from "./../managed/database";
@@ -61,6 +69,10 @@ Inject.mappings = {
 	},
 	"HistoricListingService": {
 		objectConstructor: HistoricListingService,
+		parameters: ["DbContext"]
+	},
+	"PublicationService": {
+		objectConstructor: PublicationService,
 		parameters: ["DbContext"]
 	},
 	"TrainService": {
@@ -330,6 +342,37 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(HistoricListingService),
 			(controller, params) => controller.removeModifier(
 				params["kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn"]
+			)
+		);
+
+		this.expose(
+			"h6NmRpZnF3eHBhemx2am50a3Ftd2ZrZH",
+			{
+			"Y0amFoNTk2dWxiZHB2NWV6azF6NTZ6NX": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.getPublication(
+				params["Y0amFoNTk2dWxiZHB2NWV6azF6NTZ6NX"]
+			)
+		);
+
+		this.expose(
+			"drMjJ0Nm40YWV2b3F6dzt4ZXdremBvMm",
+			{
+			"JhZ3kwamJnYWVyYWB6ZWYxbGRoZXB1a3": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.getArticle(
+				params["JhZ3kwamJnYWVyYWB6ZWYxbGRoZXB1a3"]
+			)
+		);
+
+		this.expose(
+			"F1aXFpZz05eX01dmR2cXd6dGZwdzR2dD",
+			{},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.listNewestArticles(
+				
 			)
 		);
 
@@ -1419,6 +1462,309 @@ ViewModel.mappings = {
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"shortName" in viewModel && (model.shortName = viewModel.shortName === null ? null : `${viewModel.shortName}`);
+
+			return model;
+		}
+	},
+	[ArticleViewModel.name]: class ComposedArticleViewModel extends ArticleViewModel {
+		async map() {
+			return {
+				images: (await this.$$model.images.includeTree(ViewModel.mappings[ArticleImageViewModel.name].items).toArray()).map(item => new ArticleImageViewModel(item)),
+				publication: new PublicationSummaryModel(await BaseServer.unwrap(this.$$model.publication)),
+				body: this.$$model.body,
+				id: this.$$model.id,
+				published: this.$$model.published,
+				title: this.$$model.title
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get images() {
+					return ViewModel.mappings[ArticleImageViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "images-ArticleViewModel"]
+					);
+				},
+				get publication() {
+					return ViewModel.mappings[PublicationSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "publication-ArticleViewModel"]
+					);
+				},
+				body: true,
+				id: true,
+				published: true,
+				title: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ArticleViewModel(null);
+			"images" in data && (item.images = data.images && [...data.images].map(i => ViewModel.mappings[ArticleImageViewModel.name].toViewModel(i)));
+			"publication" in data && (item.publication = data.publication && ViewModel.mappings[PublicationSummaryModel.name].toViewModel(data.publication));
+			"body" in data && (item.body = data.body === null ? null : `${data.body}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"published" in data && (item.published = data.published === null ? null : new Date(data.published));
+			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ArticleViewModel) {
+			let model: Article;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Article).find(viewModel.id)
+			} else {
+				model = new Article();
+			}
+			
+			"images" in viewModel && (null);
+			"publication" in viewModel && (model.publication.id = viewModel.publication ? viewModel.publication.id : null);
+			"body" in viewModel && (model.body = viewModel.body === null ? null : `${viewModel.body}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"published" in viewModel && (model.published = viewModel.published === null ? null : new Date(viewModel.published));
+			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
+
+			return model;
+		}
+	},
+	[ArticleImageViewModel.name]: class ComposedArticleImageViewModel extends ArticleImageViewModel {
+		async map() {
+			return {
+				caption: this.$$model.caption,
+				id: this.$$model.id
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				caption: true,
+				id: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ArticleImageViewModel(null);
+			"caption" in data && (item.caption = data.caption === null ? null : `${data.caption}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ArticleImageViewModel) {
+			let model: ArticleImage;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ArticleImage).find(viewModel.id)
+			} else {
+				model = new ArticleImage();
+			}
+			
+			"caption" in viewModel && (model.caption = viewModel.caption === null ? null : `${viewModel.caption}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+
+			return model;
+		}
+	},
+	[PublicationSummaryModel.name]: class ComposedPublicationSummaryModel extends PublicationSummaryModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				name: this.$$model.name,
+				tag: this.$$model.tag
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				name: true,
+				tag: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new PublicationSummaryModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PublicationSummaryModel) {
+			let model: Publication;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Publication).find(viewModel.id)
+			} else {
+				model = new Publication();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
+
+			return model;
+		}
+	},
+	[PublicationViewModel.name]: class ComposedPublicationViewModel extends PublicationViewModel {
+		async map() {
+			return {
+				articles: (await this.$$model.articles.includeTree(ViewModel.mappings[ArticleViewModel.name].items).toArray()).map(item => new ArticleViewModel(item)),
+				id: this.$$model.id,
+				incorporation: this.$$model.incorporation,
+				legalName: this.$$model.legalName,
+				mainOfficeId: this.$$model.mainOfficeId,
+				name: this.$$model.name,
+				tag: this.$$model.tag
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get articles() {
+					return ViewModel.mappings[ArticleViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "articles-PublicationViewModel"]
+					);
+				},
+				id: true,
+				incorporation: true,
+				legalName: true,
+				mainOfficeId: true,
+				name: true,
+				tag: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new PublicationViewModel(null);
+			"articles" in data && (item.articles = data.articles && [...data.articles].map(i => ViewModel.mappings[ArticleViewModel.name].toViewModel(i)));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"incorporation" in data && (item.incorporation = data.incorporation === null ? null : new Date(data.incorporation));
+			"legalName" in data && (item.legalName = data.legalName === null ? null : `${data.legalName}`);
+			"mainOfficeId" in data && (item.mainOfficeId = data.mainOfficeId === null ? null : `${data.mainOfficeId}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PublicationViewModel) {
+			let model: Publication;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Publication).find(viewModel.id)
+			} else {
+				model = new Publication();
+			}
+			
+			"articles" in viewModel && (null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"incorporation" in viewModel && (model.incorporation = viewModel.incorporation === null ? null : new Date(viewModel.incorporation));
+			"legalName" in viewModel && (model.legalName = viewModel.legalName === null ? null : `${viewModel.legalName}`);
+			"mainOfficeId" in viewModel && (model.mainOfficeId = viewModel.mainOfficeId === null ? null : `${viewModel.mainOfficeId}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 
 			return model;
 		}

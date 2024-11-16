@@ -14,6 +14,8 @@ import { GameBridge } from "./bridge";
 import { BoroughPage } from "./borough";
 import { CreateBannerComponent } from "./banner/create";
 import './shared/polyfills';
+import { NewsPage } from "./news";
+import { ArticePage } from "./news/article";
 
 export class Application {
 	static router: Router;
@@ -41,6 +43,9 @@ export class Application {
 				.route('/property/:id', PropertyComponent)
 
 				.route('/borough/:tag', BoroughPage)
+
+				.route('/news/article/:id', ArticePage)
+				.route('/news', NewsPage)
 
 				.route('/create-banner', CreateBannerComponent)
 				.route('/create-banner/:code', CreateBannerComponent)

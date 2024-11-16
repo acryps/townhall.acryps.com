@@ -256,6 +256,78 @@ export class HistoricListingModifierViewModel {
 	}
 }
 
+export class ArticleViewModel {
+	images: ArticleImageViewModel[];
+	publication: PublicationSummaryModel;
+	body: string;
+	id: string;
+	published: Date;
+	title: string;
+
+	private static $build(raw) {
+		const item = new ArticleViewModel();
+		raw.images === undefined || (item.images = raw.images ? raw.images.map(i => ArticleImageViewModel["$build"](i)) : null)
+		raw.publication === undefined || (item.publication = raw.publication ? PublicationSummaryModel["$build"](raw.publication) : null)
+		raw.body === undefined || (item.body = raw.body === null ? null : `${raw.body}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.published === undefined || (item.published = raw.published ? new Date(raw.published) : null)
+		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
+		
+		return item;
+	}
+}
+
+export class ArticleImageViewModel {
+	caption: string;
+	id: string;
+
+	private static $build(raw) {
+		const item = new ArticleImageViewModel();
+		raw.caption === undefined || (item.caption = raw.caption === null ? null : `${raw.caption}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		
+		return item;
+	}
+}
+
+export class PublicationSummaryModel {
+	id: string;
+	name: string;
+	tag: string;
+
+	private static $build(raw) {
+		const item = new PublicationSummaryModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
+		
+		return item;
+	}
+}
+
+export class PublicationViewModel {
+	articles: ArticleViewModel[];
+	id: string;
+	incorporation: Date;
+	legalName: string;
+	mainOfficeId: string;
+	name: string;
+	tag: string;
+
+	private static $build(raw) {
+		const item = new PublicationViewModel();
+		raw.articles === undefined || (item.articles = raw.articles ? raw.articles.map(i => ArticleViewModel["$build"](i)) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.incorporation === undefined || (item.incorporation = raw.incorporation ? new Date(raw.incorporation) : null)
+		raw.legalName === undefined || (item.legalName = raw.legalName === null ? null : `${raw.legalName}`)
+		raw.mainOfficeId === undefined || (item.mainOfficeId = raw.mainOfficeId === null ? null : `${raw.mainOfficeId}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
+		
+		return item;
+	}
+}
+
 export class TrainStationExitViewModel {
 	station: TrainStationViewModel;
 	id: string;
@@ -893,6 +965,71 @@ export class HistoricListingService {
 
 			if ("aborted" in r) {
 				throw new Error("request aborted by server");
+			}
+		});
+	}
+}
+
+export class PublicationService {
+	async getPublication(tag: string): Promise<PublicationViewModel> {
+		const $data = new FormData();
+		$data.append("Y0amFoNTk2dWxiZHB2NWV6azF6NTZ6NX", Service.stringify(tag))
+
+		return await fetch(Service.toURL("h6NmRpZnF3eHBhemx2am50a3Ftd2ZrZH"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : PublicationViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getArticle(id: string): Promise<ArticleViewModel> {
+		const $data = new FormData();
+		$data.append("JhZ3kwamJnYWVyYWB6ZWYxbGRoZXB1a3", Service.stringify(id))
+
+		return await fetch(Service.toURL("drMjJ0Nm40YWV2b3F6dzt4ZXdremBvMm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : ArticleViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async listNewestArticles(): Promise<Array<ArticleViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("F1aXFpZz05eX01dmR2cXd6dGZwdzR2dD"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ArticleViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
 			}
 		});
 	}

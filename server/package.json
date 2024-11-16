@@ -1,7 +1,7 @@
 {
 	"name": "server-townhall",
 	"scripts": {
-		"build": "npx vlserver compile && esbuild index.ts --bundle --outfile=.built/index.js --platform=node --target=es2018 --external:express-ws --external:sharp --external:canvas --external:pg && vlquery compile",
+		"build": "npx vlserver compile && esbuild index.ts --bundle --outfile=.built/index.js --platform=node --target=es2018 --external:express-ws --external:sharp --external:canvas --external:pg --external:ollama && vlquery compile",
 		"start": "npm run build && environment node .built/index.js",
 		"typecheck": "npx vlserver compile && tsc --noEmit",
 		"database:update": "environment vlquery create-context"
@@ -19,6 +19,7 @@
 		"express-ws": "^5.0.2",
 		"js-md5": "^0.7.3",
 		"node-fetch": "^2.6.6",
+		"ollama": "^0.5.10",
 		"sharp": "^0.30.2",
 		"vlquery": "^7.2.0",
 		"vlserver": "^4.9.2"

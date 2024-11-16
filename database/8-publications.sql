@@ -17,7 +17,8 @@ CREATE TABLE article (
 	title TEXT,
 	body TEXT,
 
-	published TIMESTAMP
+	published TIMESTAMP,
+	publication_id UUID CONSTRAINT publication__articles REFERENCES publication (id)
 );
 
 CREATE TABLE article_image (

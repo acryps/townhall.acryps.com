@@ -1,0 +1,6 @@
+[
+	{
+		"role": "user",
+		"content": "\n\t\t\tgiven the following story, what type of bond do Harriet and Emilia have?\n\t\t\tis this a relationship, a friendship, a business relation or what?\n\t\t\treply in a single word\n\t\t"
+	}
+]

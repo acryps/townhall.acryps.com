@@ -39,7 +39,7 @@ export class HomePage extends Component {
 					</ui-description>
 				</ui-topic>
 
-				<ui-topic ui-href='publications'>
+				<ui-topic ui-href='news'>
 					{publicationIcon()}
 
 					<ui-name>

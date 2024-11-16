@@ -11,15 +11,19 @@ export class MapType extends QueryEnum {
 }
 
 export class ArticleQueryProxy extends QueryProxy {
+	get publication(): Partial<PublicationQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get body(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get publicationId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get published(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get title(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class Article extends Entity<ArticleQueryProxy> {
 	images: PrimaryReference<ArticleImage, ArticleImageQueryProxy>;
-		body: string;
+		get publication(): Partial<ForeignReference<Publication>> { return this.$publication; }
+	body: string;
 	declare id: string;
+	publicationId: string;
 	published: Date;
 	title: string;
 	
@@ -28,6 +32,7 @@ export class Article extends Entity<ArticleQueryProxy> {
 		columns: {
 			body: { type: "text", name: "body" },
 			id: { type: "uuid", name: "id" },
+			publicationId: { type: "uuid", name: "publication_id" },
 			published: { type: "timestamp", name: "published" },
 			title: { type: "text", name: "title" }
 		},
@@ -40,7 +45,22 @@ export class Article extends Entity<ArticleQueryProxy> {
 		super();
 		
 		this.images = new PrimaryReference<ArticleImage, ArticleImageQueryProxy>(this, "articleId", ArticleImage);
+		this.$publication = new ForeignReference<Publication>(this, "publicationId", Publication);
 	}
+	
+	private $publication: ForeignReference<Publication>;
+
+	set publication(value: Partial<ForeignReference<Publication>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.publicationId = value.id as string;
+		} else {
+			this.publicationId = null;
+		}
+	}
+
+	
 }
 			
 export class ArticleImageQueryProxy extends QueryProxy {
@@ -249,6 +269,50 @@ export class Company extends Entity<CompanyQueryProxy> {
 			this.ownerId = value.id as string;
 		} else {
 			this.ownerId = null;
+		}
+	}
+
+	
+}
+			
+export class DwellingQueryProxy extends QueryProxy {
+	get property(): Partial<PropertyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get propertyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Dwelling extends Entity<DwellingQueryProxy> {
+	tenants: PrimaryReference<Tenancy, TenancyQueryProxy>;
+		get property(): Partial<ForeignReference<Property>> { return this.$property; }
+	declare id: string;
+	propertyId: string;
+	
+	$$meta = {
+		source: "dwelling",
+		columns: {
+			id: { type: "uuid", name: "id" },
+			propertyId: { type: "uuid", name: "property_id" }
+		},
+		get set(): DbSet<Dwelling, DwellingQueryProxy> { 
+			return new DbSet<Dwelling, DwellingQueryProxy>(Dwelling, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.tenants = new PrimaryReference<Tenancy, TenancyQueryProxy>(this, "dwellingId", Tenancy);
+		this.$property = new ForeignReference<Property>(this, "propertyId", Property);
+	}
+	
+	private $property: ForeignReference<Property>;
+
+	set property(value: Partial<ForeignReference<Property>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.propertyId = value.id as string;
+		} else {
+			this.propertyId = null;
 		}
 	}
 
@@ -475,7 +539,8 @@ export class Property extends Entity<PropertyQueryProxy> {
 	get borough(): Partial<ForeignReference<Borough>> { return this.$borough; }
 	get historicListingGrade(): Partial<ForeignReference<HistoricListingGrade>> { return this.$historicListingGrade; }
 	get owner(): Partial<ForeignReference<Player>> { return this.$owner; }
-	historicListingModifiers: PrimaryReference<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>;
+	dwellings: PrimaryReference<Dwelling, DwellingQueryProxy>;
+		historicListingModifiers: PrimaryReference<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>;
 		get type(): Partial<ForeignReference<PropertyType>> { return this.$type; }
 	boroughId: string;
 	bounds: string;
@@ -511,7 +576,8 @@ export class Property extends Entity<PropertyQueryProxy> {
 		this.$borough = new ForeignReference<Borough>(this, "boroughId", Borough);
 	this.$historicListingGrade = new ForeignReference<HistoricListingGrade>(this, "historicListingGradeId", HistoricListingGrade);
 	this.$owner = new ForeignReference<Player>(this, "ownerId", Player);
-	this.historicListingModifiers = new PrimaryReference<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>(this, "propertyId", PropertyHistoricListingModifier);
+	this.dwellings = new PrimaryReference<Dwelling, DwellingQueryProxy>(this, "propertyId", Dwelling);
+		this.historicListingModifiers = new PrimaryReference<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>(this, "propertyId", PropertyHistoricListingModifier);
 		this.$type = new ForeignReference<PropertyType>(this, "typeId", PropertyType);
 	}
 	
@@ -671,7 +737,8 @@ export class PublicationQueryProxy extends QueryProxy {
 
 export class Publication extends Entity<PublicationQueryProxy> {
 	get mainOffice(): Partial<ForeignReference<Property>> { return this.$mainOffice; }
-	description: string;
+	articles: PrimaryReference<Article, ArticleQueryProxy>;
+		description: string;
 	declare id: string;
 	incorporation: Date;
 	legalName: string;
@@ -699,6 +766,7 @@ export class Publication extends Entity<PublicationQueryProxy> {
 		super();
 		
 		this.$mainOffice = new ForeignReference<Property>(this, "mainOfficeId", Property);
+	this.articles = new PrimaryReference<Article, ArticleQueryProxy>(this, "publicationId", Article);
 	}
 	
 	private $mainOffice: ForeignReference<Property>;
@@ -710,6 +778,140 @@ export class Publication extends Entity<PublicationQueryProxy> {
 			this.mainOfficeId = value.id as string;
 		} else {
 			this.mainOfficeId = null;
+		}
+	}
+
+	
+}
+			
+export class ResidentQueryProxy extends QueryProxy {
+	get mainTenancy(): Partial<TenancyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get biography(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get birthday(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get familyName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get givenName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get mainTenancyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Resident extends Entity<ResidentQueryProxy> {
+	tenancies: PrimaryReference<Tenancy, TenancyQueryProxy>;
+		get mainTenancy(): Partial<ForeignReference<Tenancy>> { return this.$mainTenancy; }
+	biography: string;
+	birthday: Date;
+	familyName: string;
+	givenName: string;
+	declare id: string;
+	mainTenancyId: string;
+	
+	$$meta = {
+		source: "resident",
+		columns: {
+			biography: { type: "text", name: "biography" },
+			birthday: { type: "timestamp", name: "birthday" },
+			familyName: { type: "text", name: "family_name" },
+			givenName: { type: "text", name: "given_name" },
+			id: { type: "uuid", name: "id" },
+			mainTenancyId: { type: "uuid", name: "main_tenancy_id" }
+		},
+		get set(): DbSet<Resident, ResidentQueryProxy> { 
+			return new DbSet<Resident, ResidentQueryProxy>(Resident, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.tenancies = new PrimaryReference<Tenancy, TenancyQueryProxy>(this, "inhabitantId", Tenancy);
+		this.$mainTenancy = new ForeignReference<Tenancy>(this, "mainTenancyId", Tenancy);
+	}
+	
+	private $mainTenancy: ForeignReference<Tenancy>;
+
+	set mainTenancy(value: Partial<ForeignReference<Tenancy>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.mainTenancyId = value.id as string;
+		} else {
+			this.mainTenancyId = null;
+		}
+	}
+
+	
+}
+			
+export class ResidentRelationshipQueryProxy extends QueryProxy {
+	get initiator(): Partial<ResidentQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get peer(): Partial<ResidentQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get bonded(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get conflict(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get connection(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get ended(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get initiatorId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get peerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get purpose(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get summary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class ResidentRelationship extends Entity<ResidentRelationshipQueryProxy> {
+	get initiator(): Partial<ForeignReference<Resident>> { return this.$initiator; }
+	get peer(): Partial<ForeignReference<Resident>> { return this.$peer; }
+	bonded: Date;
+	conflict: string;
+	connection: string;
+	ended: Date;
+	declare id: string;
+	initiatorId: string;
+	peerId: string;
+	purpose: string;
+	summary: string;
+	
+	$$meta = {
+		source: "resident_relationship",
+		columns: {
+			bonded: { type: "timestamp", name: "bonded" },
+			conflict: { type: "text", name: "conflict" },
+			connection: { type: "text", name: "connection" },
+			ended: { type: "timestamp", name: "ended" },
+			id: { type: "uuid", name: "id" },
+			initiatorId: { type: "uuid", name: "initiator_id" },
+			peerId: { type: "uuid", name: "peer_id" },
+			purpose: { type: "text", name: "purpose" },
+			summary: { type: "text", name: "summary" }
+		},
+		get set(): DbSet<ResidentRelationship, ResidentRelationshipQueryProxy> { 
+			return new DbSet<ResidentRelationship, ResidentRelationshipQueryProxy>(ResidentRelationship, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$initiator = new ForeignReference<Resident>(this, "initiatorId", Resident);
+	this.$peer = new ForeignReference<Resident>(this, "peerId", Resident);
+	}
+	
+	private $initiator: ForeignReference<Resident>;
+
+	set initiator(value: Partial<ForeignReference<Resident>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.initiatorId = value.id as string;
+		} else {
+			this.initiatorId = null;
+		}
+	}
+
+	private $peer: ForeignReference<Resident>;
+
+	set peer(value: Partial<ForeignReference<Resident>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.peerId = value.id as string;
+		} else {
+			this.peerId = null;
 		}
 	}
 
@@ -798,6 +1000,72 @@ export class Street extends Entity<StreetQueryProxy> {
 		
 		this.bridges = new PrimaryReference<Bridge, BridgeQueryProxy>(this, "streetId", Bridge);
 	}
+}
+			
+export class TenancyQueryProxy extends QueryProxy {
+	get dwelling(): Partial<DwellingQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get inhabitant(): Partial<ResidentQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get dwellingId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get end(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get inhabitantId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get start(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Tenancy extends Entity<TenancyQueryProxy> {
+	get dwelling(): Partial<ForeignReference<Dwelling>> { return this.$dwelling; }
+	get inhabitant(): Partial<ForeignReference<Resident>> { return this.$inhabitant; }
+	dwellingId: string;
+	end: Date;
+	declare id: string;
+	inhabitantId: string;
+	start: Date;
+	
+	$$meta = {
+		source: "tenancy",
+		columns: {
+			dwellingId: { type: "uuid", name: "dwelling_id" },
+			end: { type: "timestamp", name: "end" },
+			id: { type: "uuid", name: "id" },
+			inhabitantId: { type: "uuid", name: "inhabitant_id" },
+			start: { type: "timestamp", name: "start" }
+		},
+		get set(): DbSet<Tenancy, TenancyQueryProxy> { 
+			return new DbSet<Tenancy, TenancyQueryProxy>(Tenancy, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$dwelling = new ForeignReference<Dwelling>(this, "dwellingId", Dwelling);
+	this.$inhabitant = new ForeignReference<Resident>(this, "inhabitantId", Resident);
+	}
+	
+	private $dwelling: ForeignReference<Dwelling>;
+
+	set dwelling(value: Partial<ForeignReference<Dwelling>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.dwellingId = value.id as string;
+		} else {
+			this.dwellingId = null;
+		}
+	}
+
+	private $inhabitant: ForeignReference<Resident>;
+
+	set inhabitant(value: Partial<ForeignReference<Resident>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.inhabitantId = value.id as string;
+		} else {
+			this.inhabitantId = null;
+		}
+	}
+
+	
 }
 			
 export class TrainRouteQueryProxy extends QueryProxy {
@@ -1012,6 +1280,7 @@ export class DbContext {
 	borough: DbSet<Borough, BoroughQueryProxy>;
 	bridge: DbSet<Bridge, BridgeQueryProxy>;
 	company: DbSet<Company, CompanyQueryProxy>;
+	dwelling: DbSet<Dwelling, DwellingQueryProxy>;
 	historicListingGrade: DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>;
 	historicListingModifier: DbSet<HistoricListingModifier, HistoricListingModifierQueryProxy>;
 	mapTile: DbSet<MapTile, MapTileQueryProxy>;
@@ -1021,8 +1290,11 @@ export class DbContext {
 	propertyHistoricListingModifier: DbSet<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>;
 	propertyType: DbSet<PropertyType, PropertyTypeQueryProxy>;
 	publication: DbSet<Publication, PublicationQueryProxy>;
+	resident: DbSet<Resident, ResidentQueryProxy>;
+	residentRelationship: DbSet<ResidentRelationship, ResidentRelationshipQueryProxy>;
 	square: DbSet<Square, SquareQueryProxy>;
 	street: DbSet<Street, StreetQueryProxy>;
+	tenancy: DbSet<Tenancy, TenancyQueryProxy>;
 	trainRoute: DbSet<TrainRoute, TrainRouteQueryProxy>;
 	trainStation: DbSet<TrainStation, TrainStationQueryProxy>;
 	trainStationExit: DbSet<TrainStationExit, TrainStationExitQueryProxy>;
@@ -1035,6 +1307,7 @@ export class DbContext {
 		this.borough = new DbSet<Borough, BoroughQueryProxy>(Borough, this.runContext);
 		this.bridge = new DbSet<Bridge, BridgeQueryProxy>(Bridge, this.runContext);
 		this.company = new DbSet<Company, CompanyQueryProxy>(Company, this.runContext);
+		this.dwelling = new DbSet<Dwelling, DwellingQueryProxy>(Dwelling, this.runContext);
 		this.historicListingGrade = new DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>(HistoricListingGrade, this.runContext);
 		this.historicListingModifier = new DbSet<HistoricListingModifier, HistoricListingModifierQueryProxy>(HistoricListingModifier, this.runContext);
 		this.mapTile = new DbSet<MapTile, MapTileQueryProxy>(MapTile, this.runContext);
@@ -1044,8 +1317,11 @@ export class DbContext {
 		this.propertyHistoricListingModifier = new DbSet<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>(PropertyHistoricListingModifier, this.runContext);
 		this.propertyType = new DbSet<PropertyType, PropertyTypeQueryProxy>(PropertyType, this.runContext);
 		this.publication = new DbSet<Publication, PublicationQueryProxy>(Publication, this.runContext);
+		this.resident = new DbSet<Resident, ResidentQueryProxy>(Resident, this.runContext);
+		this.residentRelationship = new DbSet<ResidentRelationship, ResidentRelationshipQueryProxy>(ResidentRelationship, this.runContext);
 		this.square = new DbSet<Square, SquareQueryProxy>(Square, this.runContext);
 		this.street = new DbSet<Street, StreetQueryProxy>(Street, this.runContext);
+		this.tenancy = new DbSet<Tenancy, TenancyQueryProxy>(Tenancy, this.runContext);
 		this.trainRoute = new DbSet<TrainRoute, TrainRouteQueryProxy>(TrainRoute, this.runContext);
 		this.trainStation = new DbSet<TrainStation, TrainStationQueryProxy>(TrainStation, this.runContext);
 		this.trainStationExit = new DbSet<TrainStationExit, TrainStationExitQueryProxy>(TrainStationExit, this.runContext);

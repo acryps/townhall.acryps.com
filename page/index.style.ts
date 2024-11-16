@@ -4,6 +4,7 @@ import { bold, boldItalic, regular, regularItalic } from "./assets/font/index.st
 import { boroughStyle } from "./borough/index.style";
 import { bannerStyle, createBannerStyle } from "./banner/index.style";
 import { iconFont, icons } from "./assets/icons/managed";
+import { articleStyle, newsStyle } from "./news/index.style";
 
 export const pageStyle = () => root(
 	bold,
@@ -21,7 +22,12 @@ export const pageStyle = () => root(
 	child('body',
 		child('ui-page',
 			homeStyle(),
+
 			boroughStyle(),
+
+			newsStyle(),
+			articleStyle(),
+
 			createBannerStyle()
 		)
 	)

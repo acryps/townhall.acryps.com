@@ -87,6 +87,8 @@ DbClient.connectedClient.connect().then(async () => {
 		borough['neighbors'] = neighbors;
 	}
 
+	let totalPopulation = 0;
+
 	for (let borough of boroughs) {
 		let population = 0;
 
@@ -108,6 +110,8 @@ DbClient.connectedClient.connect().then(async () => {
 
 		borough['population'] = population;
 		borough['populationDensity'] = population / borough['size'];
+
+		totalPopulation += population;
 	}
 
 	for (let borough of boroughs) {
@@ -133,6 +137,7 @@ DbClient.connectedClient.connect().then(async () => {
 
 	const populated = boroughs.toSorted((a, b) => b['population'] - a['population']);
 	console.debug('rank population:', populated.map(b => b.name));
+	console.debug('!!! total population: ', totalPopulation);
 
 	const populationDensities = boroughs.toSorted((a, b) => b['populationDensity'] - a['populationDensity']);
 	console.debug('rank population density:', populationDensities.map(b => b.name));
@@ -141,31 +146,33 @@ DbClient.connectedClient.connect().then(async () => {
 	console.debug('rank work:', jobs.map(b => b.name));
 
 	for (let borough of boroughs) {
-		// rank
-		const size = biggest.indexOf(borough) + 1;
-		const centrality = central.indexOf(borough) + 1;
-		const population = populated.indexOf(borough) + 1;
-		const populationDensity = populationDensities.indexOf(borough) + 1;
-		const job = jobs.indexOf(borough) + 1;
+		if (!borough.aiDescription) {
+			// rank
+			const size = biggest.indexOf(borough) + 1;
+			const centrality = central.indexOf(borough) + 1;
+			const population = populated.indexOf(borough) + 1;
+			const populationDensity = populationDensities.indexOf(borough) + 1;
+			const job = jobs.indexOf(borough) + 1;
 
-		console.debug(borough.name, `${borough['size']}m2 ${borough['population']}ppl ${borough['populationDensity']}ppl/m2`);
+			console.debug(borough.name, `${borough['size']}m2 ${borough['population']}ppl ${borough['populationDensity']}ppl/m2`);
 
-		const rankSheet = `#${size} in size, #${centrality} closest to center, #${population} in population, #${populationDensity} in population density, #${job} in work offering`;
+			const rankSheet = `#${size} in size, #${centrality} closest to center, #${population} in population, #${populationDensity} in population density, #${job} in work offering`;
 
-		const neighborTexts = `also to consider are the boroughs neibors. here a list and a short description of them: ${borough['neighbors'].map((neibor: Borough) => `\n- ${neibor.name}: ${neibor.aiSummary}`)}`;
+			const neighborTexts = `also to consider are the boroughs neibors. here a list and a short description of them: ${borough['neighbors'].map((neibor: Borough) => `\n- ${neibor.name}: ${neibor.aiSummary}`)}`;
 
-		try {
-			const src = await db.borough.find(borough.id);
+			try {
+				const src = await db.borough.find(borough.id);
 
-			const prompt = `i am writing descriptions of boroughs in my fictional city. i have recorded the descriptions using text to speech software, which might have introduced some issues. the text to speech software made a lot of issues, so no matter what, only call this district ${JSON.stringify(borough.name)}, even if the following text has the name written wrong. we are in 1890 europe, a bit like london. but beware, just because some of the names might sound familiar, they must not represent what has been built in real life. some general info about this district, which might help you. there are ${boroughs.length} boroughs in total: ${rankSheet}. write about 3 paragraphs. do not just repeat the rankings as text, use it to form a pretty text. do not say anything about that this is a fictional city, or london or europe. the city is called "City of Pilegron". the river is called "Pilger River". there are no countries yet, nor continents. do not invent stuff only use the data i provided.\n\n` + neighborTexts;
+				const prompt = `i am writing descriptions of boroughs in my fictional city. i have recorded the descriptions using text to speech software, which might have introduced some issues. the text to speech software made a lot of issues, so no matter what, only call this district ${JSON.stringify(borough.name)}, even if the following text has the name written wrong. we are in 1890 europe, a bit like london. but beware, just because some of the names might sound familiar, they must not represent what has been built in real life. some general info about this district, which might help you. there are ${boroughs.length} boroughs in total: ${rankSheet}. write about 3 paragraphs. do not just repeat the rankings as text, use it to form a pretty text. do not say anything about that this is a fictional city, or london or europe. the city is called "City of Pilegron". the river is called "Pilger River". there are no countries yet, nor continents. do not invent stuff only use the data i provided.\n\n` + neighborTexts;
 
-			writeFileSync(`${borough.name}.txt`, prompt);
+				writeFileSync(`${borough.name}.txt`, prompt);
 
-			src.aiDescription = await ai(prompt, borough.ttsDescription);
+				src.aiDescription = await ai(prompt, borough.ttsDescription);
 
-			await src.update();
-		} catch (error) {
-			console.error(error);
+				await src.update();
+			} catch (error) {
+				console.error(error);
+			}
 		}
 	}
 });

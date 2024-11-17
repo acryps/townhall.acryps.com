@@ -3,6 +3,7 @@ import { Borough, DbContext, Resident, ResidentRelationship } from "./managed/da
 import { Message } from "../interface";
 import { writeFileSync } from "fs";
 import { toSimulatedTime } from "../interface/time";
+import { Z_RLE } from "zlib";
 
 export class Life {
 	// weights, of how many people do what on a tick
@@ -82,6 +83,12 @@ export class Life {
 		return relations;
 	}
 
+	private async compileDescription(resident: Resident) {
+		const relations = await this.findActiveRelations(resident);
+
+		return `${resident.biography}. relations: ${(await this.compileFriendList(resident, relations)).join(', ')}`;
+	}
+
 	async findActiveRelations(resident: Resident) {
 		return this.database.residentRelationship
 			.where(relationship => relationship.initiatorId == resident.id || relationship.peerId == resident.id)
@@ -90,14 +97,11 @@ export class Life {
 	}
 
 	// create someone new
-	async spawn(place: Borough, standing: number, birthday: Date) {
+	async spawn(place: Borough, standing: number, birthday: Date, pronoun: string = Math.random() > 0.51 ? 'he' : 'she') {
 		const resident = new Resident();
 		resident.birthday = birthday;
 
 		const age = toSimulatedTime(new Date()).getFullYear() - toSimulatedTime(birthday).getFullYear();
-
-		// there are more women in the world...
-		const pronoun = Math.random() > 0.51 ? 'he' : 'she';
 
 		// prevents everybody being called Emilia Fothergrill
 		const usedNames = [...this.residents].sort(() => Math.random() - 0.5).slice(0, 100).flatMap(peer => [peer.givenName, peer.familyName]).join(', ');
@@ -113,7 +117,7 @@ export class Life {
 			when mentioning dates, always use YYYY-MM-DD format.
 			write a biography as a story, do not mention facts like age or social standing.
 			do not tell me that you are writing a biography, or any meta text.
-			imagine a name, probable occupation, core beliefs and principles.
+			imagine a creative given and family name, probable occupation, core beliefs and principles.
 			do not mention that this city is fictional, pretend that the story is real.
 			do not name ${pronoun} any of the following names: ${usedNames}
 		`, place.description);
@@ -154,7 +158,7 @@ export class Life {
 				}
 			}
 
-			return common;
+			return common?.trim();
 		};
 
 		resident.givenName = await extractName('given name');
@@ -167,10 +171,14 @@ export class Life {
 			retry = true;
 		}
 
-		for (let key in ['givenName', 'familyName']) {
-			if (!(await this.confirm(`is this a ${key}`, resident[key]))) {
+		for (let key of ['givenName', 'familyName']) {
+			if (!(await this.confirm('fictional persons name', 'random sentence or text explaining an error', resident[key]))) {
 				retry = true;
 			}
+		}
+
+		if (retry) {
+			return await this.spawn(place, standing, birthday, pronoun);
 		}
 
 		console.log(`+ spawn ${resident.givenName} ${resident.familyName}`);
@@ -181,11 +189,116 @@ export class Life {
 		return resident;
 	}
 
-	private async confirm(instruction: string, ...data: string[]) {
-		const token = Math.random().toString(36).substring(2);
-		const response = await this.respond(`${instruction} if this applies, respond with ${token}`, ...data);
+	async merge(parentA: Resident, parentB: Resident, familyName: string, birthday = new Date(), pronoun: string = Math.random() > 0.51 ? 'he' : 'she') {
+		const resident = new Resident();
+		resident.birthday = birthday;
 
-		return response!.includes(token);
+		const age = toSimulatedTime(new Date()).getFullYear() - toSimulatedTime(birthday).getFullYear();
+
+		// prevents everybody being called Emilia Fothergrill
+		const usedNames = [...this.residents].sort(() => Math.random() - 0.5).slice(0, 100).flatMap(peer => [peer.givenName, peer.familyName]).join(', ');
+
+		const biography = await this.respond(`
+			a new person was born in our fictional city called Pilegron.
+			${pronoun} is ${age} years old now.
+			the family name is ${familyName}
+			come up with a biography of this person based on their parents.
+			even tho a common practice, do not name ${pronoun} like one of the parents.
+			${age ? '' : 'as they were just born, there is not much to write. keep it short.'}
+			it is currently ${toSimulatedTime(new Date()).toDateString()}.
+			we are in europe, in a place like england, but it is not england.
+			well known world events, like the world wars, did not happen here.
+			when mentioning dates, always use YYYY-MM-DD format.
+			write a biography as a story, do not mention facts like age.
+			do not tell me that you are writing a biography, or any meta text.
+			imagine a creative name, probable occupation, core beliefs and principles.
+			do not mention that this city is fictional, pretend that the story is real.
+			do not name them any of the following names: ${usedNames}
+		`, await this.compileDescription(parentA), await this.compileDescription(parentB));
+
+		resident.biography = biography;
+
+		const extractName = async () => {
+			const tasks: Promise<string>[] = [];
+
+			for (let attempt = 0; attempt < 10; attempt++) {
+				tasks.push(this.respond(`
+					what is this persons given name, given the following biography?
+					only respond with the name
+					if you cannot or do not want to respond, just do not respond with anything
+				`, biography));
+			}
+
+			const names = new Map<string, number>();
+
+			let common;
+			let maxOccurences = 0;
+
+			for (let name of await Promise.all(tasks)) {
+				if (name.trim()) {
+					if (names.has(name)) {
+						const occurences = names.get(name) + 1;
+
+						names.set(name, occurences);
+
+						if (occurences > maxOccurences) {
+							common = name;
+
+							maxOccurences = occurences;
+						}
+					} else {
+						names.set(name, 1);
+					}
+				}
+			}
+
+			return common;
+		};
+
+		resident.givenName = await extractName();
+		resident.familyName = familyName;
+
+		// retry if fishy
+		let retry = false;
+
+		if (!resident.givenName || !resident.familyName || resident.givenName.includes(resident.familyName) || resident.familyName.includes(resident.givenName)) {
+			retry = true;
+		}
+
+		if (!(await this.confirm('fictional persons given name', 'random sentence or error message', resident.familyName))) {
+			retry = true;
+		}
+
+		if (retry) {
+			return await this.merge(parentA, parentB, familyName, birthday);
+		}
+
+		console.log(`+ merge ${parentA.givenName} + ${parentB.givenName} ${familyName} = ${resident.givenName}`);
+
+		await resident.create();
+		this.residents.push(resident);
+
+		for (let parent of [parentA, parentB]) {
+			const relation = new ResidentRelationship();
+			relation.bonded = birthday;
+			relation.connection = 'parent';
+			relation.purpose = 'parent';
+			relation.summary = 'parent';
+			relation.initiator = parent;
+			relation.peer = resident;
+
+			await relation.create();
+		}
+
+		return resident;
+	}
+
+	private async confirm(positive: string, negative: string, ...data: string[]) {
+		const response = await this.respond(`is the following text acceptable as a ${positive}, then respond with YES. if it is clearly a ${negative}, respond with NO`, ...data);
+
+		console.log(data, response)
+
+		return response.includes('YES');
 	}
 
 	private async respond(instruction: string, ...data: string[]) {
@@ -197,13 +310,13 @@ export class Life {
 		];
 
 		const response = await ollama.chat({
-			model: 'llama3.2',
+			model: 'gemma2:27b',
 			messages: messages
 		});
 
 		writeFileSync('.prompt', JSON.stringify(messages, null, '\t'))
 
-		return response.message.content;
+		return response.message.content?.trim();
 	}
 
 	private async summarize(message: string) {

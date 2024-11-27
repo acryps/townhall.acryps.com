@@ -1,4 +1,4 @@
-import { child, fontFamily, root } from "@acryps/style";
+import { child, ColorValue, fontFamily, px, root, Variable } from "@acryps/style";
 import { homeStyle } from "./home/index.style";
 import { bold, boldItalic, regular, regularItalic } from "./assets/font/index.style";
 import { boroughStyle } from "./borough/index.style";

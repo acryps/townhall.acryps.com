@@ -66,7 +66,7 @@ DbClient.connectedClient.connect().then(async () => {
 
 					await relationship.create();
 
-					while (Math.random() > 0.4 && +birthday < end) {
+					while (Math.random() > 0.2 && +birthday < end) {
 						const child = await life.merge(father, mother, familyName, birthday);
 						birthday = new Date(+birthday + Math.random() * 1000 * 60 * 60 * 24 * 365 / 10);
 
@@ -80,17 +80,23 @@ DbClient.connectedClient.connect().then(async () => {
 						tenancy.start = birthday;
 
 						await tenancy.create();
+
+						peer.mainTenancyId = tenancy.id;
+						await peer.update();
 					}
 				} else {
 					const birthday = new Date(start + Math.random() * (endAdult - start));
-					const father = await life.spawn(borough, standing, birthday);
+					const person = await life.spawn(borough, standing, birthday);
 
 					const tenancy = new Tenancy();
-					tenancy.inhabitant = father;
+					tenancy.inhabitant = person;
 					tenancy.dwelling = dwelling;
 					tenancy.start = birthday;
 
 					await tenancy.create();
+
+					person.mainTenancyId = tenancy.id;
+					await person.update();
 				}
 			}
 		}

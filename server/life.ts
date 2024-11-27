@@ -1,9 +1,7 @@
 import ollama from "ollama"
 import { Borough, DbContext, Resident, ResidentRelationship } from "./managed/database";
-import { Message } from "../interface";
 import { writeFileSync } from "fs";
 import { toSimulatedTime } from "../interface/time";
-import { Z_RLE } from "zlib";
 
 export class Life {
 	// weights, of how many people do what on a tick
@@ -97,7 +95,7 @@ export class Life {
 	}
 
 	// create someone new
-	async spawn(place: Borough, standing: number, birthday: Date, pronoun: string = Math.random() > 0.51 ? 'he' : 'she') {
+	async spawn(place: Borough, standing: number, birthday: Date, pronoun: string = Math.random() > 0.51 ? 'he' : 'she'): Promise<Resident> {
 		const resident = new Resident();
 		resident.birthday = birthday;
 
@@ -105,10 +103,14 @@ export class Life {
 
 		// prevents everybody being called Emilia Fothergrill
 		const usedNames = [...this.residents].sort(() => Math.random() - 0.5).slice(0, 100).flatMap(peer => [peer.givenName, peer.familyName]).join(', ');
+		const nameLength = Math.floor(Math.random() * 8 + 4);
 
 		const biography = await this.respond(`
-			a new person appeared in our fictional city called Pilegron.
-			come up with a biography of this person.
+			we are comming up with a history our fictional city called Pilegron.
+			invent a person who is a Pilegron native.
+			come up with a biography of this person - written in the third person.
+			menion the persons given and family name.
+			for the given name, use ${nameLength} - ${nameLength + 4} letters, containing the letters ${this.randomLetters(nameLength / 3).join(' ')}.
 			${pronoun} appeared in ${place.name} and is ${age} years old.
 			${pronoun} social standing is ${standing}, where 0 is the worst and 1 is the best.
 			it is currently ${toSimulatedTime(new Date()).toDateString()}.
@@ -119,15 +121,17 @@ export class Life {
 			do not tell me that you are writing a biography, or any meta text.
 			imagine a creative given and family name, probable occupation, core beliefs and principles.
 			do not mention that this city is fictional, pretend that the story is real.
-			do not name ${pronoun} any of the following names: ${usedNames}
-		`, place.description);
+			do not under any circumstance name the person any of the names below
+		`, place.description, usedNames);
+
+		// console.debug(biography)
 
 		resident.biography = biography;
 
 		const extractName = async (type: string) => {
 			const tasks: Promise<string>[] = [];
 
-			for (let attempt = 0; attempt < 10; attempt++) {
+			for (let attempt = 0; attempt < 4; attempt++) {
 				tasks.push(this.respond(`
 					what is this persons ${type}, given the following biography?
 					only respond with the name
@@ -167,7 +171,13 @@ export class Life {
 		// retry if fishy
 		let retry = false;
 
-		if (!resident.givenName || !resident.familyName || resident.givenName.includes(resident.familyName) || resident.familyName.includes(resident.givenName)) {
+		// make sure that the used names are not reused
+		// small chance that we'll just let it happen anyways
+		if ((Math.random() > 0.2 && usedNames.includes(resident.givenName)) || (Math.random() > 0.3 && usedNames.includes(resident.familyName))) {
+			retry = true;
+		}
+
+		if (!resident.givenName || !resident.familyName || resident.givenName == resident.familyName || resident.givenName.includes(resident.familyName) || resident.familyName.includes(resident.givenName)) {
 			retry = true;
 		}
 
@@ -186,7 +196,7 @@ export class Life {
 		await resident.create();
 		this.residents.push(resident);
 
-		return resident;
+		return resident as Resident;
 	}
 
 	async merge(parentA: Resident, parentB: Resident, familyName: string, birthday = new Date(), pronoun: string = Math.random() > 0.51 ? 'he' : 'she') {
@@ -197,14 +207,16 @@ export class Life {
 
 		// prevents everybody being called Emilia Fothergrill
 		const usedNames = [...this.residents].sort(() => Math.random() - 0.5).slice(0, 100).flatMap(peer => [peer.givenName, peer.familyName]).join(', ');
+		const nameLength = Math.floor(Math.random() * 8 + 4);
 
 		const biography = await this.respond(`
 			a new person was born in our fictional city called Pilegron.
 			${pronoun} is ${age} years old now.
-			the family name is ${familyName}
+			the family name is ${familyName}.
+			menion the persons name, use ${nameLength} - ${nameLength + 4} letters, containing the letters ${this.randomLetters(nameLength / 3).join(' ')}.
 			come up with a biography of this person based on their parents.
 			even tho a common practice, do not name ${pronoun} like one of the parents.
-			${age ? '' : 'as they were just born, there is not much to write. keep it short.'}
+			${age < 3 ? '' : 'as they were just born, there is not much to write. keep it short.'}
 			it is currently ${toSimulatedTime(new Date()).toDateString()}.
 			we are in europe, in a place like england, but it is not england.
 			well known world events, like the world wars, did not happen here.
@@ -213,15 +225,15 @@ export class Life {
 			do not tell me that you are writing a biography, or any meta text.
 			imagine a creative name, probable occupation, core beliefs and principles.
 			do not mention that this city is fictional, pretend that the story is real.
-			do not name them any of the following names: ${usedNames}
-		`, await this.compileDescription(parentA), await this.compileDescription(parentB));
+			do not name them any of the names listed below.
+		`, await this.compileDescription(parentA), await this.compileDescription(parentB), usedNames);
 
 		resident.biography = biography;
 
 		const extractName = async () => {
 			const tasks: Promise<string>[] = [];
 
-			for (let attempt = 0; attempt < 10; attempt++) {
+			for (let attempt = 0; attempt < 4; attempt++) {
 				tasks.push(this.respond(`
 					what is this persons given name, given the following biography?
 					only respond with the name
@@ -256,10 +268,15 @@ export class Life {
 		};
 
 		resident.givenName = await extractName();
+
 		resident.familyName = familyName;
 
 		// retry if fishy
 		let retry = false;
+
+		if (usedNames.includes(resident.givenName)) {
+			retry = true;
+		}
 
 		if (!resident.givenName || !resident.familyName || resident.givenName.includes(resident.familyName) || resident.familyName.includes(resident.givenName)) {
 			retry = true;
@@ -302,7 +319,7 @@ export class Life {
 	}
 
 	private async respond(instruction: string, ...data: string[]) {
-		console.debug(`-- ${instruction.replace(/\s+/g, ' ').substring(0, 100).trim()}`);
+		// console.debug(`-- ${instruction.replace(/\s+/g, ' ').substring(0, 100).trim()}`);
 
 		const messages = [
 			{ role: 'user', content: instruction },
@@ -332,6 +349,57 @@ export class Life {
 		}
 
 		return summary;
+	}
+
+	private randomLetters(length: number) {
+		const frequencies: Record<string, number> = {
+			a: 8.2,
+			b: 1.5,
+			c: 2.8,
+			d: 4.3,
+			e: 12.7,
+			f: 2.2,
+			g: 2.0,
+			h: 6.1,
+			i: 7.0,
+			j: 0.15,
+			k: 0.77,
+			l: 4.0,
+			m: 2.4,
+			n: 6.7,
+			o: 7.5,
+			p: 1.9,
+			q: 0.095,
+			r: 6.0,
+			s: 6.3,
+			t: 9.1,
+			u: 2.8,
+			v: 0.98,
+			w: 2.4,
+			x: 0.15,
+			y: 2.0,
+			z: 0.074
+		};
+
+		const characters = Object.keys(frequencies);
+		const totalWeight = Object.values(frequencies).reduce((sum, weight) => sum + weight, 0);
+
+		const output: string[] = [];
+
+		for (let index = 0; index < length; index++) {
+			let distance = totalWeight * Math.random();
+			let characterIndex = -1;
+
+			while (distance > 0) {
+				characterIndex++;
+
+				distance -= frequencies[characters[characterIndex]];
+			}
+
+			output.push(characters[characterIndex]);
+		}
+
+		return output;
 	}
 }
 

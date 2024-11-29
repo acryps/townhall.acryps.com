@@ -1,16 +1,20 @@
 import { DbClient, RunContext } from "vlquery";
 import { Inject, StaticFileRoute, ViewModel } from "vlserver";
 import { ManagedServer } from "./managed/server";
-import { Article, ArticleImage, ArticleMedia, Bridge, DbContext, MapType, Movement, Resident, ResidentRelationship, Tenancy, TenancyQueryProxy } from "./managed/database";
+import { Article, ArticleImage, ArticleMedia, Bridge, DbContext, MapType, Movement, Resident, ResidentFigure, ResidentRelationship, Tenancy, TenancyQueryProxy } from "./managed/database";
 import ws from 'express-ws';
+import ollama from 'ollama'
 import { join } from "path";
 import { Proxy } from "./proxy";
 import { GameBridge } from "./bridge";
 import { Message } from "../interface";
 import { MovementHeatmap } from "./movement-heatmap";
-import { existsSync, readdirSync, readFileSync } from "fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "fs";
 import { ArticleImageInterface } from "./areas/publication/image";
 import { Life } from "./life";
+import { NameGenerator } from "./life/name";
+import { female, male } from "./life/gender";
+import { Language } from "./life/language";
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
@@ -23,90 +27,159 @@ DbClient.connectedClient.connect().then(async () => {
 
 	const db = new DbContext(new RunContext());
 
+	for (let figure of await db.residentFigure.where(figure => figure.outfit == null).toArray()) {
+		writeFileSync('IMAGE.PNG', figure.image);
+		console.debug(figure.id, figure.sourceBiome)
+
+		try {
+
+			const respond = async () => {
+				const res = await ollama.chat({
+					model: 'llava:13b',
+					messages: [{
+						role: 'user',
+						content: 'describe this outfit. make a detailed description, mention gear and colors. make a long extensive description over 1000 characters',
+						images: ['./IMAGE.PNG']
+					}]
+				})
+
+				const text = res.message.content;
+				console.log('>', text)
+
+				if (text.length < 500) {
+					return await respond();
+				}
+
+				const summary = await new Language().respondText(`
+				given the following image description, make a 2 - 4 sentence long description of the outfit.
+				the image description mentions that this is a pixelated figure from minecraft, do not mention this, i only want to know the outfit description.
+				make this desciption not gender specific, avoid using pronouns at all.
+
+				${new Language().metaRules()}
+			`, text);
+
+				console.log('-', text)
+
+				if (summary.toLowerCase().includes('minecraft') || summary.toLowerCase().includes('game') || summary.toLowerCase().includes('pixel')) {
+					return await respond();
+				}
+
+				if (summary.trim().includes('\n')) {
+					return await respond();
+				}
+
+				if (summary.length < 200) {
+					return await respond();
+				}
+
+				return summary;
+			}
+
+			figure.outfit = await respond();
+			await figure.update();
+			console.log('=', figure.outfit)
+
+		} catch (error) {
+			console.warn(error)
+		}
+	}
+
+	console.debug('done')
+
+
+
 	const life = new Life(db);
 	await life.load();
 
 	// life.tick();
 
 	// fill all homes with people
-	const start = +new Date('2021-01-01');
-	const endAdult = +new Date('2024-01-01');
-	const end = +new Date();
+	(async () => {
+		for (let resident of life.residents) {
+			resident.tag = await life['createNameTag'](resident.givenName, resident.familyName);
 
-	for (let property of await db.property.include(property => property.borough).include(property => property.dwellings).toArray()) {
-		const dwellings = await property.dwellings.toArray();
-		const borough = await property.borough.fetch();
-		const standing = Math.random();
+			await resident.update();
+		}
 
-		for (let dwelling of dwellings) {
-			if (await dwelling.tenants.count() == 0) {
-				if (Math.random() > 0.2) {
-					const fatherBirthday = new Date(start + Math.random() * (endAdult - start));
-					const motherBirthday = new Date(start + Math.random() * 1000 * 60 * 60 * 24 * 100);
+		for (let resident of life.residents) {
+			await life.assignFigure(resident);
+		}
 
-					console.log('FATHER')
-					const father = await life.spawn(borough, standing, fatherBirthday, 'he');
+		const start = +new Date('2022-06-01');
+		const endAdult = +new Date('2024-01-01');
+		const end = +new Date();
 
-					console.log('MOTHER')
-					const mother = await life.spawn(borough, standing, motherBirthday, 'she');
-					const familyName = Math.random() > 0.8 ? mother.familyName : father.familyName;
+		for (let property of await db.property.include(property => property.borough).include(property => property.dwellings).toArray()) {
+			const dwellings = await property.dwellings.toArray();
+			const borough = await property.borough.fetch();
+			const standing = Math.random();
 
-					const relationship = new ResidentRelationship();
-					relationship.initiator = father;
-					relationship.peer = mother;
-					relationship.purpose = 'Romantic'
+			for (let dwelling of dwellings) {
+				if (await dwelling.tenants.count() == 0) {
+					if (Math.random() > 0.2) {
+						const fatherBirthday = new Date(start + Math.random() * (endAdult - start));
+						const motherBirthday = new Date(start + Math.random() * 1000 * 60 * 60 * 24 * 100);
 
-					const family = [father, mother];
+						console.log('FATHER')
+						const father = await life.spawn(borough, standing, fatherBirthday, male);
 
-					let birthday = new Date(start + Math.random() * 1000 * 60 * 60 * 24 * 365);
-					console.log('FIRST BIRTHDAY', birthday)
+						console.log('MOTHER')
+						const mother = await life.spawn(borough, standing, motherBirthday, female);
+						const familyName = Math.random() > 0.8 ? mother.familyName : father.familyName;
 
-					relationship.connection = 'Family';
-					relationship.bonded = birthday;
+						const relationship = new ResidentRelationship();
+						relationship.initiator = father;
+						relationship.peer = mother;
+						relationship.purpose = 'Romantic'
 
-					await relationship.create();
+						const family = [father, mother];
 
-					while (Math.random() > 0.2 && +birthday < end) {
-						const child = await life.merge(father, mother, familyName, birthday);
-						birthday = new Date(+birthday + Math.random() * 1000 * 60 * 60 * 24 * 365 / 10);
+						let birthday = new Date(start + Math.random() * 1000 * 60 * 60 * 24 * 365);
+						console.log('FIRST BIRTHDAY', birthday)
 
-						family.push(child);
-					}
+						relationship.connection = 'Family';
+						relationship.bonded = birthday;
 
-					for (let peer of family) {
+						await relationship.create();
+
+						while (Math.random() > 0.35 && +birthday < end) {
+							const child = await life.merge(father, mother, familyName, birthday, borough);
+							birthday = new Date(+birthday + Math.random() * 1000 * 60 * 60 * 24 * 365 / 10);
+
+							family.push(child);
+						}
+
+						for (let peer of family) {
+							const tenancy = new Tenancy();
+							tenancy.inhabitant = peer;
+							tenancy.dwelling = dwelling;
+							tenancy.start = birthday;
+
+							await tenancy.create();
+
+							peer.mainTenancyId = tenancy.id;
+							await peer.update();
+						}
+					} else {
+						const birthday = new Date(start + Math.random() * (endAdult - start));
+						const person = await life.spawn(borough, standing, birthday);
+
 						const tenancy = new Tenancy();
-						tenancy.inhabitant = peer;
+						tenancy.inhabitant = person;
 						tenancy.dwelling = dwelling;
 						tenancy.start = birthday;
 
 						await tenancy.create();
 
-						peer.mainTenancyId = tenancy.id;
-						await peer.update();
+						person.mainTenancyId = tenancy.id;
+						await person.update();
 					}
-				} else {
-					const birthday = new Date(start + Math.random() * (endAdult - start));
-					const person = await life.spawn(borough, standing, birthday);
-
-					const tenancy = new Tenancy();
-					tenancy.inhabitant = person;
-					tenancy.dwelling = dwelling;
-					tenancy.start = birthday;
-
-					await tenancy.create();
-
-					person.mainTenancyId = tenancy.id;
-					await person.update();
 				}
 			}
 		}
-	}
 
-	console.log('DONE');
-
-	/*for (let borough of await db.borough.toArray()) {
-		await life.spawn(borough, 0.7, new Date('2021-03-19'));
-		}*/
+		console.log('DONE');
+	})();
 
 	ViewModel.globalFetchingContext = db;
 
@@ -124,6 +197,7 @@ DbClient.connectedClient.connect().then(async () => {
 	});
 
 	new ArticleImageInterface(app, db);
+	new ResidentImageInterface(app, db, life);
 
 	app.createInjector = context => new Inject({
 		Context: context,

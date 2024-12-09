@@ -5,6 +5,7 @@ CREATE TABLE publication (
 	name TEXT,
 	legal_name TEXT,
 	description TEXT,
+	banner TEXT,
 
 	main_office_id UUID CONSTRAINT main_office__ REFERENCES property (id),
 

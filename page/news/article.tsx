@@ -18,7 +18,7 @@ export class ArticePage extends Component {
 			</ui-title>
 
 			<ui-detail>
-				<ui-publication ui-href={`../publication/${this.article.publication.tag}`}>
+				<ui-publication ui-href={`/news/publication/${this.article.publication.tag}`}>
 					{this.article.publication.name}
 				</ui-publication>
 

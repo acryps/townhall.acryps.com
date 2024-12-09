@@ -25,8 +25,6 @@ export class BannerComponent extends Component {
 		bannerCanvas.height = this.height;
 
 		requestAnimationFrame(async () => {
-			console.log(this.layers)
-
 			const image = new Image();
 			image.src = '/assets/banner/index.webp';
 

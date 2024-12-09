@@ -1,5 +1,7 @@
 import { Component } from "@acryps/page";
 import { ArticleViewModel, PublicationService, PublicationSummaryModel } from "../managed/services";
+import { BannerComponent } from "../banner";
+import { ArticleListComponent } from "./list";
 
 export class NewsPage extends Component {
 	articles: ArticleViewModel[];
@@ -17,48 +19,22 @@ export class NewsPage extends Component {
 	}
 
 	render() {
-		let lastDate = new Date();
-
 		return <ui-news>
 			<ui-publications>
 				{this.publications.map(publication => <ui-publication ui-href={`publication/${publication.tag}`}>
-					{publication.name}
+					{BannerComponent.unpack(publication.banner)}
+
+					<ui-name>
+						{publication.name}
+					</ui-name>
+
+					<ui-description>
+						{publication.description}
+					</ui-description>
 				</ui-publication>)}
 			</ui-publications>
 
-			<ui-articles>
-				{this.articles.map(article => {
-					const element = <ui-article ui-href={`article/${article.id}`}>
-						<ui-title>
-							{article.title}
-						</ui-title>
-
-						<ui-body>
-							{article.body.substring(0, 1000)}
-						</ui-body>
-
-						<ui-publication>
-							{article.publication.name}
-						</ui-publication>
-					</ui-article>;
-
-					if (lastDate.toDateString() != article.published.toDateString()) {
-						lastDate = article.published;
-
-						return [
-							<ui-date>
-								{article.published.toLocaleDateString()}
-							</ui-date>,
-
-							element
-						]
-					}
-
-					lastDate = article.published;
-
-					return element;
-				})}
-			</ui-articles>
+			{new ArticleListComponent(this.articles)}
 		</ui-news>;
 	}
 }

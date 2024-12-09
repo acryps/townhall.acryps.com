@@ -357,13 +357,13 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"U5MnFmMTpxaGM4a3J6YTZma2BoYnthNH",
+			"B6eWMwaDNkZ3NvOWNjdnRmdHx6anJrOD",
 			{
-			"xlOXR0N2ZuamB4d2MydnZud3U1Y3RjdT": { type: "string", isArray: false, isOptional: false }
+			"g5bmNiODV3dmF5N2JmY3JjY2dvZ3ZveD": { type: "string", isArray: false, isOptional: false }
 			},
 			inject => inject.construct(LifeService),
 			(controller, params) => controller.getResident(
-				params["xlOXR0N2ZuamB4d2MydnZud3U1Y3RjdT"]
+				params["g5bmNiODV3dmF5N2JmY3JjY2dvZ3ZveD"]
 			)
 		);
 
@@ -1505,7 +1505,8 @@ ViewModel.mappings = {
 				birthday: this.$$model.birthday,
 				familyName: this.$$model.familyName,
 				givenName: this.$$model.givenName,
-				id: this.$$model.id
+				id: this.$$model.id,
+				tag: this.$$model.tag
 			}
 		};
 
@@ -1538,7 +1539,8 @@ ViewModel.mappings = {
 				birthday: true,
 				familyName: true,
 				givenName: true,
-				id: true
+				id: true,
+				tag: true
 			};
 		};
 
@@ -1548,6 +1550,7 @@ ViewModel.mappings = {
 			"familyName" in data && (item.familyName = data.familyName === null ? null : `${data.familyName}`);
 			"givenName" in data && (item.givenName = data.givenName === null ? null : `${data.givenName}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 
 			return item;
 		}
@@ -1565,6 +1568,7 @@ ViewModel.mappings = {
 			"familyName" in viewModel && (model.familyName = viewModel.familyName === null ? null : `${viewModel.familyName}`);
 			"givenName" in viewModel && (model.givenName = viewModel.givenName === null ? null : `${viewModel.givenName}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 
 			return model;
 		}
@@ -1576,7 +1580,8 @@ ViewModel.mappings = {
 				birthday: this.$$model.birthday,
 				familyName: this.$$model.familyName,
 				givenName: this.$$model.givenName,
-				id: this.$$model.id
+				id: this.$$model.id,
+				tag: this.$$model.tag
 			}
 		};
 
@@ -1610,7 +1615,8 @@ ViewModel.mappings = {
 				birthday: true,
 				familyName: true,
 				givenName: true,
-				id: true
+				id: true,
+				tag: true
 			};
 		};
 
@@ -1621,6 +1627,7 @@ ViewModel.mappings = {
 			"familyName" in data && (item.familyName = data.familyName === null ? null : `${data.familyName}`);
 			"givenName" in data && (item.givenName = data.givenName === null ? null : `${data.givenName}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 
 			return item;
 		}
@@ -1639,6 +1646,7 @@ ViewModel.mappings = {
 			"familyName" in viewModel && (model.familyName = viewModel.familyName === null ? null : `${viewModel.familyName}`);
 			"givenName" in viewModel && (model.givenName = viewModel.givenName === null ? null : `${viewModel.givenName}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 
 			return model;
 		}
@@ -1874,6 +1882,8 @@ ViewModel.mappings = {
 	[PublicationSummaryModel.name]: class ComposedPublicationSummaryModel extends PublicationSummaryModel {
 		async map() {
 			return {
+				banner: this.$$model.banner,
+				description: this.$$model.description,
 				id: this.$$model.id,
 				name: this.$$model.name,
 				tag: this.$$model.tag
@@ -1906,6 +1916,8 @@ ViewModel.mappings = {
 			}
 
 			return {
+				banner: true,
+				description: true,
 				id: true,
 				name: true,
 				tag: true
@@ -1914,6 +1926,8 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new PublicationSummaryModel(null);
+			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
@@ -1930,6 +1944,8 @@ ViewModel.mappings = {
 				model = new Publication();
 			}
 			
+			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
@@ -1941,6 +1957,8 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				articles: (await this.$$model.articles.includeTree(ViewModel.mappings[ArticleViewModel.name].items).toArray()).map(item => new ArticleViewModel(item)),
+				banner: this.$$model.banner,
+				description: this.$$model.description,
 				id: this.$$model.id,
 				incorporation: this.$$model.incorporation,
 				legalName: this.$$model.legalName,
@@ -1982,6 +2000,8 @@ ViewModel.mappings = {
 						[...parents, "articles-PublicationViewModel"]
 					);
 				},
+				banner: true,
+				description: true,
 				id: true,
 				incorporation: true,
 				legalName: true,
@@ -1994,6 +2014,8 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new PublicationViewModel(null);
 			"articles" in data && (item.articles = data.articles && [...data.articles].map(i => ViewModel.mappings[ArticleViewModel.name].toViewModel(i)));
+			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"incorporation" in data && (item.incorporation = data.incorporation === null ? null : new Date(data.incorporation));
 			"legalName" in data && (item.legalName = data.legalName === null ? null : `${data.legalName}`);
@@ -2014,6 +2036,8 @@ ViewModel.mappings = {
 			}
 			
 			"articles" in viewModel && (null);
+			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"incorporation" in viewModel && (model.incorporation = viewModel.incorporation === null ? null : new Date(viewModel.incorporation));
 			"legalName" in viewModel && (model.legalName = viewModel.legalName === null ? null : `${viewModel.legalName}`);

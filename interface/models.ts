@@ -111,6 +111,7 @@ export interface ResidentSummaryModel {
 	familyName: string;
 	givenName: string;
 	id: string;
+	tag: string;
 }
 
 export interface ResidentViewModel {
@@ -119,6 +120,7 @@ export interface ResidentViewModel {
 	familyName: string;
 	givenName: string;
 	id: string;
+	tag: string;
 }
 
 export interface ResidentRelationViewModel {
@@ -145,13 +147,17 @@ export interface ArticleImageViewModel {
 }
 
 export interface PublicationSummaryModel {
-    id: string;
+    banner: string;
+	description: string;
+	id: string;
 	name: string;
 	tag: string;
 }
 
 export interface PublicationViewModel {
     articles: ArticleViewModel[];
+	banner: string;
+	description: string;
 	id: string;
 	incorporation: Date;
 	legalName: string;

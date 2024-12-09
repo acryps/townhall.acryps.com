@@ -1,5 +1,6 @@
 CREATE TABLE resident (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+	tag TEXT UNIQUE,
 
 	given_name TEXT,
 	family_name TEXT,
@@ -41,3 +42,16 @@ CREATE TABLE tenancy (
 );
 
 ALTER TABLE resident ADD main_tenancy_id UUID CONSTRAINT main_tenancy__ REFERENCES tenancy (id);
+
+CREATE TABLE resident_figure (
+	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+	source_biome TEXT,
+	source_job TEXT,
+
+	outfit TEXT,
+
+	image BYTEA
+);
+
+ALTER TABLE resident ADD figure_id UUID CONSTRAINT figure__ REFERENCES resident_figure (id);

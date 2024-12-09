@@ -1,8 +1,18 @@
-import { ch, child, display, fontSize, fontWeight, marginBottom, marginRight, rem, textAlign, whiteSpace } from "@acryps/style";
+import { ch, child, display, fontSize, fontWeight, marginBottom, marginInline, marginRight, maxHeight, objectFit, percentage, rem, textAlign, vh, whiteSpace, width } from "@acryps/style";
 import { boxed } from "../shared/boxed.style";
 
 export const residentStyle = () => child('ui-resident',
 	boxed(),
+
+	child('img',
+		display('block'),
+		width(percentage(50)),
+		maxHeight(vh(20)),
+		marginInline('auto'),
+		marginBottom(rem(1.5)),
+
+		objectFit('contain')
+	),
 
 	child('ui-name',
 		display('block'),
@@ -13,9 +23,7 @@ export const residentStyle = () => child('ui-resident',
 
 		child('ui-given-name',
 			display('inline-block'),
-			marginRight(ch(1)),
-
-			fontWeight('bold')
+			marginRight(ch(1))
 		)
 	),
 

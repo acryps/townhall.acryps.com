@@ -8,6 +8,8 @@ export class ResidentsPage extends Component {
 	page = 0;
 	loadingNextPage = false;
 
+	loadMoreTracker: HTMLElement = <ui-load-more></ui-load-more>;
+
 	async onload() {
 		this.residents = await new LifeService().listResidents(0);
 	}
@@ -27,26 +29,31 @@ export class ResidentsPage extends Component {
 		}
 
 		this.residents.push(...nextPage);
-		this.loadingNextPage = false;
+
+		setTimeout(() => {
+			this.loadingNextPage = false;
+
+			this.checkLoading();
+		}, 250);
 
 		this.update();
 	}
 
-	render() {
-		const loadMoreTracker: HTMLElement = <ui-load-more></ui-load-more>;
+	checkLoading() {
+		if (this.loaded) {
+			if (this.loadMoreTracker.getBoundingClientRect().y < innerHeight * 2) {
+				this.loadNextPage();
+			}
+		}
+	}
 
-		requestAnimationFrame(() => {
-			document.addEventListener('scroll', () => {
-				if (this.loaded) {
-					if (loadMoreTracker.getBoundingClientRect().y < innerHeight) {
-						this.loadNextPage();
-					}
-				}
-			});
-		})
+	render() {
+		document.addEventListener('scroll', () => this.checkLoading());
 
 		return <ui-residents>
-			{this.residents.map(resident => <ui-resident ui-href={resident.id}>
+			{this.residents.map(resident => <ui-resident ui-href={`/resident/${resident.tag}`}>
+				<img src={`/resident/image/${resident.tag}`} />
+
 				<ui-name>
 					<ui-given-name>
 						{resident.givenName}
@@ -62,7 +69,7 @@ export class ResidentsPage extends Component {
 				</ui-age>
 			</ui-resident>)}
 
-			{loadMoreTracker}
+			{this.loadMoreTracker}
 		</ui-residents>
 	}
 }

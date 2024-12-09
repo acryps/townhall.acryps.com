@@ -1,3 +1,6 @@
+export type PackedPoint = string;
+export type PackedPointArray = string;
+
 export class Point {
 	constructor(
 		public x,
@@ -16,16 +19,20 @@ export class Point {
 		return Math.hypot(this.x - peer.x, this.y - peer.y);
 	}
 
-	static unpack(source: string) {
+	pack(): PackedPoint {
+		return `${this.x},${this.y}`;
+	}
+
+	static unpack(source: PackedPointArray) {
 		return source.split(";").map(source => new Point(+source.split(",")[0], +source.split(",")[1]))
 	}
 
-	static unpackSingle(source: string) {
+	static unpackSingle(source: PackedPoint) {
 		return this.unpack(source)[0];
 	}
 
-	static pack(points: Point[]) {
-		return points.map(point => `${point.x},${point.y}`).join(";");
+	static pack(points: Point[]): PackedPointArray {
+		return points.map(point => point.pack()).join(";");
 	}
 
 	static bounding(points: Point[], offset = 0) {

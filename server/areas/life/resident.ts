@@ -3,6 +3,7 @@ import { Resident, ResidentRelationship } from "../../managed/database";
 
 export class ResidentSummaryModel extends ViewModel<Resident> {
 	id;
+	tag;
 
 	givenName;
 	familyName;
@@ -11,6 +12,7 @@ export class ResidentSummaryModel extends ViewModel<Resident> {
 
 export class ResidentViewModel extends ViewModel<Resident> {
 	id;
+	tag;
 
 	givenName;
 	familyName;

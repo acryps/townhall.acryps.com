@@ -8,7 +8,9 @@ export class PageComponent extends Component {
 				townhall
 			</ui-header>
 
-			{child}
+			<ui-content>
+				{child}
+			</ui-content>
 		</ui-page>;
 	}
 }

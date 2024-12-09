@@ -7,6 +7,8 @@ export class PublicationSummaryModel extends ViewModel<Publication> {
 	tag;
 
 	name;
+	description;
+	banner;
 }
 
 export class PublicationViewModel extends ViewModel<Publication> {
@@ -14,8 +16,10 @@ export class PublicationViewModel extends ViewModel<Publication> {
 	tag;
 
 	name;
+	description;
 	incorporation;
 	legalName;
+	banner;
 
 	mainOfficeId;
 

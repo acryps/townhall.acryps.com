@@ -10,8 +10,8 @@ export class LifeService extends Service {
 		super();
 	}
 
-	async getResident(id: string) {
-		return new ResidentViewModel(await this.database.resident.find(id));
+	async getResident(tag: string) {
+		return new ResidentViewModel(await this.database.resident.first(resident => resident.tag.valueOf() == tag));
 	}
 
 	listResidents(page: number) {

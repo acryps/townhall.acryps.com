@@ -5,8 +5,6 @@ import { card } from "../shared/card.style";
 
 export const homeStyle = () => child('ui-home',
 	display('block'),
-	padding(rem(1)),
-	marginTop(rem(5)),
 
 	child('ui-title',
 		display('block'),

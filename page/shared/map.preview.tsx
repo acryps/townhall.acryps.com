@@ -1,5 +1,4 @@
 import { brightness, contrast, grayscale } from "@acryps/style";
-import { world } from "../map/elements/map";
 import { Point } from "../map/point";
 import { Component } from "@acryps/page";
 

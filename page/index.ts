@@ -1,7 +1,5 @@
 import { PageComponent } from "./page";
-import { MapComponent } from "./map/map.component";
 import { Point } from "./map/point";
-import { HistoryComponent } from "./map/history.component";
 import { PropertiesComponent } from "./properties/index";
 import { PropertyComponent } from "./property/index";
 import { BoroughService, BoroughSummaryModel, BoroughViewModel, GameService, PlayerViewModel, Service } from "./managed/services";
@@ -18,6 +16,9 @@ import { NewsPage } from "./news";
 import { ArticePage } from "./news/article";
 import { ResidentsPage } from "./residents";
 import { ResidentPage } from "./resident";
+import { PublicationPage } from "./news/publication";
+import { MapComponent } from "./map/map";
+import { MapPage } from "./map";
 
 export class Application {
 	static router: Router;
@@ -37,9 +38,7 @@ export class Application {
 
 		this.router = new PathRouter(
 			PageComponent
-				.route('/map/:x/:y/:zoom', MapComponent
-					.route('/history', HistoryComponent)
-				)
+				.route('/map/:x/:y/:zoom', MapPage)
 
 				.route('/properties', PropertiesComponent)
 				.route('/property/:id', PropertyComponent)
@@ -47,9 +46,10 @@ export class Application {
 				.route('/borough/:tag', BoroughPage)
 
 				.route('/news/article/:id', ArticePage)
+				.route('/news/publication/:tag', PublicationPage)
 				.route('/news', NewsPage)
 
-				.route('/residents/:id', ResidentPage)
+				.route('/resident/:tag', ResidentPage)
 				.route('/residents', ResidentsPage)
 
 				.route('/create-banner', CreateBannerComponent)

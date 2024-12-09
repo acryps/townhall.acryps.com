@@ -261,6 +261,7 @@ export class ResidentSummaryModel {
 	familyName: string;
 	givenName: string;
 	id: string;
+	tag: string;
 
 	private static $build(raw) {
 		const item = new ResidentSummaryModel();
@@ -268,6 +269,7 @@ export class ResidentSummaryModel {
 		raw.familyName === undefined || (item.familyName = raw.familyName === null ? null : `${raw.familyName}`)
 		raw.givenName === undefined || (item.givenName = raw.givenName === null ? null : `${raw.givenName}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		
 		return item;
 	}
@@ -279,6 +281,7 @@ export class ResidentViewModel {
 	familyName: string;
 	givenName: string;
 	id: string;
+	tag: string;
 
 	private static $build(raw) {
 		const item = new ResidentViewModel();
@@ -287,6 +290,7 @@ export class ResidentViewModel {
 		raw.familyName === undefined || (item.familyName = raw.familyName === null ? null : `${raw.familyName}`)
 		raw.givenName === undefined || (item.givenName = raw.givenName === null ? null : `${raw.givenName}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		
 		return item;
 	}
@@ -348,12 +352,16 @@ export class ArticleImageViewModel {
 }
 
 export class PublicationSummaryModel {
+	banner: string;
+	description: string;
 	id: string;
 	name: string;
 	tag: string;
 
 	private static $build(raw) {
 		const item = new PublicationSummaryModel();
+		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
@@ -364,6 +372,8 @@ export class PublicationSummaryModel {
 
 export class PublicationViewModel {
 	articles: ArticleViewModel[];
+	banner: string;
+	description: string;
 	id: string;
 	incorporation: Date;
 	legalName: string;
@@ -374,6 +384,8 @@ export class PublicationViewModel {
 	private static $build(raw) {
 		const item = new PublicationViewModel();
 		raw.articles === undefined || (item.articles = raw.articles ? raw.articles.map(i => ArticleViewModel["$build"](i)) : null)
+		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.incorporation === undefined || (item.incorporation = raw.incorporation ? new Date(raw.incorporation) : null)
 		raw.legalName === undefined || (item.legalName = raw.legalName === null ? null : `${raw.legalName}`)
@@ -1028,11 +1040,11 @@ export class HistoricListingService {
 }
 
 export class LifeService {
-	async getResident(id: string): Promise<ResidentViewModel> {
+	async getResident(tag: string): Promise<ResidentViewModel> {
 		const $data = new FormData();
-		$data.append("xlOXR0N2ZuamB4d2MydnZud3U1Y3RjdT", Service.stringify(id))
+		$data.append("g5bmNiODV3dmF5N2JmY3JjY2dvZ3ZveD", Service.stringify(tag))
 
-		return await fetch(Service.toURL("U5MnFmMTpxaGM4a3J6YTZma2BoYnthNH"), {
+		return await fetch(Service.toURL("B6eWMwaDNkZ3NvOWNjdnRmdHx6anJrOD"), {
 			method: "post",
 			credentials: "include",
 			body: $data

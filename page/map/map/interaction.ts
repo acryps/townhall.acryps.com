@@ -5,9 +5,8 @@ export const registerInteration = (map: MapComponent, onMoveEnd: (destination: P
 	const element = map.rootNode;
 
 	let movement: {
-		pointer: Point,
-		map: Point,
-		changes: number
+		pointers: Point[],
+		map: Point
 	};
 
 	let scale: {
@@ -29,14 +28,46 @@ export const registerInteration = (map: MapComponent, onMoveEnd: (destination: P
 			return;
 		}
 
+		if (!event.buttons) {
+			return;
+		}
+
 		return new Point(event.clientX, event.clientY);
 	};
 
+	const getPointers = (event: TouchEvent | MouseEvent) => {
+		if (event instanceof TouchEvent) {
+			const points = [];
+
+			for (let index = 0; index < event.touches.length; index++) {
+				points.push(getPointer(event, index));
+			}
+
+			return points;
+		}
+
+		const pointer = getPointer(event);
+
+		if (!pointer) {
+			return [];
+		}
+
+		return [pointer];
+	}
+
+	const startMovement = (pointers: Point[]) => {
+		movement = {
+			pointers,
+			map: map.center.copy()
+		};
+	}
+
 	element.onmousedown = element.ontouchstart = (event: TouchEvent | MouseEvent) => {
-		const first = getPointer(event);
 		const second = getPointer(event, 1);
 
 		if (second) {
+			const first = getPointer(event);
+
 			scale = {
 				pointer: first,
 				distance: first.distance(second),
@@ -47,22 +78,24 @@ export const registerInteration = (map: MapComponent, onMoveEnd: (destination: P
 				return;
 			}
 
-			movement = {
-				pointer: first,
-				map: map.center.copy(),
-				changes: 1
-			};
+			const pointers = getPointers(event);
+
+			if (!pointers.length) {
+				return;
+			}
+
+			startMovement(pointers);
 		}
 	};
 
 	element.onmousemove = element.ontouchmove = (event: TouchEvent | MouseEvent) => {
-		const first = getPointer(event);
 		event.preventDefault();
 
 		if (scale) {
 			const second = getPointer(event, 1);
 
 			if (second) {
+				const first = getPointer(event);
 				const distance = first.distance(second);
 
 				map.zoom(scale.scale / (distance / scale.distance));
@@ -75,18 +108,31 @@ export const registerInteration = (map: MapComponent, onMoveEnd: (destination: P
 			return;
 		}
 
-		movement.changes++;
+		const pointers = getPointers(event);
 
-		const x = (movement.pointer.x - first.x) * map.scale;
-		const y = (movement.pointer.y - first.y) * map.scale;
+		// not pressed, after exiting and reentering map
+		if (!pointers.length) {
+			movement = null;
 
-		map.move(new Point(movement.map.x + x, movement.map.y + y));
+			return;
+		}
+
+		// reset movement when touch count changes
+		if (pointers.length != movement.pointers.length) {
+			startMovement(pointers);
+
+			return;
+		}
+
+		const delta = Point.average(movement.pointers).subtract(Point.average(pointers)).scale(map.scale);
+		map.move(new Point(movement.map.x + delta.x, movement.map.y + delta.y));
 	};
 
 	element.onmouseup = element.ontouchend = (event: TouchEvent | MouseEvent) => {
-		movement = null;
+		const pointers = getPointers(event);
 
-		if (!getPointer(event)) {
+		if (!pointers.length) {
+			movement = null;
 			scale = null;
 		}
 
@@ -94,9 +140,10 @@ export const registerInteration = (map: MapComponent, onMoveEnd: (destination: P
 	};
 
 	element.onmouseout = element.ontouchcancel = (event: TouchEvent | MouseEvent) => {
-		movement = null;
+		const pointers = getPointers(event);
 
-		if (!getPointer(event)) {
+		if (!pointers.length) {
+			movement = null;
 			scale = null;
 		}
 

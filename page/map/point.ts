@@ -30,6 +30,14 @@ export class Point {
 		return `${this.x},${this.y}`;
 	}
 
+	subtract(peer: Point) {
+		return new Point(this.x - peer.x, this.y - peer.y);
+	}
+
+	scale(factor: number) {
+		return new Point(this.x * factor, this.y * factor);
+	}
+
 	static unpack(source: PackedPointArray) {
 		return source.split(";").map(source => new Point(+source.split(",")[0], +source.split(",")[1]))
 	}
@@ -40,6 +48,21 @@ export class Point {
 
 	static pack(points: Point[]): PackedPointArray {
 		return points.map(point => point.pack()).join(";");
+	}
+
+	static sum(points: Point[]) {
+		const sum = new Point(0, 0);
+
+		for (let point of points) {
+			sum.x += point.x;
+			sum.y += point.y;
+		}
+
+		return sum;
+	}
+
+	static average(points: Point[]) {
+		return this.sum(points).scale(1 / points.length);
 	}
 
 	static bounding(points: Point[], offset = 0) {

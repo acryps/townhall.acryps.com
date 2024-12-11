@@ -1,7 +1,34 @@
 import { createHash, Hash } from "crypto";
 import { DbContext, MapTile, MapType } from "./managed/database";
+import { createCanvas, ImageData, loadImage } from "canvas";
 
 const sharp = require('sharp');
+
+export const tilecomplete = async (database: DbContext) => {
+	const tiles = await database.mapTile.where(tile => tile.complete == null).toArray();
+
+	const findHoles = (imageData: ImageData) => {
+		for (let index = 0; index < imageData.data.length; index += 4 * 64) {
+			if (imageData.data[index + 3] == 0) {
+				return true;
+			}
+		}
+	}
+
+	for (let tile of tiles) {
+		const image = await loadImage(tile.image);
+
+		const canvas = createCanvas(image.naturalWidth, image.naturalHeight);
+		const context = canvas.getContext('2d');
+
+		context.drawImage(image, 0, 0);
+
+		const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+		tile.complete = !findHoles(imageData);
+		await tile.update();
+	}
+}
 
 export const tileimport = async (database: DbContext) => {
 	const versions = await fetch('http://minecraft.acryps.com:9941/').then(response => response.text());

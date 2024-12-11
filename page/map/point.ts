@@ -15,6 +15,13 @@ export class Point {
 		return new Point(this.x + x, this.y + y);
 	}
 
+	floor() {
+		return new Point(
+			Math.floor(this.x),
+			Math.floor(this.y)
+		);
+	}
+
 	distance(peer: Point) {
 		return Math.hypot(this.x - peer.x, this.y - peer.y);
 	}

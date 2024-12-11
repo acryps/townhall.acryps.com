@@ -12,7 +12,7 @@ import { ArticleImageInterface } from "./areas/publication/image";
 import { Life } from "./life";
 import { female, male } from "./life/gender";
 import { ResidentImageInterface } from "./areas/resident/interface";
-import { tileimport } from "./IMPORT_TILE";
+import { tilecomplete, tileimport } from "./IMPORT_TILE";
 import { TileInterface } from "./tile-server";
 
 console.log("connecting to database...");
@@ -25,6 +25,7 @@ DbClient.connectedClient.connect().then(async () => {
 	ws(app.app);
 
 	const db = new DbContext(new RunContext());
+	// tilecomplete(db);
 	tileimport(db);
 
 	const life = new Life(db);

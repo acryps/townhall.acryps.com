@@ -27,8 +27,9 @@ export class MapComponent extends Component {
 	];
 
 	// centers the map around this point (intially)
-	show(center: Point) {
+	show(center: Point, scale: number) {
 		this.center = center;
+		this.scale = scale;
 	}
 
 	// move map to new center

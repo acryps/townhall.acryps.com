@@ -1,7 +1,11 @@
 import { MapComponent } from ".";
 import { Point } from "../point";
 
-export const registerInteration = (map: MapComponent, onMoveEnd: (destination: Point) => void) => {
+export const registerInteration = (
+	map: MapComponent,
+	onMoveEnd: (destination: Point) => void,
+	onScaleEnd: (scale: number) => void
+) => {
 	const element = map.rootNode;
 
 	let movement: {
@@ -99,6 +103,7 @@ export const registerInteration = (map: MapComponent, onMoveEnd: (destination: P
 				const distance = first.distance(second);
 
 				map.zoom(scale.scale / (distance / scale.distance));
+				onScaleEnd(map.scale);
 			} else {
 				scale = null;
 			}
@@ -150,9 +155,17 @@ export const registerInteration = (map: MapComponent, onMoveEnd: (destination: P
 		onMoveEnd(map.center);
 	};
 
+	let zoomEndDebounce = setTimeout(() => { });
+
 	element.onwheel = event => {
 		event.preventDefault();
 
 		map.zoom(map.scale * (event.deltaY * 0.01 + 1));
+
+		clearTimeout(zoomEndDebounce);
+
+		zoomEndDebounce = setTimeout(() => {
+			onScaleEnd(map.scale);
+		}, 100);
 	}
 };

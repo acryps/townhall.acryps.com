@@ -1,7 +1,7 @@
 import { Component } from "@acryps/page";
-import { Point } from "../point";
+import { Point } from "../../../interface/point";
 import { MapLayer } from "./layer";
-import { mapOverdraw, mapPixelWidth, subpixelOffsetX, subpixelOffsetY } from "../index.style";
+import { mapOverdraw, mapPixelWidth, subpixelOffsetX, subpixelOffsetY } from "./index.style";
 
 export class MapComponent extends Component {
 	readonly defaultZoom = 4;
@@ -23,13 +23,18 @@ export class MapComponent extends Component {
 
 	layers: MapLayer[] = [
 		// night layer
-		MapLayer.fromTileSource((x, y) => `/map/tile/night/${x}/${y}`, 250)
+		MapLayer.fromTileSource((x, y) => `/tile/base/day/${x}/${y}`, 250),
+
+		// property layer
+		MapLayer.fromTileSource((x, y) => `/tile/property/${x}/${y}`, 500, (x, y) => `/pick/property/${x}/${y}`, id => `/property/${id}`),
 	];
 
 	// centers the map around this point (intially)
 	show(center: Point, scale: number) {
 		this.center = center;
 		this.scale = scale;
+
+		return this;
 	}
 
 	// move map to new center
@@ -50,7 +55,22 @@ export class MapComponent extends Component {
 	// highlight an area
 	highlight(shape: Point[]) {
 		this.highlightedShape = shape;
-		this.show(Point.center(shape));
+		this.show(Point.center(shape), this.scale);
+
+		return this;
+	}
+
+	// pick
+	async pick(point: Point) {
+		for (let layer of this.layers) {
+			const link = await layer.pick(point.x, point.y);
+
+			if (link) {
+				this.navigate(link);
+
+				return;
+			}
+		}
 	}
 
 	render() {
@@ -65,9 +85,9 @@ export class MapComponent extends Component {
 			}
 		})
 
-		const container = <ui-map>
+		const container = <ui-map-container>
 			{this.canvas}
-		</ui-map>;
+		</ui-map-container>;
 
 		return container;
 	}
@@ -127,40 +147,71 @@ export class MapComponent extends Component {
 
 	// render layers onto map
 	private renderLayers() {
+		this.context.save();
+
 		this.context.clearRect(0, 0, this.width, this.height);
-
-		// copy layer buffers to main context
-		for (let layer of this.layers) {
-			const image = layer.render(this.center.floor(), this.width, this.height);
-
-			this.context.drawImage(image, 0, 0);
-		}
+		this.renderLayerBuffers();
 
 		if (this.highlightedShape) {
 			const left = Math.floor(this.center.x - this.width / 2);
 			const top = Math.floor(this.center.y - this.height / 2);
 
+			// prepare clip area
+			const path = new Path2D();
 			this.context.beginPath();
 
 			for (let pointIndex = 0; pointIndex < this.highlightedShape.length; pointIndex++) {
 				// offset by 1/2 pixel to keep lines unblurry
-				const x = this.highlightedShape[pointIndex].x - left + 0.5;
-				const y = this.highlightedShape[pointIndex].y - top + 0.5;
+				const x = this.highlightedShape[pointIndex].x - left;
+				const y = this.highlightedShape[pointIndex].y - top;
 
 				if (pointIndex) {
-					this.context.lineTo(x, y);
+					path.lineTo(x, y);
 				} else {
-					this.context.moveTo(x, y);
+					path.moveTo(x, y);
 				}
 			}
 
-			this.context.closePath();
+			path.closePath();
 
+			// gray out map
+			const imageData = this.context.getImageData(0, 0, this.width, this.height);
+			let index = 0;
+
+			while (index < imageData.data.length) {
+				// make it a big brighter
+				const gray = (imageData.data[index] + imageData.data[index + 1] + imageData.data[index + 2]) / 4 + 0xff / 2;
+
+				imageData.data[index++] = gray;
+				imageData.data[index++] = gray;
+				imageData.data[index++] = gray;
+				index++; // alpha
+			}
+
+			this.context.putImageData(imageData, 0, 0);
+
+			// draw shape
+			this.context.lineWidth = 2;
 			this.context.strokeStyle = '#000';
-			this.context.stroke();
+			this.context.stroke(path);
 
 			this.context.fillStyle = '#fff3';
-			this.context.fill();
+			this.context.fill(path);
+
+			// draw highlighted area in color
+			this.context.clip(path);
+			this.renderLayerBuffers();
+		}
+
+		this.context.restore();
+	}
+
+	private renderLayerBuffers() {
+		// copy layer buffers to main context
+		for (let layer of this.layers) {
+			const image = layer.render(this.center.floor(), this.width, this.height);
+
+			this.context.drawImage(image, 0, 0);
 		}
 	}
 }

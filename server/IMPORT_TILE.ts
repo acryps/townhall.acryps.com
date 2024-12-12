@@ -1,6 +1,6 @@
 import { createHash, Hash } from "crypto";
 import { DbContext, MapTile, MapType } from "./managed/database";
-import { createCanvas, ImageData, loadImage } from "canvas";
+import { Canvas, loadImage } from "skia-canvas";
 
 const sharp = require('sharp');
 
@@ -18,7 +18,7 @@ export const tilecomplete = async (database: DbContext) => {
 	for (let tile of tiles) {
 		const image = await loadImage(tile.image);
 
-		const canvas = createCanvas(image.naturalWidth, image.naturalHeight);
+		const canvas = new Canvas(image.width, image.height);
 		const context = canvas.getContext('2d');
 
 		context.drawImage(image, 0, 0);

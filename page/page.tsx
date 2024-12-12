@@ -5,7 +5,9 @@ export class PageComponent extends Component {
 	render(child?: Node) {
 		return <ui-page>
 			<ui-header>
-				townhall
+				<ui-logo ui-href='/'>
+					townhall
+				</ui-logo>
 			</ui-header>
 
 			<ui-content>

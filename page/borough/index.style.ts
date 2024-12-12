@@ -10,7 +10,7 @@ export const boroughStyle = () => child('ui-borough',
 		justifyContent('center'),
 		marginBottom(rem(1)),
 
-		child('canvas',
+		child('img',
 			height(min(vh(20), rem(10))),
 
 			border(px(1), 'solid', hex('000'))

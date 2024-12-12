@@ -11,24 +11,39 @@ export class BannerComponent extends Component {
 
 	static maxLayerCount = 7;
 
+	static source: Promise<HTMLImageElement>;
+	static cache = new Map<string, Promise<Blob>>();
+
 	layers: { offset: number, color: string }[] = [];
 
 	constructor(
 		public baseColor: string
 	) {
 		super();
+
+		if (!BannerComponent.source) {
+			BannerComponent.source = new Promise(done => {
+				const image = new Image();
+				image.src = '/assets/banner/index.webp';
+
+				image.onload = () => done(image);
+			});
+		}
 	}
 
 	render() {
-		const bannerCanvas = document.createElement('canvas');
-		bannerCanvas.width = this.width;
-		bannerCanvas.height = this.height;
-
 		requestAnimationFrame(async () => {
-			const image = new Image();
-			image.src = '/assets/banner/index.webp';
+			const image = await BannerComponent.source;
+			const cached = BannerComponent.cache.get(this.pack());
 
-			await new Promise<void>(done => image.onload = () => done());
+			if (cached) {
+				const image = new Image();
+				image.src = URL.createObjectURL(await cached);
+
+				this.rootNode.appendChild(image);
+
+				return;
+			}
 
 			if (image.naturalHeight != this.height) {
 				throw new Error('Invalid banner source image height');
@@ -40,6 +55,7 @@ export class BannerComponent extends Component {
 
 			const sourceData = sourceContext.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
 
+			const bannerCanvas = new OffscreenCanvas(this.width, this.height);
 			const bannerContext = bannerCanvas.getContext('2d');
 			bannerContext.fillStyle = this.baseColor;
 			bannerContext.fillRect(0, 0, this.width, this.height);
@@ -69,11 +85,17 @@ export class BannerComponent extends Component {
 				placingContext.putImageData(image, 0, 0);
 				bannerContext.drawImage(placingCanvas, 0, 0);
 			}
+
+			const blob = bannerCanvas.convertToBlob();
+			BannerComponent.cache.set(this.pack(), blob);
+
+			const bannerImage = new Image();
+			bannerImage.src = URL.createObjectURL(await blob);
+
+			this.rootNode.appendChild(bannerImage);
 		});
 
-		return <ui-banner>
-			{bannerCanvas}
-		</ui-banner>;
+		return <ui-banner></ui-banner>;
 	}
 
 	static unpack(source: string) {

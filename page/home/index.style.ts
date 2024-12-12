@@ -123,7 +123,7 @@ export const homeStyle = () => child('ui-home',
 					marginRight(rem(1)),
 					fontSize(0),
 
-					child('canvas',
+					child('img',
 						height(rem(3)),
 
 						border(px(1), 'solid', hex('000'))

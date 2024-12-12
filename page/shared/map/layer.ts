@@ -1,5 +1,5 @@
 import { Pc } from "@acryps/style";
-import { Point, PackedPoint } from "../point";
+import { Point, PackedPoint } from "../../../interface/point";
 
 export class MapLayer {
 	// null tiles are loading - or failed to load
@@ -10,7 +10,8 @@ export class MapLayer {
 
 	constructor(
 		private source: (x: number, y: number) => Promise<CanvasImageSource>,
-		private size: number
+		private size: number,
+		public pick: (x: number, y: number) => Promise<string>
 	) {
 		this.canvas = new OffscreenCanvas(1, 1);
 		this.context = this.canvas.getContext('2d');
@@ -84,7 +85,7 @@ export class MapLayer {
 		return this.canvas;
 	}
 
-	static fromTileSource(source: (x, y) => string, size: number) {
+	static fromTileSource(source: (x: number, y: number) => string, size: number, pick?: (x: number, y: number) => string, itemLink?: (item: string) => string) {
 		return new MapLayer(
 			async (x, y) => {
 				const image = new Image();
@@ -94,7 +95,20 @@ export class MapLayer {
 
 				return image;
 			},
-			size
+			size,
+			async (x, y) => {
+				if (!pick) {
+					return;
+				}
+
+				const id = await fetch(pick(x, y)).then(response => response.json());
+
+				if (!id) {
+					return;
+				}
+
+				return itemLink(id);
+			}
 		)
 	}
 }

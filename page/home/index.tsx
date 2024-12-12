@@ -5,8 +5,8 @@ import { BoroughService, BoroughSummaryModel } from "../managed/services";
 import { boroughColor } from "./index.style";
 import { border, hex } from "@acryps/style";
 import { BannerComponent } from "../banner";
-import { Point } from "../map/point";
 import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, propertyRegisterIcon, publicationIcon, residentIcon } from "../assets/icons/managed";
+import { Point } from "../../interface/point";
 
 export class HomePage extends Component {
 	render() {
@@ -27,7 +27,7 @@ export class HomePage extends Component {
 			{new OnlinePlayerComponent()}
 
 			<ui-topics>
-				<ui-topic ui-href={`map/${Application.center.x}/${Application.center.y}/3`}>
+				<ui-topic ui-href={`map/${Application.center.x}/${Application.center.y}/8`}>
 					{mapIcon()}
 
 					<ui-name>

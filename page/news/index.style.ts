@@ -20,7 +20,7 @@ export const newsStyle = () => child('ui-news',
 			child('ui-banner',
 				fontSize(0),
 
-				child('canvas',
+				child('img',
 					height(rem(4))
 				)
 			),
@@ -45,7 +45,7 @@ export const publicationStyle = () => child('ui-publication',
 		justifyContent('center'),
 		marginBottom(rem(1)),
 
-		child('canvas',
+		child('img',
 			height(min(vh(20), rem(10))),
 
 			border(px(1), 'solid', hex('000'))
@@ -142,7 +142,7 @@ export const articleListStyle = () => child('ui-articles',
 			child('ui-banner',
 				fontSize(0),
 
-				child('canvas',
+				child('img',
 					height(rem(0.9))
 				)
 			)

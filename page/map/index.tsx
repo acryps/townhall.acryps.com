@@ -1,8 +1,8 @@
 import { Component } from "@acryps/page";
-import { MapComponent } from "./map";
+import { MapComponent } from "../shared/map";
 import { Application } from "..";
-import { Point } from "./point";
-import { registerInteration } from "./map/interaction";
+import { registerInteration } from "../shared/map/interaction";
+import { Point } from "../../interface/point";
 
 export class MapPage extends Component {
 	declare parameters: { x, y, zoom };
@@ -22,6 +22,8 @@ export class MapPage extends Component {
 				this.parameters.y = point.y.toFixed(0);
 			}, scale => {
 				this.parameters.zoom = (Math.sqrt(1 / scale) * this.zoomAccuracy).toFixed(0);
+			}, pick => {
+				map.pick(pick);
 			});
 		});
 

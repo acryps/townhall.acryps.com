@@ -1,10 +1,10 @@
-import { Application } from "../index";
-import { BoroughViewModel, HistoricListingGradeViewModel, HistoricListingModifierViewModel, HistoricListingService, MapService, PropertyTypeViewModel, PropertyViewModel } from "../managed/services";
-import { Point } from "../map/point";
+import { Application } from "../../index";
+import { BoroughViewModel, HistoricListingGradeViewModel, HistoricListingModifierViewModel, HistoricListingService, MapService, PropertyTypeViewModel, PropertyViewModel } from "../../managed/services";
 import { Component } from "@acryps/page";
-import { MapPreviewComponent } from "../shared/map.preview";
+import { MapComponent } from "../../shared/map";
+import { Point } from "../../../interface/point";
 
-export class PropertyComponent extends Component {
+export class PropertyPage extends Component {
 	declare parameters: { id: string };
 
 	property: PropertyViewModel;
@@ -27,13 +27,13 @@ export class PropertyComponent extends Component {
 	render() {
 		const points = Point.unpack(this.property.bounds);
 		const size = Point.size(points);
-		
-		return <ui-property>
-			{new MapPreviewComponent(Point.unpack(this.property.bounds))}
 
-			<ui-title>
+		return <ui-property>
+			<ui-name>
 				{this.property.name || `Plot ${this.property.id.substring(0, 8)}`}
-			</ui-title>
+			</ui-name>
+
+			{new MapComponent().highlight(Point.unpack(this.property.bounds))}
 
 			<ui-field>
 				<label>Name</label>

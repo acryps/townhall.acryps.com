@@ -1,13 +1,12 @@
 import { PageComponent } from "./page";
-import { Point } from "./map/point";
 import { PropertiesComponent } from "./properties/index";
-import { PropertyComponent } from "./property/index";
+import { PropertyPage } from "./properties/property/index";
 import { BoroughService, BoroughSummaryModel, BoroughViewModel, GameService, PlayerViewModel, Service } from "./managed/services";
 import { PathRouter, Router } from "@acryps/page/built/router";
 import { Component } from "@acryps/page/built/component";
 import { registerDirectives } from "@acryps/page-default-directives/built/index";
 import { HomePage } from "./home";
-import { pageStyle } from "./index.style";
+import { pageStyle } from "./page.style";
 import { GameBridge } from "./bridge";
 import { BoroughPage } from "./borough";
 import { CreateBannerComponent } from "./banner/create";
@@ -17,8 +16,8 @@ import { ArticePage } from "./news/article";
 import { ResidentsPage } from "./residents";
 import { ResidentPage } from "./resident";
 import { PublicationPage } from "./news/publication";
-import { MapComponent } from "./map/map";
 import { MapPage } from "./map";
+import { Point } from "./../interface/point";
 
 export class Application {
 	static router: Router;
@@ -41,7 +40,7 @@ export class Application {
 				.route('/map/:x/:y/:zoom', MapPage)
 
 				.route('/properties', PropertiesComponent)
-				.route('/property/:id', PropertyComponent)
+				.route('/property/:id', PropertyPage)
 
 				.route('/borough/:tag', BoroughPage)
 

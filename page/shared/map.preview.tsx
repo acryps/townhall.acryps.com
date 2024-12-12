@@ -1,5 +1,5 @@
 import { brightness, contrast, grayscale } from "@acryps/style";
-import { Point } from "../map/point";
+import { Point } from "./../../interface/point";
 import { Component } from "@acryps/page";
 
 export class MapPreviewComponent extends Component {

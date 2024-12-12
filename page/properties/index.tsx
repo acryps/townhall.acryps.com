@@ -1,7 +1,7 @@
 import { MapService, PropertySummaryModel } from "../managed/services";
-import { Point } from "../map/point";
 import { Component } from "@acryps/page/built/component";
 import { MapPreviewComponent } from "../shared/map.preview";
+import { Point } from "../../interface/point";
 
 export class PropertiesComponent extends Component {
 	properties: PropertySummaryModel[];

@@ -1,16 +1,18 @@
 import { MapComponent } from ".";
-import { Point } from "../point";
+import { Point } from "../../../interface/point";
 
 export const registerInteration = (
 	map: MapComponent,
 	onMoveEnd: (destination: Point) => void,
-	onScaleEnd: (scale: number) => void
+	onScaleEnd: (scale: number) => void,
+	onPick: (point: Point) => void
 ) => {
 	const element = map.rootNode;
 
 	let movement: {
 		pointers: Point[],
-		map: Point
+		map: Point,
+		changes: number
 	};
 
 	let scale: {
@@ -19,7 +21,7 @@ export const registerInteration = (
 		scale: number
 	};
 
-	const getPointer = (event: TouchEvent | MouseEvent, index = 0) => {
+	const getPointer = (event: TouchEvent | MouseEvent, index = 0, allowReleasedPoints = false) => {
 		if (event instanceof TouchEvent) {
 			if (!event.touches[index]) {
 				return;
@@ -32,7 +34,7 @@ export const registerInteration = (
 			return;
 		}
 
-		if (!event.buttons) {
+		if (!event.buttons && !allowReleasedPoints) {
 			return;
 		}
 
@@ -62,7 +64,8 @@ export const registerInteration = (
 	const startMovement = (pointers: Point[]) => {
 		movement = {
 			pointers,
-			map: map.center.copy()
+			map: map.center.copy(),
+			changes: 1
 		};
 	}
 
@@ -113,6 +116,8 @@ export const registerInteration = (
 			return;
 		}
 
+		movement.changes++;
+
 		const pointers = getPointers(event);
 
 		// not pressed, after exiting and reentering map
@@ -124,7 +129,10 @@ export const registerInteration = (
 
 		// reset movement when touch count changes
 		if (pointers.length != movement.pointers.length) {
+			const changes = movement.changes;
+
 			startMovement(pointers);
+			movement.changes = changes + 1;
 
 			return;
 		}
@@ -136,23 +144,36 @@ export const registerInteration = (
 	element.onmouseup = element.ontouchend = (event: TouchEvent | MouseEvent) => {
 		const pointers = getPointers(event);
 
-		if (!pointers.length) {
+		if (pointers.length == 0) {
+			if (movement) {
+				if (movement.changes < 3) {
+					const pointer = getPointer(event, 0, true);
+					const bounds = map.rootNode.getBoundingClientRect();
+
+					// TODO fix subpixel offset
+					onPick(new Point(
+						Math.floor((pointer.x - bounds.x - Math.floor(map.center.x) - map.center.x) * map.scale - map.width / 2 + map.center.x),
+						Math.floor((pointer.y - bounds.y - Math.floor(map.center.y) - map.center.y) * map.scale - map.height / 2 + map.center.y)
+					));
+				} else {
+					onMoveEnd(map.center);
+				}
+			}
+
 			movement = null;
 			scale = null;
 		}
-
-		onMoveEnd(map.center);
 	};
 
 	element.onmouseout = element.ontouchcancel = (event: TouchEvent | MouseEvent) => {
 		const pointers = getPointers(event);
 
-		if (!pointers.length) {
+		if (pointers.length == 0) {
 			movement = null;
 			scale = null;
-		}
 
-		onMoveEnd(map.center);
+			onMoveEnd(map.center);
+		}
 	};
 
 	let zoomEndDebounce = setTimeout(() => { });

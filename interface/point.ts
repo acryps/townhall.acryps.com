@@ -30,6 +30,10 @@ export class Point {
 		return `${this.x},${this.y}`;
 	}
 
+	add(peer: Point) {
+		return new Point(this.x + peer.x, this.y + peer.y);
+	}
+
 	subtract(peer: Point) {
 		return new Point(this.x - peer.x, this.y - peer.y);
 	}

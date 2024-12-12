@@ -1,19 +1,18 @@
 import { DbClient, RunContext } from "vlquery";
 import { Inject, StaticFileRoute, ViewModel } from "vlserver";
 import { ManagedServer } from "./managed/server";
-import { Article, ArticleImage, ArticleMedia, Bridge, DbContext, MapType, Movement, Resident, ResidentFigure, ResidentRelationship, Tenancy, TenancyQueryProxy } from "./managed/database";
+import { Article, ArticleImage, Bridge, DbContext, MapType, Movement, Resident, ResidentFigure, ResidentRelationship, Tenancy, TenancyQueryProxy } from "./managed/database";
 import ws from 'express-ws';
 import { join } from "path";
 import { Proxy } from "./proxy";
 import { GameBridge } from "./bridge";
 import { Message } from "../interface";
-import { MovementHeatmap } from "./movement-heatmap";
 import { ArticleImageInterface } from "./areas/publication/image";
 import { Life } from "./life";
-import { female, male } from "./life/gender";
 import { ResidentImageInterface } from "./areas/resident/interface";
 import { tilecomplete, tileimport } from "./IMPORT_TILE";
-import { TileInterface } from "./tile-server";
+import { BaseTileServer } from "./map/base";
+import { PropertyRegisterTileServer } from "./map/property";
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
@@ -25,13 +24,14 @@ DbClient.connectedClient.connect().then(async () => {
 	ws(app.app);
 
 	const db = new DbContext(new RunContext());
-	// tilecomplete(db);
-	tileimport(db);
+	tilecomplete(db);
+	// tileimport(db);
 
 	const life = new Life(db);
 	await life.load();
 
-	new TileInterface(app, db);
+	new BaseTileServer(app, db);
+	new PropertyRegisterTileServer(app, db);
 
 	// life.tick();
 

@@ -2,8 +2,8 @@ import { Component } from "@acryps/page";
 import { BoroughService, BoroughViewModel } from "../managed/services";
 import { BannerComponent } from "../banner";
 import { MapPreviewComponent } from "../shared/map.preview";
-import { Point } from "../map/point";
 import { linkText } from "../linked-text";
+import { Point } from "../../interface/../interface/point";
 
 export class BoroughPage extends Component {
 	declare parameters: { tag };

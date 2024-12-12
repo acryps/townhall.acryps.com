@@ -1,9 +1,8 @@
 import { Component } from "@acryps/page";
 import { Application } from "..";
 import { OnlinePlayerComponent } from "./online";
-import { BoroughService, BoroughSummaryModel } from "../managed/services";
 import { boroughColor } from "./index.style";
-import { border, hex } from "@acryps/style";
+import { hex } from "@acryps/style";
 import { BannerComponent } from "../banner";
 import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, propertyRegisterIcon, publicationIcon, residentIcon } from "../assets/icons/managed";
 import { Point } from "../../interface/point";
@@ -11,11 +10,6 @@ import { Point } from "../../interface/point";
 export class HomePage extends Component {
 	render() {
 		return <ui-home>
-			{new BannerComponent('#ff0000')
-				.addRoundel('#00ff00')
-				.addLozenge('black')
-				.addGuster('orange')}
-
 			<ui-title>
 				City of Pilegron
 			</ui-title>
@@ -27,7 +21,7 @@ export class HomePage extends Component {
 			{new OnlinePlayerComponent()}
 
 			<ui-topics>
-				<ui-topic ui-href={`map/${Application.center.x}/${Application.center.y}/8`}>
+				<ui-topic ui-href={`/map/${Application.center.x}/${Application.center.y}/8`}>
 					{mapIcon()}
 
 					<ui-name>
@@ -39,7 +33,7 @@ export class HomePage extends Component {
 					</ui-description>
 				</ui-topic>
 
-				<ui-topic ui-href='news'>
+				<ui-topic ui-href='/news'>
 					{publicationIcon()}
 
 					<ui-name>
@@ -51,7 +45,7 @@ export class HomePage extends Component {
 					</ui-description>
 				</ui-topic>
 
-				<ui-topic ui-href='properties'>
+				<ui-topic ui-href='/properties'>
 					{propertyRegisterIcon()}
 
 					<ui-name>
@@ -63,7 +57,7 @@ export class HomePage extends Component {
 					</ui-description>
 				</ui-topic>
 
-				<ui-topic ui-href='vote'>
+				<ui-topic ui-href='/vote'>
 					{electionIcon()}
 
 					<ui-name>
@@ -75,7 +69,7 @@ export class HomePage extends Component {
 					</ui-description>
 				</ui-topic>
 
-				<ui-topic ui-href='residents'>
+				<ui-topic ui-href='/residents'>
 					{residentIcon()}
 
 					<ui-name>
@@ -87,7 +81,7 @@ export class HomePage extends Component {
 					</ui-description>
 				</ui-topic>
 
-				<ui-topic ui-href='company-office'>
+				<ui-topic ui-href='/company-office'>
 					{companyOfficeIcon()}
 
 					<ui-name>
@@ -99,7 +93,7 @@ export class HomePage extends Component {
 					</ui-description>
 				</ui-topic>
 
-				<ui-topic ui-href='building-code'>
+				<ui-topic ui-href='/building-code'>
 					{buildingCodeIcon()}
 
 					<ui-name>
@@ -111,7 +105,7 @@ export class HomePage extends Component {
 					</ui-description>
 				</ui-topic>
 
-				<ui-topic ui-href='laws'>
+				<ui-topic ui-href='/laws'>
 					{lawIcon()}
 
 					<ui-name>

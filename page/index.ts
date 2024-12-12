@@ -31,6 +31,10 @@ export class Application {
 	static async main() {
 		Service.baseUrl = '/';
 
+		if (location.pathname == '/') {
+			location.pathname = '/home';
+		}
+
 		this.players = await new GameService().getPlayers();
 		this.boroughs = await new BoroughService().list();
 
@@ -53,7 +57,7 @@ export class Application {
 				.route('/create-banner', CreateBannerComponent)
 				.route('/create-banner/:code', CreateBannerComponent)
 
-				.route('/', HomePage)
+				.route('/home', HomePage)
 		);
 
 		registerDirectives(Component, this.router);

@@ -153,12 +153,6 @@ DbClient.connectedClient.connect().then(async () => {
 		Life: life
 	});
 
-	app.app.use((request, response, next) => {
-		console.log('request', request.url);
-
-		next();
-	});
-
 	app.prepareRoutes();
 	app.use(new StaticFileRoute('/assets/', join(process.cwd(), '..', 'page', 'assets')));
 	app.use(new StaticFileRoute('/bundle/', join(process.cwd(), '..', 'page', '.built')));

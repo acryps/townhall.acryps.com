@@ -1,3 +1,4 @@
+import { Router, PathRouter, Component } from "@acryps/page";
 import { PageComponent } from "./page";
 import { PropertiesComponent } from "./properties/index";
 import { PropertyPage } from "./properties/property/index";
@@ -16,7 +17,6 @@ import { ResidentPage } from "./resident";
 import { PublicationPage } from "./news/publication";
 import { MapPage } from "./map";
 import { Point } from "./../interface/point";
-import { Router, PathRouter, Component } from "@acryps/page";
 
 export class Application {
 	static router: Router;
@@ -60,12 +60,6 @@ export class Application {
 
 		pageStyle().apply();
 		this.router.host(document.body);
-	}
-
-	static serverTime() {
-		const date = +new Date() - (150 * 365.4 * 24 * 60 * 60);
-
-		return new Date(date);
 	}
 }
 

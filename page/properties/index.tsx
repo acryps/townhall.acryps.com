@@ -1,5 +1,5 @@
 import { MapService, PropertySummaryModel } from "../managed/services";
-import { Component } from "@acryps/page/built/component";
+import { Component } from "@acryps/page";
 import { MapPreviewComponent } from "../shared/map.preview";
 import { Point } from "../../interface/point";
 

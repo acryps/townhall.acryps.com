@@ -2,9 +2,7 @@ import { PageComponent } from "./page";
 import { PropertiesComponent } from "./properties/index";
 import { PropertyPage } from "./properties/property/index";
 import { BoroughService, BoroughSummaryModel, BoroughViewModel, GameService, PlayerViewModel, Service } from "./managed/services";
-import { PathRouter, Router } from "@acryps/page/built/router";
-import { Component } from "@acryps/page/built/component";
-import { registerDirectives } from "@acryps/page-default-directives/built/index";
+import { registerDirectives } from "@acryps/page-default-directives";
 import { HomePage } from "./home";
 import { pageStyle } from "./page.style";
 import { GameBridge } from "./bridge";
@@ -18,6 +16,7 @@ import { ResidentPage } from "./resident";
 import { PublicationPage } from "./news/publication";
 import { MapPage } from "./map";
 import { Point } from "./../interface/point";
+import { Router, PathRouter, Component } from "@acryps/page";
 
 export class Application {
 	static router: Router;

@@ -1,5 +1,5 @@
 import { Application } from "./index";
-import { Component } from "@acryps/page/built/component";
+import { Component } from "@acryps/page";
 
 export class PageComponent extends Component {
 	render(child?: Node) {

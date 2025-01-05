@@ -13,6 +13,7 @@ import { ResidentImageInterface } from "./areas/resident/interface";
 import { tilecomplete, tileimport } from "./IMPORT_TILE";
 import { BaseTileServer } from "./map/base";
 import { PropertyRegisterTileServer } from "./map/property";
+import { MapImporter } from "./map/import";
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
@@ -24,8 +25,11 @@ DbClient.connectedClient.connect().then(async () => {
 	ws(app.app);
 
 	const db = new DbContext(new RunContext());
-	tilecomplete(db);
+	// tilecomplete(db);
 	// tileimport(db);
+
+	MapImporter.schedule(MapType.overworld, db);
+	MapImporter.schedule(MapType.night, db);
 
 	const life = new Life(db);
 	await life.load();

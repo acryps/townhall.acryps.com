@@ -8,7 +8,6 @@ export class MapImporter {
 
 	readonly regions = this.size / this.tile;
 
-	private hashes: string[];
 	private lastMapHash: string;
 
 	constructor(
@@ -31,23 +30,6 @@ export class MapImporter {
 	}
 
 	async update() {
-		if (!this.hashes) {
-			this.hashes = [];
-
-			console.log('loading hashes');
-
-			const tiles = await this.database.mapTile
-				.where(tile => tile.type == this.type)
-				.includeTree({ hash: true })
-				.toArray();
-
-			for (let tile of tiles) {
-				this.hashes.push(tile.hash);
-			}
-
-			console.log(this.hashes)
-		}
-
 		console.log('updating map...');
 
 		const source = Buffer.from(
@@ -81,7 +63,7 @@ export class MapImporter {
 				const hash = createHash('sha1').update(image).digest('base64');
 				console.log(hash)
 
-				if (!this.hashes.includes(hash)) {
+				if (await this.database.mapTile.where(tile => tile.hash.valueOf() == hash).count() == 0) {
 					const entry = new MapTile();
 					entry.image = image;
 					entry.regionX = x - this.regions / 2;
@@ -93,9 +75,7 @@ export class MapImporter {
 
 					await entry.create();
 
-					this.hashes.push(hash);
-
-					console.log('+', x, y);
+					console.log('+tile', x, y);
 				}
 			}
 		}

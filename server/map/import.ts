@@ -30,7 +30,7 @@ export class MapImporter {
 	}
 
 	async update() {
-		console.log('updating map...');
+		console.log(new Date().toISOString(), 'updating map...');
 
 		const source = Buffer.from(
 			await fetch(`http://minecraft.acryps.com:9941/${this.type == MapType.overworld ? 'map' : 'night'}.png`)
@@ -43,6 +43,8 @@ export class MapImporter {
 		if (mapHash == this.lastMapHash) {
 			return;
 		}
+
+		console.log(`new map: ${mapHash}`);
 
 		this.lastMapHash = mapHash;
 
@@ -61,7 +63,6 @@ export class MapImporter {
 				const image = await canvas.toBuffer('png');
 
 				const hash = createHash('sha1').update(image).digest('base64');
-				console.log(hash)
 
 				if (await this.database.mapTile.where(tile => tile.hash.valueOf() == hash).count() == 0) {
 					const entry = new MapTile();

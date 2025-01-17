@@ -14,6 +14,8 @@ import { tilecomplete, tileimport } from "./IMPORT_TILE";
 import { BaseTileServer } from "./map/base";
 import { PropertyRegisterTileServer } from "./map/property";
 import { MapImporter } from "./map/import";
+import { female, male } from "./life/gender";
+import { toRealTime, toSimulatedAge, toSimulatedTime } from "../interface/time";
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
@@ -45,26 +47,15 @@ DbClient.connectedClient.connect().then(async () => {
 
 	// life.tick();
 
-	/*
 	// fill all homes with people
 	(async () => {
-		for (let resident of life.residents) {
-			if (!resident.tag) {
-				resident.tag = await life['createNameTag'](resident.givenName, resident.familyName);
+		const oldestPersonBirthday = +new Date('2021-06-01');
+		const youngestParentBirthday = +new Date('2024-01-01');
+		const now = +new Date();
 
-				await resident.update();
-			}
-		}
-
-		for (let resident of life.residents) {
-			if (!resident.figureId) {
-				await life.assignFigure(resident);
-			}
-		}
-
-		const start = +new Date('2022-06-01');
-		const endAdult = +new Date('2024-01-01');
-		const end = +new Date();
+		console.log('oldestPersonBirthday', toSimulatedAge(new Date(oldestPersonBirthday)));
+		console.log('youngestParentBirthday', toSimulatedAge(new Date(youngestParentBirthday)));
+		console.log('now', toSimulatedAge(new Date(now)));
 
 		for (let property of await db.property.include(property => property.borough).include(property => property.dwellings).toArray()) {
 			const dwellings = await property.dwellings.toArray();
@@ -74,8 +65,12 @@ DbClient.connectedClient.connect().then(async () => {
 			for (let dwelling of dwellings) {
 				if (await dwelling.tenants.count() == 0) {
 					if (Math.random() > 0.2) {
-						const fatherBirthday = new Date(start + Math.random() * (endAdult - start));
-						const motherBirthday = new Date(start + Math.random() * 1000 * 60 * 60 * 24 * 100);
+						const fatherBirthday = new Date(oldestPersonBirthday + Math.random() * (youngestParentBirthday - oldestPersonBirthday));
+						const motherBirthday = new Date(
+							+fatherBirthday + ((Math.random() * 15 - 2) / 20) * 365 * 24 * 60 * 60 * 1000
+						);
+
+						console.log('father', toSimulatedAge(fatherBirthday), 'mother', toSimulatedAge(motherBirthday));
 
 						console.log('FATHER')
 						const father = await life.spawn(borough, standing, fatherBirthday, male);
@@ -91,26 +86,33 @@ DbClient.connectedClient.connect().then(async () => {
 
 						const family = [father, mother];
 
-						let birthday = new Date(start + Math.random() * 1000 * 60 * 60 * 24 * 365);
-						console.log('FIRST BIRTHDAY', birthday)
+						const youngestParent = Math.max(+fatherBirthday, +motherBirthday);
+
+						let birthday = new Date(
+							youngestParent + ((Math.random() * 20 + 17) / 20) * 365 * 24 * 60 * 60 * 1000
+						);
 
 						relationship.connection = 'Family';
-						relationship.bonded = birthday;
+						relationship.bonded = +birthday > now ? new Date(now) : birthday;
 
 						await relationship.create();
 
-						while (Math.random() > 0.35 && +birthday < end) {
+						while (Math.random() > 0.45 && +birthday < now) {
 							const child = await life.merge(father, mother, familyName, birthday, borough);
-							birthday = new Date(+birthday + Math.random() * 1000 * 60 * 60 * 24 * 365 / 10);
+							birthday = new Date(+birthday + ((Math.random() * 3 + 0.9) / 20) * 365 * 24 * 60 * 60 * 1000);
+
+							console.log('next birthday', toSimulatedAge(birthday));
 
 							family.push(child);
 						}
+
+						const moveIn = new Date(+now - ((Math.random() * 100) / 20) * 365 * 24 * 60 * 60 * 1000);
 
 						for (let peer of family) {
 							const tenancy = new Tenancy();
 							tenancy.inhabitant = peer;
 							tenancy.dwelling = dwelling;
-							tenancy.start = birthday;
+							tenancy.start = new Date(Math.max(+peer.birthday, +moveIn));
 
 							await tenancy.create();
 
@@ -118,7 +120,7 @@ DbClient.connectedClient.connect().then(async () => {
 							await peer.update();
 						}
 					} else {
-						const birthday = new Date(start + Math.random() * (endAdult - start));
+						const birthday = new Date(oldestPersonBirthday + Math.random() * (youngestParentBirthday - oldestPersonBirthday));
 						const person = await life.spawn(borough, standing, birthday);
 
 						const tenancy = new Tenancy();
@@ -137,7 +139,6 @@ DbClient.connectedClient.connect().then(async () => {
 
 		console.log('DONE');
 	})();
-	*/
 
 	ViewModel.globalFetchingContext = db;
 

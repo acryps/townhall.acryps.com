@@ -27,7 +27,7 @@ export class LifeService extends Service {
 	listResidents(page: number) {
 		return ResidentSummaryModel.from(
 			this.database.resident
-				.orderByDescending(resident => resident.birthday)
+				.orderByDescending(resident => resident.id)
 				.page(page, 100)
 		);
 	}

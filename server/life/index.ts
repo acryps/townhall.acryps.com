@@ -151,11 +151,11 @@ export class Life {
 		const prompt = this.language.createSpawnedBiography(resident.givenName, resident.familyName, birthday, gender, place, standing);
 		resident.biography = await this.language.respondText(prompt, place.description);
 
-		console.log(`+ spawn ${resident.givenName} ${resident.familyName}`);
-
 		await resident.create();
 		this.residents.push(resident);
 		this.assignFigure(resident);
+
+		console.log(`+ spawn ${resident.tag} ${resident.givenName} ${resident.familyName}`);
 
 		return resident as Resident;
 	}
@@ -178,18 +178,18 @@ export class Life {
 		const prompt = this.language.createChildBiography([parentA, parentB], resident.givenName, familyName, birthday, gender, place, Math.random());
 		resident.biography = await this.language.respondText(prompt, await this.compileDescription(parentA), await this.compileDescription(parentB));
 
-		console.log(`+ merge ${parentA.givenName} + ${parentB.givenName} ${familyName} = ${resident.givenName} ${familyName}`);
-
 		await resident.create();
 		this.residents.push(resident);
 		this.assignFigure(resident);
 
+		console.log(`+ merge ${resident.tag} ${parentA.givenName} + ${parentB.givenName} ${familyName} = ${resident.givenName} ${familyName}`);
+
 		for (let parent of [parentA, parentB]) {
 			const relation = new ResidentRelationship();
 			relation.bonded = birthday;
-			relation.connection = 'parent';
-			relation.purpose = 'parent';
-			relation.summary = 'parent';
+			relation.connection = 'Parent';
+			relation.purpose = 'Parent';
+			relation.summary = 'Parent';
 			relation.initiator = parent;
 			relation.peer = resident;
 

@@ -1,8 +1,10 @@
 import { Application } from "../../index";
-import { BoroughViewModel, HistoricListingGradeViewModel, HistoricListingModifierViewModel, HistoricListingService, MapService, PropertyTypeViewModel, PropertyViewModel } from "../../managed/services";
+import { BoroughViewModel, HistoricListingGradeViewModel, HistoricListingModifierViewModel, HistoricListingService, MapService, PropertyService, PropertyTypeViewModel, PropertyViewModel } from "../../managed/services";
 import { Component } from "@acryps/page";
 import { MapComponent } from "../../shared/map";
 import { Point } from "../../../interface/point";
+import { toSimulatedAge } from "../../../interface/time";
+import { addIcon } from "../../assets/icons/managed";
 
 export class PropertyPage extends Component {
 	declare parameters: { id: string };
@@ -25,12 +27,9 @@ export class PropertyPage extends Component {
 	}
 
 	render() {
-		const points = Point.unpack(this.property.bounds);
-		const size = Point.size(points);
-
 		return <ui-property>
 			<ui-name>
-				{this.property.name || `Plot ${this.property.id.substring(0, 8)}`}
+				{this.property.name || `Property #${this.property.id.substring(0, 8)}`}
 			</ui-name>
 
 			{new MapComponent().highlight(Point.unpack(this.property.bounds))}
@@ -75,12 +74,45 @@ export class PropertyPage extends Component {
 				</select>
 			</ui-field>
 
-			<ui-section>
-				<ui-title>Historic Listing</ui-title>
+			<ui-dwellings>
+				{this.property.dwellings.map(dwelling => <ui-dwelling>
+					<ui-name>
+						Dwelling #{dwelling.id.split('-')[0]}
+					</ui-name>
 
-				{this.property.historicListingRegisteredAt && <ui-paragraph>
+					{dwelling.tenants.length ? <ui-tenants>
+						{dwelling.tenants.map(tenant => <ui-tenant ui-left={!!tenant.end} ui-href={`/resident/${tenant.inhabitant.tag}`}>
+							<img src={`/resident/image/${tenant.inhabitant.tag}`} />
+
+							<ui-name>
+								{tenant.inhabitant.givenName} {tenant.inhabitant.familyName}
+							</ui-name>
+						</ui-tenant>)}
+					</ui-tenants> : <ui-vacant>
+						<ui-header>
+							Vacant
+						</ui-header>
+
+						<ui-hint>
+							Residents will move in automatically, but it might take some time.
+						</ui-hint>
+					</ui-vacant>}
+				</ui-dwelling>)}
+
+				<ui-action ui-click={async () => {
+					this.property.dwellings.push(await new PropertyService().createDwelling(this.property.id));
+					this.update();
+				}}>
+					{addIcon()} Create Dwelling
+				</ui-action>
+			</ui-dwellings>
+
+			<ui-historic-listing>
+				<ui-header>Historic Listing</ui-header>
+
+				{this.property.historicListingRegisteredAt && <ui-date>
 					This item was registered as a historic item at {this.property.historicListingRegisteredAt.toLocaleDateString()}
-				</ui-paragraph>}
+				</ui-date>}
 
 				<ui-field>
 					<label>Listing Grade</label>
@@ -106,44 +138,29 @@ export class PropertyPage extends Component {
 					const link = this.property.historicListingModifiers.find(source => source.historicListingModifier.id == modifier.id);
 					let value = !!link;
 
-					return <ui-field>
-						<label>{modifier.name}</label>
+					return <ui-modifier>
+						<ui-field>
+							<input type="checkbox" $ui-value={value} ui-change={async value => {
+								if (value) {
+									this.property.historicListingModifiers.push(await new HistoricListingService().addModifier(this.property.id, modifier.id));
+								} else {
+									this.property.historicListingModifiers = this.property.historicListingModifiers.filter(existing => existing != link);
 
-						<input type="checkbox" $ui-value={value} ui-change={async value => {
-							if (value) {
-								this.property.historicListingModifiers.push(await new HistoricListingService().addModifier(this.property.id, modifier.id));
-							} else {
-								this.property.historicListingModifiers = this.property.historicListingModifiers.filter(existing => existing != link);
+									await new HistoricListingService().removeModifier(link.id);
+								}
 
-								await new HistoricListingService().removeModifier(link.id);
-							}
+								this.update();
+							}}></input>
 
-							this.update();
-						}}></input>
+							<label>{modifier.name}</label>
+						</ui-field>
 
-						<ui-hint>
+						<ui-grade>
 							{modifier.description}
-						</ui-hint>
-					</ui-field>
+						</ui-grade>
+					</ui-modifier>
 				})}
-			</ui-section>
-
-			<ui-labeled-value>
-				<ui-label>Size</ui-label>
-				<ui-value>
-					{size.width} x {size.height}
-				</ui-value>
-			</ui-labeled-value>
-
-			<ui-button ui-danger-outline ui-click={async () => {
-				if (confirm('delete property?')) {
-					await new MapService().deleteProperty(this.property);
-
-					history.back();
-				}
-			}}>
-				Delete Property
-			</ui-button>
+			</ui-historic-listing>
 		</ui-property>
 	}
 }

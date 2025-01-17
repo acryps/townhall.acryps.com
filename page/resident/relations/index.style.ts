@@ -32,7 +32,7 @@ export const relationsStyle = () => child('ui-relations',
 
 				child('img',
 					height(rem(3)),
-					aspectRatio(ratio(1, 1)),
+					aspectRatio(ratio(1, 1.25)),
 
 					objectFit('cover'),
 					objectPosition('top')

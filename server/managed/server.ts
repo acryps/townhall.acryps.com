@@ -27,6 +27,10 @@ import { ResidentRelationViewModel } from "././../areas/life/resident";
 import { ResidentSummaryModel } from "././../areas/life/resident";
 import { ResidentViewModel } from "././../areas/life/resident";
 import { LifeService } from "././../areas/life/service";
+import { Dwelling } from "././database";
+import { DwellingViewModel } from "././../areas/life/resident";
+import { PropertyDwellingViewModel } from "././../areas/property.view";
+import { PropertyService } from "././../areas/property/service";
 import { ArticleViewModel } from "././../areas/publication/article";
 import { PublicationViewModel } from "././../areas/publication/publication";
 import { PublicationService } from "././../areas/publication/service";
@@ -36,7 +40,7 @@ import { ChatService } from "././../areas/resident/chat/service";
 import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
-import { DwellingViewModel } from "./../areas/life/resident";
+import { TenantViewModel } from "./../areas/property.view";
 import { TenancyViewModel } from "./../areas/life/resident";
 import { ArticleImageViewModel } from "./../areas/publication/article";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
@@ -47,6 +51,7 @@ import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
 import { PropertyType } from "./../managed/database";
 import { Property } from "./../managed/database";
+import { Tenancy } from "./../managed/database";
 import { Square } from "./../managed/database";
 import { Street } from "./../managed/database";
 import { WaterBody } from "./../managed/database";
@@ -54,8 +59,6 @@ import { HistoricListingGrade } from "./../managed/database";
 import { HistoricListingModifier } from "./../managed/database";
 import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
-import { Dwelling } from "./../managed/database";
-import { Tenancy } from "./../managed/database";
 import { Article } from "./../managed/database";
 import { ArticleImage } from "./../managed/database";
 import { Publication } from "./../managed/database";
@@ -88,6 +91,10 @@ Inject.mappings = {
 	},
 	"LifeService": {
 		objectConstructor: LifeService,
+		parameters: ["DbContext"]
+	},
+	"PropertyService": {
+		objectConstructor: PropertyService,
 		parameters: ["DbContext"]
 	},
 	"PublicationService": {
@@ -402,6 +409,17 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(LifeService),
 			(controller, params) => controller.listResidents(
 				params["J1aTRnbHQ4YmMxdWQwZzUycDlheHMydX"]
+			)
+		);
+
+		this.expose(
+			"l3OGBvenJyc3lvbzZleWFmbzFpZ2g5cD",
+			{
+			"p2dHJxa2BodTR6NDZodDIxYWEyejlia2": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PropertyService),
+			(controller, params) => controller.createDwelling(
+				params["p2dHJxa2BodTR6NDZodDIxYWEyejlia2"]
 			)
 		);
 
@@ -1013,6 +1031,7 @@ ViewModel.mappings = {
 				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.$$model.borough)),
 				historicListingGrade: new HistoricListingGradeViewModel(await BaseServer.unwrap(this.$$model.historicListingGrade)),
 				owner: new PlayerViewModel(await BaseServer.unwrap(this.$$model.owner)),
+				dwellings: (await this.$$model.dwellings.includeTree(ViewModel.mappings[PropertyDwellingViewModel.name].items).toArray()).map(item => new PropertyDwellingViewModel(item)),
 				historicListingModifiers: (await this.$$model.historicListingModifiers.includeTree(ViewModel.mappings[PropertyHistoricListingModifierViewModel.name].items).toArray()).map(item => new PropertyHistoricListingModifierViewModel(item)),
 				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.$$model.type)),
 				bounds: this.$$model.bounds,
@@ -1067,6 +1086,12 @@ ViewModel.mappings = {
 						[...parents, "owner-PropertyViewModel"]
 					);
 				},
+				get dwellings() {
+					return ViewModel.mappings[PropertyDwellingViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "dwellings-PropertyViewModel"]
+					);
+				},
 				get historicListingModifiers() {
 					return ViewModel.mappings[PropertyHistoricListingModifierViewModel.name].getPrefetchingProperties(
 						level,
@@ -1092,6 +1117,7 @@ ViewModel.mappings = {
 			"borough" in data && (item.borough = data.borough && ViewModel.mappings[BoroughSummaryModel.name].toViewModel(data.borough));
 			"historicListingGrade" in data && (item.historicListingGrade = data.historicListingGrade && ViewModel.mappings[HistoricListingGradeViewModel.name].toViewModel(data.historicListingGrade));
 			"owner" in data && (item.owner = data.owner && ViewModel.mappings[PlayerViewModel.name].toViewModel(data.owner));
+			"dwellings" in data && (item.dwellings = data.dwellings && [...data.dwellings].map(i => ViewModel.mappings[PropertyDwellingViewModel.name].toViewModel(i)));
 			"historicListingModifiers" in data && (item.historicListingModifiers = data.historicListingModifiers && [...data.historicListingModifiers].map(i => ViewModel.mappings[PropertyHistoricListingModifierViewModel.name].toViewModel(i)));
 			"type" in data && (item.type = data.type && ViewModel.mappings[PropertyTypeViewModel.name].toViewModel(data.type));
 			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
@@ -1115,6 +1141,7 @@ ViewModel.mappings = {
 			"borough" in viewModel && (model.borough.id = viewModel.borough ? viewModel.borough.id : null);
 			"historicListingGrade" in viewModel && (model.historicListingGrade.id = viewModel.historicListingGrade ? viewModel.historicListingGrade.id : null);
 			"owner" in viewModel && (model.owner.id = viewModel.owner ? viewModel.owner.id : null);
+			"dwellings" in viewModel && (null);
 			"historicListingModifiers" in viewModel && (null);
 			"type" in viewModel && (model.type.id = viewModel.type ? viewModel.type.id : null);
 			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
@@ -1122,6 +1149,148 @@ ViewModel.mappings = {
 			"historicListingRegisteredAt" in viewModel && (model.historicListingRegisteredAt = viewModel.historicListingRegisteredAt === null ? null : new Date(viewModel.historicListingRegisteredAt));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+
+			return model;
+		}
+	},
+	[PropertyDwellingViewModel.name]: class ComposedPropertyDwellingViewModel extends PropertyDwellingViewModel {
+		async map() {
+			return {
+				tenants: (await this.$$model.tenants.includeTree(ViewModel.mappings[TenantViewModel.name].items).toArray()).map(item => new TenantViewModel(item)),
+				id: this.$$model.id
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get tenants() {
+					return ViewModel.mappings[TenantViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "tenants-PropertyDwellingViewModel"]
+					);
+				},
+				id: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new PropertyDwellingViewModel(null);
+			"tenants" in data && (item.tenants = data.tenants && [...data.tenants].map(i => ViewModel.mappings[TenantViewModel.name].toViewModel(i)));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PropertyDwellingViewModel) {
+			let model: Dwelling;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Dwelling).find(viewModel.id)
+			} else {
+				model = new Dwelling();
+			}
+			
+			"tenants" in viewModel && (null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+
+			return model;
+		}
+	},
+	[TenantViewModel.name]: class ComposedTenantViewModel extends TenantViewModel {
+		async map() {
+			return {
+				inhabitant: new ResidentSummaryModel(await BaseServer.unwrap(this.$$model.inhabitant)),
+				end: this.$$model.end,
+				id: this.$$model.id,
+				start: this.$$model.start
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get inhabitant() {
+					return ViewModel.mappings[ResidentSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "inhabitant-TenantViewModel"]
+					);
+				},
+				end: true,
+				id: true,
+				start: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new TenantViewModel(null);
+			"inhabitant" in data && (item.inhabitant = data.inhabitant && ViewModel.mappings[ResidentSummaryModel.name].toViewModel(data.inhabitant));
+			"end" in data && (item.end = data.end === null ? null : new Date(data.end));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"start" in data && (item.start = data.start === null ? null : new Date(data.start));
+
+			return item;
+		}
+
+		static async toModel(viewModel: TenantViewModel) {
+			let model: Tenancy;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Tenancy).find(viewModel.id)
+			} else {
+				model = new Tenancy();
+			}
+			
+			"inhabitant" in viewModel && (model.inhabitant.id = viewModel.inhabitant ? viewModel.inhabitant.id : null);
+			"end" in viewModel && (model.end = viewModel.end === null ? null : new Date(viewModel.end));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"start" in viewModel && (model.start = viewModel.start === null ? null : new Date(viewModel.start));
 
 			return model;
 		}

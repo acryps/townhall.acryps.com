@@ -55,6 +55,7 @@ export interface PropertyViewModel {
     borough: BoroughSummaryModel;
 	historicListingGrade: HistoricListingGradeViewModel;
 	owner: PlayerViewModel;
+	dwellings: PropertyDwellingViewModel[];
 	historicListingModifiers: PropertyHistoricListingModifierViewModel[];
 	type: PropertyTypeViewModel;
 	bounds: string;
@@ -62,6 +63,18 @@ export interface PropertyViewModel {
 	historicListingRegisteredAt: Date;
 	id: string;
 	name: string;
+}
+
+export interface PropertyDwellingViewModel {
+    tenants: TenantViewModel[];
+	id: string;
+}
+
+export interface TenantViewModel {
+    inhabitant: ResidentSummaryModel;
+	end: Date;
+	id: string;
+	start: Date;
 }
 
 export interface SquareViewModel {

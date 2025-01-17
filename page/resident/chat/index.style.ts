@@ -1,6 +1,7 @@
 import { alignItems, alignSelf, background, backgroundColor, border, borderBottom, borderRadius, borderTop, borderTopWidth, bottom, ch, child, color, columnGap, display, flexDirection, flexGrow, flexShrink, fontFamily, fontSize, height, insetInline, justifySelf, marginBottom, marginInline, marginRight, maxHeight, maxWidth, objectFit, opacity, outline, overflow, padding, paddingBlock, paddingBottom, paddingInline, percentage, position, Px, px, rem, resize, svh, textAlign, top, transform, translateY, Variable, vh, whiteSpace, width } from "@acryps/style";
 import { boxed } from "../../shared/boxed.style";
 import { navigationBackgroundColor, navigationBorderColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
+import { fieldStyle } from "../../shared/field.style";
 
 export const pusher = new Variable<Px>('pusher');
 
@@ -115,18 +116,8 @@ export const chatStyle = () => child('ui-chat',
 
 			child('textarea',
 				flexGrow(1),
-				resize('none'),
 
-				paddingBlock(rem(0.5)),
-				paddingInline(rem(0.75)),
-
-				fontFamily('inherit'),
-				fontSize(rem(1)),
-				color(pageBackgroundColor),
-				backgroundColor(pageTextColor),
-				border(0, 'none', 'transparent'),
-				borderRadius(0),
-				outline(0, 'none', 'transparent')
+				fieldStyle()
 			),
 
 			child('ui-action',

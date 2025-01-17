@@ -2,11 +2,11 @@ import { select, style, content, Font, fontFamily, fontWeight, fontStyle } from 
 
 
 export const iconFont = new Font('icons', fontWeight('normal'), fontStyle('normal'))
-	.addSource('/assets/icons/managed/font/index.eot?fdab9e33e449', 'embedded-opentype')
-	.addSource('/assets/icons/managed/font/index.svg?f70356eb8c42', 'svg')
-	.addSource('/assets/icons/managed/font/index.ttf?ac61c547538d', 'truetype')
-	.addSource('/assets/icons/managed/font/index.woff?61cb37e90379', 'woff')
-	.addSource('/assets/icons/managed/font/index.woff2?c3bdddbae665', 'woff2');
+	.addSource('/assets/icons/managed/font/index.eot?ae95687e1917', 'embedded-opentype')
+	.addSource('/assets/icons/managed/font/index.svg?7f72311ba302', 'svg')
+	.addSource('/assets/icons/managed/font/index.ttf?e54e5a76e05f', 'truetype')
+	.addSource('/assets/icons/managed/font/index.woff?1b3da89c64c9', 'woff')
+	.addSource('/assets/icons/managed/font/index.woff2?9be377957bda', 'woff2');
 
 export const icons = () => select('ui-icon',
 	fontFamily(iconFont.name),
@@ -14,19 +14,20 @@ export const icons = () => select('ui-icon',
 
 	style(':empty').before('?'),
 
-	style('[ui-building-code]').before('\f101'),
-	style('[ui-chat]').before('\f102'),
-	style('[ui-company-office]').before('\f103'),
-	style('[ui-delete]').before('\f104'),
-	style('[ui-election]').before('\f105'),
-	style('[ui-home]').before('\f106'),
-	style('[ui-law]').before('\f107'),
-	style('[ui-map]').before('\f108'),
-	style('[ui-property-register]').before('\f109'),
-	style('[ui-publication]').before('\f10a'),
-	style('[ui-relation-graph]').before('\f10b'),
-	style('[ui-relation]').before('\f10c'),
-	style('[ui-resident]').before('\f10d'),
+	style('[ui-add]').before('\f101'),
+	style('[ui-building-code]').before('\f102'),
+	style('[ui-chat]').before('\f103'),
+	style('[ui-company-office]').before('\f104'),
+	style('[ui-delete]').before('\f105'),
+	style('[ui-election]').before('\f106'),
+	style('[ui-home]').before('\f107'),
+	style('[ui-law]').before('\f108'),
+	style('[ui-map]').before('\f109'),
+	style('[ui-property-register]').before('\f10a'),
+	style('[ui-publication]').before('\f10b'),
+	style('[ui-relation-graph]').before('\f10c'),
+	style('[ui-relation]').before('\f10d'),
+	style('[ui-resident]').before('\f10e'),
 );
 
 const createIconElement = (name: string) => {
@@ -36,6 +37,7 @@ const createIconElement = (name: string) => {
 	return element;
 };
 
+export const addIcon = () => createIconElement('add');
 export const buildingCodeIcon = () => createIconElement('building-code');
 export const chatIcon = () => createIconElement('chat');
 export const companyOfficeIcon = () => createIconElement('company-office');

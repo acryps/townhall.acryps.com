@@ -129,6 +129,7 @@ export class PropertyViewModel {
 	borough: BoroughSummaryModel;
 	historicListingGrade: HistoricListingGradeViewModel;
 	owner: PlayerViewModel;
+	dwellings: PropertyDwellingViewModel[];
 	historicListingModifiers: PropertyHistoricListingModifierViewModel[];
 	type: PropertyTypeViewModel;
 	bounds: string;
@@ -142,6 +143,7 @@ export class PropertyViewModel {
 		raw.borough === undefined || (item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null)
 		raw.historicListingGrade === undefined || (item.historicListingGrade = raw.historicListingGrade ? HistoricListingGradeViewModel["$build"](raw.historicListingGrade) : null)
 		raw.owner === undefined || (item.owner = raw.owner ? PlayerViewModel["$build"](raw.owner) : null)
+		raw.dwellings === undefined || (item.dwellings = raw.dwellings ? raw.dwellings.map(i => PropertyDwellingViewModel["$build"](i)) : null)
 		raw.historicListingModifiers === undefined || (item.historicListingModifiers = raw.historicListingModifiers ? raw.historicListingModifiers.map(i => PropertyHistoricListingModifierViewModel["$build"](i)) : null)
 		raw.type === undefined || (item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null)
 		raw.bounds === undefined || (item.bounds = raw.bounds === null ? null : `${raw.bounds}`)
@@ -149,6 +151,36 @@ export class PropertyViewModel {
 		raw.historicListingRegisteredAt === undefined || (item.historicListingRegisteredAt = raw.historicListingRegisteredAt ? new Date(raw.historicListingRegisteredAt) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		
+		return item;
+	}
+}
+
+export class PropertyDwellingViewModel {
+	tenants: TenantViewModel[];
+	id: string;
+
+	private static $build(raw) {
+		const item = new PropertyDwellingViewModel();
+		raw.tenants === undefined || (item.tenants = raw.tenants ? raw.tenants.map(i => TenantViewModel["$build"](i)) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		
+		return item;
+	}
+}
+
+export class TenantViewModel {
+	inhabitant: ResidentSummaryModel;
+	end: Date;
+	id: string;
+	start: Date;
+
+	private static $build(raw) {
+		const item = new TenantViewModel();
+		raw.inhabitant === undefined || (item.inhabitant = raw.inhabitant ? ResidentSummaryModel["$build"](raw.inhabitant) : null)
+		raw.end === undefined || (item.end = raw.end ? new Date(raw.end) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.start === undefined || (item.start = raw.start ? new Date(raw.start) : null)
 		
 		return item;
 	}
@@ -1150,6 +1182,29 @@ export class LifeService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : ResidentSummaryModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class PropertyService {
+	async createDwelling(propertyId: string): Promise<PropertyDwellingViewModel> {
+		const $data = new FormData();
+		$data.append("p2dHJxa2BodTR6NDZodDIxYWEyejlia2", Service.stringify(propertyId))
+
+		return await fetch(Service.toURL("l3OGBvenJyc3lvbzZleWFmbzFpZ2g5cD"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : PropertyDwellingViewModel["$build"](d);
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

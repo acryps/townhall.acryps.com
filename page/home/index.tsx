@@ -57,18 +57,6 @@ export class HomePage extends Component {
 					</ui-description>
 				</ui-topic>
 
-				<ui-topic ui-href='/vote'>
-					{electionIcon()}
-
-					<ui-name>
-						Elections
-					</ui-name>
-
-					<ui-description>
-						View bills and watch residents vote live
-					</ui-description>
-				</ui-topic>
-
 				<ui-topic ui-href='/residents'>
 					{residentIcon()}
 
@@ -78,6 +66,18 @@ export class HomePage extends Component {
 
 					<ui-description>
 						View all residents living in Pilegron
+					</ui-description>
+				</ui-topic>
+
+				<ui-topic ui-href='/vote'>
+					{electionIcon()}
+
+					<ui-name>
+						Elections
+					</ui-name>
+
+					<ui-description>
+						View bills and watch residents vote live
 					</ui-description>
 				</ui-topic>
 

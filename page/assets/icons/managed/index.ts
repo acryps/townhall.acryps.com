@@ -2,11 +2,11 @@ import { select, style, content, Font, fontFamily, fontWeight, fontStyle } from 
 
 
 export const iconFont = new Font('icons', fontWeight('normal'), fontStyle('normal'))
-	.addSource('/assets/icons/managed/font/index.eot?0d07134ea041', 'embedded-opentype')
-	.addSource('/assets/icons/managed/font/index.svg?7ef02e0d8a53', 'svg')
-	.addSource('/assets/icons/managed/font/index.ttf?6a2769edf7c1', 'truetype')
-	.addSource('/assets/icons/managed/font/index.woff?d77301870158', 'woff')
-	.addSource('/assets/icons/managed/font/index.woff2?ce463c2a6502', 'woff2');
+	.addSource('/assets/icons/managed/font/index.eot?fdab9e33e449', 'embedded-opentype')
+	.addSource('/assets/icons/managed/font/index.svg?f70356eb8c42', 'svg')
+	.addSource('/assets/icons/managed/font/index.ttf?ac61c547538d', 'truetype')
+	.addSource('/assets/icons/managed/font/index.woff?61cb37e90379', 'woff')
+	.addSource('/assets/icons/managed/font/index.woff2?c3bdddbae665', 'woff2');
 
 export const icons = () => select('ui-icon',
 	fontFamily(iconFont.name),
@@ -25,7 +25,8 @@ export const icons = () => select('ui-icon',
 	style('[ui-property-register]').before('\f109'),
 	style('[ui-publication]').before('\f10a'),
 	style('[ui-relation-graph]').before('\f10b'),
-	style('[ui-resident]').before('\f10c'),
+	style('[ui-relation]').before('\f10c'),
+	style('[ui-resident]').before('\f10d'),
 );
 
 const createIconElement = (name: string) => {
@@ -46,4 +47,5 @@ export const mapIcon = () => createIconElement('map');
 export const propertyRegisterIcon = () => createIconElement('property-register');
 export const publicationIcon = () => createIconElement('publication');
 export const relationGraphIcon = () => createIconElement('relation-graph');
+export const relationIcon = () => createIconElement('relation');
 export const residentIcon = () => createIconElement('resident');

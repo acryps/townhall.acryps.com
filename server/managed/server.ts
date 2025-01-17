@@ -23,16 +23,21 @@ import { PropertyHistoricListingModifierViewModel } from "././../areas/history-l
 import { HistoricListingModifierViewModel } from "././../areas/history-listing/modifier.view";
 import { HistoricListingService } from "././../areas/history-listing/listing.service";
 import { Life } from "././../life";
+import { ResidentRelationViewModel } from "././../areas/life/resident";
 import { ResidentSummaryModel } from "././../areas/life/resident";
 import { ResidentViewModel } from "././../areas/life/resident";
 import { LifeService } from "././../areas/life/service";
 import { ArticleViewModel } from "././../areas/publication/article";
 import { PublicationViewModel } from "././../areas/publication/publication";
 import { PublicationService } from "././../areas/publication/service";
+import { ChatManager } from "././../areas/resident/chat/manager";
+import { ChatInteractionViewModel } from "././../areas/resident/chat/interaction";
+import { ChatService } from "././../areas/resident/chat/service";
 import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
-import { ResidentRelationViewModel } from "./../areas/life/resident";
+import { DwellingViewModel } from "./../areas/life/resident";
+import { TenancyViewModel } from "./../areas/life/resident";
 import { ArticleImageViewModel } from "./../areas/publication/article";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
@@ -49,9 +54,12 @@ import { HistoricListingGrade } from "./../managed/database";
 import { HistoricListingModifier } from "./../managed/database";
 import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
+import { Dwelling } from "./../managed/database";
+import { Tenancy } from "./../managed/database";
 import { Article } from "./../managed/database";
 import { ArticleImage } from "./../managed/database";
 import { Publication } from "./../managed/database";
+import { ChatInteraction } from "./../managed/database";
 import { TrainStationExit } from "./../managed/database";
 import { TrainRoute } from "./../managed/database";
 import { TrainStation } from "./../managed/database";
@@ -85,6 +93,14 @@ Inject.mappings = {
 	"PublicationService": {
 		objectConstructor: PublicationService,
 		parameters: ["DbContext"]
+	},
+	"ChatService": {
+		objectConstructor: ChatService,
+		parameters: ["ChatManager"]
+	},
+	"ChatManager": {
+		objectConstructor: ChatManager,
+		parameters: ["DbContext","Life"]
 	},
 	"TrainService": {
 		objectConstructor: TrainService,
@@ -368,6 +384,17 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"huZ2F0ODhpb2VuajhyZ31oMmFrY2Y0b3",
+			{
+			"IxaD93ajg4aWx5eWBwc3ZkOHVlejU2Zm": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LifeService),
+			(controller, params) => controller.getRelations(
+				params["IxaD93ajg4aWx5eWBwc3ZkOHVlejU2Zm"]
+			)
+		);
+
+		this.expose(
 			"huMGxqZmMyZD16eHtmaXIxOTo0aTVqeT",
 			{
 			"J1aTRnbHQ4YmMxdWQwZzUycDlheHMydX": { type: "number", isArray: false, isOptional: false }
@@ -406,6 +433,41 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(PublicationService),
 			(controller, params) => controller.listNewestArticles(
 				
+			)
+		);
+
+		this.expose(
+			"k4NXU5azV0bnB6NDVyeGl4ZWUybXM3MH",
+			{
+			"g1aGFnaGE4aGhta2RicnJxdzdqOT1sN2": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(ChatService),
+			(controller, params) => controller.start(
+				params["g1aGFnaGE4aGhta2RicnJxdzdqOT1sN2"]
+			)
+		);
+
+		this.expose(
+			"g4c2I5ZjkxcWE1bGE2cjB5aWYyM2oyaG",
+			{
+			"Rkd3VxNGFuaWMyN3RvdzJjaGlrZWRjbG": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(ChatService),
+			(controller, params) => controller.read(
+				params["Rkd3VxNGFuaWMyN3RvdzJjaGlrZWRjbG"]
+			)
+		);
+
+		this.expose(
+			"F5ZTIxMn00a2h0MWhuZXVlZGBvMWhieX",
+			{
+			"prbXM3dnU2aTAyNDYxdWs5aWdtbnRsZn": { type: "string", isArray: false, isOptional: false },
+				"J2ZXFweXFuNGd1cmQ1enFsaG14NTA5c3": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(ChatService),
+			(controller, params) => controller.send(
+				params["prbXM3dnU2aTAyNDYxdWs5aWdtbnRsZn"],
+				params["J2ZXFweXFuNGd1cmQ1enFsaG14NTA5c3"]
 			)
 		);
 
@@ -1576,6 +1638,7 @@ ViewModel.mappings = {
 	[ResidentViewModel.name]: class ComposedResidentViewModel extends ResidentViewModel {
 		async map() {
 			return {
+				mainTenancy: new TenancyViewModel(await BaseServer.unwrap(this.$$model.mainTenancy)),
 				biography: this.$$model.biography,
 				birthday: this.$$model.birthday,
 				familyName: this.$$model.familyName,
@@ -1611,6 +1674,12 @@ ViewModel.mappings = {
 			}
 
 			return {
+				get mainTenancy() {
+					return ViewModel.mappings[TenancyViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "mainTenancy-ResidentViewModel"]
+					);
+				},
 				biography: true,
 				birthday: true,
 				familyName: true,
@@ -1622,6 +1691,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new ResidentViewModel(null);
+			"mainTenancy" in data && (item.mainTenancy = data.mainTenancy && ViewModel.mappings[TenancyViewModel.name].toViewModel(data.mainTenancy));
 			"biography" in data && (item.biography = data.biography === null ? null : `${data.biography}`);
 			"birthday" in data && (item.birthday = data.birthday === null ? null : new Date(data.birthday));
 			"familyName" in data && (item.familyName = data.familyName === null ? null : `${data.familyName}`);
@@ -1641,6 +1711,7 @@ ViewModel.mappings = {
 				model = new Resident();
 			}
 			
+			"mainTenancy" in viewModel && (model.mainTenancy.id = viewModel.mainTenancy ? viewModel.mainTenancy.id : null);
 			"biography" in viewModel && (model.biography = viewModel.biography === null ? null : `${viewModel.biography}`);
 			"birthday" in viewModel && (model.birthday = viewModel.birthday === null ? null : new Date(viewModel.birthday));
 			"familyName" in viewModel && (model.familyName = viewModel.familyName === null ? null : `${viewModel.familyName}`);
@@ -1654,6 +1725,8 @@ ViewModel.mappings = {
 	[ResidentRelationViewModel.name]: class ComposedResidentRelationViewModel extends ResidentRelationViewModel {
 		async map() {
 			return {
+				initiator: new ResidentSummaryModel(await BaseServer.unwrap(this.$$model.initiator)),
+				peer: new ResidentSummaryModel(await BaseServer.unwrap(this.$$model.peer)),
 				bonded: this.$$model.bonded,
 				conflict: this.$$model.conflict,
 				connection: this.$$model.connection,
@@ -1689,6 +1762,18 @@ ViewModel.mappings = {
 			}
 
 			return {
+				get initiator() {
+					return ViewModel.mappings[ResidentSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "initiator-ResidentRelationViewModel"]
+					);
+				},
+				get peer() {
+					return ViewModel.mappings[ResidentSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "peer-ResidentRelationViewModel"]
+					);
+				},
 				bonded: true,
 				conflict: true,
 				connection: true,
@@ -1700,6 +1785,8 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new ResidentRelationViewModel(null);
+			"initiator" in data && (item.initiator = data.initiator && ViewModel.mappings[ResidentSummaryModel.name].toViewModel(data.initiator));
+			"peer" in data && (item.peer = data.peer && ViewModel.mappings[ResidentSummaryModel.name].toViewModel(data.peer));
 			"bonded" in data && (item.bonded = data.bonded === null ? null : new Date(data.bonded));
 			"conflict" in data && (item.conflict = data.conflict === null ? null : `${data.conflict}`);
 			"connection" in data && (item.connection = data.connection === null ? null : `${data.connection}`);
@@ -1719,12 +1806,156 @@ ViewModel.mappings = {
 				model = new ResidentRelationship();
 			}
 			
+			"initiator" in viewModel && (model.initiator.id = viewModel.initiator ? viewModel.initiator.id : null);
+			"peer" in viewModel && (model.peer.id = viewModel.peer ? viewModel.peer.id : null);
 			"bonded" in viewModel && (model.bonded = viewModel.bonded === null ? null : new Date(viewModel.bonded));
 			"conflict" in viewModel && (model.conflict = viewModel.conflict === null ? null : `${viewModel.conflict}`);
 			"connection" in viewModel && (model.connection = viewModel.connection === null ? null : `${viewModel.connection}`);
 			"ended" in viewModel && (model.ended = viewModel.ended === null ? null : new Date(viewModel.ended));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"purpose" in viewModel && (model.purpose = viewModel.purpose === null ? null : `${viewModel.purpose}`);
+
+			return model;
+		}
+	},
+	[DwellingViewModel.name]: class ComposedDwellingViewModel extends DwellingViewModel {
+		async map() {
+			return {
+				property: new PropertySummaryModel(await BaseServer.unwrap(this.$$model.property)),
+				id: this.$$model.id
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get property() {
+					return ViewModel.mappings[PropertySummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "property-DwellingViewModel"]
+					);
+				},
+				id: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new DwellingViewModel(null);
+			"property" in data && (item.property = data.property && ViewModel.mappings[PropertySummaryModel.name].toViewModel(data.property));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: DwellingViewModel) {
+			let model: Dwelling;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Dwelling).find(viewModel.id)
+			} else {
+				model = new Dwelling();
+			}
+			
+			"property" in viewModel && (model.property.id = viewModel.property ? viewModel.property.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+
+			return model;
+		}
+	},
+	[TenancyViewModel.name]: class ComposedTenancyViewModel extends TenancyViewModel {
+		async map() {
+			return {
+				dwelling: new DwellingViewModel(await BaseServer.unwrap(this.$$model.dwelling)),
+				end: this.$$model.end,
+				id: this.$$model.id,
+				start: this.$$model.start
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get dwelling() {
+					return ViewModel.mappings[DwellingViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "dwelling-TenancyViewModel"]
+					);
+				},
+				end: true,
+				id: true,
+				start: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new TenancyViewModel(null);
+			"dwelling" in data && (item.dwelling = data.dwelling && ViewModel.mappings[DwellingViewModel.name].toViewModel(data.dwelling));
+			"end" in data && (item.end = data.end === null ? null : new Date(data.end));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"start" in data && (item.start = data.start === null ? null : new Date(data.start));
+
+			return item;
+		}
+
+		static async toModel(viewModel: TenancyViewModel) {
+			let model: Tenancy;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Tenancy).find(viewModel.id)
+			} else {
+				model = new Tenancy();
+			}
+			
+			"dwelling" in viewModel && (model.dwelling.id = viewModel.dwelling ? viewModel.dwelling.id : null);
+			"end" in viewModel && (model.end = viewModel.end === null ? null : new Date(viewModel.end));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"start" in viewModel && (model.start = viewModel.start === null ? null : new Date(viewModel.start));
 
 			return model;
 		}
@@ -2044,6 +2275,80 @@ ViewModel.mappings = {
 			"mainOfficeId" in viewModel && (model.mainOfficeId = viewModel.mainOfficeId === null ? null : `${viewModel.mainOfficeId}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
+
+			return model;
+		}
+	},
+	[ChatInteractionViewModel.name]: class ComposedChatInteractionViewModel extends ChatInteractionViewModel {
+		async map() {
+			return {
+				containsInformationRequest: this.$$model.containsInformationRequest,
+				id: this.$$model.id,
+				question: this.$$model.question,
+				responded: this.$$model.responded,
+				response: this.$$model.response
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				containsInformationRequest: true,
+				id: true,
+				question: true,
+				responded: true,
+				response: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ChatInteractionViewModel(null);
+			"containsInformationRequest" in data && (item.containsInformationRequest = !!data.containsInformationRequest);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"question" in data && (item.question = data.question === null ? null : `${data.question}`);
+			"responded" in data && (item.responded = data.responded === null ? null : new Date(data.responded));
+			"response" in data && (item.response = data.response === null ? null : `${data.response}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ChatInteractionViewModel) {
+			let model: ChatInteraction;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ChatInteraction).find(viewModel.id)
+			} else {
+				model = new ChatInteraction();
+			}
+			
+			"containsInformationRequest" in viewModel && (model.containsInformationRequest = !!viewModel.containsInformationRequest);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"question" in viewModel && (model.question = viewModel.question === null ? null : `${viewModel.question}`);
+			"responded" in viewModel && (model.responded = viewModel.responded === null ? null : new Date(viewModel.responded));
+			"response" in viewModel && (model.response = viewModel.response === null ? null : `${viewModel.response}`);
 
 			return model;
 		}

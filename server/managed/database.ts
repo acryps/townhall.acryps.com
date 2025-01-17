@@ -224,6 +224,113 @@ export class Bridge extends Entity<BridgeQueryProxy> {
 	
 }
 			
+export class ChatQueryProxy extends QueryProxy {
+	get resident(): Partial<ResidentQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get residentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get started(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Chat extends Entity<ChatQueryProxy> {
+	interactions: PrimaryReference<ChatInteraction, ChatInteractionQueryProxy>;
+		get resident(): Partial<ForeignReference<Resident>> { return this.$resident; }
+	declare id: string;
+	residentId: string;
+	started: Date;
+	tag: string;
+	
+	$$meta = {
+		source: "chat",
+		columns: {
+			id: { type: "uuid", name: "id" },
+			residentId: { type: "uuid", name: "resident_id" },
+			started: { type: "timestamp", name: "started" },
+			tag: { type: "text", name: "tag" }
+		},
+		get set(): DbSet<Chat, ChatQueryProxy> { 
+			return new DbSet<Chat, ChatQueryProxy>(Chat, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.interactions = new PrimaryReference<ChatInteraction, ChatInteractionQueryProxy>(this, "chatId", ChatInteraction);
+		this.$resident = new ForeignReference<Resident>(this, "residentId", Resident);
+	}
+	
+	private $resident: ForeignReference<Resident>;
+
+	set resident(value: Partial<ForeignReference<Resident>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.residentId = value.id as string;
+		} else {
+			this.residentId = null;
+		}
+	}
+
+	
+}
+			
+export class ChatInteractionQueryProxy extends QueryProxy {
+	get chat(): Partial<ChatQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get chatId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get containsInformationRequest(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get question(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get responded(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get response(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get sent(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class ChatInteraction extends Entity<ChatInteractionQueryProxy> {
+	get chat(): Partial<ForeignReference<Chat>> { return this.$chat; }
+	chatId: string;
+	containsInformationRequest: boolean;
+	declare id: string;
+	question: string;
+	responded: Date;
+	response: string;
+	sent: Date;
+	
+	$$meta = {
+		source: "chat_interaction",
+		columns: {
+			chatId: { type: "uuid", name: "chat_id" },
+			containsInformationRequest: { type: "bool", name: "contains_information_request" },
+			id: { type: "uuid", name: "id" },
+			question: { type: "text", name: "question" },
+			responded: { type: "timestamp", name: "responded" },
+			response: { type: "text", name: "response" },
+			sent: { type: "timestamp", name: "sent" }
+		},
+		get set(): DbSet<ChatInteraction, ChatInteractionQueryProxy> { 
+			return new DbSet<ChatInteraction, ChatInteractionQueryProxy>(ChatInteraction, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$chat = new ForeignReference<Chat>(this, "chatId", Chat);
+	}
+	
+	private $chat: ForeignReference<Chat>;
+
+	set chat(value: Partial<ForeignReference<Chat>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.chatId = value.id as string;
+		} else {
+			this.chatId = null;
+		}
+	}
+
+	
+}
+			
 export class CompanyQueryProxy extends QueryProxy {
 	get owner(): Partial<PlayerQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -803,7 +910,8 @@ export class Resident extends Entity<ResidentQueryProxy> {
 	get figure(): Partial<ForeignReference<ResidentFigure>> { return this.$figure; }
 	tenancies: PrimaryReference<Tenancy, TenancyQueryProxy>;
 		get mainTenancy(): Partial<ForeignReference<Tenancy>> { return this.$mainTenancy; }
-	biography: string;
+	chats: PrimaryReference<Chat, ChatQueryProxy>;
+		biography: string;
 	birthday: Date;
 	familyName: string;
 	figureId: string;
@@ -835,6 +943,7 @@ export class Resident extends Entity<ResidentQueryProxy> {
 		this.$figure = new ForeignReference<ResidentFigure>(this, "figureId", ResidentFigure);
 	this.tenancies = new PrimaryReference<Tenancy, TenancyQueryProxy>(this, "inhabitantId", Tenancy);
 		this.$mainTenancy = new ForeignReference<Tenancy>(this, "mainTenancyId", Tenancy);
+	this.chats = new PrimaryReference<Chat, ChatQueryProxy>(this, "residentId", Chat);
 	}
 	
 	private $figure: ForeignReference<ResidentFigure>;
@@ -1332,6 +1441,8 @@ export class DbContext {
 	articleImage: DbSet<ArticleImage, ArticleImageQueryProxy>;
 	borough: DbSet<Borough, BoroughQueryProxy>;
 	bridge: DbSet<Bridge, BridgeQueryProxy>;
+	chat: DbSet<Chat, ChatQueryProxy>;
+	chatInteraction: DbSet<ChatInteraction, ChatInteractionQueryProxy>;
 	company: DbSet<Company, CompanyQueryProxy>;
 	dwelling: DbSet<Dwelling, DwellingQueryProxy>;
 	historicListingGrade: DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>;
@@ -1360,6 +1471,8 @@ export class DbContext {
 		this.articleImage = new DbSet<ArticleImage, ArticleImageQueryProxy>(ArticleImage, this.runContext);
 		this.borough = new DbSet<Borough, BoroughQueryProxy>(Borough, this.runContext);
 		this.bridge = new DbSet<Bridge, BridgeQueryProxy>(Bridge, this.runContext);
+		this.chat = new DbSet<Chat, ChatQueryProxy>(Chat, this.runContext);
+		this.chatInteraction = new DbSet<ChatInteraction, ChatInteractionQueryProxy>(ChatInteraction, this.runContext);
 		this.company = new DbSet<Company, CompanyQueryProxy>(Company, this.runContext);
 		this.dwelling = new DbSet<Dwelling, DwellingQueryProxy>(Dwelling, this.runContext);
 		this.historicListingGrade = new DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>(HistoricListingGrade, this.runContext);

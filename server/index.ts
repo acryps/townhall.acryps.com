@@ -28,11 +28,17 @@ DbClient.connectedClient.connect().then(async () => {
 	// tilecomplete(db);
 	// tileimport(db);
 
-	MapImporter.schedule(MapType.overworld, db);
-	MapImporter.schedule(MapType.night, db);
+	// MapImporter.schedule(MapType.overworld, db);
+	// MapImporter.schedule(MapType.night, db);
 
 	const life = new Life(db);
 	await life.load();
+
+	/*for (let resident of await db.resident.where(resident => resident.figure == null).toArray()) {
+		console.log(resident.givenName)
+
+		await life.assignFigure(resident);
+	}*/
 
 	new BaseTileServer(app, db);
 	new PropertyRegisterTileServer(app, db);
@@ -139,7 +145,8 @@ DbClient.connectedClient.connect().then(async () => {
 
 	(app.app as any).ws('/game', socket => connections.push(socket));
 
-	new Proxy(app);
+	// new Proxy(app);
+
 	new GameBridge(app, db, message => {
 		for (let connection of connections) {
 			try {

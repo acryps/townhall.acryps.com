@@ -276,6 +276,7 @@ export class ResidentSummaryModel {
 }
 
 export class ResidentViewModel {
+	mainTenancy: TenancyViewModel;
 	biography: string;
 	birthday: Date;
 	familyName: string;
@@ -285,6 +286,7 @@ export class ResidentViewModel {
 
 	private static $build(raw) {
 		const item = new ResidentViewModel();
+		raw.mainTenancy === undefined || (item.mainTenancy = raw.mainTenancy ? TenancyViewModel["$build"](raw.mainTenancy) : null)
 		raw.biography === undefined || (item.biography = raw.biography === null ? null : `${raw.biography}`)
 		raw.birthday === undefined || (item.birthday = raw.birthday ? new Date(raw.birthday) : null)
 		raw.familyName === undefined || (item.familyName = raw.familyName === null ? null : `${raw.familyName}`)
@@ -297,6 +299,8 @@ export class ResidentViewModel {
 }
 
 export class ResidentRelationViewModel {
+	initiator: ResidentSummaryModel;
+	peer: ResidentSummaryModel;
 	bonded: Date;
 	conflict: string;
 	connection: string;
@@ -306,12 +310,44 @@ export class ResidentRelationViewModel {
 
 	private static $build(raw) {
 		const item = new ResidentRelationViewModel();
+		raw.initiator === undefined || (item.initiator = raw.initiator ? ResidentSummaryModel["$build"](raw.initiator) : null)
+		raw.peer === undefined || (item.peer = raw.peer ? ResidentSummaryModel["$build"](raw.peer) : null)
 		raw.bonded === undefined || (item.bonded = raw.bonded ? new Date(raw.bonded) : null)
 		raw.conflict === undefined || (item.conflict = raw.conflict === null ? null : `${raw.conflict}`)
 		raw.connection === undefined || (item.connection = raw.connection === null ? null : `${raw.connection}`)
 		raw.ended === undefined || (item.ended = raw.ended ? new Date(raw.ended) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.purpose === undefined || (item.purpose = raw.purpose === null ? null : `${raw.purpose}`)
+		
+		return item;
+	}
+}
+
+export class DwellingViewModel {
+	property: PropertySummaryModel;
+	id: string;
+
+	private static $build(raw) {
+		const item = new DwellingViewModel();
+		raw.property === undefined || (item.property = raw.property ? PropertySummaryModel["$build"](raw.property) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		
+		return item;
+	}
+}
+
+export class TenancyViewModel {
+	dwelling: DwellingViewModel;
+	end: Date;
+	id: string;
+	start: Date;
+
+	private static $build(raw) {
+		const item = new TenancyViewModel();
+		raw.dwelling === undefined || (item.dwelling = raw.dwelling ? DwellingViewModel["$build"](raw.dwelling) : null)
+		raw.end === undefined || (item.end = raw.end ? new Date(raw.end) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.start === undefined || (item.start = raw.start ? new Date(raw.start) : null)
 		
 		return item;
 	}
@@ -392,6 +428,25 @@ export class PublicationViewModel {
 		raw.mainOfficeId === undefined || (item.mainOfficeId = raw.mainOfficeId === null ? null : `${raw.mainOfficeId}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
+		
+		return item;
+	}
+}
+
+export class ChatInteractionViewModel {
+	containsInformationRequest: boolean;
+	id: string;
+	question: string;
+	responded: Date;
+	response: string;
+
+	private static $build(raw) {
+		const item = new ChatInteractionViewModel();
+		raw.containsInformationRequest === undefined || (item.containsInformationRequest = !!raw.containsInformationRequest)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.question === undefined || (item.question = raw.question === null ? null : `${raw.question}`)
+		raw.responded === undefined || (item.responded = raw.responded ? new Date(raw.responded) : null)
+		raw.response === undefined || (item.response = raw.response === null ? null : `${raw.response}`)
 		
 		return item;
 	}
@@ -1061,6 +1116,27 @@ export class LifeService {
 		});
 	}
 
+	async getRelations(id: string): Promise<Array<ResidentRelationViewModel>> {
+		const $data = new FormData();
+		$data.append("IxaD93ajg4aWx5eWBwc3ZkOHVlejU2Zm", Service.stringify(id))
+
+		return await fetch(Service.toURL("huZ2F0ODhpb2VuajhyZ31oMmFrY2Y0b3"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ResidentRelationViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async listResidents(page: number): Promise<Array<ResidentSummaryModel>> {
 		const $data = new FormData();
 		$data.append("J1aTRnbHQ4YmMxdWQwZzUycDlheHMydX", Service.stringify(page))
@@ -1139,6 +1215,72 @@ export class PublicationService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : ArticleViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class ChatService {
+	async start(tag: string): Promise<string> {
+		const $data = new FormData();
+		$data.append("g1aGFnaGE4aGhta2RicnJxdzdqOT1sN2", Service.stringify(tag))
+
+		return await fetch(Service.toURL("k4NXU5azV0bnB6NDVyeGl4ZWUybXM3MH"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async read(chatTag: string): Promise<Array<ChatInteractionViewModel>> {
+		const $data = new FormData();
+		$data.append("Rkd3VxNGFuaWMyN3RvdzJjaGlrZWRjbG", Service.stringify(chatTag))
+
+		return await fetch(Service.toURL("g4c2I5ZjkxcWE1bGE2cjB5aWYyM2oyaG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ChatInteractionViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async send(chatTag: string, message: string): Promise<Array<ChatInteractionViewModel>> {
+		const $data = new FormData();
+		$data.append("prbXM3dnU2aTAyNDYxdWs5aWdtbnRsZn", Service.stringify(chatTag))
+		$data.append("J2ZXFweXFuNGd1cmQ1enFsaG14NTA5c3", Service.stringify(message))
+
+		return await fetch(Service.toURL("F5ZTIxMn00a2h0MWhuZXVlZGBvMWhieX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ChatInteractionViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

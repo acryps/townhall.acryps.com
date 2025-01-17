@@ -1,6 +1,6 @@
 import { Service } from "vlserver";
 import { Life } from "../../life";
-import { ResidentSummaryModel, ResidentViewModel } from "./resident";
+import { ResidentRelationViewModel, ResidentSummaryModel, ResidentViewModel } from "./resident";
 import { DbContext } from "../../managed/database";
 
 export class LifeService extends Service {
@@ -11,7 +11,17 @@ export class LifeService extends Service {
 	}
 
 	async getResident(tag: string) {
-		return new ResidentViewModel(await this.database.resident.first(resident => resident.tag.valueOf() == tag));
+		return new ResidentViewModel(
+			await this.database.resident.first(resident => resident.tag.valueOf() == tag)
+		);
+	}
+
+	async getRelations(id: string) {
+		return ResidentRelationViewModel.from(
+			this.database.residentRelationship
+				.where(relationship => relationship.initiatorId == id || relationship.peerId == id)
+				.orderByAscending(relationship => relationship.bonded)
+		);
 	}
 
 	listResidents(page: number) {

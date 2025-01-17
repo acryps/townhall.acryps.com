@@ -3,7 +3,6 @@ import { Borough, Resident, ResidentFigure, ResidentRelationship } from "../mana
 import { toSimulatedTime } from "../../interface/time";
 import { NameType } from "./name";
 import { Gender } from "./gender";
-import { resolve } from "path/posix";
 
 export class Language {
 	readonly environment = () => `
@@ -79,11 +78,10 @@ export class Language {
 
 	readonly assignFigure = (resident: Resident, figures: ResidentFigure[]) => `
 		What outfit would best fit ${resident.givenName} ${resident.familyName}, given the selection below?
-		Just return the identifier (the hexadecimal string).
+		Just return the number of the outfit.
 		If none of them fit even remotely, return null.
-		I do not need help writing a stroy, just pick the best outfit!
 
-		${figures.map(figure => `- "${figure.id.split('-')[0]}": "${figure.outfit.trim()}"`).join('\n')}
+		${figures.map((figure, index) => `${index + 1}: ${figure.outfit.trim()}`).join('\n')}
 
 		${this.metaRules()}
 	`;

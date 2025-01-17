@@ -17,6 +17,8 @@ import { ResidentPage } from "./resident";
 import { PublicationPage } from "./news/publication";
 import { MapPage } from "./map";
 import { Point } from "./../interface/point";
+import { ChatPage } from "./resident/chat";
+import { RelationsPage } from "./resident/relations";
 
 export class Application {
 	static router: Router;
@@ -51,7 +53,10 @@ export class Application {
 				.route('/news/publication/:tag', PublicationPage)
 				.route('/news', NewsPage)
 
-				.route('/resident/:tag', ResidentPage)
+				.route('/resident/:tag', ResidentPage
+					.route('/chat/:chat', ChatPage)
+					.route('/relations', RelationsPage)
+				)
 				.route('/residents', ResidentsPage)
 
 				.route('/create-banner', CreateBannerComponent)

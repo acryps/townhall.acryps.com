@@ -1,5 +1,6 @@
 import { ViewModel } from "vlserver";
-import { Resident, ResidentRelationship } from "../../managed/database";
+import { Dwelling, Resident, ResidentRelationship, Tenancy } from "../../managed/database";
+import { PropertySummaryModel } from "../property.summary";
 
 export class ResidentSummaryModel extends ViewModel<Resident> {
 	id;
@@ -19,6 +20,8 @@ export class ResidentViewModel extends ViewModel<Resident> {
 	birthday;
 
 	biography;
+
+	mainTenancy: TenancyViewModel;
 }
 
 export class ResidentRelationViewModel extends ViewModel<ResidentRelationship> {
@@ -30,4 +33,21 @@ export class ResidentRelationViewModel extends ViewModel<ResidentRelationship> {
 
 	ended;
 	conflict;
+
+	initiator: ResidentSummaryModel;
+	peer: ResidentSummaryModel;
+}
+
+export class DwellingViewModel extends ViewModel<Dwelling> {
+	id;
+
+	property: PropertySummaryModel;
+}
+
+export class TenancyViewModel extends ViewModel<Tenancy> {
+	id;
+	dwelling: DwellingViewModel;
+
+	start;
+	end;
 }

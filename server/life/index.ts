@@ -45,15 +45,15 @@ export class Life {
 		figures.sort(() => Math.random() - 0.5);
 
 		const prompt = this.language.assignFigure(resident, figures.slice(0, 20));
-		console.debug(prompt);
 
-		const identifier = await this.language.respondText(prompt, resident.biography);
+		const response = await this.language.respondText(prompt, resident.biography);
+		const figureIndex = +response - 1;
 
-		const figure = figures.find(figure => figure.id.split('-')[0] == identifier);
-
-		if (!figure) {
+		if (isNaN(figureIndex) || figureIndex >= figures.length) {
 			return await this.assignFigure(resident);
 		}
+
+		const figure = figures[figureIndex];
 
 		console.log(resident.givenName, resident.familyName, figure.outfit)
 
@@ -104,22 +104,27 @@ export class Life {
 		await relationship.create();*/
 	}
 
-	private async compileFriendList(resident: Resident, relationships: ResidentRelationship[]) {
+	async compileFriendList(resident: Resident, relationships: ResidentRelationship[]) {
 		let relations = [];
 
 		for (let relationship of relationships) {
 			const peer = relationship.initiatorId == resident.id ? await relationship.peer.fetch() : await relationship.initiator.fetch();
 
-			relations.push(`${relationship} with ${peer.givenName} ${peer.familyName}`);
+			relations.push(`- ${relationship} with ${peer.givenName} ${peer.familyName}: ${relationship.summary}`);
 		}
 
 		return relations;
 	}
 
-	private async compileDescription(resident: Resident) {
+	async compileDescription(resident: Resident) {
 		const relations = await this.findActiveRelations(resident);
 
-		return `${resident.biography}. relations: ${(await this.compileFriendList(resident, relations)).join(', ')}`;
+		return `
+			${resident.biography}
+
+			relations:
+			${(await this.compileFriendList(resident, relations)).join('\n\n')
+		}`;
 	}
 
 	async findActiveRelations(resident: Resident) {

@@ -115,7 +115,8 @@ export interface ResidentSummaryModel {
 }
 
 export interface ResidentViewModel {
-    biography: string;
+    mainTenancy: TenancyViewModel;
+	biography: string;
 	birthday: Date;
 	familyName: string;
 	givenName: string;
@@ -124,12 +125,26 @@ export interface ResidentViewModel {
 }
 
 export interface ResidentRelationViewModel {
-    bonded: Date;
+    initiator: ResidentSummaryModel;
+	peer: ResidentSummaryModel;
+	bonded: Date;
 	conflict: string;
 	connection: string;
 	ended: Date;
 	id: string;
 	purpose: string;
+}
+
+export interface DwellingViewModel {
+    property: PropertySummaryModel;
+	id: string;
+}
+
+export interface TenancyViewModel {
+    dwelling: DwellingViewModel;
+	end: Date;
+	id: string;
+	start: Date;
 }
 
 export interface ArticleViewModel {
@@ -164,6 +179,14 @@ export interface PublicationViewModel {
 	mainOfficeId: string;
 	name: string;
 	tag: string;
+}
+
+export interface ChatInteractionViewModel {
+    containsInformationRequest: boolean;
+	id: string;
+	question: string;
+	responded: Date;
+	response: string;
 }
 
 export interface TrainStationExitViewModel {

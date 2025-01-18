@@ -19,6 +19,10 @@ import { MapPage } from "./map";
 import { Point } from "./../interface/point";
 import { ChatPage } from "./resident/chat";
 import { RelationsPage } from "./resident/relations";
+import { VotePage } from "./vote";
+import { ProposeBillPage } from "./vote/propose";
+import { HonestiumPage } from "./vote/honestium";
+import { BillPage } from "./vote/bill";
 
 export class Application {
 	static router: Router;
@@ -58,6 +62,13 @@ export class Application {
 					.route('/relations', RelationsPage)
 				)
 				.route('/residents', ResidentsPage)
+
+				.route('/vote', VotePage
+					.route('/propose', ProposeBillPage)
+					.route('/honestium', HonestiumPage)
+
+					.route('/bill/:tag', BillPage)
+				)
 
 				.route('/create-banner', CreateBannerComponent)
 				.route('/create-banner/:code', CreateBannerComponent)

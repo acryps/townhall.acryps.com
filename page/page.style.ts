@@ -12,6 +12,7 @@ import { navigationBackgroundColor, navigationBorderColor, pageBackgroundColor, 
 import { propertyStyle } from "./properties/property/index.style";
 import { mapStyle } from "./shared/map/index.style";
 import { chatStyle } from "./resident/chat/index.style";
+import { voteStyle } from "./vote/index.style";
 
 export const pageStyle = () => root(
 	bold,
@@ -73,6 +74,8 @@ export const pageStyle = () => root(
 
 				residentStyle(),
 				residentsStyle(),
+
+				voteStyle(),
 
 				createBannerStyle(),
 			)

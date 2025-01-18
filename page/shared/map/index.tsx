@@ -26,7 +26,7 @@ export class MapComponent extends Component {
 		MapLayer.fromTileSource((x, y) => `/tile/base/day/${x}/${y}`, 250),
 
 		// property layer
-		MapLayer.fromTileSource((x, y) => `/tile/property/${x}/${y}`, 500, (x, y) => `/pick/property/${x}/${y}`, id => `/property/${id}`),
+		/// MapLayer.fromTileSource((x, y) => `/tile/property/${x}/${y}`, 500, (x, y) => `/pick/property/${x}/${y}`, id => `/property/${id}`),
 	];
 
 	// centers the map around this point (intially)

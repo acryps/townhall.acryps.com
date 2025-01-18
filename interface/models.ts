@@ -229,3 +229,46 @@ export interface TrainStopViewModel {
 	stationId: string;
 	trackPosition: string;
 }
+
+export interface BillViewModel {
+    honestiums: HonestiumViewModel[];
+	certified: Date;
+	description: string;
+	id: string;
+	pro: boolean;
+	tag: string;
+	title: string;
+}
+
+export interface HonestiumViewModel {
+    answer: string;
+	answered: Date;
+	id: string;
+	pro: boolean;
+	question: string;
+}
+
+export interface DistrictViewModel {
+    id: string;
+	name: string;
+	parentId: string;
+}
+
+export interface OpenHonestiumViewModel {
+    bill: BillViewModel;
+	answer: string;
+	id: string;
+	pro: boolean;
+	question: string;
+}
+
+export interface VoteViewModel {
+    id: string;
+	pro: boolean;
+	reason: string;
+	submitted: Date;
+}
+
+export interface VoteTickerViewModel {
+    pro: boolean;
+}

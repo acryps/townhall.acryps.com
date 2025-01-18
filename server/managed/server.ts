@@ -40,12 +40,20 @@ import { ChatService } from "././../areas/resident/chat/service";
 import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
+import { Bill } from "././database";
+import { DistrictViewModel } from "././../areas/vote/district";
+import { OpenHonestiumViewModel } from "././../areas/vote/honestium";
+import { BillViewModel } from "././../areas/vote/bill";
+import { VoteTickerViewModel } from "././../areas/vote/vote";
+import { VoteViewModel } from "././../areas/vote/vote";
+import { VoteService } from "././../areas/vote/service";
 import { TenantViewModel } from "./../areas/property.view";
 import { TenancyViewModel } from "./../areas/life/resident";
 import { ArticleImageViewModel } from "./../areas/publication/article";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
+import { HonestiumViewModel } from "./../areas/vote/bill";
 import { Bridge } from "./../managed/database";
 import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
@@ -67,6 +75,9 @@ import { TrainStationExit } from "./../managed/database";
 import { TrainRoute } from "./../managed/database";
 import { TrainStation } from "./../managed/database";
 import { TrainStop } from "./../managed/database";
+import { BillHonestium } from "./../managed/database";
+import { District } from "./../managed/database";
+import { Vote } from "./../managed/database";
 
 Inject.mappings = {
 	"MapService": {
@@ -111,6 +122,10 @@ Inject.mappings = {
 	},
 	"TrainService": {
 		objectConstructor: TrainService,
+		parameters: ["DbContext"]
+	},
+	"VoteService": {
+		objectConstructor: VoteService,
 		parameters: ["DbContext"]
 	}
 };
@@ -504,6 +519,107 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(TrainService),
 			(controller, params) => controller.getStations(
 				
+			)
+		);
+
+		this.expose(
+			"I0OWJncGF1dj1jbTozOXVkMjFxcmFua2",
+			{
+			"NvNTIza3xkcng5NmJtYjEyNDdyeXY4YW": { type: "string", isArray: false, isOptional: false },
+				"poejUyZzFjZzZzazt0ZTp3MWR2cGw4a2": { type: "string", isArray: false, isOptional: false },
+				"ZucHVmaT11a3Y5Y3djZ2k5bWtiMTlsOG": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(VoteService),
+			(controller, params) => controller.propse(
+				params["NvNTIza3xkcng5NmJtYjEyNDdyeXY4YW"],
+				params["poejUyZzFjZzZzazt0ZTp3MWR2cGw4a2"],
+				params["ZucHVmaT11a3Y5Y3djZ2k5bWtiMTlsOG"]
+			)
+		);
+
+		this.expose(
+			"JqcXhvb2FydTNjeHE2ZWZhdWVrZjhiMm",
+			{},
+			inject => inject.construct(VoteService),
+			(controller, params) => controller.getScopes(
+				
+			)
+		);
+
+		this.expose(
+			"R3emV0bHprcTYxZ3N1aTY0a3o2bXBueH",
+			{},
+			inject => inject.construct(VoteService),
+			(controller, params) => controller.getOpenBills(
+				
+			)
+		);
+
+		this.expose(
+			"lvYzVhcjphcH5zdWR4dTd0ZWgyMmBtem",
+			{
+			"Fib2NuZnZkNmZtYWFrNXQ0c3YycWRvZm": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(VoteService),
+			(controller, params) => controller.getBill(
+				params["Fib2NuZnZkNmZtYWFrNXQ0c3YycWRvZm"]
+			)
+		);
+
+		this.expose(
+			"Eyc2NzMHxxY2IyaGR6YTE4bmM5Mmwwcj",
+			{
+			"hycXx5eXl3dTJ4dH0xYjVvemlqYjZtOH": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(VoteService),
+			(controller, params) => controller.getTicker(
+				params["hycXx5eXl3dTJ4dH0xYjVvemlqYjZtOH"]
+			)
+		);
+
+		this.expose(
+			"VqbGQ2eTNiNWVxOHdhZXBwNHczZGUzcW",
+			{
+			"5uYnR5djpvMWNnYTFjNDJ3d2JxNjc1Z3": { type: "string", isArray: false, isOptional: false },
+				"E3eXV1aXhyaXd5Zz16Z2s2azJuMWkyc2": { type: "boolean", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(VoteService),
+			(controller, params) => controller.getImpression(
+				params["5uYnR5djpvMWNnYTFjNDJ3d2JxNjc1Z3"],
+				params["E3eXV1aXhyaXd5Zz16Z2s2azJuMWkyc2"]
+			)
+		);
+
+		this.expose(
+			"ZnMX5maWdxbWJyMnx5NnM0M2FoczdmYm",
+			{},
+			inject => inject.construct(VoteService),
+			(controller, params) => controller.getOpenHonestium(
+				
+			)
+		);
+
+		this.expose(
+			"dzZz52YnI1Mn5nZjFscHl0Z2dqbDhhYX",
+			{
+			"NpY3hlNzVnbjk0MW0wM3M4ZjVlaTluNn": { type: "string", isArray: false, isOptional: false },
+				"JkbjNpOTRqbmN6dH82NTdiZW5qbXc3cX": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(VoteService),
+			(controller, params) => controller.saveHonestium(
+				params["NpY3hlNzVnbjk0MW0wM3M4ZjVlaTluNn"],
+				params["JkbjNpOTRqbmN6dH82NTdiZW5qbXc3cX"]
+			)
+		);
+
+		this.expose(
+			"k0djR0dHRmbTN4ZzkxaWg5bzdjeXJqMT",
+			{
+			"JsMjxrNWRqNGZ4ZXViaGFxaWZwOWhncG": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(VoteService),
+			(controller, params) => controller.submitHonestium(
+				params["JsMjxrNWRqNGZ4ZXViaGFxaWZwOWhncG"]
 			)
 		)
 	}
@@ -2808,6 +2924,434 @@ ViewModel.mappings = {
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"stationId" in viewModel && (model.stationId = viewModel.stationId === null ? null : `${viewModel.stationId}`);
 			"trackPosition" in viewModel && (model.trackPosition = viewModel.trackPosition === null ? null : `${viewModel.trackPosition}`);
+
+			return model;
+		}
+	},
+	[BillViewModel.name]: class ComposedBillViewModel extends BillViewModel {
+		async map() {
+			return {
+				honestiums: (await this.$$model.honestiums.includeTree(ViewModel.mappings[HonestiumViewModel.name].items).toArray()).map(item => new HonestiumViewModel(item)),
+				certified: this.$$model.certified,
+				description: this.$$model.description,
+				id: this.$$model.id,
+				pro: this.$$model.pro,
+				tag: this.$$model.tag,
+				title: this.$$model.title
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get honestiums() {
+					return ViewModel.mappings[HonestiumViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "honestiums-BillViewModel"]
+					);
+				},
+				certified: true,
+				description: true,
+				id: true,
+				pro: true,
+				tag: true,
+				title: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new BillViewModel(null);
+			"honestiums" in data && (item.honestiums = data.honestiums && [...data.honestiums].map(i => ViewModel.mappings[HonestiumViewModel.name].toViewModel(i)));
+			"certified" in data && (item.certified = data.certified === null ? null : new Date(data.certified));
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"pro" in data && (item.pro = !!data.pro);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
+			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: BillViewModel) {
+			let model: Bill;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Bill).find(viewModel.id)
+			} else {
+				model = new Bill();
+			}
+			
+			"honestiums" in viewModel && (null);
+			"certified" in viewModel && (model.certified = viewModel.certified === null ? null : new Date(viewModel.certified));
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"pro" in viewModel && (model.pro = !!viewModel.pro);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
+			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
+
+			return model;
+		}
+	},
+	[HonestiumViewModel.name]: class ComposedHonestiumViewModel extends HonestiumViewModel {
+		async map() {
+			return {
+				answer: this.$$model.answer,
+				answered: this.$$model.answered,
+				id: this.$$model.id,
+				pro: this.$$model.pro,
+				question: this.$$model.question
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				answer: true,
+				answered: true,
+				id: true,
+				pro: true,
+				question: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new HonestiumViewModel(null);
+			"answer" in data && (item.answer = data.answer === null ? null : `${data.answer}`);
+			"answered" in data && (item.answered = data.answered === null ? null : new Date(data.answered));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"pro" in data && (item.pro = !!data.pro);
+			"question" in data && (item.question = data.question === null ? null : `${data.question}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: HonestiumViewModel) {
+			let model: BillHonestium;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(BillHonestium).find(viewModel.id)
+			} else {
+				model = new BillHonestium();
+			}
+			
+			"answer" in viewModel && (model.answer = viewModel.answer === null ? null : `${viewModel.answer}`);
+			"answered" in viewModel && (model.answered = viewModel.answered === null ? null : new Date(viewModel.answered));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"pro" in viewModel && (model.pro = !!viewModel.pro);
+			"question" in viewModel && (model.question = viewModel.question === null ? null : `${viewModel.question}`);
+
+			return model;
+		}
+	},
+	[DistrictViewModel.name]: class ComposedDistrictViewModel extends DistrictViewModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				name: this.$$model.name,
+				parentId: this.$$model.parentId
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				name: true,
+				parentId: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new DistrictViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"parentId" in data && (item.parentId = data.parentId === null ? null : `${data.parentId}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: DistrictViewModel) {
+			let model: District;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(District).find(viewModel.id)
+			} else {
+				model = new District();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"parentId" in viewModel && (model.parentId = viewModel.parentId === null ? null : `${viewModel.parentId}`);
+
+			return model;
+		}
+	},
+	[OpenHonestiumViewModel.name]: class ComposedOpenHonestiumViewModel extends OpenHonestiumViewModel {
+		async map() {
+			return {
+				bill: new BillViewModel(await BaseServer.unwrap(this.$$model.bill)),
+				answer: this.$$model.answer,
+				id: this.$$model.id,
+				pro: this.$$model.pro,
+				question: this.$$model.question
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get bill() {
+					return ViewModel.mappings[BillViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "bill-OpenHonestiumViewModel"]
+					);
+				},
+				answer: true,
+				id: true,
+				pro: true,
+				question: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new OpenHonestiumViewModel(null);
+			"bill" in data && (item.bill = data.bill && ViewModel.mappings[BillViewModel.name].toViewModel(data.bill));
+			"answer" in data && (item.answer = data.answer === null ? null : `${data.answer}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"pro" in data && (item.pro = !!data.pro);
+			"question" in data && (item.question = data.question === null ? null : `${data.question}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: OpenHonestiumViewModel) {
+			let model: BillHonestium;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(BillHonestium).find(viewModel.id)
+			} else {
+				model = new BillHonestium();
+			}
+			
+			"bill" in viewModel && (model.bill.id = viewModel.bill ? viewModel.bill.id : null);
+			"answer" in viewModel && (model.answer = viewModel.answer === null ? null : `${viewModel.answer}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"pro" in viewModel && (model.pro = !!viewModel.pro);
+			"question" in viewModel && (model.question = viewModel.question === null ? null : `${viewModel.question}`);
+
+			return model;
+		}
+	},
+	[VoteViewModel.name]: class ComposedVoteViewModel extends VoteViewModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				pro: this.$$model.pro,
+				reason: this.$$model.reason,
+				submitted: this.$$model.submitted
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				pro: true,
+				reason: true,
+				submitted: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new VoteViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"pro" in data && (item.pro = !!data.pro);
+			"reason" in data && (item.reason = data.reason === null ? null : `${data.reason}`);
+			"submitted" in data && (item.submitted = data.submitted === null ? null : new Date(data.submitted));
+
+			return item;
+		}
+
+		static async toModel(viewModel: VoteViewModel) {
+			let model: Vote;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Vote).find(viewModel.id)
+			} else {
+				model = new Vote();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"pro" in viewModel && (model.pro = !!viewModel.pro);
+			"reason" in viewModel && (model.reason = viewModel.reason === null ? null : `${viewModel.reason}`);
+			"submitted" in viewModel && (model.submitted = viewModel.submitted === null ? null : new Date(viewModel.submitted));
+
+			return model;
+		}
+	},
+	[VoteTickerViewModel.name]: class ComposedVoteTickerViewModel extends VoteTickerViewModel {
+		async map() {
+			return {
+				pro: this.$$model.pro
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				pro: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new VoteTickerViewModel(null);
+			"pro" in data && (item.pro = !!data.pro);
+
+			return item;
+		}
+
+		static async toModel(viewModel: VoteTickerViewModel) {
+			const model = new Vote();
+			
+			"pro" in viewModel && (model.pro = !!viewModel.pro);
 
 			return model;
 		}

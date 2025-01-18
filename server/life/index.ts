@@ -1,5 +1,5 @@
 
-import { Borough, DbContext, Resident, ResidentRelationship } from "../managed/database";
+import { Bill, Borough, DbContext, District, Resident, ResidentRelationship, Vote } from "../managed/database";
 import { writeFileSync } from "fs";
 import { toSimulatedTime } from "../../interface/time";
 import { TickFactor } from "./factor";
@@ -35,6 +35,86 @@ export class Life {
 
 	async tick() {
 		await this.bondingFactor.tick(async (initiator: Resident, peer: Resident) => await this.bond(initiator, peer));
+	}
+
+	async vote() {
+		const openBills = await this.database.bill.where(bill => bill.certified == null).toArray();
+
+		for (let bill of openBills) {
+			console.log(`open: '${bill.tag}'`);
+
+			// find people who need to vote on this bill
+			const boroughs = await this.collectBoroughs(await bill.scope.fetch());
+
+			// find residents
+			const residents: Resident[] = [];
+
+			for (let borough of boroughs) {
+				for (let resident of await this.database.resident
+					.where(resident => resident.mainTenancy.dwelling.property.boroughId == borough.id)
+					.include(resident => resident.votes)
+					.toArray()
+				) {
+					if (!(await resident.votes.toArray()).some(vote => vote.billId == bill.id)) {
+						residents.push(resident);
+					}
+				}
+			}
+
+			console.log(`found ${residents.length} residents who still need to vote on '${bill.tag}'`);
+
+			// vote
+			for (let resident of residents) {
+				await this.voteBill(resident, bill);
+			}
+		}
+	}
+
+	async collectBoroughs(district: District) {
+		const boroughs = await district.boroughs.toArray();
+
+		for (let child of await district.children.toArray()) {
+			boroughs.push(...await this.collectBoroughs(child));
+		}
+
+		return boroughs;
+	}
+
+	async voteBill(resident: Resident, bill: Bill) {
+		const honestums = await bill.honestiums.toArray();
+
+		const response = await this.language.respondText(this.language.vote(resident),
+			await this.compileDescription(resident),
+			bill.title,
+			bill.description,
+			...honestums.map(honestium => `${honestium.question}: ${honestium.answer}`)
+		);
+
+		if (bill.certified) {
+			throw new Error(`Bill '${bill.tag}' already certified`);
+		}
+
+		const existingVote = await bill.votes.first(vote => vote.residentId.valueOf() == resident.id);
+
+		if (existingVote) {
+			throw new Error(`Bill '${bill.tag}' already voted by '${resident.givenName} ${resident.familyName}'`);
+		}
+
+		console.log(response);
+
+		if (!response.startsWith('YES:') && !response.startsWith('NO:')) {
+			return this.voteBill(resident, bill);
+		}
+
+		const vote = new Vote();
+		vote.bill = bill;
+		vote.submitted = new Date();
+		vote.resident = resident;
+
+		vote.pro = response.startsWith('YES:');
+		vote.reason = response.split(':').slice(1).join(':').trim();
+
+		await vote.create();
 	}
 
 	async assignFigure(resident: Resident) {

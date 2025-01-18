@@ -12,7 +12,7 @@ export class BannerComponent extends Component {
 	static maxLayerCount = 7;
 
 	static source: Promise<HTMLImageElement>;
-	static cache = new Map<string, Promise<Blob>>();
+	static cache = new Map<string, Promise<string>>();
 
 	layers: { offset: number, color: string }[] = [];
 
@@ -38,7 +38,7 @@ export class BannerComponent extends Component {
 
 			if (cached) {
 				const image = new Image();
-				image.src = URL.createObjectURL(await cached);
+				image.src = await cached;
 
 				this.rootNode.appendChild(image);
 
@@ -49,50 +49,57 @@ export class BannerComponent extends Component {
 				throw new Error('Invalid banner source image height');
 			}
 
-			const sourceCanvas = new OffscreenCanvas(image.naturalWidth, image.naturalHeight);
-			const sourceContext = sourceCanvas.getContext('2d');
-			sourceContext.drawImage(image, 0, 0);
+			const task = new Promise<string>(async done => {
+				console.log('generating')
 
-			const sourceData = sourceContext.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
+				const sourceCanvas = new OffscreenCanvas(image.naturalWidth, image.naturalHeight);
+				const sourceContext = sourceCanvas.getContext('2d');
+				sourceContext.drawImage(image, 0, 0);
 
-			const bannerCanvas = new OffscreenCanvas(this.width, this.height);
-			const bannerContext = bannerCanvas.getContext('2d');
-			bannerContext.fillStyle = this.baseColor;
-			bannerContext.fillRect(0, 0, this.width, this.height);
+				const sourceData = sourceContext.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
 
-			const placingCanvas = new OffscreenCanvas(this.width, this.height);
-			const placingContext = placingCanvas.getContext('2d');
+				const bannerCanvas = new OffscreenCanvas(this.width, this.height);
+				const bannerContext = bannerCanvas.getContext('2d');
+				bannerContext.fillStyle = this.baseColor;
+				bannerContext.fillRect(0, 0, this.width, this.height);
 
-			for (let layer of this.layers) {
-				// use disused source canvas to convert color string to bitmap color value
-				sourceContext.fillStyle = layer.color;
-				sourceContext.fillRect(0, 0, 1, 1);
+				const placingCanvas = new OffscreenCanvas(this.width, this.height);
+				const placingContext = placingCanvas.getContext('2d');
 
-				const color = sourceContext.getImageData(0, 0, 1, 1);
-				const image = new ImageData(this.width, this.height);
+				for (let layer of this.layers) {
+					// use disused source canvas to convert color string to bitmap color value
+					sourceContext.fillStyle = layer.color;
+					sourceContext.fillRect(0, 0, 1, 1);
 
-				for (let x = 0; x < this.width; x++) {
-					for (let y = 0; y < this.height; y++) {
-						const intensity = 0xff - sourceData.data[(y * sourceCanvas.width + x + layer.offset * this.width) * 4 + 3];
+					const color = sourceContext.getImageData(0, 0, 1, 1);
+					const image = new ImageData(this.width, this.height);
 
-						image.data[(y * this.width + x) * 4 + 0] = color.data[0];
-						image.data[(y * this.width + x) * 4 + 1] = color.data[1];
-						image.data[(y * this.width + x) * 4 + 2] = color.data[2];
-						image.data[(y * this.width + x) * 4 + 3] = intensity;
+					for (let x = 0; x < this.width; x++) {
+						for (let y = 0; y < this.height; y++) {
+							const intensity = 0xff - sourceData.data[(y * sourceCanvas.width + x + layer.offset * this.width) * 4 + 3];
+
+							image.data[(y * this.width + x) * 4 + 0] = color.data[0];
+							image.data[(y * this.width + x) * 4 + 1] = color.data[1];
+							image.data[(y * this.width + x) * 4 + 2] = color.data[2];
+							image.data[(y * this.width + x) * 4 + 3] = intensity;
+						}
 					}
+
+					placingContext.putImageData(image, 0, 0);
+					bannerContext.drawImage(placingCanvas, 0, 0);
 				}
 
-				placingContext.putImageData(image, 0, 0);
-				bannerContext.drawImage(placingCanvas, 0, 0);
-			}
+				done(URL.createObjectURL(await bannerCanvas.convertToBlob()))
+			});
 
-			const blob = bannerCanvas.convertToBlob();
-			BannerComponent.cache.set(this.pack(), blob);
+			task.then(blob => {
+				const bannerImage = new Image();
+				bannerImage.src = blob;
 
-			const bannerImage = new Image();
-			bannerImage.src = URL.createObjectURL(await blob);
+				this.rootNode.appendChild(bannerImage);
+			});
 
-			this.rootNode.appendChild(bannerImage);
+			BannerComponent.cache.set(this.pack(), task);
 		});
 
 		return <ui-banner></ui-banner>;

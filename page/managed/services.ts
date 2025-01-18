@@ -552,6 +552,110 @@ export class TrainStopViewModel {
 	}
 }
 
+export class BillViewModel {
+	honestiums: HonestiumViewModel[];
+	certified: Date;
+	description: string;
+	id: string;
+	pro: boolean;
+	tag: string;
+	title: string;
+
+	private static $build(raw) {
+		const item = new BillViewModel();
+		raw.honestiums === undefined || (item.honestiums = raw.honestiums ? raw.honestiums.map(i => HonestiumViewModel["$build"](i)) : null)
+		raw.certified === undefined || (item.certified = raw.certified ? new Date(raw.certified) : null)
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.pro === undefined || (item.pro = !!raw.pro)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
+		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
+		
+		return item;
+	}
+}
+
+export class HonestiumViewModel {
+	answer: string;
+	answered: Date;
+	id: string;
+	pro: boolean;
+	question: string;
+
+	private static $build(raw) {
+		const item = new HonestiumViewModel();
+		raw.answer === undefined || (item.answer = raw.answer === null ? null : `${raw.answer}`)
+		raw.answered === undefined || (item.answered = raw.answered ? new Date(raw.answered) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.pro === undefined || (item.pro = !!raw.pro)
+		raw.question === undefined || (item.question = raw.question === null ? null : `${raw.question}`)
+		
+		return item;
+	}
+}
+
+export class DistrictViewModel {
+	id: string;
+	name: string;
+	parentId: string;
+
+	private static $build(raw) {
+		const item = new DistrictViewModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.parentId === undefined || (item.parentId = raw.parentId === null ? null : `${raw.parentId}`)
+		
+		return item;
+	}
+}
+
+export class OpenHonestiumViewModel {
+	bill: BillViewModel;
+	answer: string;
+	id: string;
+	pro: boolean;
+	question: string;
+
+	private static $build(raw) {
+		const item = new OpenHonestiumViewModel();
+		raw.bill === undefined || (item.bill = raw.bill ? BillViewModel["$build"](raw.bill) : null)
+		raw.answer === undefined || (item.answer = raw.answer === null ? null : `${raw.answer}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.pro === undefined || (item.pro = !!raw.pro)
+		raw.question === undefined || (item.question = raw.question === null ? null : `${raw.question}`)
+		
+		return item;
+	}
+}
+
+export class VoteViewModel {
+	id: string;
+	pro: boolean;
+	reason: string;
+	submitted: Date;
+
+	private static $build(raw) {
+		const item = new VoteViewModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.pro === undefined || (item.pro = !!raw.pro)
+		raw.reason === undefined || (item.reason = raw.reason === null ? null : `${raw.reason}`)
+		raw.submitted === undefined || (item.submitted = raw.submitted ? new Date(raw.submitted) : null)
+		
+		return item;
+	}
+}
+
+export class VoteTickerViewModel {
+	pro: boolean;
+
+	private static $build(raw) {
+		const item = new VoteTickerViewModel();
+		raw.pro === undefined || (item.pro = !!raw.pro)
+		
+		return item;
+	}
+}
+
 export class Service {
 	static baseUrl = "";
 
@@ -1384,6 +1488,195 @@ export class TrainService {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
 				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class VoteService {
+	async propse(title: string, description: string, scopeId: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("NvNTIza3xkcng5NmJtYjEyNDdyeXY4YW", Service.stringify(title))
+		$data.append("poejUyZzFjZzZzazt0ZTp3MWR2cGw4a2", Service.stringify(description))
+		$data.append("ZucHVmaT11a3Y5Y3djZ2k5bWtiMTlsOG", Service.stringify(scopeId))
+
+		return await fetch(Service.toURL("I0OWJncGF1dj1jbTozOXVkMjFxcmFua2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async getScopes(): Promise<Array<DistrictViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("JqcXhvb2FydTNjeHE2ZWZhdWVrZjhiMm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : DistrictViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getOpenBills(): Promise<Array<BillViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("R3emV0bHprcTYxZ3N1aTY0a3o2bXBueH"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : BillViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getBill(tag: string): Promise<BillViewModel> {
+		const $data = new FormData();
+		$data.append("Fib2NuZnZkNmZtYWFrNXQ0c3YycWRvZm", Service.stringify(tag))
+
+		return await fetch(Service.toURL("lvYzVhcjphcH5zdWR4dTd0ZWgyMmBtem"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : BillViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getTicker(id: string): Promise<Array<VoteTickerViewModel>> {
+		const $data = new FormData();
+		$data.append("hycXx5eXl3dTJ4dH0xYjVvemlqYjZtOH", Service.stringify(id))
+
+		return await fetch(Service.toURL("Eyc2NzMHxxY2IyaGR6YTE4bmM5Mmwwcj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : VoteTickerViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getImpression(id: string, pro: boolean): Promise<VoteViewModel> {
+		const $data = new FormData();
+		$data.append("5uYnR5djpvMWNnYTFjNDJ3d2JxNjc1Z3", Service.stringify(id))
+		$data.append("E3eXV1aXhyaXd5Zz16Z2s2azJuMWkyc2", Service.stringify(pro))
+
+		return await fetch(Service.toURL("VqbGQ2eTNiNWVxOHdhZXBwNHczZGUzcW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : VoteViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getOpenHonestium(): Promise<OpenHonestiumViewModel> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("ZnMX5maWdxbWJyMnx5NnM0M2FoczdmYm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : OpenHonestiumViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async saveHonestium(id: string, answer: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("NpY3hlNzVnbjk0MW0wM3M4ZjVlaTluNn", Service.stringify(id))
+		$data.append("JkbjNpOTRqbmN6dH82NTdiZW5qbXc3cX", Service.stringify(answer))
+
+		return await fetch(Service.toURL("dzZz52YnI1Mn5nZjFscHl0Z2dqbDhhYX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async submitHonestium(id: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("JsMjxrNWRqNGZ4ZXViaGFxaWZwOWhncG", Service.stringify(id))
+
+		return await fetch(Service.toURL("k0djR0dHRmbTN4ZzkxaWg5bzdjeXJqMT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
 			}
 		});
 	}

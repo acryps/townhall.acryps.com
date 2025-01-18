@@ -1,5 +1,5 @@
 import ollama from "ollama"
-import { Borough, Resident, ResidentFigure, ResidentRelationship } from "../managed/database";
+import { Bill, BillHonestium, Borough, Resident, ResidentFigure, ResidentRelationship } from "../managed/database";
 import { toSimulatedTime } from "../../interface/time";
 import { NameType } from "./name";
 import { Gender } from "./gender";
@@ -95,6 +95,30 @@ export class Language {
 	readonly breakBond = (initiator: Resident, peer: Resident, relationship: ResidentRelationship) => `
 		${initiator.givenName} and ${peer.givenName} were socially connected as ${relationship.purpose}.
 		Given thier biographies and other relations, write an imaginary a story why their bond broke.
+
+		${this.environment()}
+		${this.metaRules()}
+	`;
+
+	readonly writeHonestiumQuestion = (pro: boolean, peers: BillHonestium[]) => `
+		In our fictional voting system, anybody can propose a new bill, even without legal knowledge.
+		But the commitee or person submitting the vote must answer multiple pro and contra questions honestly - a so called Honestium.
+		Given the bill, write a ${pro ? 'pro' : 'contra'} question asking about a ${pro ? 'positive' : 'negative'} aspect of this bill.
+
+		Avoid asking questions like the following questions, as they have already been raised:
+		${peers.map(honestium => `- ${honestium.pro ? 'pro' : 'contra'}: ${honestium.question}`).join('\n')}
+
+		${this.environment()}
+		${this.metaRules()}
+	`;
+
+	readonly vote = (resident: Resident) => `
+		Given the following biography, bill proposal and q&a, what would ${resident.givenName} ${resident.familyName} vote?
+		Answer with YES: or NO: followed by a short one sentence reason for the decision.
+
+		The people do not have to be progressive, they might vote conservatively even in cases where it might not align with modern values.
+		Do not forget, we are not in the current year, this is a long time ago.
+		All voting is anonymous, and everybody is free to express their beliefs, even if they would be percieved as distruptive or evil by other people.
 
 		${this.environment()}
 		${this.metaRules()}

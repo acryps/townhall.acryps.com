@@ -16,6 +16,8 @@ import { PropertyRegisterTileServer } from "./map/property";
 import { MapImporter } from "./map/import";
 import { female, male } from "./life/gender";
 import { toRealTime, toSimulatedAge, toSimulatedTime } from "../interface/time";
+import { LawHouse } from "./life/law-house";
+import { Language } from "./life/language";
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
@@ -35,6 +37,15 @@ DbClient.connectedClient.connect().then(async () => {
 
 	const life = new Life(db);
 	await life.load();
+
+	const lawHouse = new LawHouse(db, new Language());
+	lawHouse.session();
+
+	setInterval(() => {
+		lawHouse.session();
+	}, 4 * 60 * 60 * 1000);
+
+	life.vote();
 
 	/*for (let resident of await db.resident.where(resident => resident.figure == null).toArray()) {
 		console.log(resident.givenName)
@@ -138,7 +149,7 @@ DbClient.connectedClient.connect().then(async () => {
 		}
 
 		console.log('DONE');
-	})();
+	});
 
 	ViewModel.globalFetchingContext = db;
 
@@ -162,7 +173,8 @@ DbClient.connectedClient.connect().then(async () => {
 	app.createInjector = context => new Inject({
 		Context: context,
 		DbContext: db,
-		Life: life
+		Life: life,
+		LawHouse: lawHouse
 	});
 
 	app.prepareRoutes();

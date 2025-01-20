@@ -1,6 +1,7 @@
 import { Component } from "@acryps/page";
 import { ArticleViewModel, PublicationService } from "../managed/services";
 import { linkText } from "../linked-text";
+import { MetaNewsArticle, MetaOrganization } from "@acryps/metadata";
 
 export class ArticePage extends Component {
 	declare parameters: { id };
@@ -9,6 +10,16 @@ export class ArticePage extends Component {
 
 	async onload() {
 		this.article = await new PublicationService().getArticle(this.parameters.id);
+
+		new MetaNewsArticle({
+			name: this.article.title,
+			articleBody: this.article.body,
+			datePublished: this.article.published,
+			publisher: new MetaOrganization({
+				name: this.article.publication.name
+			}),
+			url: location.href
+		}).apply();
 	}
 
 	render() {

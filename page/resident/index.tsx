@@ -2,6 +2,7 @@ import { Component } from "@acryps/page";
 import { ChatService, LifeService, ResidentEventViewModel, ResidentViewModel } from "../managed/services";
 import { toSimulatedAge } from "../../interface/time";
 import { chatIcon, electionIcon, homeIcon, relationGraphIcon } from "../assets/icons/managed";
+import { MetaPerson } from "@acryps/metadata";
 
 export class ResidentPage extends Component {
 	declare parameters: { tag };
@@ -12,6 +13,13 @@ export class ResidentPage extends Component {
 	async onload() {
 		this.resident = await new LifeService().getResident(this.parameters.tag);
 		this.events = await new LifeService().getEventHistory(this.resident.id);
+
+		new MetaPerson({
+			givenName: this.resident.givenName,
+			familyName: this.resident.familyName,
+
+			description: this.resident.biography
+		}).apply();
 	}
 
 	render(child) {

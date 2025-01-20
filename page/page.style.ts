@@ -40,7 +40,7 @@ export const pageStyle = () => root(
 
 			backgroundColor(pageBackgroundColor),
 
-			child('ui-header',
+			child('ui-navigation',
 				position('sticky'),
 				top(0),
 				zIndex(100),

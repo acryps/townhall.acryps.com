@@ -4,6 +4,7 @@ import { BannerComponent } from "../banner";
 import { MapPreviewComponent } from "../shared/map.preview";
 import { linkText } from "../linked-text";
 import { Point } from "../../interface/../interface/point";
+import { MetaPlace } from "@acryps/metadata";
 
 export class BoroughPage extends Component {
 	declare parameters: { tag };
@@ -12,6 +13,12 @@ export class BoroughPage extends Component {
 
 	async onload() {
 		this.borough = await new BoroughService().get(this.parameters.tag);
+
+		new MetaPlace({
+			name: this.borough.name,
+			description: this.borough.description,
+			url: location.href
+		}).apply();
 	}
 
 	render() {

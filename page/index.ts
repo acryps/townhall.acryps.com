@@ -23,6 +23,7 @@ import { VotePage } from "./vote";
 import { ProposeBillPage } from "./vote/propose";
 import { HonestiumPage } from "./vote/honestium";
 import { BillPage } from "./vote/bill";
+import { rewrite } from "./rewrite";
 
 export class Application {
 	static router: Router;
@@ -35,6 +36,8 @@ export class Application {
 	static bridge = new GameBridge();
 
 	static async main() {
+		rewrite();
+
 		Service.baseUrl = '/';
 
 		if (location.pathname == '/') {

@@ -5,6 +5,7 @@ import { MapComponent } from "../../shared/map";
 import { Point } from "../../../interface/point";
 import { toSimulatedAge } from "../../../interface/time";
 import { addIcon } from "../../assets/icons/managed";
+import { MetaGovernmentBuilding, MetaPlace } from "@acryps/metadata";
 
 export class PropertyPage extends Component {
 	declare parameters: { id: string };
@@ -24,6 +25,15 @@ export class PropertyPage extends Component {
 
 		this.grades = await new HistoricListingService().getGrades();
 		this.modifiers = await new HistoricListingService().getModifiers();
+
+		const points = Point.unpack(this.property.bounds);
+		const center = Point.center(points);
+
+		new MetaPlace({
+			name: this.property.name ?? `Property ${this.property.id.split('-')[0]}`,
+			address: `${this.property.borough?.name} ${Math.floor(center.x)} ${Math.floor(center.y)}`,
+			url: location.href
+		}).apply();
 	}
 
 	render() {

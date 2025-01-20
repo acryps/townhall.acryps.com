@@ -4,11 +4,11 @@ import { Component } from "@acryps/page";
 export class PageComponent extends Component {
 	render(child?: Node) {
 		return <ui-page>
-			<ui-header>
+			<ui-navigation>
 				<ui-logo ui-href='/'>
 					townhall
 				</ui-logo>
-			</ui-header>
+			</ui-navigation>
 
 			<ui-content>
 				{child}

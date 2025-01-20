@@ -13,7 +13,7 @@
 		"@acryps/page": "^1.2.3",
 		"@acryps/page-default-directives": "^1.1.4",
 		"@acryps/page-observable": "^1.4.1",
-		"@acryps/style": "^0.13.0"
+		"@acryps/style": "^0.14.0"
 	},
 	"devDependencies": {
 		"@acryps/esbuild-page": "^0.0.1",

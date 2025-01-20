@@ -23,9 +23,12 @@ import { PropertyHistoricListingModifierViewModel } from "././../areas/history-l
 import { HistoricListingModifierViewModel } from "././../areas/history-listing/modifier.view";
 import { HistoricListingService } from "././../areas/history-listing/listing.service";
 import { Life } from "././../life";
+import { ResidentEventViewModel } from "././../areas/life/resident";
 import { ResidentRelationViewModel } from "././../areas/life/resident";
 import { ResidentSummaryModel } from "././../areas/life/resident";
 import { ResidentViewModel } from "././../areas/life/resident";
+import { ResidentEventView } from "././database";
+import { ResidentTickerModel } from "././../areas/life/ticker";
 import { LifeService } from "././../areas/life/service";
 import { Dwelling } from "././database";
 import { DwellingViewModel } from "././../areas/life/resident";
@@ -395,6 +398,15 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"htaGJyZ2pqM3hzM2NxMzl4aDJ3c2Nsbz",
+			{},
+			inject => inject.construct(LifeService),
+			(controller, params) => controller.ticker(
+				
+			)
+		);
+
+		this.expose(
 			"B6eWMwaDNkZ3NvOWNjdnRmdHx6anJrOD",
 			{
 			"g5bmNiODV3dmF5N2JmY3JjY2dvZ3ZveD": { type: "string", isArray: false, isOptional: false }
@@ -402,6 +414,17 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(LifeService),
 			(controller, params) => controller.getResident(
 				params["g5bmNiODV3dmF5N2JmY3JjY2dvZ3ZveD"]
+			)
+		);
+
+		this.expose(
+			"FyYXcxZ2hocDg2dmUxeX1vN25jZGU1YT",
+			{
+			"5pOHt2NGU2ZzJxenFrcDQwZHlsOWQ2bG": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LifeService),
+			(controller, params) => controller.getEventHistory(
+				params["5pOHt2NGU2ZzJxenFrcDQwZHlsOWQ2bG"]
 			)
 		);
 
@@ -424,6 +447,17 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(LifeService),
 			(controller, params) => controller.listResidents(
 				params["J1aTRnbHQ4YmMxdWQwZzUycDlheHMydX"]
+			)
+		);
+
+		this.expose(
+			"c3bHdmNmN1bGNyd28yMXF1b2M1YmdyNX",
+			{
+			"c2cWYybjR0ZjdramJraXF2d2N0MnZmNX": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LifeService),
+			(controller, params) => controller.search(
+				params["c2cWYybjR0ZjdramJraXF2d2N0MnZmNX"]
 			)
 		);
 
@@ -2241,6 +2275,142 @@ ViewModel.mappings = {
 			"end" in viewModel && (model.end = viewModel.end === null ? null : new Date(viewModel.end));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"start" in viewModel && (model.start = viewModel.start === null ? null : new Date(viewModel.start));
+
+			return model;
+		}
+	},
+	[ResidentEventViewModel.name]: class ComposedResidentEventViewModel extends ResidentEventViewModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				timestamp: this.$$model.timestamp,
+				action: this.$$model.action,
+				detail: this.$$model.detail
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				timestamp: true,
+				action: true,
+				detail: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ResidentEventViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"timestamp" in data && (item.timestamp = data.timestamp === null ? null : new Date(data.timestamp));
+			"action" in data && (item.action = data.action === null ? null : `${data.action}`);
+			"detail" in data && (item.detail = data.detail === null ? null : `${data.detail}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ResidentEventViewModel) {
+			let model: ResidentEventView;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ResidentEventView).find(viewModel.id)
+			} else {
+				model = new ResidentEventView();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"timestamp" in viewModel && (model.timestamp = viewModel.timestamp === null ? null : new Date(viewModel.timestamp));
+			"action" in viewModel && (model.action = viewModel.action === null ? null : `${viewModel.action}`);
+			"detail" in viewModel && (model.detail = viewModel.detail === null ? null : `${viewModel.detail}`);
+
+			return model;
+		}
+	},
+	[ResidentTickerModel.name]: class ComposedResidentTickerModel extends ResidentTickerModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				primaryResidentId: this.$$model.primaryResidentId,
+				action: this.$$model.action
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				primaryResidentId: true,
+				action: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ResidentTickerModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"primaryResidentId" in data && (item.primaryResidentId = data.primaryResidentId === null ? null : `${data.primaryResidentId}`);
+			"action" in data && (item.action = data.action === null ? null : `${data.action}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ResidentTickerModel) {
+			let model: ResidentEventView;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ResidentEventView).find(viewModel.id)
+			} else {
+				model = new ResidentEventView();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"primaryResidentId" in viewModel && (model.primaryResidentId = viewModel.primaryResidentId === null ? null : `${viewModel.primaryResidentId}`);
+			"action" in viewModel && (model.action = viewModel.action === null ? null : `${viewModel.action}`);
 
 			return model;
 		}

@@ -1,8 +1,10 @@
 import { Component } from "@acryps/page";
-import { LifeService, ResidentSummaryModel } from "../managed/services";
+import { LifeService, ResidentSummaryModel, ResidentTickerModel } from "../managed/services";
 import { toSimulatedAge, toSimulatedTime } from "../../interface/time";
+import { SearchComponent } from "./search";
+import { PopulationTickerComponent } from "./ticker";
 
-export class ResidentsPage extends Component {
+export class PopulationPage extends Component {
 	residents: ResidentSummaryModel[];
 
 	page = 0;
@@ -47,29 +49,41 @@ export class ResidentsPage extends Component {
 		}
 	}
 
-	render() {
+	render(child) {
+		if (child) {
+			return <ui-residents>
+				{child}
+			</ui-residents>;
+		}
+
 		document.addEventListener('scroll', () => this.checkLoading());
 
 		return <ui-residents>
-			{this.residents.map(resident => <ui-resident ui-href={`/resident/${resident.tag}`}>
-				<img src={`/resident/image/${resident.tag}`} />
+			{new SearchComponent()}
 
-				<ui-name>
-					<ui-given-name>
-						{resident.givenName}
-					</ui-given-name>
+			{new PopulationTickerComponent()}
 
-					<ui-family-name>
-						{resident.familyName}
-					</ui-family-name>
-				</ui-name>
+			<ui-picks>
+				{this.residents.map(resident => <ui-resident ui-href={`/resident/${resident.tag}`}>
+					<img src={`/resident/image/${resident.tag}`} />
 
-				<ui-age>
-					{toSimulatedAge(resident.birthday)} years old
-				</ui-age>
-			</ui-resident>)}
+					<ui-name>
+						<ui-given-name>
+							{resident.givenName}
+						</ui-given-name>
 
-			{this.loadMoreTracker}
+						<ui-family-name>
+							{resident.familyName}
+						</ui-family-name>
+					</ui-name>
+
+					<ui-age>
+						{toSimulatedAge(resident.birthday)} years old
+					</ui-age>
+				</ui-resident>)}
+
+				{this.loadMoreTracker}
+			</ui-picks>
 		</ui-residents>
 	}
 }

@@ -50,8 +50,6 @@ export class BannerComponent extends Component {
 			}
 
 			const task = new Promise<string>(async done => {
-				console.log('generating')
-
 				const sourceCanvas = new OffscreenCanvas(image.naturalWidth, image.naturalHeight);
 				const sourceContext = sourceCanvas.getContext('2d');
 				sourceContext.drawImage(image, 0, 0);

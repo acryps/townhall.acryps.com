@@ -1701,6 +1701,39 @@ export class WaterBody extends Entity<WaterBodyQueryProxy> {
 	};
 }
 			
+class ResidentEventViewProxy extends QueryProxy {
+	get timestamp(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get primaryResidentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get secondaryResidentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get action(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get detail(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class ResidentEventView extends View<ResidentEventViewProxy> {
+	$$meta = {
+		source: "resident_event",
+		get set(): ViewSet<ResidentEventView, ResidentEventViewProxy> { 
+			return new ViewSet<ResidentEventView, ResidentEventViewProxy>(ResidentEventView, null);
+		},
+
+		columns: {
+			id: { type: "uuid", name: "id" },
+			timestamp: { type: "timestamp", name: "timestamp" },
+			primaryResidentId: { type: "uuid", name: "primary_resident_id" },
+			secondaryResidentId: { type: "uuid", name: "secondary_resident_id" },
+			action: { type: "text", name: "action" },
+			detail: { type: "text", name: "detail" }
+		}
+	};
+
+	id: string;
+	timestamp: Date;
+	primaryResidentId: string;
+	secondaryResidentId: string;
+	action: string;
+	detail: string;
+}
+			
 
 export class DbContext {
 	article: DbSet<Article, ArticleQueryProxy>;
@@ -1781,5 +1814,7 @@ export class DbContext {
 		}
 	}
 
-	
+	views = {
+		residentEvent: new ViewSet<ResidentEventView, ResidentEventViewProxy>(ResidentEventView)
+	}
 };

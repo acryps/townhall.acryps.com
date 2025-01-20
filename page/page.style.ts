@@ -5,7 +5,7 @@ import { boroughStyle } from "./borough/index.style";
 import { bannerStyle, createBannerStyle } from "./banner/index.style";
 import { iconFont, icons } from "./assets/icons/managed";
 import { articleStyle, newsStyle, publicationStyle } from "./news/index.style";
-import { residentsStyle } from "./residents/index.style";
+import { populationStyle } from "./population/index.style";
 import { residentStyle } from "./resident/index.style";
 import { mapStyle as mapPageStyle } from "./map/index.style";
 import { navigationBackgroundColor, navigationBorderColor, pageBackgroundColor, pageGutter, pageTextColor } from "./index.style";
@@ -72,8 +72,8 @@ export const pageStyle = () => root(
 				publicationStyle(),
 				articleStyle(),
 
+				populationStyle(),
 				residentStyle(),
-				residentsStyle(),
 
 				voteStyle(),
 

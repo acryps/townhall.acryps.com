@@ -56,7 +56,6 @@ export const billStyle = () => child('ui-bill',
 	child('ui-certification',
 		display('block'),
 		marginTop(rem(3)),
-		marginBottom(rem(2)),
 		lineHeight(1),
 
 		child('ui-date',
@@ -73,6 +72,7 @@ export const billStyle = () => child('ui-bill',
 
 	child('ui-ticker',
 		display('block'),
+		marginTop(rem(2)),
 
 		child('ui-bar',
 			display('flex'),
@@ -104,8 +104,10 @@ export const billStyle = () => child('ui-bill',
 				paddingBlock(rem(0.5)),
 				paddingInline(rem(0.75)),
 
-				border(px(1), 'solid', 'currentColor'),
-				whiteSpace('pre-wrap')
+				whiteSpace('pre-wrap'),
+
+				color(pageTextColor),
+				backgroundColor(pageBackgroundColor)
 			)
 				.attribute('ui-type', 'pro', alignSelf('flex-start'))
 				.attribute('ui-type', 'contra', alignSelf('flex-end'))

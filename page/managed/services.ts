@@ -385,6 +385,38 @@ export class TenancyViewModel {
 	}
 }
 
+export class ResidentEventViewModel {
+	id: string;
+	timestamp: Date;
+	action: string;
+	detail: string;
+
+	private static $build(raw) {
+		const item = new ResidentEventViewModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.timestamp === undefined || (item.timestamp = raw.timestamp ? new Date(raw.timestamp) : null)
+		raw.action === undefined || (item.action = raw.action === null ? null : `${raw.action}`)
+		raw.detail === undefined || (item.detail = raw.detail === null ? null : `${raw.detail}`)
+		
+		return item;
+	}
+}
+
+export class ResidentTickerModel {
+	id: string;
+	primaryResidentId: string;
+	action: string;
+
+	private static $build(raw) {
+		const item = new ResidentTickerModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.primaryResidentId === undefined || (item.primaryResidentId = raw.primaryResidentId === null ? null : `${raw.primaryResidentId}`)
+		raw.action === undefined || (item.action = raw.action === null ? null : `${raw.action}`)
+		
+		return item;
+	}
+}
+
 export class ArticleViewModel {
 	images: ArticleImageViewModel[];
 	publication: PublicationSummaryModel;
@@ -1231,6 +1263,27 @@ export class HistoricListingService {
 }
 
 export class LifeService {
+	async ticker(): Promise<Array<ResidentTickerModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("htaGJyZ2pqM3hzM2NxMzl4aDJ3c2Nsbz"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ResidentTickerModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async getResident(tag: string): Promise<ResidentViewModel> {
 		const $data = new FormData();
 		$data.append("g5bmNiODV3dmF5N2JmY3JjY2dvZ3ZveD", Service.stringify(tag))
@@ -1244,6 +1297,27 @@ export class LifeService {
 				const d = r.data;
 
 				return d === null ? null : ResidentViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getEventHistory(id: string): Promise<Array<ResidentEventViewModel>> {
+		const $data = new FormData();
+		$data.append("5pOHt2NGU2ZzJxenFrcDQwZHlsOWQ2bG", Service.stringify(id))
+
+		return await fetch(Service.toURL("FyYXcxZ2hocDg2dmUxeX1vN25jZGU1YT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ResidentEventViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
@@ -1286,6 +1360,27 @@ export class LifeService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : ResidentSummaryModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async search(query: string): Promise<Array<ResidentViewModel>> {
+		const $data = new FormData();
+		$data.append("c2cWYybjR0ZjdramJraXF2d2N0MnZmNX", Service.stringify(query))
+
+		return await fetch(Service.toURL("c3bHdmNmN1bGNyd28yMXF1b2M1YmdyNX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ResidentViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

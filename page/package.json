@@ -9,6 +9,7 @@
 	"dependencies": {
 		"@acryps/glyph": "^0.0.5",
 		"@acryps/language": "^0.0.3",
+		"@acryps/metadata": "^0.0.1",
 		"@acryps/page": "^1.2.3",
 		"@acryps/page-default-directives": "^1.1.4",
 		"@acryps/page-observable": "^1.4.1",

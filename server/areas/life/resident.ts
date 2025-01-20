@@ -1,5 +1,5 @@
 import { ViewModel } from "vlserver";
-import { Dwelling, Resident, ResidentRelationship, Tenancy } from "../../managed/database";
+import { Dwelling, Resident, ResidentEventView, ResidentRelationship, Tenancy } from "../../managed/database";
 import { PropertySummaryModel } from "../property.summary";
 
 export class ResidentSummaryModel extends ViewModel<Resident> {
@@ -50,4 +50,12 @@ export class TenancyViewModel extends ViewModel<Tenancy> {
 
 	start;
 	end;
+}
+
+export class ResidentEventViewModel extends ViewModel<ResidentEventView> {
+	id;
+
+	timestamp;
+	action;
+	detail;
 }

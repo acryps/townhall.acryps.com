@@ -12,7 +12,7 @@ import { CreateBannerComponent } from "./banner/create";
 import './shared/polyfills';
 import { NewsPage } from "./news";
 import { ArticePage } from "./news/article";
-import { ResidentsPage } from "./residents";
+import { PopulationPage } from "./population";
 import { ResidentPage } from "./resident";
 import { PublicationPage } from "./news/publication";
 import { MapPage } from "./map";
@@ -61,7 +61,8 @@ export class Application {
 					.route('/chat/:chat', ChatPage)
 					.route('/relations', RelationsPage)
 				)
-				.route('/residents', ResidentsPage)
+
+				.route('/population', PopulationPage)
 
 				.route('/vote', VotePage
 					.route('/propose', ProposeBillPage)

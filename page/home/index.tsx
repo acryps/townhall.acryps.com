@@ -57,7 +57,7 @@ export class HomePage extends Component {
 					</ui-description>
 				</ui-topic>
 
-				<ui-topic ui-href='/residents'>
+				<ui-topic ui-href='/population'>
 					{residentIcon()}
 
 					<ui-name>

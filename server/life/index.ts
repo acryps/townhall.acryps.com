@@ -6,6 +6,7 @@ import { TickFactor } from "./factor";
 import { Gender, genders } from "./gender";
 import { NameGenerator } from "./name";
 import { Language } from "./language";
+import { resolve } from "dns/promises";
 
 export class Life {
 	// weights, of how many people do what on a tick
@@ -37,29 +38,35 @@ export class Life {
 		await this.bondingFactor.tick(async (initiator: Resident, peer: Resident) => await this.bond(initiator, peer));
 	}
 
+	async getPendingVoters(bill: Bill) {
+		// find people who need to vote on this bill
+		const boroughs = await this.collectBoroughs(await bill.scope.fetch());
+
+		// find residents
+		const residents: Resident[] = [];
+
+		for (let borough of boroughs) {
+			for (let resident of await this.database.resident
+				.where(resident => resident.mainTenancy.dwelling.property.boroughId == borough.id)
+				.include(resident => resident.votes)
+				.toArray()
+			) {
+				if (!(await resident.votes.toArray()).some(vote => vote.billId == bill.id)) {
+					residents.push(resident);
+				}
+			}
+		}
+
+		return residents;
+	}
+
 	async vote() {
 		const openBills = await this.database.bill.where(bill => bill.certified == null).toArray();
 
 		for (let bill of openBills) {
 			console.log(`open: '${bill.tag}'`);
 
-			// find people who need to vote on this bill
-			const boroughs = await this.collectBoroughs(await bill.scope.fetch());
-
-			// find residents
-			const residents: Resident[] = [];
-
-			for (let borough of boroughs) {
-				for (let resident of await this.database.resident
-					.where(resident => resident.mainTenancy.dwelling.property.boroughId == borough.id)
-					.include(resident => resident.votes)
-					.toArray()
-				) {
-					if (!(await resident.votes.toArray()).some(vote => vote.billId == bill.id)) {
-						residents.push(resident);
-					}
-				}
-			}
+			const residents = await this.getPendingVoters(bill);
 
 			console.log(`found ${residents.length} residents who still need to vote on '${bill.tag}'`);
 

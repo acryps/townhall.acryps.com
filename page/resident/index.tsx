@@ -1,5 +1,5 @@
 import { Component } from "@acryps/page";
-import { ChatService, LifeService, ResidentViewModel } from "../managed/services";
+import { ChatService, LifeService, ResidentEventViewModel, ResidentViewModel } from "../managed/services";
 import { toSimulatedAge } from "../../interface/time";
 import { chatIcon, electionIcon, homeIcon, relationGraphIcon } from "../assets/icons/managed";
 
@@ -7,9 +7,11 @@ export class ResidentPage extends Component {
 	declare parameters: { tag };
 
 	resident: ResidentViewModel;
+	events: ResidentEventViewModel[];
 
 	async onload() {
 		this.resident = await new LifeService().getResident(this.parameters.tag);
+		this.events = await new LifeService().getEventHistory(this.resident.id);
 	}
 
 	render(child) {
@@ -54,15 +56,27 @@ export class ResidentPage extends Component {
 				<ui-action ui-href='relations'>
 					{relationGraphIcon()}
 				</ui-action>
-
-				<ui-action>
-					{electionIcon()}
-				</ui-action>
 			</ui-actions>
 
 			<ui-biography>
 				{this.resident.biography}
 			</ui-biography>
+
+			<ui-timeline>
+				{this.events.map(event => <ui-event>
+					<ui-time>
+						{toSimulatedAge(event.timestamp)} years ago
+					</ui-time>
+
+					<ui-action>
+						{event.action ?? event.id}
+					</ui-action>
+
+					<ui-detail>
+						{event.detail}
+					</ui-detail>
+				</ui-event>)}
+			</ui-timeline>
 		</ui-resident>
 	}
 }

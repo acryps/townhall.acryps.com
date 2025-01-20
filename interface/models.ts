@@ -160,6 +160,19 @@ export interface TenancyViewModel {
 	start: Date;
 }
 
+export interface ResidentEventViewModel {
+    id: string;
+	timestamp: Date;
+	action: string;
+	detail: string;
+}
+
+export interface ResidentTickerModel {
+    id: string;
+	primaryResidentId: string;
+	action: string;
+}
+
 export interface ArticleViewModel {
     images: ArticleImageViewModel[];
 	publication: PublicationSummaryModel;

@@ -1,3 +1,4 @@
+import { Life } from "..";
 import { BillHonestium, DbContext, Property } from "../../managed/database";
 import { Language } from "../language";
 
@@ -8,7 +9,8 @@ export class LawHouse {
 
 	constructor(
 		private database: DbContext,
-		private language: Language
+		private language: Language,
+		private life: Life
 	) { }
 
 	// works through all tasks assigned to the law house
@@ -17,16 +19,19 @@ export class LawHouse {
 		this.active = true;
 
 		await this.writeHonestiums();
+		await this.certifyBills();
 
 		this.active = false;
 	}
 
-	private async writeHonestiums() {
-		const openBills = await this.database.bill
+	private async getOpenBills() {
+		return await this.database.bill
 			.where(bill => bill.certified == null)
 			.toArray();
+	}
 
-		for (let bill of openBills) {
+	private async writeHonestiums() {
+		for (let bill of await this.getOpenBills()) {
 			const honestiums = await bill.honestiums.toArray();
 
 			while (honestiums.length != this.honestiumSize * 2) {
@@ -47,6 +52,21 @@ export class LawHouse {
 				await honestium.create();
 
 				honestiums.push(honestium);
+			}
+		}
+	}
+
+	private async certifyBills() {
+		for (let bill of await this.getOpenBills()) {
+			const openVoters = await this.life.getPendingVoters(bill);
+
+			if (openVoters.length == 0 && !bill.certified) {
+				const votes = await bill.votes.toArray();
+
+				bill.pro = votes.filter(vote => vote.pro).length > votes.length / 2;
+				bill.certified = new Date();
+
+				await bill.update();
 			}
 		}
 	}

@@ -1,10 +1,9 @@
-import ollama from "ollama";
 import { Manager } from "vlserver";
 import { Chat, ChatInteraction, DbContext } from "../../../managed/database";
 import { randomBytes } from "crypto";
-import internal from "stream";
 import { Life } from "../../../life";
 import { boroughInformationToken } from "./information-token/borough";
+import { Language } from "../../../life/language";
 
 export class ChatManager extends Manager {
 	constructor(
@@ -97,10 +96,7 @@ export class ChatManager extends Manager {
 
 		let history = await this.getSystemMessages(chat);
 
-		const response = await ollama.chat({
-			model: 'gemma2:27b',
-			messages: history
-		});
+		const response = await Language.chat(history);
 
 		interaction.response = response.message.content?.trim();
 		interaction.responded = new Date();

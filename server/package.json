@@ -11,7 +11,12 @@
 		"pgdatabase": "Postgres database",
 		"pguser": "Postgres user",
 		"pgpassword": "Postgres password",
-		"townhallServerAddress": "Minecraft File Server Location"
+		"townhallServerAddress": "Minecraft File Server Location",
+
+		"languageModel": {
+			"model": "Language Model and Size",
+			"host": "Language Model Host"
+		}
 	},
 	"dependencies": {
 		"@acryps/environment": "^2.7.2",

@@ -1,8 +1,8 @@
-import ollama from "ollama"
 import { Bill, BillHonestium, Borough, Resident, ResidentFigure, ResidentRelationship } from "../managed/database";
 import { toSimulatedTime } from "../../interface/time";
 import { NameType } from "./name";
 import { Gender } from "./gender";
+import { Ollama } from "ollama";
 
 export class Language {
 	readonly environment = () => `
@@ -210,17 +210,23 @@ export class Language {
 	}
 
 	private async respondRaw(instruction: string, ...data: string[]) {
-		const messages = [
+		const response = await Language.chat([
 			{ role: 'user', content: instruction },
 			...data.map(data => ({ role: 'user', content: data }))
-		];
-
-		const response = await ollama.chat({
-			model: 'gemma2:27b',
-			messages: messages
-		});
+		]);
 
 		return response.message.content?.trim();
+	}
+
+	static async chat(messages) {
+		const ollama = new Ollama({
+			host: process.env.LANGUAGE_MODEL_HOST // default: http://127.0.0.1:11434
+		});
+
+		return await ollama.chat({
+			model: process.env.LANGUAGE_MODEL_MODEL,
+			messages
+		});
 	}
 
 	private async confirm(positive: string, negative: string, ...data: string[]) {

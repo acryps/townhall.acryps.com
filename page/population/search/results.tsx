@@ -13,9 +13,11 @@ export class SearchResultsComponent extends Component {
 					{result.givenName} {result.familyName}
 				</ui-name>
 
-				<ui-age>
-					{toSimulatedAge(result.birthday)}
-				</ui-age>
+				<ui-detail>
+					<ui-age>
+						{toSimulatedAge(result.birthday)}
+					</ui-age>
+				</ui-detail>
 			</ui-result>)}
 		</ui-results>
 	}

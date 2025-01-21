@@ -15,7 +15,8 @@ export class Language {
 	`;
 
 	readonly metaRules = () => `
-		Do not tell me what you are doing, just respond in a JSON format.
+		Do not tell me what you are doing, just respond in values in a JSON format.
+		Nothing before the output, nothing after.
 		Do not encapsulate the object, just respond as a JSON string or array of strings.
 		Do not mention that this is all fictional, pretend that the story is real.
 		When mentioning dates, always use YYYY-MM-DD format.
@@ -155,26 +156,13 @@ export class Language {
 		return await this.respondTextArray(instruction, ...data);
 	}
 
-	private async respondJSON(instruction: string, ...data: string[]) {
+	async respondJSON(instruction: string, ...data: string[]) {
 		let response = await this.respondRaw(instruction, ...data);
 		response = response.trim();
 
 		// remove markdown wrapping
-		if (response.startsWith('json')) {
-			response = response.replace('json', '');
-		}
-
-		if (response.startsWith('```')) {
-			response = response.replace('```', '');
-		}
-
-		if (response.endsWith('```')) {
-			response = response.split('').reverse().join('').replace('```', '').split('').reverse().join('');
-		}
-
-		if (response.startsWith('json')) {
-			response = response.replace('json', '');
-		}
+		response = response.split('```json')[1] ?? '';
+		response = response.split('```')[0];
 
 		// llms struggle with putting '\n' in multiline strings
 		// replaces new lines with \n as a string, making it valid JSON
@@ -233,19 +221,14 @@ export class Language {
 		});
 	}
 
-	private async confirm(positive: string, negative: string, ...data: string[]) {
-		const response = await this.respondText(`is the following text acceptable as a ${positive}, then respond with YES. if it is clearly a ${negative}, respond with NO`, ...data);
-
-		console.log(data, response)
-
-		return response.includes('YES');
-	}
-
 	async summarize(message: string) {
-		const summary = await this.respondText(`
-			summarize the text in two to three sentences.
-			do not tell me that you made a summary, or add any other meta text, just return the summary
+		const lines = await this.respondTextArray(`
+			summarize the text in two to three short sentences.
+
+			${this.metaRules}
 		`, message);
+
+		const summary = lines.join(' ');
 
 		if (summary.trim().includes('\n')) {
 			console.debug(summary)

@@ -30,8 +30,8 @@ export class VoteService extends Service {
 		return DistrictViewModel.from(this.database.district.orderByAscending(district => district.name));
 	}
 
-	getOpenBills() {
-		return BillViewModel.from(this.database.bill.orderByAscending(bill => bill.tag).where(bill => bill.certified == null));
+	getBills() {
+		return BillViewModel.from(this.database.bill.orderByAscending(bill => bill.tag));
 	}
 
 	async getBill(tag: string) {

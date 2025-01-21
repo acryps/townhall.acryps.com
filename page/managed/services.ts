@@ -22,6 +22,7 @@ export class BoroughSummaryModel {
 }
 
 export class BoroughViewModel {
+	district: DistrictViewModel;
 	banner: string;
 	bounds: string;
 	color: string;
@@ -33,6 +34,7 @@ export class BoroughViewModel {
 
 	private static $build(raw) {
 		const item = new BoroughViewModel();
+		raw.district === undefined || (item.district = raw.district ? DistrictViewModel["$build"](raw.district) : null)
 		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
 		raw.bounds === undefined || (item.bounds = raw.bounds === null ? null : `${raw.bounds}`)
 		raw.color === undefined || (item.color = raw.color === null ? null : `${raw.color}`)
@@ -404,12 +406,14 @@ export class ResidentEventViewModel {
 
 export class ResidentTickerModel {
 	id: string;
+	timestamp: Date;
 	primaryResidentId: string;
 	action: string;
 
 	private static $build(raw) {
 		const item = new ResidentTickerModel();
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.timestamp === undefined || (item.timestamp = raw.timestamp ? new Date(raw.timestamp) : null)
 		raw.primaryResidentId === undefined || (item.primaryResidentId = raw.primaryResidentId === null ? null : `${raw.primaryResidentId}`)
 		raw.action === undefined || (item.action = raw.action === null ? null : `${raw.action}`)
 		
@@ -586,20 +590,24 @@ export class TrainStopViewModel {
 
 export class BillViewModel {
 	honestiums: HonestiumViewModel[];
+	scope: DistrictViewModel;
 	certified: Date;
 	description: string;
 	id: string;
 	pro: boolean;
+	summary: string;
 	tag: string;
 	title: string;
 
 	private static $build(raw) {
 		const item = new BillViewModel();
 		raw.honestiums === undefined || (item.honestiums = raw.honestiums ? raw.honestiums.map(i => HonestiumViewModel["$build"](i)) : null)
+		raw.scope === undefined || (item.scope = raw.scope ? DistrictViewModel["$build"](raw.scope) : null)
 		raw.certified === undefined || (item.certified = raw.certified ? new Date(raw.certified) : null)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.pro === undefined || (item.pro = !!raw.pro)
+		raw.summary === undefined || (item.summary = raw.summary === null ? null : `${raw.summary}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
 		
@@ -1633,11 +1641,11 @@ export class VoteService {
 		});
 	}
 
-	async getOpenBills(): Promise<Array<BillViewModel>> {
+	async getBills(): Promise<Array<BillViewModel>> {
 		const $data = new FormData();
 		
 
-		return await fetch(Service.toURL("R3emV0bHprcTYxZ3N1aTY0a3o2bXBueH"), {
+		return await fetch(Service.toURL("pvbjJ4Ym91ZG00M3VrbWJqNGZnam5pdT"), {
 			method: "post",
 			credentials: "include",
 			body: $data

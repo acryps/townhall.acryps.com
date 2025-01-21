@@ -119,6 +119,7 @@ export class BillQueryProxy extends QueryProxy {
 	get mailed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get pro(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get scopeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get summary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get title(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
@@ -134,6 +135,7 @@ export class Bill extends Entity<BillQueryProxy> {
 	mailed: Date;
 	pro: boolean;
 	scopeId: string;
+	summary: string;
 	tag: string;
 	title: string;
 	
@@ -147,6 +149,7 @@ export class Bill extends Entity<BillQueryProxy> {
 			mailed: { type: "timestamp", name: "mailed" },
 			pro: { type: "bool", name: "pro" },
 			scopeId: { type: "uuid", name: "scope_id" },
+			summary: { type: "text", name: "summary" },
 			tag: { type: "text", name: "tag" },
 			title: { type: "text", name: "title" }
 		},

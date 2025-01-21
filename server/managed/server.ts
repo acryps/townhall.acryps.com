@@ -581,10 +581,10 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"R3emV0bHprcTYxZ3N1aTY0a3o2bXBueH",
+			"pvbjJ4Ym91ZG00M3VrbWJqNGZnam5pdT",
 			{},
 			inject => inject.construct(VoteService),
-			(controller, params) => controller.getOpenBills(
+			(controller, params) => controller.getBills(
 				
 			)
 		);
@@ -745,6 +745,7 @@ ViewModel.mappings = {
 	[BoroughViewModel.name]: class ComposedBoroughViewModel extends BoroughViewModel {
 		async map() {
 			return {
+				district: new DistrictViewModel(await BaseServer.unwrap(this.$$model.district)),
 				banner: this.$$model.banner,
 				bounds: this.$$model.bounds,
 				color: this.$$model.color,
@@ -782,6 +783,12 @@ ViewModel.mappings = {
 			}
 
 			return {
+				get district() {
+					return ViewModel.mappings[DistrictViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "district-BoroughViewModel"]
+					);
+				},
 				banner: true,
 				bounds: true,
 				color: true,
@@ -795,6 +802,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new BoroughViewModel(null);
+			"district" in data && (item.district = data.district && ViewModel.mappings[DistrictViewModel.name].toViewModel(data.district));
 			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
 			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
@@ -816,6 +824,7 @@ ViewModel.mappings = {
 				model = new Borough();
 			}
 			
+			"district" in viewModel && (model.district.id = viewModel.district ? viewModel.district.id : null);
 			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
 			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
@@ -2353,6 +2362,7 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				id: this.$$model.id,
+				timestamp: this.$$model.timestamp,
 				primaryResidentId: this.$$model.primaryResidentId,
 				action: this.$$model.action
 			}
@@ -2385,6 +2395,7 @@ ViewModel.mappings = {
 
 			return {
 				id: true,
+				timestamp: true,
 				primaryResidentId: true,
 				action: true
 			};
@@ -2393,6 +2404,7 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new ResidentTickerModel(null);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"timestamp" in data && (item.timestamp = data.timestamp === null ? null : new Date(data.timestamp));
 			"primaryResidentId" in data && (item.primaryResidentId = data.primaryResidentId === null ? null : `${data.primaryResidentId}`);
 			"action" in data && (item.action = data.action === null ? null : `${data.action}`);
 
@@ -2409,6 +2421,7 @@ ViewModel.mappings = {
 			}
 			
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"timestamp" in viewModel && (model.timestamp = viewModel.timestamp === null ? null : new Date(viewModel.timestamp));
 			"primaryResidentId" in viewModel && (model.primaryResidentId = viewModel.primaryResidentId === null ? null : `${viewModel.primaryResidentId}`);
 			"action" in viewModel && (model.action = viewModel.action === null ? null : `${viewModel.action}`);
 
@@ -3102,10 +3115,12 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				honestiums: (await this.$$model.honestiums.includeTree(ViewModel.mappings[HonestiumViewModel.name].items).toArray()).map(item => new HonestiumViewModel(item)),
+				scope: new DistrictViewModel(await BaseServer.unwrap(this.$$model.scope)),
 				certified: this.$$model.certified,
 				description: this.$$model.description,
 				id: this.$$model.id,
 				pro: this.$$model.pro,
+				summary: this.$$model.summary,
 				tag: this.$$model.tag,
 				title: this.$$model.title
 			}
@@ -3143,10 +3158,17 @@ ViewModel.mappings = {
 						[...parents, "honestiums-BillViewModel"]
 					);
 				},
+				get scope() {
+					return ViewModel.mappings[DistrictViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "scope-BillViewModel"]
+					);
+				},
 				certified: true,
 				description: true,
 				id: true,
 				pro: true,
+				summary: true,
 				tag: true,
 				title: true
 			};
@@ -3155,10 +3177,12 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new BillViewModel(null);
 			"honestiums" in data && (item.honestiums = data.honestiums && [...data.honestiums].map(i => ViewModel.mappings[HonestiumViewModel.name].toViewModel(i)));
+			"scope" in data && (item.scope = data.scope && ViewModel.mappings[DistrictViewModel.name].toViewModel(data.scope));
 			"certified" in data && (item.certified = data.certified === null ? null : new Date(data.certified));
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"pro" in data && (item.pro = !!data.pro);
+			"summary" in data && (item.summary = data.summary === null ? null : `${data.summary}`);
 			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
 
@@ -3175,10 +3199,12 @@ ViewModel.mappings = {
 			}
 			
 			"honestiums" in viewModel && (null);
+			"scope" in viewModel && (model.scope.id = viewModel.scope ? viewModel.scope.id : null);
 			"certified" in viewModel && (model.certified = viewModel.certified === null ? null : new Date(viewModel.certified));
 			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"pro" in viewModel && (model.pro = !!viewModel.pro);
+			"summary" in viewModel && (model.summary = viewModel.summary === null ? null : `${viewModel.summary}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
 

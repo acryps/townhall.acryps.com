@@ -60,7 +60,7 @@ export class Life {
 		const bill = await ballot.bill.fetch();
 		const honestums = await bill.honestiums.toArray();
 
-		const response = await this.language.respondText(this.language.vote(resident),
+		const response = await this.language.respondJSON(this.language.vote(resident),
 			await this.compileDescription(resident),
 			bill.title,
 			bill.description,
@@ -71,15 +71,13 @@ export class Life {
 			throw new Error(`Bill '${bill.tag}' already certified`);
 		}
 
-		console.log(response);
-
-		if (!response.startsWith('YES:') && !response.startsWith('NO:')) {
-			return this.voteBill(resident, bill);
+		if (typeof response != 'object' || !response.vote || !(response.vote == 'YES' || response.vote == 'NO') || !response.reason) {
+			return this.voteBill(ballot);
 		}
 
 		ballot.submitted = new Date();
-		ballot.pro = response.startsWith('YES:');
-		ballot.reason = response.split(':').slice(1).join(':').trim();
+		ballot.pro = response.vote == 'YES';
+		ballot.reason = response.reason;
 
 		await ballot.update();
 	}

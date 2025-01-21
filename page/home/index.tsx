@@ -6,13 +6,30 @@ import { hex } from "@acryps/style";
 import { BannerComponent } from "../banner";
 import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, propertyRegisterIcon, publicationIcon, residentIcon } from "../assets/icons/managed";
 import { Point } from "../../interface/point";
+import { toSimulatedTime } from "../../interface/time";
 
 export class HomePage extends Component {
 	render() {
+		const time = <ui-time></ui-time>;
+
+		requestAnimationFrame(() => {
+			const updateTime = () => {
+				time.textContent = toSimulatedTime(new Date()).toLocaleString();
+
+				if (this.loaded) {
+					requestAnimationFrame(() => updateTime());
+				}
+			};
+
+			updateTime();
+		});
+
 		return <ui-home>
 			<ui-title>
 				City of Pilegron
 			</ui-title>
+
+			{time}
 
 			<ui-description>
 				Welcome to our minecraft server

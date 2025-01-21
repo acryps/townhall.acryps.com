@@ -39,7 +39,7 @@ export class BillPage extends Component {
 				</ui-result>
 			</ui-certification>}
 
-			{new VoteTickerComponent(this.bill)}
+			{!!this.bill.honestiums.length && new VoteTickerComponent(this.bill)}
 		</ui-bill>
 	}
 

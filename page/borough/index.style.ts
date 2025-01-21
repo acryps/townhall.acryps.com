@@ -32,6 +32,13 @@ export const boroughStyle = () => child('ui-borough',
 		textAlign('center')
 	),
 
+	child('ui-district',
+		display('block'),
+		marginBottom(rem(1)),
+
+		textAlign('center')
+	),
+
 	child('ui-description',
 		display('block'),
 		marginBottom(rem(2)),

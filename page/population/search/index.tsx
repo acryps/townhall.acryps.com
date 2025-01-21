@@ -9,7 +9,7 @@ export class SearchComponent extends Component {
 	results = new SearchResultsComponent();
 
 	render() {
-		const field: HTMLInputElement = <input type='search' $ui-value={this.query} />
+		const field: HTMLInputElement = <input type='search' $ui-value={this.query} placeholder='Search...' />
 		let latest: Promise<any>;
 
 		field.onkeyup = () => {

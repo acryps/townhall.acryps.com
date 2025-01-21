@@ -9,7 +9,8 @@ export interface BoroughSummaryModel {
 }
 
 export interface BoroughViewModel {
-    banner: string;
+    district: DistrictViewModel;
+	banner: string;
 	bounds: string;
 	color: string;
 	description: string;
@@ -169,6 +170,7 @@ export interface ResidentEventViewModel {
 
 export interface ResidentTickerModel {
     id: string;
+	timestamp: Date;
 	primaryResidentId: string;
 	action: string;
 }
@@ -245,10 +247,12 @@ export interface TrainStopViewModel {
 
 export interface BillViewModel {
     honestiums: HonestiumViewModel[];
+	scope: DistrictViewModel;
 	certified: Date;
 	description: string;
 	id: string;
 	pro: boolean;
+	summary: string;
 	tag: string;
 	title: string;
 }

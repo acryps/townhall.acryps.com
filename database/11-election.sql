@@ -17,6 +17,7 @@ CREATE TABLE bill (
 	tag TEXT,
 	title TEXT,
 	description TEXT,
+	summary TEXT,
 
 	mailed TIMESTAMP,
 

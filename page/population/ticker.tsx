@@ -6,12 +6,28 @@ export class PopulationTickerComponent extends Component {
 
 	async onload() {
 		this.events = await new LifeService().ticker();
+
+		setTimeout(() => {
+			if (this.loaded) {
+				this.reload();
+			}
+		}, 1000);
 	}
 
 	render() {
 		return <ui-ticker>
-			{this.events.map(event => <ui-event>
-				{event.action}
+			<ui-header>
+				Last actions by residents
+			</ui-header>
+
+			{this.events.map(event => <ui-event ui-href={`/go/${event.id}`}>
+				<ui-action>
+					{event.action}
+				</ui-action>
+
+				<ui-time>
+					{event.timestamp.toLocaleString()}
+				</ui-time>
 			</ui-event>)}
 		</ui-ticker>;
 	}

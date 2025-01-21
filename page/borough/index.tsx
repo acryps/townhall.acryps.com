@@ -33,6 +33,10 @@ export class BoroughPage extends Component {
 				Incorporated {this.borough.incorporation.toLocaleDateString()}
 			</ui-incorporation>}
 
+			{this.borough.district && <ui-district>
+				{this.borough.district.name} legal district
+			</ui-district>}
+
 			<ui-description>
 				{linkText(this.borough.description)}
 			</ui-description>

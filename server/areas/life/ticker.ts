@@ -3,6 +3,7 @@ import { ResidentEventView } from "../../managed/database";
 
 export class ResidentTickerModel extends ViewModel<ResidentEventView> {
 	id;
+	timestamp;
 
 	primaryResidentId;
 	action;

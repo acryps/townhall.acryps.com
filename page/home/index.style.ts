@@ -8,9 +8,13 @@ export const homeStyle = () => child('ui-home',
 
 	child('ui-title',
 		display('block'),
-		marginBottom(rem(1)),
 
 		fontSize(rem(3))
+	),
+
+	child('ui-time',
+		display('block'),
+		marginBottom(rem(1)),
 	),
 
 	child('ui-description',

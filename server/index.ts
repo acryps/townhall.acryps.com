@@ -19,6 +19,7 @@ import { toRealTime, toSimulatedAge, toSimulatedTime } from "../interface/time";
 import { LawHouse } from "./life/law-house";
 import { Language } from "./life/language";
 import { FillLife } from "./life/fill/fill";
+import { GoInterface } from "./go";
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
@@ -40,15 +41,13 @@ DbClient.connectedClient.connect().then(async () => {
 	await life.load();
 
 	const lawHouse = new LawHouse(db, new Language(), life);
-
-
-	/* lawHouse.session();
+	lawHouse.session();
 
 	setInterval(() => {
 		lawHouse.session();
-	}, 4 * 60 * 60 * 1000); */
+	}, 4 * 60 * 60 * 1000);
 
-	// life.vote();
+	life.vote();
 
 	/*for (let resident of await db.resident.where(resident => resident.figure == null).toArray()) {
 		console.log(resident.givenName)
@@ -87,6 +86,8 @@ DbClient.connectedClient.connect().then(async () => {
 		Life: life,
 		LawHouse: lawHouse
 	});
+
+	new GoInterface(app, db);
 
 	app.prepareRoutes();
 	app.use(new StaticFileRoute('/assets/', join(process.cwd(), '..', 'page', 'assets')));

@@ -65,6 +65,16 @@ export class LawHouse {
 				bill.mailed = new Date();
 				await bill.update();
 
+				const honestiums = await bill.honestiums.toArray();
+				bill.summary = await this.language.summarize(`
+					${bill.title}
+					${bill.description}
+
+					${honestiums.map(honestium => `${honestium.question}\n${honestium.answer}`).join('\n\n')}
+				`);
+
+				await bill.update();
+
 				const residents = await this.collectLegallyCompetentResidents(await bill.scope.fetch());
 
 				for (let resident of residents) {
@@ -113,9 +123,7 @@ export class LawHouse {
 				.include(resident => resident.votes)
 				.toArray()
 			) {
-				if (!(await resident.votes.toArray()).some(vote => vote.billId == bill.id)) {
-					residents.push(resident);
-				}
+				residents.push(resident);
 			}
 		}
 

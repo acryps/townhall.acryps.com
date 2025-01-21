@@ -39,14 +39,14 @@ DbClient.connectedClient.connect().then(async () => {
 	const life = new Life(db);
 	await life.load();
 
-	const lawHouse = new LawHouse(db, new Language(), life);
+	/* const lawHouse = new LawHouse(db, new Language(), life);
 	lawHouse.session();
 
 	setInterval(() => {
 		lawHouse.session();
-	}, 4 * 60 * 60 * 1000);
+	}, 4 * 60 * 60 * 1000); */
 
-	life.vote();
+	// life.vote();
 
 	/*for (let resident of await db.resident.where(resident => resident.figure == null).toArray()) {
 		console.log(resident.givenName)

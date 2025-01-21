@@ -79,49 +79,6 @@ export class LawHouseSessionManager {
 		await this.session.update();
 	}
 
-	private async unanimous(prompt: string, verification: (proposal: string) => string, context: string, issues: string[] = []) {
-		const proposal = await this.language.respondText(prompt, issues.length ? `
-			this is not the first time that this question has been asked.
-			the last time, the following issues were raised, please consider them when making an answer:
-			${issues.map(issue => `- ${issue}`).join('\n')}
-		` : '', context);
-
-		this.protocol(`Unanimous decision has to be found regarding:\n${proposal}`);
-
-		let pass = 0;
-
-		for (let sessionary of this.sessionaries) {
-			const opinion = await this.language.respondText(verification(proposal), context, sessionary.biography);
-			console.log(opinion);
-
-			if (opinion.startsWith('YES')) {
-				pass++;
-
-				this.protocol(`Unanimous decision supported by ${sessionary.givenName} ${sessionary.familyName}`);
-			} else {
-				const summary = await this.language.summarize(opinion);
-				issues.push(summary);
-
-				this.protocol(`Unanimous decision not supported by ${sessionary.givenName} ${sessionary.familyName}:\n${summary}`);
-			}
-		}
-
-		if (pass == this.sessionaries.length) {
-			this.protocol(`Unanimous decision has been reached`);
-
-			return proposal;
-		} else {
-			this.protocol(`Unanimous decision has not been reached, ${this.sessionaries.length - pass} sessionaries raised issues`);
-
-			// make sure that issues do not overflow
-			while (issues.length > 50) {
-				issues.shift();
-			}
-
-			return await this.unanimous(prompt, verification, context, issues);
-		}
-	}
-
 	private async writeHonestiums() {
 		for (let bill of await this.getOpenBills()) {
 			const honestiums = await bill.honestiums.toArray();
@@ -134,15 +91,7 @@ export class LawHouseSessionManager {
 				const honestium = new BillHonestium();
 				honestium.bill = bill;
 				honestium.pro = pro;
-
-				honestium.question = await this.unanimous(
-					this.language.writeHonestiumQuestion(pro, honestiums),
-					proposal => this.language.verifyHonestiumQuestion(pro, proposal),
-					`
-						${bill.title}
-						${bill.description}
-					`
-				);
+				honestium.question = await this.language.respondText(this.language.writeHonestiumQuestion(pro, honestiums));
 
 				await honestium.create();
 

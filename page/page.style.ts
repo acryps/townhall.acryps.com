@@ -13,6 +13,8 @@ import { propertyStyle } from "./properties/property/index.style";
 import { mapStyle } from "./shared/map/index.style";
 import { chatStyle } from "./resident/chat/index.style";
 import { voteStyle } from "./vote/index.style";
+import { lawHouseStyle } from "./law-house/index.style";
+import { residentBadgeListStyle } from "./shared/resident-badge-list/index.style";
 
 export const pageStyle = () => root(
 	bold,
@@ -27,6 +29,7 @@ export const pageStyle = () => root(
 
 	bannerStyle(),
 	mapStyle(),
+	residentBadgeListStyle(),
 
 	child('body',
 		padding(0),
@@ -76,6 +79,8 @@ export const pageStyle = () => root(
 				residentStyle(),
 
 				voteStyle(),
+
+				lawHouseStyle(),
 
 				createBannerStyle(),
 			)

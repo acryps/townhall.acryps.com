@@ -7,6 +7,7 @@ import { BannerComponent } from "../banner";
 import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, propertyRegisterIcon, publicationIcon, residentIcon } from "../assets/icons/managed";
 import { Point } from "../../interface/point";
 import { toSimulatedTime } from "../../interface/time";
+import { ImpressionsComponent } from "./impressions";
 
 export class HomePage extends Component {
 	render() {
@@ -25,6 +26,8 @@ export class HomePage extends Component {
 		});
 
 		return <ui-home>
+			{new ImpressionsComponent()}
+
 			<ui-title>
 				City of Pilegron
 			</ui-title>
@@ -98,39 +101,15 @@ export class HomePage extends Component {
 					</ui-description>
 				</ui-topic>
 
-				<ui-topic ui-href='/company-office'>
-					{companyOfficeIcon()}
-
-					<ui-name>
-						Company Office
-					</ui-name>
-
-					<ui-description>
-						Register and view a company
-					</ui-description>
-				</ui-topic>
-
-				<ui-topic ui-href='/building-code'>
-					{buildingCodeIcon()}
-
-					<ui-name>
-						Building Code
-					</ui-name>
-
-					<ui-description>
-						Read up on the rules of what can be built
-					</ui-description>
-				</ui-topic>
-
-				<ui-topic ui-href='/laws'>
+				<ui-topic ui-href='/law-house'>
 					{lawIcon()}
 
 					<ui-name>
-						Laws
+						Law House
 					</ui-name>
 
 					<ui-description>
-						Legal information released by Law House
+						Everything legal.
 					</ui-description>
 				</ui-topic>
 			</ui-topics>

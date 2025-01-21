@@ -56,37 +56,6 @@ export const propertyStyle = () => child('ui-property',
 				marginBottom(rem(0.25))
 			),
 
-			child('ui-tenants',
-				display('flex'),
-				flexWrap('wrap'),
-				gap(rem(0.5)),
-
-				child('ui-tenant',
-					display('flex'),
-					alignItems('flex-end'),
-					lineHeight(1),
-
-					color(pageBackgroundColor),
-					backgroundColor(pageTextColor),
-
-					child('img',
-						height(rem(1.25)),
-						width(rem(1)),
-						marginInline(rem(0.5)),
-
-						objectFit('cover'),
-						objectPosition('top')
-					),
-
-					child('ui-name',
-						padding(rem(0.25))
-					)
-				)
-					.attribute('ui-left',
-						opacity(0.5)
-					)
-			),
-
 			child('ui-vacant',
 				display('block'),
 

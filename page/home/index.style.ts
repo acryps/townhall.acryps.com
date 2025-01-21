@@ -1,10 +1,46 @@
-import { alignContent, alignItems, backgroundColor, border, child, ColorValue, display, flexDirection, flexWrap, fontSize, fontStyle, fontWeight, gap, height, hex, Hex, justifyContent, marginBlock, marginBottom, marginInline, marginRight, marginTop, padding, px, rem, style, textAlign, Variable } from "@acryps/style";
+import { alignContent, alignItems, aspectRatio, backdropFilter, backgroundColor, border, bottom, boxShadow, brightness, child, color, ColorValue, contrast, display, flexDirection, flexWrap, fontSize, fontStyle, fontWeight, gap, grayscale, height, hex, Hex, inset, insetInline, invert, justifyContent, left, lineHeight, margin, marginBlock, marginBottom, marginInline, marginRight, marginTop, maxHeight, objectFit, padding, percentage, position, px, ratio, rem, style, textAlign, Variable, vh, width } from "@acryps/style";
 import { buttonStyle } from "../shared/index.style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { card } from "../shared/card.style";
+import { pageGutter } from "../index.style";
 
 export const homeStyle = () => child('ui-home',
 	display('block'),
+
+	child('ui-impression',
+		display('block'),
+		width(percentage(100).add(pageGutter).add(pageGutter)),
+		maxHeight(vh(50)),
+		aspectRatio(ratio(16, 9)),
+		margin(pageGutter.invert()),
+		marginBottom(rem(1)),
+
+		position('relative'),
+
+		child('img',
+			position('absolute'),
+			inset(0),
+
+			width(percentage(100)),
+			height(percentage(100)),
+
+			objectFit('cover')
+		),
+
+		child('ui-name',
+			position('absolute'),
+			left(pageGutter.divide(2)),
+			bottom(pageGutter.divide(2)),
+			padding(pageGutter.divide(2)),
+			marginRight(pageGutter.divide(2)),
+
+			backdropFilter(grayscale(1), brightness(1.5), contrast(0.2)),
+			lineHeight(1),
+			fontSize(rem(0.75)),
+
+			color(hex('fff'))
+		)
+	),
 
 	child('ui-title',
 		display('block'),

@@ -23,8 +23,11 @@ export class LawHouseSessionManager {
 		this.session = new LawHouseSession();
 		this.session.started = new Date();
 		this.session.protocol = '';
+		this.session.scope = this.district;
 
 		await this.session.create();
+
+		this.protocol(`Collecting population consensus for legal district ${this.district.name}`);
 
 		// find sessionaries
 		// sessionaries decide on the tasks of this session
@@ -56,11 +59,16 @@ export class LawHouseSessionManager {
 			this.protocol(`Sessionary ${resident.givenName} ${resident.familyName} present.`);
 		}
 
+		this.protocol(`Session tasks started.`);
+
 		await this.writeHonestiums();
 		await this.certifyBills();
 		await this.sendVotingBallots();
 
 		this.session.ended = new Date();
+
+		this.protocol(`Session finished.`);
+
 		await this.session.update();
 	}
 

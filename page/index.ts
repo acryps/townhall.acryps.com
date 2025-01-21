@@ -24,6 +24,8 @@ import { ProposeBillPage } from "./vote/propose";
 import { HonestiumPage } from "./vote/honestium";
 import { BillPage } from "./vote/bill";
 import { rewrite } from "./rewrite";
+import { LawHousePage } from "./law-house";
+import { LawHouseSessionPage } from "./law-house/session";
 
 export class Application {
 	static router: Router;
@@ -72,6 +74,10 @@ export class Application {
 					.route('/honestium', HonestiumPage)
 
 					.route('/bill/:tag', BillPage)
+				)
+
+				.route('/law-house', LawHousePage
+					.route('/session/:id', LawHouseSessionPage)
 				)
 
 				.route('/create-banner', CreateBannerComponent)

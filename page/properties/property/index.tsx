@@ -6,6 +6,7 @@ import { Point } from "../../../interface/point";
 import { toSimulatedAge } from "../../../interface/time";
 import { addIcon } from "../../assets/icons/managed";
 import { MetaGovernmentBuilding, MetaPlace } from "@acryps/metadata";
+import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
 
 export class PropertyPage extends Component {
 	declare parameters: { id: string };
@@ -90,15 +91,7 @@ export class PropertyPage extends Component {
 						Dwelling #{dwelling.id.split('-')[0]}
 					</ui-name>
 
-					{dwelling.tenants.length ? <ui-tenants>
-						{dwelling.tenants.map(tenant => <ui-tenant ui-left={!!tenant.end} ui-href={`/resident/${tenant.inhabitant.tag}`}>
-							<img src={`/resident/image/${tenant.inhabitant.tag}`} />
-
-							<ui-name>
-								{tenant.inhabitant.givenName} {tenant.inhabitant.familyName}
-							</ui-name>
-						</ui-tenant>)}
-					</ui-tenants> : <ui-vacant>
+					{dwelling.tenants.length ? new ResidentBadgeListComponent(dwelling.tenants.map(tenant => tenant.inhabitant)) : <ui-vacant>
 						<ui-header>
 							Vacant
 						</ui-header>

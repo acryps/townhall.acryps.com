@@ -41,9 +41,9 @@ DbClient.connectedClient.connect().then(async () => {
 	await life.load();
 
 	const lawHouse = new LawHouse(db, new Language(), life);
-	lawHouse.schedule();
+	// lawHouse.schedule();
 
-	life.vote();
+	// life.vote();
 
 	/*for (let resident of await db.resident.where(resident => resident.figure == null).toArray()) {
 		console.log(resident.givenName)

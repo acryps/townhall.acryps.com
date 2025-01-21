@@ -7,6 +7,8 @@ import { LawHouseSessionManager } from "./session";
 export class LawHouse {
 	active = false;
 
+	interval = 4 * 60 * 60 * 1000;
+
 	constructor(
 		private database: DbContext,
 		private language: Language,
@@ -18,22 +20,31 @@ export class LawHouse {
 			const hour = new Date().getHours();
 
 			// sessions can only take place in the work day
-			if (hour >= 8 && hour <= 16) {
+			if (hour >= 8 && hour <= 18) {
 				this.active = true;
 
 				for (let district of await this.database.district.toArray()) {
-					await new LawHouseSessionManager(this.database, this.language, this.life, district, this).execute();
+					const lastSession = await district.lawHouseSessions.orderByDescending(session => session.started).first();
+
+					if (!lastSession || +new Date() - +lastSession.ended > this.interval) {
+						await new LawHouseSessionManager(this.database, this.language, this.life, district, this).execute();
+					}
 				}
 
 				this.active = false;
 			}
 
+			// check every minute
 			setTimeout(() => {
 				next();
-			}, 4 * 60 * 60 * 1000);
+			}, 1000 * 60);
 		};
 
-		next();
+		// check for the first time within the first 30 minutes from launch
+		// prevents multiple instances from messing with eachother
+		setTimeout(() => {
+			next();
+		}, 1000 * 60 * 30 * Math.random());
 	}
 
 	// only people who are responsible in a legal sense

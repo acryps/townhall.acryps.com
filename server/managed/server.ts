@@ -22,6 +22,9 @@ import { HistoricListingGradeViewModel } from "././../areas/history-listing/grad
 import { PropertyHistoricListingModifierViewModel } from "././../areas/history-listing/link.view";
 import { HistoricListingModifierViewModel } from "././../areas/history-listing/modifier.view";
 import { HistoricListingService } from "././../areas/history-listing/listing.service";
+import { LawHouseSessionSummaryModel } from "././../areas/law-house/session";
+import { LawHouseSessionViewModel } from "././../areas/law-house/session";
+import { LawHouseService } from "././../areas/law-house/service";
 import { Life } from "././../life";
 import { ResidentEventViewModel } from "././../areas/life/resident";
 import { ResidentRelationViewModel } from "././../areas/life/resident";
@@ -51,6 +54,7 @@ import { VoteTickerViewModel } from "././../areas/vote/vote";
 import { VoteViewModel } from "././../areas/vote/vote";
 import { VoteService } from "././../areas/vote/service";
 import { TenantViewModel } from "./../areas/property.view";
+import { LawHouseSessionaryViewModel } from "./../areas/law-house/session";
 import { TenancyViewModel } from "./../areas/life/resident";
 import { ArticleImageViewModel } from "./../areas/publication/article";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
@@ -68,6 +72,8 @@ import { Street } from "./../managed/database";
 import { WaterBody } from "./../managed/database";
 import { HistoricListingGrade } from "./../managed/database";
 import { HistoricListingModifier } from "./../managed/database";
+import { LawHouseSession } from "./../managed/database";
+import { LawHouseSessionary } from "./../managed/database";
 import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
 import { Article } from "./../managed/database";
@@ -101,6 +107,10 @@ Inject.mappings = {
 	},
 	"HistoricListingService": {
 		objectConstructor: HistoricListingService,
+		parameters: ["DbContext"]
+	},
+	"LawHouseService": {
+		objectConstructor: LawHouseService,
 		parameters: ["DbContext"]
 	},
 	"LifeService": {
@@ -394,6 +404,26 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(HistoricListingService),
 			(controller, params) => controller.removeModifier(
 				params["kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn"]
+			)
+		);
+
+		this.expose(
+			"FhNmk4YT9mdGlwem83b2U2MW04NWdudW",
+			{},
+			inject => inject.construct(LawHouseService),
+			(controller, params) => controller.getSessions(
+				
+			)
+		);
+
+		this.expose(
+			"FjemcwbHIxaTVub2c1aDozOTNmeDduYz",
+			{
+			"BoeXUxZGZka3ZvMGI1ZX1yZThzdmZ0NX": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LawHouseService),
+			(controller, params) => controller.getSession(
+				params["BoeXUxZGZka3ZvMGI1ZX1yZThzdmZ0NX"]
 			)
 		);
 
@@ -1885,6 +1915,148 @@ ViewModel.mappings = {
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"shortName" in viewModel && (model.shortName = viewModel.shortName === null ? null : `${viewModel.shortName}`);
+
+			return model;
+		}
+	},
+	[LawHouseSessionSummaryModel.name]: class ComposedLawHouseSessionSummaryModel extends LawHouseSessionSummaryModel {
+		async map() {
+			return {
+				scope: new DistrictViewModel(await BaseServer.unwrap(this.$$model.scope)),
+				ended: this.$$model.ended,
+				id: this.$$model.id,
+				started: this.$$model.started
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get scope() {
+					return ViewModel.mappings[DistrictViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "scope-LawHouseSessionSummaryModel"]
+					);
+				},
+				ended: true,
+				id: true,
+				started: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new LawHouseSessionSummaryModel(null);
+			"scope" in data && (item.scope = data.scope && ViewModel.mappings[DistrictViewModel.name].toViewModel(data.scope));
+			"ended" in data && (item.ended = data.ended === null ? null : new Date(data.ended));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"started" in data && (item.started = data.started === null ? null : new Date(data.started));
+
+			return item;
+		}
+
+		static async toModel(viewModel: LawHouseSessionSummaryModel) {
+			let model: LawHouseSession;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(LawHouseSession).find(viewModel.id)
+			} else {
+				model = new LawHouseSession();
+			}
+			
+			"scope" in viewModel && (model.scope.id = viewModel.scope ? viewModel.scope.id : null);
+			"ended" in viewModel && (model.ended = viewModel.ended === null ? null : new Date(viewModel.ended));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"started" in viewModel && (model.started = viewModel.started === null ? null : new Date(viewModel.started));
+
+			return model;
+		}
+	},
+	[LawHouseSessionaryViewModel.name]: class ComposedLawHouseSessionaryViewModel extends LawHouseSessionaryViewModel {
+		async map() {
+			return {
+				resident: new ResidentSummaryModel(await BaseServer.unwrap(this.$$model.resident)),
+				id: this.$$model.id
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get resident() {
+					return ViewModel.mappings[ResidentSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "resident-LawHouseSessionaryViewModel"]
+					);
+				},
+				id: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new LawHouseSessionaryViewModel(null);
+			"resident" in data && (item.resident = data.resident && ViewModel.mappings[ResidentSummaryModel.name].toViewModel(data.resident));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: LawHouseSessionaryViewModel) {
+			let model: LawHouseSessionary;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(LawHouseSessionary).find(viewModel.id)
+			} else {
+				model = new LawHouseSessionary();
+			}
+			
+			"resident" in viewModel && (model.resident.id = viewModel.resident ? viewModel.resident.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 
 			return model;
 		}
@@ -3552,6 +3724,94 @@ ViewModel.mappings = {
 			
 			"pro" in viewModel && (model.pro = !!viewModel.pro);
 			"submitted" in viewModel && (model.submitted = viewModel.submitted === null ? null : new Date(viewModel.submitted));
+
+			return model;
+		}
+	},
+	[LawHouseSessionViewModel.name]: class ComposedLawHouseSessionViewModel extends LawHouseSessionViewModel {
+		async map() {
+			return {
+				scope: new DistrictViewModel(await BaseServer.unwrap(this.$$model.scope)),
+				sessionaries: (await this.$$model.sessionaries.includeTree(ViewModel.mappings[LawHouseSessionaryViewModel.name].items).toArray()).map(item => new LawHouseSessionaryViewModel(item)),
+				ended: this.$$model.ended,
+				id: this.$$model.id,
+				protocol: this.$$model.protocol,
+				started: this.$$model.started
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get scope() {
+					return ViewModel.mappings[DistrictViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "scope-LawHouseSessionViewModel"]
+					);
+				},
+				get sessionaries() {
+					return ViewModel.mappings[LawHouseSessionaryViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "sessionaries-LawHouseSessionViewModel"]
+					);
+				},
+				ended: true,
+				id: true,
+				protocol: true,
+				started: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new LawHouseSessionViewModel(null);
+			"scope" in data && (item.scope = data.scope && ViewModel.mappings[DistrictViewModel.name].toViewModel(data.scope));
+			"sessionaries" in data && (item.sessionaries = data.sessionaries && [...data.sessionaries].map(i => ViewModel.mappings[LawHouseSessionaryViewModel.name].toViewModel(i)));
+			"ended" in data && (item.ended = data.ended === null ? null : new Date(data.ended));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"protocol" in data && (item.protocol = data.protocol === null ? null : `${data.protocol}`);
+			"started" in data && (item.started = data.started === null ? null : new Date(data.started));
+
+			return item;
+		}
+
+		static async toModel(viewModel: LawHouseSessionViewModel) {
+			let model: LawHouseSession;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(LawHouseSession).find(viewModel.id)
+			} else {
+				model = new LawHouseSession();
+			}
+			
+			"scope" in viewModel && (model.scope.id = viewModel.scope ? viewModel.scope.id : null);
+			"sessionaries" in viewModel && (null);
+			"ended" in viewModel && (model.ended = viewModel.ended === null ? null : new Date(viewModel.ended));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"protocol" in viewModel && (model.protocol = viewModel.protocol === null ? null : `${viewModel.protocol}`);
+			"started" in viewModel && (model.started = viewModel.started === null ? null : new Date(viewModel.started));
 
 			return model;
 		}

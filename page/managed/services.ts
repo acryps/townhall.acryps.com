@@ -290,6 +290,36 @@ export class HistoricListingModifierViewModel {
 	}
 }
 
+export class LawHouseSessionSummaryModel {
+	scope: DistrictViewModel;
+	ended: Date;
+	id: string;
+	started: Date;
+
+	private static $build(raw) {
+		const item = new LawHouseSessionSummaryModel();
+		raw.scope === undefined || (item.scope = raw.scope ? DistrictViewModel["$build"](raw.scope) : null)
+		raw.ended === undefined || (item.ended = raw.ended ? new Date(raw.ended) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.started === undefined || (item.started = raw.started ? new Date(raw.started) : null)
+		
+		return item;
+	}
+}
+
+export class LawHouseSessionaryViewModel {
+	resident: ResidentSummaryModel;
+	id: string;
+
+	private static $build(raw) {
+		const item = new LawHouseSessionaryViewModel();
+		raw.resident === undefined || (item.resident = raw.resident ? ResidentSummaryModel["$build"](raw.resident) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		
+		return item;
+	}
+}
+
 export class ResidentSummaryModel {
 	birthday: Date;
 	familyName: string;
@@ -693,6 +723,27 @@ export class VoteTickerViewModel {
 		const item = new VoteTickerViewModel();
 		raw.pro === undefined || (item.pro = !!raw.pro)
 		raw.submitted === undefined || (item.submitted = raw.submitted ? new Date(raw.submitted) : null)
+		
+		return item;
+	}
+}
+
+export class LawHouseSessionViewModel {
+	scope: DistrictViewModel;
+	sessionaries: LawHouseSessionaryViewModel[];
+	ended: Date;
+	id: string;
+	protocol: string;
+	started: Date;
+
+	private static $build(raw) {
+		const item = new LawHouseSessionViewModel();
+		raw.scope === undefined || (item.scope = raw.scope ? DistrictViewModel["$build"](raw.scope) : null)
+		raw.sessionaries === undefined || (item.sessionaries = raw.sessionaries ? raw.sessionaries.map(i => LawHouseSessionaryViewModel["$build"](i)) : null)
+		raw.ended === undefined || (item.ended = raw.ended ? new Date(raw.ended) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.protocol === undefined || (item.protocol = raw.protocol === null ? null : `${raw.protocol}`)
+		raw.started === undefined || (item.started = raw.started ? new Date(raw.started) : null)
 		
 		return item;
 	}
@@ -1267,6 +1318,50 @@ export class HistoricListingService {
 
 			if ("aborted" in r) {
 				throw new Error("request aborted by server");
+			}
+		});
+	}
+}
+
+export class LawHouseService {
+	async getSessions(): Promise<Array<LawHouseSessionSummaryModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("FhNmk4YT9mdGlwem83b2U2MW04NWdudW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : LawHouseSessionSummaryModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getSession(id: string): Promise<LawHouseSessionViewModel> {
+		const $data = new FormData();
+		$data.append("BoeXUxZGZka3ZvMGI1ZX1yZThzdmZ0NX", Service.stringify(id))
+
+		return await fetch(Service.toURL("FjemcwbHIxaTVub2c1aDozOTNmeDduYz"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : LawHouseSessionViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
 			}
 		});
 	}

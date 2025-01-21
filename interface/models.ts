@@ -120,6 +120,18 @@ export interface HistoricListingModifierViewModel {
 	shortName: string;
 }
 
+export interface LawHouseSessionSummaryModel {
+    scope: DistrictViewModel;
+	ended: Date;
+	id: string;
+	started: Date;
+}
+
+export interface LawHouseSessionaryViewModel {
+    resident: ResidentSummaryModel;
+	id: string;
+}
+
 export interface ResidentSummaryModel {
     birthday: Date;
 	familyName: string;
@@ -289,4 +301,13 @@ export interface VoteViewModel {
 export interface VoteTickerViewModel {
     pro: boolean;
 	submitted: Date;
+}
+
+export interface LawHouseSessionViewModel {
+    scope: DistrictViewModel;
+	sessionaries: LawHouseSessionaryViewModel[];
+	ended: Date;
+	id: string;
+	protocol: string;
+	started: Date;
 }

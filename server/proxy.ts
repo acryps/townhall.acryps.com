@@ -14,7 +14,7 @@ export class Proxy {
 		const tileSets = new Map<string, TileSet[]>();
 
 		let history;
-		
+
 		Proxy.getHistory().then(res => history = res);
 
 		setInterval(async () => {
@@ -37,7 +37,7 @@ export class Proxy {
 		});
 
 		let tubes;
-		
+
 		Proxy.getTubes().then(res => tubes = res);
 
 		setInterval(async () => {
@@ -62,7 +62,6 @@ export class Proxy {
 		const map = new TileSet(`${Proxy.source}/map.png`);
 
 		app.app.get('/images/map/:x/:y', (req, res) => map.read(+req.params.x, +req.params.y).then(tile => res.end(tile)));
-		app.app.get('/images/area/:x/:y/:width/:height', (req, res) => map.area(+req.params.x, +req.params.y, +req.params.width, +req.params.height).then(tile => res.end(tile)));
 
 		app.app.get('/images/map', (req, res) => fetch(`${Proxy.source}/map.png`).then(r => r.buffer()).then(r => res.end(r)));
 		app.app.get('/images/isometric', (req, res) => fetch(`${Proxy.source}/isometric.png`).then(r => r.buffer()).then(r => res.end(r)));

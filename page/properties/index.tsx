@@ -1,7 +1,7 @@
 import { MapService, PropertySummaryModel } from "../managed/services";
-import { Point } from "../map/point";
-import { Component } from "@acryps/page/built/component";
+import { Component } from "@acryps/page";
 import { MapPreviewComponent } from "../shared/map.preview";
+import { Point } from "../../interface/point";
 
 export class PropertiesComponent extends Component {
 	properties: PropertySummaryModel[];
@@ -16,7 +16,7 @@ export class PropertiesComponent extends Component {
 				const points = Point.unpack(property.bounds);
 				const size = Point.size(points);
 
-				return <ui-property ui-incomplete={(property.borough && property.type) ? null : ''} ui-href={`/property/${property.id}`}>
+				return <ui-property ui-incomplete={!property.borough || !property.type} ui-href={`/property/${property.id}`}>
 					{new MapPreviewComponent(Point.unpack(property.bounds))}
 
 					<ui-property-tagline>

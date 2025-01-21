@@ -3,8 +3,12 @@ import { Borough } from "../managed/database";
 
 export class BoroughViewModel extends ViewModel<Borough> {
 	id;
+	tag;
 	name;
+	description;
 	color;
-	
+	incorporation;
+
 	bounds;
+	banner;
 }

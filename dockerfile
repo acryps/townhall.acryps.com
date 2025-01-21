@@ -1,11 +1,12 @@
-FROM node:18-slim
+FROM node:20
 
 WORKDIR /usr/src/app
 COPY . .
 
-RUN npm install
-RUN cd server && npm install && cd ..
-RUN cd page && npm install && cd ..
+# build application
+RUN cd server ; npm ci ; cd ..
+RUN cd page ; npm ci ; cd ..
 RUN npm run build
 
-CMD [ "node", "server/dist/main.js" ]
+WORKDIR /usr/src/app/server
+CMD [ "node", ".built/index.js" ]

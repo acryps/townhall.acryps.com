@@ -14,4 +14,8 @@ export class GameService extends Service {
 			this.db.player.orderByAscending(player => player.username)
 		);
 	}
+	
+	getOnlinePlayers() {
+		return PlayerViewModel.from(this.db.player.where(player => player.online == true));
+	}
 }

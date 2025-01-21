@@ -1,4 +1,6 @@
 node_modules
-dist
+.built
 
-.parcel-cache
+page/asssets/icons/managed
+
+.prompt

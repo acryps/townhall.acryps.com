@@ -18,6 +18,8 @@ CREATE TABLE bill (
 	title TEXT,
 	description TEXT,
 
+	mailed TIMESTAMP,
+
 	certified TIMESTAMP,
 	pro BOOLEAN,
 

@@ -74,7 +74,6 @@ export const rewrite = () => {
 				}
 
 				attributes[rewrite.attribute] = value;
-				delete attributes[attribute];
 
 				if (rewrite.tag) {
 					tag = rewrite.tag;

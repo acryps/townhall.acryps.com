@@ -1,8 +1,11 @@
-import { child, display, padding, rem, marginBottom, color, backgroundColor, fontWeight, marginTop, whiteSpace, fontStyle, paddingInline, marginRight, marginLeft, paddingLeft, borderLeft, px, Variable, border, height, justifyContent, width, percentage, background, flexDirection, alignSelf, maxWidth, paddingBlock, fontSize, textTransform, alignItems, marginBlock, style, lineHeight } from "@acryps/style";
-import { billTextColor, billBackgroundColor, negativeColor, positiveColor, pageBackgroundColor, pageTextColor } from "../../index.style";
+import { child, display, padding, rem, marginBottom, color, backgroundColor, fontWeight, marginTop, whiteSpace, fontStyle, paddingInline, marginRight, marginLeft, paddingLeft, borderLeft, px, Variable, border, height, justifyContent, width, percentage, background, flexDirection, alignSelf, maxWidth, paddingBlock, fontSize, textTransform, alignItems, marginBlock, style, lineHeight, position, left, right } from "@acryps/style";
+import { billTextColor, billBackgroundColor, negativeColor, positiveColor, pageBackgroundColor, pageTextColor, neutralColor } from "../../index.style";
 
+export const tickerPending = new Variable('ticker-pending');
 export const tickerPro = new Variable('ticker-pro');
 export const tickerContra = new Variable('ticker-contra');
+
+const tickerWidth = tickerPending.add(tickerPro).add(tickerContra);
 
 export const billStyle = () => child('ui-bill',
 	display('block'),
@@ -75,17 +78,30 @@ export const billStyle = () => child('ui-bill',
 		marginTop(rem(2)),
 
 		child('ui-bar',
-			display('flex'),
+			display('block'),
 			height(rem(0.5)),
 			marginBlock(rem(0.5)),
+			position('relative'),
 
-			backgroundColor(negativeColor),
+			backgroundColor(neutralColor),
 			border(px(1), 'solid', 'currentColor'),
 
 			child('ui-pro',
-				width(percentage(100).divide(tickerPro.add(tickerContra)).multiply(tickerPro)),
+				position('absolute'),
+				left(0),
+				width(percentage(100).divide(tickerWidth).multiply(tickerPro)),
+				height(percentage(100)),
 
 				backgroundColor(positiveColor)
+			),
+
+			child('ui-contra',
+				position('absolute'),
+				right(0),
+				width(percentage(100).divide(tickerWidth).multiply(tickerContra)),
+				height(percentage(100)),
+
+				backgroundColor(negativeColor)
 			),
 
 			style('~ ui-container',

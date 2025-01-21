@@ -284,4 +284,5 @@ export interface VoteViewModel {
 
 export interface VoteTickerViewModel {
     pro: boolean;
+	submitted: Date;
 }

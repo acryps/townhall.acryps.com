@@ -62,6 +62,10 @@ export class Language {
 		Imagine a creative given and family name, probable occupation, core beliefs and principles.
 		Do not mention facts like age or social standing.
 
+		Remember, we are currently in the year ${toSimulatedTime(new Date()).getUTCFullYear()}.
+		The people might not be progressive, they might not be nice, or kind.
+		We cannot have everybody be a nice, socially hyperaware, environment-friendly gardener, some people will be industrialists, stupid, populists or whatever else.
+
 		${this.environment()}
 		${this.metaRules()}
 	`;
@@ -230,7 +234,7 @@ export class Language {
 	}
 
 	private async confirm(positive: string, negative: string, ...data: string[]) {
-		const response = await this.respond(`is the following text acceptable as a ${positive}, then respond with YES. if it is clearly a ${negative}, respond with NO`, ...data);
+		const response = await this.respondText(`is the following text acceptable as a ${positive}, then respond with YES. if it is clearly a ${negative}, respond with NO`, ...data);
 
 		console.log(data, response)
 
@@ -238,7 +242,7 @@ export class Language {
 	}
 
 	async summarize(message: string) {
-		const summary = await this.respond(`
+		const summary = await this.respondText(`
 			summarize the text in two to three sentences.
 			do not tell me that you made a summary, or add any other meta text, just return the summary
 		`, message);

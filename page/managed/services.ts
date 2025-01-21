@@ -679,10 +679,12 @@ export class VoteViewModel {
 
 export class VoteTickerViewModel {
 	pro: boolean;
+	submitted: Date;
 
 	private static $build(raw) {
 		const item = new VoteTickerViewModel();
 		raw.pro === undefined || (item.pro = !!raw.pro)
+		raw.submitted === undefined || (item.submitted = raw.submitted ? new Date(raw.submitted) : null)
 		
 		return item;
 	}

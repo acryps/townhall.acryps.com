@@ -11,4 +11,5 @@ export class VoteViewModel extends ViewModel<Vote> {
 
 export class VoteTickerViewModel extends ViewModel<Vote> {
 	pro;
+	submitted;
 }

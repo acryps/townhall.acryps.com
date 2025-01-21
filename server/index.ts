@@ -58,8 +58,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new PropertyRegisterTileServer(app, db);
 
 	// life.tick();
-
-	new FillLife(life, db).fillEmptyDwellings();
+	/// new FillLife(life, db).fillEmptyDwellings();
 
 	ViewModel.globalFetchingContext = db;
 

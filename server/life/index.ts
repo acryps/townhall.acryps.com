@@ -38,56 +38,26 @@ export class Life {
 		await this.bondingFactor.tick(async (initiator: Resident, peer: Resident) => await this.bond(initiator, peer));
 	}
 
-	async getPendingVoters(bill: Bill) {
-		// find people who need to vote on this bill
-		const boroughs = await this.collectBoroughs(await bill.scope.fetch());
-
-		// find residents
-		const residents: Resident[] = [];
-
-		for (let borough of boroughs) {
-			for (let resident of await this.database.resident
-				.where(resident => resident.mainTenancy.dwelling.property.boroughId == borough.id)
-				.include(resident => resident.votes)
-				.toArray()
-			) {
-				if (!(await resident.votes.toArray()).some(vote => vote.billId == bill.id)) {
-					residents.push(resident);
-				}
-			}
-		}
-
-		return residents;
-	}
-
 	async vote() {
-		const openBills = await this.database.bill.where(bill => bill.certified == null).toArray();
+		const openVotes = await this.database.vote
+			.where(vote => vote.submitted == null)
+			.orderByAscending(vote => vote.id)
+			.toArray();
 
-		for (let bill of openBills) {
-			console.log(`open: '${bill.tag}'`);
+		console.log(`open vote ballots: ${openVotes.length}`);
 
-			const residents = await this.getPendingVoters(bill);
-
-			console.log(`found ${residents.length} residents who still need to vote on '${bill.tag}'`);
-
-			// vote
-			for (let resident of residents) {
-				await this.voteBill(resident, bill);
-			}
+		for (let ballot of openVotes) {
+			await this.voteBill(ballot);
 		}
 	}
 
-	async collectBoroughs(district: District) {
-		const boroughs = await district.boroughs.toArray();
-
-		for (let child of await district.children.toArray()) {
-			boroughs.push(...await this.collectBoroughs(child));
+	async voteBill(ballot: Vote) {
+		if (ballot.submitted) {
+			throw new Error(`Vote '${ballot.id}' already submitted`);
 		}
 
-		return boroughs;
-	}
-
-	async voteBill(resident: Resident, bill: Bill) {
+		const resident = await ballot.resident.fetch();
+		const bill = await ballot.bill.fetch();
 		const honestums = await bill.honestiums.toArray();
 
 		const response = await this.language.respondText(this.language.vote(resident),
@@ -101,27 +71,17 @@ export class Life {
 			throw new Error(`Bill '${bill.tag}' already certified`);
 		}
 
-		const existingVote = await bill.votes.first(vote => vote.residentId.valueOf() == resident.id);
-
-		if (existingVote) {
-			throw new Error(`Bill '${bill.tag}' already voted by '${resident.givenName} ${resident.familyName}'`);
-		}
-
 		console.log(response);
 
 		if (!response.startsWith('YES:') && !response.startsWith('NO:')) {
 			return this.voteBill(resident, bill);
 		}
 
-		const vote = new Vote();
-		vote.bill = bill;
-		vote.submitted = new Date();
-		vote.resident = resident;
+		ballot.submitted = new Date();
+		ballot.pro = response.startsWith('YES:');
+		ballot.reason = response.split(':').slice(1).join(':').trim();
 
-		vote.pro = response.startsWith('YES:');
-		vote.reason = response.split(':').slice(1).join(':').trim();
-
-		await vote.create();
+		await ballot.update();
 	}
 
 	async assignFigure(resident: Resident) {

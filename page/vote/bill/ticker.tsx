@@ -1,6 +1,6 @@
 import { Component } from "@acryps/page";
 import { BillViewModel, VoteService, VoteTickerViewModel, VoteViewModel } from "../../managed/services";
-import { tickerContra, tickerPro } from "./index.style";
+import { tickerContra, tickerPending, tickerPro } from "./index.style";
 
 export class VoteTickerComponent extends Component {
 	iteration = 0;
@@ -40,8 +40,10 @@ export class VoteTickerComponent extends Component {
 	}
 
 	render() {
-		const pro = this.ticker.filter(vote => vote.pro).length;
-		const contra = this.ticker.filter(vote => !vote.pro).length;
+		const pending = this.ticker.filter(vote => !vote.submitted).length;
+
+		const pro = this.ticker.filter(vote => vote.pro && vote.submitted).length;
+		const contra = this.ticker.filter(vote => !vote.pro && vote.submitted).length;
 
 		return <ui-ticker>
 			<ui-container>
@@ -51,8 +53,10 @@ export class VoteTickerComponent extends Component {
 					{contra}
 				</ui-count>
 			</ui-container>
-			<ui-bar style={[tickerPro.provide(pro), tickerContra.provide(contra)].join(';')}>
+
+			<ui-bar style={[tickerPending.provide(pending), tickerPro.provide(pro), tickerContra.provide(contra)].join(';')}>
 				<ui-pro />
+				<ui-contra />
 			</ui-bar>
 
 			<ui-container>

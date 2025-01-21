@@ -3477,7 +3477,8 @@ ViewModel.mappings = {
 	[VoteTickerViewModel.name]: class ComposedVoteTickerViewModel extends VoteTickerViewModel {
 		async map() {
 			return {
-				pro: this.$$model.pro
+				pro: this.$$model.pro,
+				submitted: this.$$model.submitted
 			}
 		};
 
@@ -3507,13 +3508,15 @@ ViewModel.mappings = {
 			}
 
 			return {
-				pro: true
+				pro: true,
+				submitted: true
 			};
 		};
 
 		static toViewModel(data) {
 			const item = new VoteTickerViewModel(null);
 			"pro" in data && (item.pro = !!data.pro);
+			"submitted" in data && (item.submitted = data.submitted === null ? null : new Date(data.submitted));
 
 			return item;
 		}
@@ -3522,6 +3525,7 @@ ViewModel.mappings = {
 			const model = new Vote();
 			
 			"pro" in viewModel && (model.pro = !!viewModel.pro);
+			"submitted" in viewModel && (model.submitted = viewModel.submitted === null ? null : new Date(viewModel.submitted));
 
 			return model;
 		}

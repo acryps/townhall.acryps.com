@@ -41,11 +41,7 @@ DbClient.connectedClient.connect().then(async () => {
 	await life.load();
 
 	const lawHouse = new LawHouse(db, new Language(), life);
-	lawHouse.session();
-
-	setInterval(() => {
-		lawHouse.session();
-	}, 4 * 60 * 60 * 1000);
+	lawHouse.schedule();
 
 	life.vote();
 

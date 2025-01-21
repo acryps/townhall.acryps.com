@@ -16,7 +16,6 @@ export class Language {
 
 	readonly metaRules = () => `
 		Do not tell me what you are doing, just respond in values in a JSON format.
-		Nothing before the output, nothing after.
 		Do not encapsulate the object, just respond as a JSON string or array of strings.
 		Do not mention that this is all fictional, pretend that the story is real.
 		When mentioning dates, always use YYYY-MM-DD format.
@@ -107,11 +106,31 @@ export class Language {
 
 	readonly writeHonestiumQuestion = (pro: boolean, peers: BillHonestium[]) => `
 		In our fictional voting system, anybody can propose a new bill, even without legal knowledge.
-		But the commitee or person submitting the vote must answer multiple pro and contra questions honestly - a so called Honestium.
+		But the commitee or person submitting the bill must answer multiple pro and contra questions honestly - a so called Honestium.
 		Given the bill, write a ${pro ? 'pro' : 'contra'} question asking about a ${pro ? 'positive' : 'negative'} aspect of this bill.
+		Only write one question.
 
 		Avoid asking questions like the following questions, as they have already been raised:
 		${peers.map(honestium => `- ${honestium.pro ? 'pro' : 'contra'}: ${honestium.question}`).join('\n')}
+
+		${this.environment()}
+		${this.metaRules()}
+	`;
+
+	readonly verifyHonestiumQuestion = (pro: boolean, question: string) => `
+		In our fictional voting system, anybody can propose a new bill, even without legal knowledge.
+		The party submitting the bill must answer multiple pro and contra questions honestly - a so called Honestium.
+		The independent commitee has now proposed the following ${pro ? 'pro' : 'contra'} honestium question to be answered by the creators of the bill.
+		QUESTION: ${question}
+
+		Is this a fair ${pro ? 'pro' : 'contra'} honestium question?
+		Answer with "YES" if you think this is a fair honestium question.
+		Answer with "NO", followed by you reason if this is not a fair question.
+		The question might not align with your views, nor with what you'd vote.
+		Your job is to decide wether this question is relevant to the bill.
+		Your opinion on the question does not matter, you must only say if this question is relevant to this bill.
+		Your biography will follow, pretend that you are this person.
+		This question is aimed at the sumitters of the bill, which will try to argue ${pro ? 'for' : 'against'} this question.
 
 		${this.environment()}
 		${this.metaRules()}
@@ -161,8 +180,21 @@ export class Language {
 		response = response.trim();
 
 		// remove markdown wrapping
-		response = response.split('```json')[1] ?? '';
-		response = response.split('```')[0];
+		if (response.startsWith('json')) {
+			response = response.replace('json', '');
+		}
+
+		if (response.startsWith('```')) {
+			response = response.replace('```', '');
+		}
+
+		if (response.endsWith('```')) {
+			response = response.split('').reverse().join('').replace('```', '').split('').reverse().join('');
+		}
+
+		if (response.startsWith('json')) {
+			response = response.replace('json', '');
+		}
 
 		// llms struggle with putting '\n' in multiline strings
 		// replaces new lines with \n as a string, making it valid JSON
@@ -223,9 +255,9 @@ export class Language {
 
 	async summarize(message: string) {
 		const lines = await this.respondTextArray(`
-			summarize the text in two to three short sentences.
-
 			${this.metaRules}
+
+			summarize the text in two to three short sentences, encapsulated as a JSON array.
 		`, message);
 
 		const summary = lines.join(' ');

@@ -1,12 +1,11 @@
 import { Life } from "..";
 import { toSimulatedAge } from "../../../interface/time";
-import { BillHonestium, DbContext, District, Property, Resident, Vote } from "../../managed/database";
+import { BillHonestium, DbContext, District, LawHouseSession, Property, Resident, Vote } from "../../managed/database";
 import { Language } from "../language";
+import { LawHouseSessionManager } from "./session";
 
 export class LawHouse {
 	active = false;
-
-	honestiumSize = 3;
 
 	constructor(
 		private database: DbContext,
@@ -14,98 +13,32 @@ export class LawHouse {
 		private life: Life
 	) { }
 
-	// works through all tasks assigned to the law house
-	// the team goes into session every four hours
-	async session() {
-		this.active = true;
+	schedule() {
+		const next = async () => {
+			const hour = new Date().getHours();
 
-		await this.writeHonestiums();
-		await this.certifyBills();
-		await this.sendVotingBallots();
+			// sessions can only take place in the work day
+			if (hour >= 8 && hour <= 16) {
+				this.active = true;
 
-		this.active = false;
-	}
-
-	private async getOpenBills() {
-		return await this.database.bill
-			.where(bill => bill.certified == null)
-			.toArray();
-	}
-
-	private async writeHonestiums() {
-		for (let bill of await this.getOpenBills()) {
-			const honestiums = await bill.honestiums.toArray();
-
-			while (honestiums.length != this.honestiumSize * 2) {
-				const pro = honestiums.filter(honestium => honestium.pro).length < this.honestiumSize;
-
-				const honestium = new BillHonestium();
-				honestium.bill = bill;
-				honestium.pro = pro;
-
-				const prompt = this.language.writeHonestiumQuestion(pro, honestiums);
-				console.log(prompt);
-
-				honestium.question = await this.language.respondText(prompt, `
-					${bill.title}
-					${bill.description}
-				`);
-
-				await honestium.create();
-
-				honestiums.push(honestium);
-			}
-		}
-	}
-
-	// sends out ballots for new votes
-	private async sendVotingBallots() {
-		for (let bill of await this.getOpenBills()) {
-			if (!bill.mailed) {
-				bill.mailed = new Date();
-				await bill.update();
-
-				const honestiums = await bill.honestiums.toArray();
-				bill.summary = await this.language.summarize(`
-					${bill.title}
-					${bill.description}
-
-					${honestiums.map(honestium => `${honestium.question}\n${honestium.answer}`).join('\n\n')}
-				`);
-
-				await bill.update();
-
-				const residents = await this.collectLegallyCompetentResidents(await bill.scope.fetch());
-
-				for (let resident of residents) {
-					const vote = new Vote();
-					vote.bill = bill;
-					vote.resident = resident;
-
-					await vote.create();
+				for (let district of await this.database.district.toArray()) {
+					await new LawHouseSessionManager(this.database, this.language, this.life, district, this).execute();
 				}
+
+				this.active = false;
 			}
-		}
-	}
 
-	private async certifyBills() {
-		for (let bill of await this.getOpenBills()) {
-			const openVotes = await bill.votes.where(vote => vote.submitted == null).count();
+			setTimeout(() => {
+				next();
+			}, 4 * 60 * 60 * 1000);
+		};
 
-			if (openVotes == 0 && !bill.certified && bill.mailed) {
-				const votes = await bill.votes.toArray();
-
-				bill.pro = votes.filter(vote => vote.pro).length > votes.length / 2;
-				bill.certified = new Date();
-
-				await bill.update();
-			}
-		}
+		next();
 	}
 
 	// only people who are responsible in a legal sense
 	// no children
-	private async collectLegallyCompetentResidents(district: District) {
+	async collectLegallyCompetentResidents(district: District) {
 		return (await this.collectResidents(district))
 			.filter(resident => toSimulatedAge(resident.birthday) > 18)
 	}

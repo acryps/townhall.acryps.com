@@ -39,8 +39,10 @@ DbClient.connectedClient.connect().then(async () => {
 	const life = new Life(db);
 	await life.load();
 
-	/* const lawHouse = new LawHouse(db, new Language(), life);
-	lawHouse.session();
+	const lawHouse = new LawHouse(db, new Language(), life);
+
+
+	/* lawHouse.session();
 
 	setInterval(() => {
 		lawHouse.session();

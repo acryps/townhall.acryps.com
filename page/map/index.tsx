@@ -3,7 +3,7 @@ import { MapComponent } from "../shared/map";
 import { Application } from "..";
 import { registerInteration } from "../shared/map/interaction";
 import { Point } from "../../interface/point";
-import { baseLayer, boroughLayer, nightLayer, propertyLayer } from "../shared/map/layers";
+import { baseLayer, boroughLayer, movementHeatmapLayer, nightLayer, propertyLayer } from "../shared/map/layers";
 import { MapLayer } from "../shared/map/layer";
 import { boroughIcon, captureIcon, dayIcon, drawIcon, movementIcon, propertyRegisterIcon, residentIcon, streetIcon } from "../assets/icons/managed";
 
@@ -54,7 +54,7 @@ export class MapPage extends Component {
 				</ui-layers>
 
 				<ui-layers>
-					<ui-layer ui-click={() => this.toggleLayer(propertyLayer)}>
+					<ui-layer ui-click={() => this.toggleLayer(movementHeatmapLayer)}>
 						{movementIcon()}
 					</ui-layer>
 

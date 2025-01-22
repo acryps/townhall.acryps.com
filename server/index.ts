@@ -15,8 +15,9 @@ import { LawHouse } from "./life/law-house";
 import { Language } from "./life/language";
 import { FillLife } from "./life/fill/fill";
 import { GoInterface } from "./go";
-import { PropertyTileServer } from "./map/layers/property";
-import { BoroughTileServer } from "./map/layers/borough";
+import { PropertyTileServer } from "./map/layers/shape/property";
+import { BoroughTileServer } from "./map/layers/shape/borough";
+import { MovementTileServer } from "./map/layers/heatmap/movement";
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
@@ -51,6 +52,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new BaseTileServer(app, database);
 	new PropertyTileServer(app, database);
 	new BoroughTileServer(app, database);
+	new MovementTileServer(app, database);
 
 	// life.tick();
 	/// new FillLife(life, db).fillEmptyDwellings();

@@ -1,13 +1,13 @@
 import { Canvas } from "skia-canvas";
-import { DbContext } from "../../managed/database";
-import { ManagedServer } from "../../managed/server";
-import { Point } from "../../../interface/point";
+import { DbContext } from "../../../managed/database";
+import { ManagedServer } from "../../../managed/server";
+import { Point } from "../../../../interface/point";
 
 export class ShapeTileServer {
 	constructor(
 		app: ManagedServer,
-
 		route: string,
+
 		fetch: () => Promise<{ id: string, fill: string, stroke: string, bounds: Point[] }[]>,
 	) {
 		const size = 500;

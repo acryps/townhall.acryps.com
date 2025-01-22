@@ -1,7 +1,7 @@
 import { ShapeTileServer } from ".";
-import { Point } from "../../../interface/point";
-import { DbContext } from "../../managed/database";
-import { ManagedServer } from "../../managed/server";
+import { Point } from "../../../../interface/point";
+import { DbContext } from "../../../managed/database";
+import { ManagedServer } from "../../../managed/server";
 
 export class PropertyTileServer extends ShapeTileServer {
 	constructor(

@@ -65,13 +65,23 @@ export class MapPage extends Component {
 
 				<ui-actions>
 					<ui-action ui-click={async () => {
-						const source = URL.createObjectURL(await this.map.capture());
+						const source = await this.map.capture();
+						const name = `map-${Math.round(this.map.center.x)}-${Math.round(this.map.center.y)}.png`;
 
-						const link = document.createElement('a');
-						link.download = `map-${Math.round(this.map.center.x)}-${Math.round(this.map.center.y)}.png`;
-						link.href = source;
+						if (navigator.share) {
+							navigator.share({
+								title: `Map ${Math.round(this.map.center.x)} ${Math.round(this.map.center.y)}`,
+								files: [
+									new File([source], name, { type: 'image/png' })
+								]
+							});
+						} else {
+							const link = document.createElement('a');
+							link.download = name;
+							link.href = URL.createObjectURL(source);
 
-						link.click();
+							link.click();
+						}
 					}}>
 						{captureIcon()}
 					</ui-action>

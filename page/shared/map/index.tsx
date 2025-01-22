@@ -2,6 +2,7 @@ import { Component } from "@acryps/page";
 import { Point } from "../../../interface/point";
 import { MapLayer } from "./layer";
 import { mapOverdraw, mapPixelWidth, subpixelOffsetX, subpixelOffsetY } from "./index.style";
+import { baseLayer } from "./layers";
 
 export class MapComponent extends Component {
 	readonly defaultZoom = 4;
@@ -22,11 +23,7 @@ export class MapComponent extends Component {
 	highlightedShape: Point[];
 
 	layers: MapLayer[] = [
-		// night layer
-		MapLayer.fromTileSource((x, y) => `/tile/base/day/${x}/${y}`, 250),
-
-		// property layer
-		/// MapLayer.fromTileSource((x, y) => `/tile/property/${x}/${y}`, 500, (x, y) => `/pick/property/${x}/${y}`, id => `/property/${id}`),
+		baseLayer
 	];
 
 	// centers the map around this point (intially)
@@ -66,11 +63,16 @@ export class MapComponent extends Component {
 			const link = await layer.pick(point.x, point.y);
 
 			if (link) {
-				this.navigate(link);
+				// most picks resolve into /go/ links, which can only be followed using this
+				location.href = link;
 
 				return;
 			}
 		}
+	}
+
+	capture() {
+		return new Promise<Blob>(done => this.canvas.toBlob(done, 'image/png'));
 	}
 
 	render() {
@@ -127,7 +129,7 @@ export class MapComponent extends Component {
 	}
 
 	// updates map content
-	private updateLayers() {
+	updateLayers() {
 		// set subpixel offsets
 		//
 		// moves map slightly (within one map pixel) to allow for floating-point movement without jitter

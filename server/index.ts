@@ -4,22 +4,19 @@ import { ManagedServer } from "./managed/server";
 import { Article, ArticleImage, Bridge, DbContext, MapType, Movement, Resident, ResidentFigure, ResidentRelationship, Tenancy, TenancyQueryProxy } from "./managed/database";
 import ws from 'express-ws';
 import { join } from "path";
-import { Proxy } from "./proxy";
 import { GameBridge } from "./bridge";
 import { Message } from "../interface";
 import { ArticleImageInterface } from "./areas/publication/image";
 import { Life } from "./life";
 import { ResidentImageInterface } from "./areas/resident/interface";
-import { tilecomplete, tileimport } from "./IMPORT_TILE";
 import { BaseTileServer } from "./map/base";
-import { PropertyRegisterTileServer } from "./map/property";
 import { MapImporter } from "./map/import";
-import { female, male } from "./life/gender";
-import { toRealTime, toSimulatedAge, toSimulatedTime } from "../interface/time";
 import { LawHouse } from "./life/law-house";
 import { Language } from "./life/language";
 import { FillLife } from "./life/fill/fill";
 import { GoInterface } from "./go";
+import { PropertyTileServer } from "./map/layers/property";
+import { BoroughTileServer } from "./map/layers/borough";
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
@@ -30,17 +27,17 @@ DbClient.connectedClient.connect().then(async () => {
 	const app = new ManagedServer();
 	ws(app.app);
 
-	const db = new DbContext(new RunContext());
+	const database = new DbContext(new RunContext());
 	// tilecomplete(db);
 	// tileimport(db);
 
-	// MapImporter.schedule(MapType.overworld, db);
-	// MapImporter.schedule(MapType.night, db);
+	MapImporter.schedule(MapType.overworld, database);
+	MapImporter.schedule(MapType.night, database);
 
-	const life = new Life(db);
+	const life = new Life(database);
 	await life.load();
 
-	const lawHouse = new LawHouse(db, new Language(), life);
+	const lawHouse = new LawHouse(database, new Language(), life);
 	// lawHouse.schedule();
 
 	// life.vote();
@@ -51,13 +48,14 @@ DbClient.connectedClient.connect().then(async () => {
 		await life.assignFigure(resident);
 	}*/
 
-	new BaseTileServer(app, db);
-	new PropertyRegisterTileServer(app, db);
+	new BaseTileServer(app, database);
+	new PropertyTileServer(app, database);
+	new BoroughTileServer(app, database);
 
 	// life.tick();
 	/// new FillLife(life, db).fillEmptyDwellings();
 
-	ViewModel.globalFetchingContext = db;
+	ViewModel.globalFetchingContext = database;
 
 	const connections = [];
 
@@ -65,7 +63,7 @@ DbClient.connectedClient.connect().then(async () => {
 
 	// new Proxy(app);
 
-	new GameBridge(app, db, message => {
+	new GameBridge(app, database, message => {
 		for (let connection of connections) {
 			try {
 				connection.send(Message.encode(message));
@@ -73,17 +71,17 @@ DbClient.connectedClient.connect().then(async () => {
 		}
 	});
 
-	new ArticleImageInterface(app, db);
-	new ResidentImageInterface(app, db, life);
+	new ArticleImageInterface(app, database);
+	new ResidentImageInterface(app, database, life);
 
 	app.createInjector = context => new Inject({
 		Context: context,
-		DbContext: db,
+		DbContext: database,
 		Life: life,
 		LawHouse: lawHouse
 	});
 
-	new GoInterface(app, db);
+	new GoInterface(app, database);
 
 	app.prepareRoutes();
 	app.use(new StaticFileRoute('/assets/', join(process.cwd(), '..', 'page', 'assets')));

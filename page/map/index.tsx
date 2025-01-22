@@ -73,7 +73,8 @@ export class MapPage extends Component {
 								title: `Map ${Math.round(this.map.center.x)} ${Math.round(this.map.center.y)}`,
 								files: [
 									new File([source], name, { type: 'image/png' })
-								]
+								],
+								url: location.href
 							});
 						} else {
 							const link = document.createElement('a');

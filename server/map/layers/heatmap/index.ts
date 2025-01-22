@@ -30,9 +30,11 @@ export class HeatmapTileServer {
 				const x = Math.round(point.x - offset.x);
 				const y = Math.round(point.y - offset.y);
 
-				const base = x + size * y;
+				if (x >= 0 && y >= 0 && x < size && y < size) {
+					const base = x + size * y;
 
-				matrix[base] = (matrix[base] ?? 0) + 1;
+					matrix[base] = (matrix[base] ?? 0) + 1;
+				}
 			}
 
 			for (let offset = 0; offset < matrix.length; offset++) {

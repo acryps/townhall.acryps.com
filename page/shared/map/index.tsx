@@ -85,7 +85,7 @@ export class MapComponent extends Component {
 			if (document.contains(this.canvas)) {
 				this.updateScale();
 			}
-		})
+		});
 
 		const container = <ui-map-container>
 			{this.canvas}

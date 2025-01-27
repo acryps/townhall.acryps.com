@@ -26,6 +26,9 @@ import { BillPage } from "./vote/bill";
 import { rewrite } from "./rewrite";
 import { LawHousePage } from "./law-house";
 import { LawHouseSessionPage } from "./law-house/session";
+import { CompanyOfficePage } from "./company-office";
+import { RegisterCompanyPage } from "./company-office/register";
+import { CompanyPage } from "./company-office/company";
 
 export class Application {
 	static router: Router;
@@ -78,6 +81,11 @@ export class Application {
 
 				.route('/law-house', LawHousePage
 					.route('/session/:id', LawHouseSessionPage)
+				)
+
+				.route('/company-office', CompanyOfficePage
+					.route('/register/:firstOfficeId', RegisterCompanyPage)
+					.route('/company/:tag', CompanyPage)
 				)
 
 				.route('/create-banner', CreateBannerComponent)

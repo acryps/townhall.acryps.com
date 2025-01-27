@@ -6,6 +6,7 @@ import { PropertyHistoricListingModifierViewModel } from "./history-listing/link
 import { PlayerViewModel } from "./player.view";
 import { PropertyTypeViewModel } from "./property-type.view";
 import { ResidentSummaryModel } from "./life/resident";
+import { OfficeViewModel } from "./company.view";
 
 export class PropertyViewModel extends ViewModel<Property> {
 	id;
@@ -24,6 +25,7 @@ export class PropertyViewModel extends ViewModel<Property> {
 	type: PropertyTypeViewModel;
 
 	dwellings: PropertyDwellingViewModel[];
+	offices: OfficeViewModel[];
 }
 
 export class PropertyDwellingViewModel extends ViewModel<Dwelling> {

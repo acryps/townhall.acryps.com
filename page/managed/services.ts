@@ -1,3 +1,8 @@
+export enum CompanyType {
+	company = "company",
+	governmentCompany = "government_company"
+}
+
 export class BoroughSummaryModel {
 	banner: string;
 	bounds: string;
@@ -58,6 +63,36 @@ export class BridgeViewModel {
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.path === undefined || (item.path = raw.path === null ? null : `${raw.path}`)
+		
+		return item;
+	}
+}
+
+export class CompanySummaryModel {
+	id: string;
+	name: string;
+	tag: string;
+	type: CompanyType;
+
+	private static $build(raw) {
+		const item = new CompanySummaryModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
+		raw.type === undefined || (item.type = raw.type)
+		
+		return item;
+	}
+}
+
+export class OfficeSummaryModel {
+	id: string;
+	name: string;
+
+	private static $build(raw) {
+		const item = new OfficeSummaryModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		
 		return item;
 	}
@@ -133,6 +168,7 @@ export class PropertyViewModel {
 	owner: PlayerViewModel;
 	dwellings: PropertyDwellingViewModel[];
 	historicListingModifiers: PropertyHistoricListingModifierViewModel[];
+	offices: OfficeViewModel[];
 	type: PropertyTypeViewModel;
 	bounds: string;
 	code: string;
@@ -147,6 +183,7 @@ export class PropertyViewModel {
 		raw.owner === undefined || (item.owner = raw.owner ? PlayerViewModel["$build"](raw.owner) : null)
 		raw.dwellings === undefined || (item.dwellings = raw.dwellings ? raw.dwellings.map(i => PropertyDwellingViewModel["$build"](i)) : null)
 		raw.historicListingModifiers === undefined || (item.historicListingModifiers = raw.historicListingModifiers ? raw.historicListingModifiers.map(i => PropertyHistoricListingModifierViewModel["$build"](i)) : null)
+		raw.offices === undefined || (item.offices = raw.offices ? raw.offices.map(i => OfficeViewModel["$build"](i)) : null)
 		raw.type === undefined || (item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null)
 		raw.bounds === undefined || (item.bounds = raw.bounds === null ? null : `${raw.bounds}`)
 		raw.code === undefined || (item.code = raw.code === null ? null : `${raw.code}`)
@@ -728,6 +765,42 @@ export class VoteTickerViewModel {
 	}
 }
 
+export class CompanyViewModel {
+	offices: OfficeViewModel[];
+	description: string;
+	id: string;
+	name: string;
+	tag: string;
+	type: CompanyType;
+
+	private static $build(raw) {
+		const item = new CompanyViewModel();
+		raw.offices === undefined || (item.offices = raw.offices ? raw.offices.map(i => OfficeViewModel["$build"](i)) : null)
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
+		raw.type === undefined || (item.type = raw.type)
+		
+		return item;
+	}
+}
+
+export class OfficeViewModel {
+	company: CompanySummaryModel;
+	id: string;
+	name: string;
+
+	private static $build(raw) {
+		const item = new OfficeViewModel();
+		raw.company === undefined || (item.company = raw.company ? CompanySummaryModel["$build"](raw.company) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		
+		return item;
+	}
+}
+
 export class LawHouseSessionViewModel {
 	scope: DistrictViewModel;
 	sessionaries: LawHouseSessionaryViewModel[];
@@ -1165,6 +1238,75 @@ export class BoroughService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : BoroughSummaryModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class CompanyOfficeService {
+	async find(tag: string): Promise<CompanyViewModel> {
+		const $data = new FormData();
+		$data.append("FodnMycHpnOHlsbmVqbzdwa2BsbHl3M3", Service.stringify(tag))
+
+		return await fetch(Service.toURL("hpNW0waHBsMDdnNGdkZmVhMHhuaTJlb3"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : CompanyViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getCompanies(): Promise<Array<CompanySummaryModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("Eydzl2b3hvZWY2OTNzb3g4bmYzMjNsZ3"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : CompanySummaryModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async register(name: string, description: string, type: string, firstOfficeId: string, capacity: number): Promise<string> {
+		const $data = new FormData();
+		$data.append("RsdmF1OWVzeXo5MnllMmhmczlocDp1cX", Service.stringify(name))
+		$data.append("JiZWBkZnAwZ2ljZHE0YmZmYnlpeW9xcT", Service.stringify(description))
+		$data.append("RzdmQ4NT8xem1rbWJueXIxcWR0OX5yc2", Service.stringify(type))
+		$data.append("s1bGF2azVqaWBwazhwZmI1Z2E2Z3Jjcz", Service.stringify(firstOfficeId))
+		$data.append("oxa3VqZjprbmJtcmlrdjAzNTswYmhmdm", Service.stringify(capacity))
+
+		return await fetch(Service.toURL("NnM21sNXg2b3dxeXtoN2l4bTNubGcxN2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

@@ -78,6 +78,38 @@ export const propertyStyle = () => child('ui-property',
 		)
 	),
 
+	child('ui-offices',
+		display('block'),
+		marginBottom(rem(2)),
+
+		border(px(1), 'solid', 'currentColor'),
+
+		child('ui-office',
+			display('block'),
+			padding(pageGutter),
+
+			borderBottom(px(1), 'dotted', 'currentColor'),
+
+			child('ui-name',
+				display('block'),
+
+				fontWeight('bold')
+			),
+
+			child('ui-company',
+				display('block')
+			)
+		),
+
+		child('ui-action',
+			display('flex'),
+			columnGap(pageGutter),
+			alignItems('center'),
+
+			padding(pageGutter)
+		)
+	),
+
 	child('ui-historic-listing',
 		display('block'),
 		padding(pageGutter),

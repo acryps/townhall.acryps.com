@@ -1,3 +1,8 @@
+export enum CompanyType {
+	company = "company",
+	governmentCompany = "government_company"
+}
+
 export interface BoroughSummaryModel {
     banner: string;
 	bounds: string;
@@ -24,6 +29,18 @@ export interface BridgeViewModel {
     id: string;
 	name: string;
 	path: string;
+}
+
+export interface CompanySummaryModel {
+    id: string;
+	name: string;
+	tag: string;
+	type: CompanyType;
+}
+
+export interface OfficeSummaryModel {
+    id: string;
+	name: string;
 }
 
 export interface HistoryEntryViewModel {
@@ -58,6 +75,7 @@ export interface PropertyViewModel {
 	owner: PlayerViewModel;
 	dwellings: PropertyDwellingViewModel[];
 	historicListingModifiers: PropertyHistoricListingModifierViewModel[];
+	offices: OfficeViewModel[];
 	type: PropertyTypeViewModel;
 	bounds: string;
 	code: string;
@@ -301,6 +319,21 @@ export interface VoteViewModel {
 export interface VoteTickerViewModel {
     pro: boolean;
 	submitted: Date;
+}
+
+export interface CompanyViewModel {
+    offices: OfficeViewModel[];
+	description: string;
+	id: string;
+	name: string;
+	tag: string;
+	type: CompanyType;
+}
+
+export interface OfficeViewModel {
+    company: CompanySummaryModel;
+	id: string;
+	name: string;
 }
 
 export interface LawHouseSessionViewModel {

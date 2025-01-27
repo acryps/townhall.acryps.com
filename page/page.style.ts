@@ -15,6 +15,7 @@ import { chatStyle } from "./resident/chat/index.style";
 import { voteStyle } from "./vote/index.style";
 import { lawHouseStyle } from "./law-house/index.style";
 import { residentBadgeListStyle } from "./shared/resident-badge-list/index.style";
+import { companyOfficeStyle } from "./company-office/index.style";
 
 export const pageStyle = () => root(
 	bold,
@@ -81,6 +82,8 @@ export const pageStyle = () => root(
 				voteStyle(),
 
 				lawHouseStyle(),
+
+				companyOfficeStyle(),
 
 				createBannerStyle(),
 			)

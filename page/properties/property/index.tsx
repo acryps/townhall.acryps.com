@@ -7,6 +7,7 @@ import { toSimulatedAge } from "../../../interface/time";
 import { addIcon } from "../../assets/icons/managed";
 import { MetaGovernmentBuilding, MetaPlace } from "@acryps/metadata";
 import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
+import { CompanyOfficePage } from "../../company-office";
 
 export class PropertyPage extends Component {
 	declare parameters: { id: string };
@@ -109,6 +110,26 @@ export class PropertyPage extends Component {
 					{addIcon()} Create Dwelling
 				</ui-action>
 			</ui-dwellings>
+
+			<ui-offices>
+				{this.property.offices.map(office => <ui-office>
+					<ui-name>
+						{office.name ?? office.id.split('-')[0]}
+					</ui-name>
+
+					<ui-company ui-href={`/company-office/company/${office.company.tag}`}>
+						{office.company.name} {CompanyOfficePage.convertCompanyTypeName(office.company.type)}
+					</ui-company>
+				</ui-office>)}
+
+				<ui-action ui-href={`/company-office/register/${this.property.id}`}>
+					{addIcon()} Create Company Here
+				</ui-action>
+
+				<ui-action ui-href={`/company-office/office/create/${this.property.id}`}>
+					{addIcon()} Create Office for existing company
+				</ui-action>
+			</ui-offices>
 
 			<ui-historic-listing>
 				<ui-header>Historic Listing</ui-header>

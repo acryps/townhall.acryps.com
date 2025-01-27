@@ -112,6 +112,18 @@ export class HomePage extends Component {
 						Everything legal.
 					</ui-description>
 				</ui-topic>
+
+				<ui-topic ui-href='/company-office'>
+					{companyOfficeIcon()}
+
+					<ui-name>
+						Company Office
+					</ui-name>
+
+					<ui-description>
+						Come here if you mean business!
+					</ui-description>
+				</ui-topic>
 			</ui-topics>
 
 			<ui-connection>

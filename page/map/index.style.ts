@@ -2,65 +2,75 @@ import { alignItems, alignSelf, backgroundColor, borderTop, bottom, boxShadow, c
 import { pageTextColor, navigationBackgroundColor, navigationBorderColor, pageGutter, pageBackgroundColor } from "../index.style";
 import { buttonStyle } from "../shared/index.style";
 import { PageComponent } from "../page";
+import { createFeatureStyle } from "./create/index.style";
+import { boxed } from "../shared/boxed.style";
 
 const buttonPaddingSize = rem(0.8);
 
-export const mapStyle = () => child('ui-map',
-	position('fixed'),
-	inset(0),
+export const mapStyle = () => [
+	child('ui-map-child',
+		boxed(),
 
-	child('ui-map-container',
-		position('fixed'),
-		inset(0)
+		createFeatureStyle()
 	),
 
-	child('ui-tools',
+	child('ui-map',
 		position('fixed'),
-		insetInline(0),
-		bottom(0),
+		inset(0),
 
-		display('flex'),
-		flexDirection('column'),
-
-		child('ui-action',
-			buttonStyle(),
-
-			maxWidth(rem(30)),
-			margin(pageGutter),
-			alignSelf('center'),
-
-			backgroundColor(pageBackgroundColor),
-			boxShadow(hex('0005'), 0, rem(0.5), pageGutter)
+		child('ui-map-container',
+			position('fixed'),
+			inset(0)
 		),
 
-		child('ui-drawer',
+		child('ui-tools',
+			position('fixed'),
+			insetInline(0),
+			bottom(0),
+
 			display('flex'),
-			justifyContent('space-between'),
-			padding(pageGutter.subtract(buttonPaddingSize)),
+			flexDirection('column'),
 
-			color(pageTextColor),
-			backgroundColor(navigationBackgroundColor),
-			borderTop(px(1), 'solid', navigationBorderColor),
+			child('ui-action',
+				buttonStyle(),
 
-			select('ui-layer',
-				padding(buttonPaddingSize),
+				maxWidth(rem(30)),
+				margin(pageGutter),
+				alignSelf('center'),
 
-				fontSize(rem(1.5))
+				backgroundColor(pageBackgroundColor),
+				boxShadow(hex('0005'), 0, rem(0.5), pageGutter)
 			),
 
-			child('ui-layers',
-				display('flex')
-			),
-
-			child('ui-actions',
+			child('ui-drawer',
 				display('flex'),
+				justifyContent('space-between'),
+				padding(pageGutter.subtract(buttonPaddingSize)),
 
-				child('ui-action',
+				color(pageTextColor),
+				backgroundColor(navigationBackgroundColor),
+				borderTop(px(1), 'solid', navigationBorderColor),
+
+				select('ui-layer',
 					padding(buttonPaddingSize),
 
 					fontSize(rem(1.5))
+				),
+
+				child('ui-layers',
+					display('flex')
+				),
+
+				child('ui-actions',
+					display('flex'),
+
+					child('ui-action',
+						padding(buttonPaddingSize),
+
+						fontSize(rem(1.5))
+					)
 				)
 			)
 		)
 	)
-)
+]

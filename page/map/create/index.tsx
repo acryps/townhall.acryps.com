@@ -20,10 +20,6 @@ export class CreateFeaturePage extends Component {
 		return <ui-create-feature>
 			{new MapComponent().highlight(this.shape)}
 
-			<ui-title>
-				Create Feature
-			</ui-title>
-
 			<ui-metrics>
 				<ui-metric>
 					<ui-name>
@@ -59,7 +55,7 @@ export class CreateFeaturePage extends Component {
 					{boroughIcon()}
 
 					<ui-name>
-						Register Borough
+						Register Borough (MISSING)
 					</ui-name>
 				</ui-type>
 
@@ -67,7 +63,7 @@ export class CreateFeaturePage extends Component {
 					{streetIcon()}
 
 					<ui-name>
-						Register Street
+						Register Street (MISSING)
 					</ui-name>
 				</ui-type>
 
@@ -75,7 +71,7 @@ export class CreateFeaturePage extends Component {
 					{streetIcon()}
 
 					<ui-name>
-						Register Square
+						Register Square (MISSING)
 					</ui-name>
 				</ui-type>
 			</ui-types>

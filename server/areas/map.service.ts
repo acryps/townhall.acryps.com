@@ -25,11 +25,13 @@ export class MapService extends Service {
 		);
 	}
 
-	getProperties() {
+	getProperties(page: number) {
 		return PropertySummaryModel.from(
 			this.db.property
 				.orderByDescending(property => property.borough)
 				.orderByDescending(property => property.type)
+				.orderByDescending(property => property.id)
+				.page(page, 50)
 		);
 	}
 

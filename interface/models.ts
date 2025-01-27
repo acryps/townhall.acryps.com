@@ -323,6 +323,7 @@ export interface VoteTickerViewModel {
 
 export interface CompanyViewModel {
     offices: OfficeViewModel[];
+	created: Date;
 	description: string;
 	id: string;
 	name: string;
@@ -332,6 +333,8 @@ export interface CompanyViewModel {
 
 export interface OfficeViewModel {
     company: CompanySummaryModel;
+	property: PropertySummaryModel;
+	capacity: number;
 	id: string;
 	name: string;
 }

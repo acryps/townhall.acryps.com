@@ -5,6 +5,8 @@ export const card = (addSpacing = true) => [
 	border(px(1), 'solid', hex('000')),
 	backgroundColor(hex('eee')),
 
-	addSpacing && paddingInline(rem(1)),
-	addSpacing && paddingBlock(rem(0.5))
+	addSpacing ? [
+		paddingInline(rem(1)),
+		paddingBlock(rem(0.5))
+	] : []
 ];

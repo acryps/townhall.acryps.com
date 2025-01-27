@@ -767,6 +767,7 @@ export class VoteTickerViewModel {
 
 export class CompanyViewModel {
 	offices: OfficeViewModel[];
+	created: Date;
 	description: string;
 	id: string;
 	name: string;
@@ -776,6 +777,7 @@ export class CompanyViewModel {
 	private static $build(raw) {
 		const item = new CompanyViewModel();
 		raw.offices === undefined || (item.offices = raw.offices ? raw.offices.map(i => OfficeViewModel["$build"](i)) : null)
+		raw.created === undefined || (item.created = raw.created ? new Date(raw.created) : null)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
@@ -788,12 +790,16 @@ export class CompanyViewModel {
 
 export class OfficeViewModel {
 	company: CompanySummaryModel;
+	property: PropertySummaryModel;
+	capacity: number;
 	id: string;
 	name: string;
 
 	private static $build(raw) {
 		const item = new OfficeViewModel();
 		raw.company === undefined || (item.company = raw.company ? CompanySummaryModel["$build"](raw.company) : null)
+		raw.property === undefined || (item.property = raw.property ? PropertySummaryModel["$build"](raw.property) : null)
+		raw.capacity === undefined || (item.capacity = raw.capacity === null ? null : +raw.capacity)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		
@@ -880,11 +886,11 @@ export class MapService {
 		});
 	}
 
-	async getProperties(): Promise<Array<PropertySummaryModel>> {
+	async getProperties(page: number): Promise<Array<PropertySummaryModel>> {
 		const $data = new FormData();
-		
+		$data.append("IxYWZhMjR6Y3cwM2Q1cGRpb3A4YzFqaW", Service.stringify(page))
 
-		return await fetch(Service.toURL("VwdXVpOHpwcTVrYXE3NXF3MT9wenU5eH"), {
+		return await fetch(Service.toURL("h1cnYwOHM0amNneXFtbHQ2M3NvYTU1am"), {
 			method: "post",
 			credentials: "include",
 			body: $data

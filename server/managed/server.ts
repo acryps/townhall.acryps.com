@@ -167,11 +167,13 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"VwdXVpOHpwcTVrYXE3NXF3MT9wenU5eH",
-			{},
+			"h1cnYwOHM0amNneXFtbHQ2M3NvYTU1am",
+			{
+			"IxYWZhMjR6Y3cwM2Q1cGRpb3A4YzFqaW": { type: "number", isArray: false, isOptional: false }
+			},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.getProperties(
-				
+				params["IxYWZhMjR6Y3cwM2Q1cGRpb3A4YzFqaW"]
 			)
 		);
 
@@ -3924,6 +3926,7 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				offices: (await this.$$model.offices.includeTree(ViewModel.mappings[OfficeViewModel.name].items).toArray()).map(item => new OfficeViewModel(item)),
+				created: this.$$model.created,
 				description: this.$$model.description,
 				id: this.$$model.id,
 				name: this.$$model.name,
@@ -3964,6 +3967,7 @@ ViewModel.mappings = {
 						[...parents, "offices-CompanyViewModel"]
 					);
 				},
+				created: true,
 				description: true,
 				id: true,
 				name: true,
@@ -3975,6 +3979,7 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new CompanyViewModel(null);
 			"offices" in data && (item.offices = data.offices && [...data.offices].map(i => ViewModel.mappings[OfficeViewModel.name].toViewModel(i)));
+			"created" in data && (item.created = data.created === null ? null : new Date(data.created));
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
@@ -3994,6 +3999,7 @@ ViewModel.mappings = {
 			}
 			
 			"offices" in viewModel && (null);
+			"created" in viewModel && (model.created = viewModel.created === null ? null : new Date(viewModel.created));
 			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
@@ -4007,6 +4013,8 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				company: new CompanySummaryModel(await BaseServer.unwrap(this.$$model.company)),
+				property: new PropertySummaryModel(await BaseServer.unwrap(this.$$model.property)),
+				capacity: this.$$model.capacity,
 				id: this.$$model.id,
 				name: this.$$model.name
 			}
@@ -4044,6 +4052,13 @@ ViewModel.mappings = {
 						[...parents, "company-OfficeViewModel"]
 					);
 				},
+				get property() {
+					return ViewModel.mappings[PropertySummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "property-OfficeViewModel"]
+					);
+				},
+				capacity: true,
 				id: true,
 				name: true
 			};
@@ -4052,6 +4067,8 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new OfficeViewModel(null);
 			"company" in data && (item.company = data.company && ViewModel.mappings[CompanySummaryModel.name].toViewModel(data.company));
+			"property" in data && (item.property = data.property && ViewModel.mappings[PropertySummaryModel.name].toViewModel(data.property));
+			"capacity" in data && (item.capacity = data.capacity === null ? null : +data.capacity);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 
@@ -4068,6 +4085,8 @@ ViewModel.mappings = {
 			}
 			
 			"company" in viewModel && (model.company.id = viewModel.company ? viewModel.company.id : null);
+			"property" in viewModel && (model.property.id = viewModel.property ? viewModel.property.id : null);
+			"capacity" in viewModel && (model.capacity = viewModel.capacity === null ? null : +viewModel.capacity);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 

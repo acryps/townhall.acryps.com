@@ -16,6 +16,8 @@ import { voteStyle } from "./vote/index.style";
 import { lawHouseStyle } from "./law-house/index.style";
 import { residentBadgeListStyle } from "./shared/resident-badge-list/index.style";
 import { companyOfficeStyle } from "./company-office/index.style";
+import { propertiesStyle } from "./properties/index.style";
+import { locationMarkerStyle } from "./shared/location/index.style";
 
 export const pageStyle = () => root(
 	bold,
@@ -31,6 +33,7 @@ export const pageStyle = () => root(
 	bannerStyle(),
 	mapStyle(),
 	residentBadgeListStyle(),
+	locationMarkerStyle(),
 
 	child('body',
 		padding(0),
@@ -71,6 +74,7 @@ export const pageStyle = () => root(
 				boroughStyle(),
 
 				propertyStyle(),
+				propertiesStyle(),
 
 				newsStyle(),
 				publicationStyle(),

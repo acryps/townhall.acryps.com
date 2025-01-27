@@ -3,10 +3,10 @@ import { DbContext, MapTile, MapType } from "../managed/database";
 import { Canvas, CanvasRenderingContext2D, loadImage } from "skia-canvas";
 
 export class MapImporter {
-	readonly tile = 250;
+	static readonly tile = 250;
 	readonly size = 8000;
 
-	readonly regions = this.size / this.tile;
+	readonly regions = this.size / MapImporter.tile;
 
 	private lastMapHash: string;
 
@@ -50,15 +50,15 @@ export class MapImporter {
 
 		const map = await loadImage(source);
 
-		const canvas = new Canvas(this.tile, this.tile);
+		const canvas = new Canvas(MapImporter.tile, MapImporter.tile);
 		const context = canvas.getContext('2d');
 
 		const date = new Date();
 
 		for (let x = 0; x < this.regions; x++) {
 			for (let y = 0; y < this.regions; y++) {
-				context.clearRect(0, 0, this.tile, this.tile);
-				context.drawImage(map, -x * this.tile, -y * this.tile);
+				context.clearRect(0, 0, MapImporter.tile, MapImporter.tile);
+				context.drawImage(map, -x * MapImporter.tile, -y * MapImporter.tile);
 
 				const image = await canvas.toBuffer('png');
 
@@ -83,7 +83,7 @@ export class MapImporter {
 	}
 
 	private hasHoles(context: CanvasRenderingContext2D) {
-		const imageData = context.getImageData(0, 0, this.tile, this.tile);
+		const imageData = context.getImageData(0, 0, MapImporter.tile, MapImporter.tile);
 
 		for (let index = 0; index < imageData.data.length; index += 4 * 64) {
 			if (imageData.data[index + 3] == 0) {

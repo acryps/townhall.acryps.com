@@ -1,49 +1,87 @@
 import { MapService, PropertySummaryModel } from "../managed/services";
 import { Component } from "@acryps/page";
-import { MapPreviewComponent } from "../shared/map.preview";
 import { Point } from "../../interface/point";
+import { locationMarkerStyle } from "../shared/location/index.style";
+import { LocationMarkerComponent } from "../shared/location";
+import { MapComponent } from "../shared/map";
 
 export class PropertiesComponent extends Component {
 	properties: PropertySummaryModel[];
 
+	page = 0;
+	loadingNextPage = false;
+
+	loadMoreTracker: HTMLElement = <ui-load-more></ui-load-more>;
+
 	async onload() {
-		this.properties = await new MapService().getProperties();
+		this.properties = await new MapService().getProperties(0);
+	}
+
+	async loadNextPage() {
+		if (this.loadingNextPage) {
+			return;
+		}
+
+		this.loadingNextPage = true;
+		this.page++;
+
+		const nextPage = await new MapService().getProperties(this.page);
+
+		if (nextPage.length == 0) {
+			return;
+		}
+
+		this.properties.push(...nextPage);
+
+		setTimeout(() => {
+			this.loadingNextPage = false;
+
+			this.checkLoading();
+		}, 250);
+
+		this.update();
+	}
+
+	checkLoading() {
+		if (this.loaded) {
+			if (this.loadMoreTracker.getBoundingClientRect().y < innerHeight * 2) {
+				this.loadNextPage();
+			}
+		}
 	}
 
 	render() {
+		document.addEventListener('scroll', () => this.checkLoading());
+
 		return <ui-properties>
-			{this.properties.map(property => {
-				const points = Point.unpack(property.bounds);
-				const size = Point.size(points);
+			<ui-properties>
+				{this.properties.map(property => {
+					const points = Point.unpack(property.bounds);
+					const size = Point.size(points);
 
-				return <ui-property ui-incomplete={!property.borough || !property.type} ui-href={`/property/${property.id}`}>
-					{new MapPreviewComponent(Point.unpack(property.bounds))}
+					return <ui-property ui-incomplete={!property.borough || !property.type} ui-href={`/property/${property.id}`}>
+						{new MapComponent().highlight(Point.unpack(property.bounds))}
 
-					<ui-property-tagline>
-						<ui-property-borough>
-							{property.borough?.name}
-						</ui-property-borough>
+						<ui-name>
+							{property.name ?? property.id.split('-')[0]}
+						</ui-name>
 
-						<ui-property-type>
-							{property.type?.code}
-						</ui-property-type>
-					</ui-property-tagline>
+						<ui-tagline>
+							<ui-borough>
+								{property.borough?.name}
+							</ui-borough>
 
-					<ui-property-name>
-						{property.name || <ui-property-generic-name>{property.type?.name}</ui-property-generic-name>}
-					</ui-property-name>
+							<ui-type>
+								{property.type?.code}
+							</ui-type>
+						</ui-tagline>
 
-					<ui-property-bounds>
-						<ui-property-size>
-							{size.width}x{size.height}
-						</ui-property-size>
+						{new LocationMarkerComponent(Point.center(points))}
+					</ui-property>
+				})}
 
-						<ui-property-location>
-							{Point.center(points)}
-						</ui-property-location>
-					</ui-property-bounds>
-				</ui-property>
-			})}
+				{this.loadMoreTracker}
+			</ui-properties>
 		</ui-properties>;
 	}
 }

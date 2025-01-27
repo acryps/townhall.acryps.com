@@ -1,10 +1,10 @@
 import { Component } from "@acryps/page";
 import { BoroughService, BoroughViewModel } from "../managed/services";
 import { BannerComponent } from "../banner";
-import { MapPreviewComponent } from "../shared/map.preview";
 import { linkText } from "../linked-text";
 import { Point } from "../../interface/../interface/point";
 import { MetaPlace } from "@acryps/metadata";
+import { MapComponent } from "../shared/map";
 
 export class BoroughPage extends Component {
 	declare parameters: { tag };
@@ -41,7 +41,7 @@ export class BoroughPage extends Component {
 				{linkText(this.borough.description)}
 			</ui-description>
 
-			{new MapPreviewComponent(Point.unpack(this.borough.bounds))}
+			{new MapComponent().highlight(Point.unpack(this.borough.bounds))}
 		</ui-borough>;
 	}
 }

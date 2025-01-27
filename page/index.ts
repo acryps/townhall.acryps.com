@@ -29,6 +29,7 @@ import { LawHouseSessionPage } from "./law-house/session";
 import { CompanyOfficePage } from "./company-office";
 import { RegisterCompanyPage } from "./company-office/register";
 import { CompanyPage } from "./company-office/company";
+import { CreateFeaturePage } from "./map/create";
 
 export class Application {
 	static router: Router;
@@ -54,7 +55,9 @@ export class Application {
 
 		this.router = new PathRouter(
 			PageComponent
-				.route('/map/:x/:y/:zoom', MapPage)
+				.route('/map/:x/:y/:zoom', MapPage
+					.route('/create/:shape', CreateFeaturePage)
+				)
 
 				.route('/properties', PropertiesComponent)
 				.route('/property/:id', PropertyPage)

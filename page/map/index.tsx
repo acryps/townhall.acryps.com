@@ -5,10 +5,12 @@ import { registerInteration } from "../shared/map/interaction";
 import { Point } from "../../interface/point";
 import { baseLayer, boroughLayer, movementHeatmapLayer, nightLayer, propertyLayer } from "../shared/map/layers";
 import { MapLayer } from "../shared/map/layer";
-import { boroughIcon, captureIcon, dayIcon, drawIcon, movementIcon, propertyRegisterIcon, residentIcon, streetIcon } from "../assets/icons/managed";
+import { addIcon, boroughIcon, captureIcon, chatIcon, dayIcon, drawIcon, movementIcon, propertyRegisterIcon, residentIcon, streetIcon } from "../assets/icons/managed";
+import { Observable } from "@acryps/page-observable";
 
 export class MapPage extends Component {
 	declare parameters: { x, y, zoom };
+	declare rootNode: HTMLElement;
 
 	// scales zoom conversion (scale is a floating number, zoom a integer)
 	//
@@ -17,7 +19,13 @@ export class MapPage extends Component {
 
 	private map = new MapComponent();
 
-	render() {
+	render(child) {
+		if (child) {
+			return <ui-map-child>
+				{child}
+			</ui-map-child>;
+		}
+
 		this.map.show(new Point(+this.parameters.x, +this.parameters.y), 1 / ((+this.parameters.zoom / this.zoomAccuracy) ** 2));
 
 		requestAnimationFrame(() => {
@@ -35,62 +43,81 @@ export class MapPage extends Component {
 			{this.map}
 
 			<ui-tools>
-				<ui-layer ui-click={() => this.toggleLayer(baseLayer, nightLayer)}>
-					{dayIcon()}
-				</ui-layer>
+				{this.map.drawing && (this.map.drawingClosePossible.map(possible => possible ? <ui-action ui-click={() => {
+					const shape = this.map.completeDrawing();
+					const packed = Point.pack(shape);
 
-				<ui-layers>
-					<ui-layer ui-click={() => this.toggleLayer(boroughLayer)}>
-						{boroughIcon()}
+					// backup if create would were to fail
+					console.log('shape', packed);
+
+					this.navigate(`create/${btoa(packed)}`);
+				}}>
+					{addIcon()} Add Feature
+				</ui-action> : <ui-action ui-click={() => this.map.pushDrawingPoint()}>
+					{addIcon()} Add Point
+				</ui-action>))}
+
+				<ui-drawer>
+					<ui-layer ui-click={() => this.toggleLayer(baseLayer, nightLayer)}>
+						{dayIcon()}
 					</ui-layer>
 
-					<ui-layer ui-click={() => this.toggleLayer(propertyLayer)}>
-						{propertyRegisterIcon()}
-					</ui-layer>
+					<ui-layers>
+						<ui-layer ui-click={() => this.toggleLayer(boroughLayer)}>
+							{boroughIcon()}
+						</ui-layer>
 
-					<ui-layer ui-click={() => this.toggleLayer(propertyLayer)}>
-						{streetIcon()}
-					</ui-layer>
-				</ui-layers>
+						<ui-layer ui-click={() => this.toggleLayer(propertyLayer)}>
+							{propertyRegisterIcon()}
+						</ui-layer>
 
-				<ui-layers>
-					<ui-layer ui-click={() => this.toggleLayer(movementHeatmapLayer)}>
-						{movementIcon()}
-					</ui-layer>
+						<ui-layer ui-click={() => this.toggleLayer(propertyLayer)}>
+							{streetIcon()}
+						</ui-layer>
+					</ui-layers>
 
-					<ui-layer ui-click={() => this.toggleLayer(propertyLayer)}>
-						{residentIcon()}
-					</ui-layer>
-				</ui-layers>
+					<ui-layers>
+						<ui-layer ui-click={() => this.toggleLayer(movementHeatmapLayer)}>
+							{movementIcon()}
+						</ui-layer>
 
-				<ui-actions>
-					<ui-action ui-click={async () => {
-						const source = await this.map.capture();
-						const name = `map-${Math.round(this.map.center.x)}-${Math.round(this.map.center.y)}.png`;
+						<ui-layer ui-click={() => this.toggleLayer(propertyLayer)}>
+							{residentIcon()}
+						</ui-layer>
+					</ui-layers>
 
-						if (navigator.share) {
-							navigator.share({
-								title: `Map ${Math.round(this.map.center.x)} ${Math.round(this.map.center.y)}`,
-								files: [
-									new File([source], name, { type: 'image/png' })
-								],
-								url: location.href
-							});
-						} else {
-							const link = document.createElement('a');
-							link.download = name;
-							link.href = URL.createObjectURL(source);
+					<ui-actions>
+						<ui-action ui-active={!!this.map.drawing} ui-click={async () => {
+							const source = await this.map.capture();
+							const name = `map-${Math.round(this.map.center.x)}-${Math.round(this.map.center.y)}.png`;
 
-							link.click();
-						}
-					}}>
-						{captureIcon()}
-					</ui-action>
+							if (navigator.share) {
+								navigator.share({
+									title: `Map ${Math.round(this.map.center.x)} ${Math.round(this.map.center.y)}`,
+									files: [
+										new File([source], name, { type: 'image/png' })
+									],
+									url: location.href
+								});
+							} else {
+								const link = document.createElement('a');
+								link.download = name;
+								link.href = URL.createObjectURL(source);
 
-					<ui-action>
-						{drawIcon()}
-					</ui-action>
-				</ui-actions>
+								link.click();
+							}
+						}}>
+							{captureIcon()}
+						</ui-action>
+
+						<ui-action ui-click={() => {
+							this.map.enableDrawing();
+							this.update();
+						}}>
+							{drawIcon()}
+						</ui-action>
+					</ui-actions>
+				</ui-drawer>
 			</ui-tools>
 		</ui-map>
 	}

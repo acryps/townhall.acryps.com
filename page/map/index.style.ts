@@ -1,5 +1,7 @@
-import { alignItems, backgroundColor, borderTop, bottom, child, color, display, fontSize, gap, height, imageRendering, inset, insetInline, justifyContent, marginLeft, marginTop, Number, padding, percentage, position, px, rem, select, textAlign, Variable, width } from "@acryps/style";
-import { pageTextColor, navigationBackgroundColor, navigationBorderColor, pageGutter } from "../index.style";
+import { alignItems, alignSelf, backgroundColor, borderTop, bottom, boxShadow, child, color, display, flexDirection, fontSize, gap, height, hex, imageRendering, inset, insetInline, justifyContent, margin, marginInline, marginLeft, marginTop, maxWidth, Number, padding, percentage, position, px, rem, select, textAlign, Variable, width } from "@acryps/style";
+import { pageTextColor, navigationBackgroundColor, navigationBorderColor, pageGutter, pageBackgroundColor } from "../index.style";
+import { buttonStyle } from "../shared/index.style";
+import { PageComponent } from "../page";
 
 const buttonPaddingSize = rem(0.8);
 
@@ -18,30 +20,46 @@ export const mapStyle = () => child('ui-map',
 		bottom(0),
 
 		display('flex'),
-		justifyContent('space-between'),
-		padding(pageGutter.subtract(buttonPaddingSize)),
+		flexDirection('column'),
 
-		color(pageTextColor),
-		backgroundColor(navigationBackgroundColor),
-		borderTop(px(1), 'solid', navigationBorderColor),
+		child('ui-action',
+			buttonStyle(),
 
-		select('ui-layer',
-			padding(buttonPaddingSize),
+			maxWidth(rem(30)),
+			margin(pageGutter),
+			alignSelf('center'),
 
-			fontSize(rem(1.5))
+			backgroundColor(pageBackgroundColor),
+			boxShadow(hex('0005'), 0, rem(0.5), pageGutter)
 		),
 
-		child('ui-layers',
-			display('flex')
-		),
-
-		child('ui-actions',
+		child('ui-drawer',
 			display('flex'),
+			justifyContent('space-between'),
+			padding(pageGutter.subtract(buttonPaddingSize)),
 
-			child('ui-action',
+			color(pageTextColor),
+			backgroundColor(navigationBackgroundColor),
+			borderTop(px(1), 'solid', navigationBorderColor),
+
+			select('ui-layer',
 				padding(buttonPaddingSize),
 
 				fontSize(rem(1.5))
+			),
+
+			child('ui-layers',
+				display('flex')
+			),
+
+			child('ui-actions',
+				display('flex'),
+
+				child('ui-action',
+					padding(buttonPaddingSize),
+
+					fontSize(rem(1.5))
+				)
 			)
 		)
 	)

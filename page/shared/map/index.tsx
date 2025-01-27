@@ -3,6 +3,8 @@ import { Point } from "../../../interface/point";
 import { MapLayer } from "./layer";
 import { mapOverdraw, mapPixelWidth, subpixelOffsetX, subpixelOffsetY } from "./index.style";
 import { baseLayer } from "./layers";
+import { drawDanwinstonLine } from "../../../interface/line";
+import { Observable } from "@acryps/page-observable";
 
 export class MapComponent extends Component {
 	readonly defaultZoom = 4;
@@ -19,6 +21,9 @@ export class MapComponent extends Component {
 	context: CanvasRenderingContext2D;
 	width: number;
 	height: number;
+
+	drawing?: Point[];
+	drawingClosePossible = new Observable<boolean>(false);
 
 	highlightedShape: Point[];
 
@@ -57,6 +62,31 @@ export class MapComponent extends Component {
 		return this;
 	}
 
+	// enable drawing mode
+	enableDrawing() {
+		this.drawingClosePossible.emit(false);
+
+		this.drawing = [];
+		this.renderLayers();
+
+		return this;
+	}
+
+	pushDrawingPoint(point = this.cursor) {
+		this.drawing.push(this.cursor.copy());
+		this.renderLayers();
+	}
+
+	completeDrawing() {
+		const shape = [...this.drawing];
+		delete this.drawing;
+
+		this.renderLayers();
+		this.drawingClosePossible.emit(false);
+
+		return shape;
+	}
+
 	// pick
 	async pick(point: Point) {
 		for (let layer of this.layers) {
@@ -92,6 +122,13 @@ export class MapComponent extends Component {
 		</ui-map-container>;
 
 		return container;
+	}
+
+	get cursor() {
+		return new Point(
+			Math.floor(this.center.x),
+			Math.floor(this.center.y)
+		);
 	}
 
 	private resize() {
@@ -154,18 +191,66 @@ export class MapComponent extends Component {
 		this.context.clearRect(0, 0, this.width, this.height);
 		this.renderLayerBuffers();
 
-		if (this.highlightedShape) {
-			const left = Math.floor(this.center.x - this.width / 2);
-			const top = Math.floor(this.center.y - this.height / 2);
+		// the 1 corrects the subpixel offset
+		const offset = new Point(
+			Math.floor(this.center.x - Math.ceil(this.width / 2)) + 1,
+			Math.floor(this.center.y - Math.ceil(this.height / 2)) + 1
+		);
 
+		if (this.drawing) {
+			if (this.drawing.length) {
+				const firstPoint = this.drawing[0];
+
+				this.drawingClosePossible.emit(this.cursor.x == firstPoint.x && this.cursor.y == firstPoint.y);
+			}
+
+			// draw existing
+			this.context.strokeStyle = '#000';
+
+			for (let pointIndex = 1; pointIndex < this.drawing.length; pointIndex++) {
+				const point = this.drawing[pointIndex];
+
+				drawDanwinstonLine(
+					this.context,
+					this.drawing[pointIndex - 1].subtract(offset),
+					this.drawing[pointIndex].subtract(offset)
+				);
+			}
+
+			// draw current line
+			const last = this.drawing[this.drawing.length - 1];
+			const cursor = this.cursor;
+
+			if (last) {
+				// draw current line
+				this.context.strokeStyle = '#0008';
+
+				drawDanwinstonLine(
+					this.context,
+					last.subtract(offset),
+					cursor.subtract(offset)
+				);
+
+				// draw cursor aligned line indicator
+				if (last.x == cursor.x || last.y == cursor.y || Math.abs(last.x - cursor.x) == Math.abs(last.y - cursor.y)) {
+					this.context.fillStyle = '#0f08';
+					this.context.fillRect(cursor.x - offset.x - 1, cursor.y - offset.y - 1, 3, 3);
+				}
+			}
+
+			// draw cursor
+			this.context.fillStyle = '#000';
+			this.context.fillRect(cursor.x - offset.x, cursor.y - offset.y, 1, 1);
+		}
+
+		if (this.highlightedShape) {
 			// prepare clip area
 			const path = new Path2D();
 			this.context.beginPath();
 
-			for (let pointIndex = 0; pointIndex < this.highlightedShape.length; pointIndex++) {
-				// offset by 1/2 pixel to keep lines unblurry
-				const x = this.highlightedShape[pointIndex].x - left;
-				const y = this.highlightedShape[pointIndex].y - top;
+			for (let pointIndex = 1; pointIndex < this.highlightedShape.length; pointIndex++) {
+				const x = this.highlightedShape[pointIndex].x - offset.x;
+				const y = this.highlightedShape[pointIndex].y - offset.y;
 
 				if (pointIndex) {
 					path.lineTo(x, y);
@@ -173,8 +258,6 @@ export class MapComponent extends Component {
 					path.moveTo(x, y);
 				}
 			}
-
-			path.closePath();
 
 			// gray out map
 			const imageData = this.context.getImageData(0, 0, this.width, this.height);
@@ -192,17 +275,26 @@ export class MapComponent extends Component {
 
 			this.context.putImageData(imageData, 0, 0);
 
-			// draw shape
-			this.context.lineWidth = 2;
-			this.context.strokeStyle = '#000';
-			this.context.stroke(path);
-
-			this.context.fillStyle = '#fff3';
-			this.context.fill(path);
-
 			// draw highlighted area in color
+			this.context.save();
 			this.context.clip(path);
 			this.renderLayerBuffers();
+
+			// draw shape
+			this.context.restore();
+			this.context.strokeStyle = '#000';
+
+			for (let pointIndex = 0; pointIndex < this.highlightedShape.length; pointIndex++) {
+				for (let x = -1; x < 1; x++) {
+					for (let y = -1; y < 1; y++) {
+						drawDanwinstonLine(
+							this.context,
+							this.highlightedShape[pointIndex].subtract(offset),
+							this.highlightedShape[(pointIndex + 1) % this.highlightedShape.length].subtract(offset)
+						);
+					}
+				}
+			}
 		}
 
 		this.context.restore();

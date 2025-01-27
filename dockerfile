@@ -9,4 +9,4 @@ RUN cd page ; npm ci ; cd ..
 RUN npm run build
 
 WORKDIR /usr/src/app/server
-CMD [ "node", ".built/index.js" ]
+CMD [ "node", "--max-old-space-size=8192" ,".built/index.js" ]

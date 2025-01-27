@@ -2,6 +2,7 @@ import { BaseServer, ViewModel, Inject } from "vlserver";
 
 import { Borough } from "././database";
 import { DbContext } from "././database";
+import { Property } from "././database";
 import { Proxy } from "././../proxy";
 import { BoroughViewModel } from "././../areas/borough.view";
 import { BridgeViewModel } from "././../areas/bridge.view";
@@ -12,6 +13,7 @@ import { PropertyViewModel } from "././../areas/property.view";
 import { SquareViewModel } from "././../areas/squre.view";
 import { StreetViewModel } from "././../areas/street.view";
 import { WaterBodyViewModel } from "././../areas/water-body.view";
+import { Point } from "././../../interface/point";
 import { MapService } from "././../areas/map.service";
 import { BoroughSummaryModel } from "././../areas/borough.summary";
 import { BoroughService } from "././../areas/borough/service";
@@ -73,7 +75,6 @@ import { Bridge } from "./../managed/database";
 import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
 import { PropertyType } from "./../managed/database";
-import { Property } from "./../managed/database";
 import { Tenancy } from "./../managed/database";
 import { Square } from "./../managed/database";
 import { Street } from "./../managed/database";
@@ -252,13 +253,13 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"VxbjByZmgxb3NvNDlvcTp0ODc0OW4zaz",
+			"tzNGZjM2B3Z3Z5dGp2bWRoY2VqcWF3YW",
 			{
-			"F6Mml1d2dxdX0xamxpcDFyaXRuaXZ5NW": { type: PropertyViewModel, isArray: false, isOptional: false }
+			"B2aHdob3JiN2VpcXc2Y2NnbnhyMXI1b3": { type: "string", isArray: false, isOptional: false }
 			},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.createProperty(
-				params["F6Mml1d2dxdX0xamxpcDFyaXRuaXZ5NW"]
+				params["B2aHdob3JiN2VpcXc2Y2NnbnhyMXI1b3"]
 			)
 		);
 

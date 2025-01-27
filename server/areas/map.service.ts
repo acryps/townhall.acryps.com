@@ -1,5 +1,5 @@
 import { Service } from "vlserver";
-import { Borough, DbContext } from "../managed/database";
+import { Borough, DbContext, Property } from "../managed/database";
 import { Proxy } from "../proxy";
 import { BoroughViewModel } from "./borough.view";
 import { BridgeViewModel } from "./bridge.view";
@@ -10,6 +10,7 @@ import { PropertyViewModel } from "./property.view";
 import { SquareViewModel } from "./squre.view";
 import { StreetViewModel } from "./street.view";
 import { WaterBodyViewModel } from "./water-body.view";
+import { Point } from "../../interface/point";
 
 export class MapService extends Service {
 	constructor(
@@ -80,10 +81,13 @@ export class MapService extends Service {
 		return new PropertyViewModel(await this.db.property.find(id));
 	}
 
-	async createProperty(propertyViewModel: PropertyViewModel) {
-		const property = await propertyViewModel.toModel();
+	async createProperty(shape: string) {
+		const property = new Property();
+		property.bounds = Point.pack(Point.unpack(shape));
 
 		await property.create();
+
+		return property.id;
 	}
 
 	async createBorough(boroughViewModel: BoroughViewModel) {

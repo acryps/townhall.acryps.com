@@ -1075,21 +1075,23 @@ export class MapService {
 		});
 	}
 
-	async createProperty(propertyViewModel: PropertyViewModel): Promise<void> {
+	async createProperty(shape: string): Promise<string> {
 		const $data = new FormData();
-		$data.append("F6Mml1d2dxdX0xamxpcDFyaXRuaXZ5NW", Service.stringify(propertyViewModel))
+		$data.append("B2aHdob3JiN2VpcXc2Y2NnbnhyMXI1b3", Service.stringify(shape))
 
-		return await fetch(Service.toURL("VxbjByZmgxb3NvNDlvcTp0ODc0OW4zaz"), {
+		return await fetch(Service.toURL("tzNGZjM2B3Z3Z5dGp2bWRoY2VqcWF3YW"), {
 			method: "post",
 			credentials: "include",
 			body: $data
 		}).then(res => res.json()).then(r => {
-			if ("error" in r) {
-				throw new Error(r.error);
-			}
+			if ("data" in r) {
+				const d = r.data;
 
-			if ("aborted" in r) {
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
 			}
 		});
 	}

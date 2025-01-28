@@ -28,7 +28,7 @@ export class CompanyOfficeService extends Service {
 		company.type = type;
 
 		const findTag = async (iteration = 0) => {
-			let tag = `${name.toLowerCase().replace(/[^a-f0-9]+/g, '-')}`;
+			let tag = `${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
 
 			while (tag.includes('--')) {
 				tag = tag.replace('--', '-');

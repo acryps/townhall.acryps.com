@@ -24,7 +24,7 @@ export class PropertyTileServer extends ShapeTileServer {
 					shapes.push({
 						id: property.id,
 						fill: type?.color ?? 'transparent',
-						stroke: property.historicListingGradeId ? '#500' : '#000',
+						stroke: property.historicListingGradeId ? '#fff' : '#000',
 						bounds: Point.unpack(property.bounds)
 					});
 				}

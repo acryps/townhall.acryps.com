@@ -12,6 +12,8 @@ export const mapOverdraw = 6;
 export const subpixelOffsetX = new Variable<Number>('subpixel-offset-x');
 export const subpixelOffsetY = new Variable<Number>('subpixel-offset-y');
 
+const blankBackground = hex('0001');
+
 export const mapStyle = () => select('ui-map-container',
 	display('block'),
 	overflow('hidden'),
@@ -24,14 +26,14 @@ export const mapStyle = () => select('ui-map-container',
 		imageRendering('pixelated'),
 		backgroundImage(
 			linearGradient(turn(0.25),
-				colorStop(percentage(0), hex('0008')),
-				colorStop(percentage(50), hex('0008')),
+				colorStop(percentage(0), blankBackground),
+				colorStop(percentage(50), blankBackground),
 				colorStop(percentage(50), 'transparent'),
 				colorStop(percentage(100), 'transparent')
 			),
 			linearGradient(turn(0),
-				colorStop(percentage(0), hex('0008')),
-				colorStop(percentage(50), hex('0008')),
+				colorStop(percentage(0), blankBackground),
+				colorStop(percentage(50), blankBackground),
 				colorStop(percentage(50), 'transparent'),
 				colorStop(percentage(100), 'transparent')
 			)
@@ -42,30 +44,3 @@ export const mapStyle = () => select('ui-map-container',
 		])
 	)
 )
-	.after('',
-		position('absolute'),
-		inset(0),
-		zIndex(10),
-		pointerEvents('none'),
-
-		backgroundImage(linearGradient(turn(0.125),
-			colorStop(percentage(0), hex('0001')),
-			colorStop(percentage(50), hex('0001')),
-			colorStop(percentage(50), 'transparent'),
-			colorStop(percentage(100), 'transparent')
-		))
-	)
-
-	.before('',
-		position('absolute'),
-		inset(0),
-		zIndex(10),
-		pointerEvents('none'),
-
-		backgroundImage(linearGradient(turn(0.125 + 0.25),
-			colorStop(percentage(0), hex('0001')),
-			colorStop(percentage(50), hex('0001')),
-			colorStop(percentage(50), 'transparent'),
-			colorStop(percentage(100), 'transparent')
-		))
-	)

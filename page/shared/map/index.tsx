@@ -44,8 +44,6 @@ export class MapComponent extends Component {
 		this.center = center.floor().copy(0.5, 0.5);
 		this.scale = scale;
 
-		console.debug(this.center)
-
 		return this;
 	}
 
@@ -237,17 +235,9 @@ export class MapComponent extends Component {
 		// top most pixel offset
 		// point 0,0 in canvas converted to map location
 		const offset = new Point(
-			this.cursor.x - this.width / 2 - (this.width % 2 ? 0.5 : 0), // Math.floor(this.cursor.x - this.width / 2),
-			this.cursor.y - this.height / 2 - (this.height % 2 ? 0.5 : 0)	 // Math.floor(this.cursor.y - this.height / 2)
+			this.cursor.x - this.width / 2 - (this.width % 2 ? 0.5 : 0),
+			this.cursor.y - this.height / 2 - (this.height % 2 ? 0.5 : 0)
 		);
-
-		// console.clear();
-
-		console.debug('center', this.center);
-		console.debug('cursor', this.cursor);
-		console.debug('offset', offset);
-		console.debug('subpixel', this.subpixel);
-		console.debug('size', this.width, this.height);
 
 		if (this.drawing) {
 			if (this.drawing.length) {
@@ -283,11 +273,15 @@ export class MapComponent extends Component {
 					cursor.subtract(offset)
 				);
 
+				let cursorColor = '#fff8';
+
 				// draw cursor aligned line indicator
 				if (last.x == cursor.x || last.y == cursor.y || Math.abs(last.x - cursor.x) == Math.abs(last.y - cursor.y)) {
-					this.context.fillStyle = '#0f08';
-					this.context.fillRect(cursor.x - offset.x - 1, cursor.y - offset.y - 1, 3, 3);
+					cursorColor = '#0f08';
 				}
+
+				this.context.fillStyle = cursorColor;
+				this.context.fillRect(cursor.x - offset.x - 1, cursor.y - offset.y - 1, 3, 3);
 			}
 
 			// draw cursor
@@ -300,7 +294,7 @@ export class MapComponent extends Component {
 			const path = new Path2D();
 			this.context.beginPath();
 
-			for (let pointIndex = 1; pointIndex < this.highlightedShape.length; pointIndex++) {
+			for (let pointIndex = 0; pointIndex < this.highlightedShape.length; pointIndex++) {
 				const x = this.highlightedShape[pointIndex].x - offset.x;
 				const y = this.highlightedShape[pointIndex].y - offset.y;
 

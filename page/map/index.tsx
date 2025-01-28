@@ -42,8 +42,6 @@ export class MapPage extends Component {
 		return <ui-map>
 			{this.map}
 
-			<ui-map-marker />
-
 			<ui-tools>
 				{this.map.drawing && (this.map.drawingClosePossible.map(possible => possible ? <ui-action ui-click={() => {
 					const shape = this.map.completeDrawing();
@@ -113,8 +111,10 @@ export class MapPage extends Component {
 						</ui-action>
 
 						<ui-action ui-click={() => {
-							this.map.enableDrawing();
-							this.update();
+							if (!this.map.drawing) {
+								this.map.enableDrawing();
+								this.update();
+							}
 						}}>
 							{drawIcon()}
 						</ui-action>

@@ -20,17 +20,9 @@ export const mapStyle = () => [
 
 		child('ui-map-container',
 			position('fixed'),
-			inset(rem(20)),
+			inset(rem(0)),
 
 			overflow('visible')
-		),
-
-		child('ui-map-marker',
-			position('fixed'),
-			inset(rem(20)),
-
-			border(px(3), 'dotted', 'currentColor'),
-			pointerEvents('none')
 		),
 
 		child('ui-tools',

@@ -5,6 +5,7 @@ import { mapOverdraw, mapPixelHeight, mapPixelWidth, mapSubpixelHeight, mapSubpi
 import { baseLayer } from "./layers";
 import { drawDanwinstonLine } from "../../../interface/line";
 import { Observable } from "@acryps/page-observable";
+import { Hex } from "@acryps/style";
 
 export class MapComponent extends Component {
 	readonly defaultZoom = 4;
@@ -236,8 +237,8 @@ export class MapComponent extends Component {
 		// top most pixel offset
 		// point 0,0 in canvas converted to map location
 		const offset = new Point(
-			Math.floor(this.center.x - this.width / 2),
-			Math.floor(this.center.y - this.height / 2)
+			this.cursor.x - this.width / 2 - (this.width % 2 ? 0.5 : 0), // Math.floor(this.cursor.x - this.width / 2),
+			this.cursor.y - this.height / 2 - (this.height % 2 ? 0.5 : 0)	 // Math.floor(this.cursor.y - this.height / 2)
 		);
 
 		// console.clear();

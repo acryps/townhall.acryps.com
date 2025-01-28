@@ -71,6 +71,7 @@ export class LawHouseSessionManager {
 		await this.writeHonestiums();
 		await this.certifyBills();
 		await this.sendVotingBallots();
+		await this.incorporateCompanies();
 
 		this.session.ended = new Date();
 

@@ -39,6 +39,10 @@ export class CompanyOfficePage extends Component {
 					<ui-name>
 						{company.name} {CompanyOfficePage.convertCompanyTypeName(company.type)}
 					</ui-name>
+
+					{company.purpose && <ui-purpose>
+						{company.purpose}
+					</ui-purpose>}
 				</ui-company>)}
 			</ui-companies>
 		</ui-company-office>

@@ -1,6 +1,6 @@
 import { LawHouse } from ".";
 import { Life } from "..";
-import { BillHonestium, DbContext, District, LawHouseSession, LawHouseSessionary, Resident, ResidentEventView, Vote } from "../../managed/database";
+import { BillHonestium, Company, DbContext, District, LawHouseSession, LawHouseSessionary, Resident, ResidentEventView, Vote } from "../../managed/database";
 import { Language } from "../language";
 
 export class LawHouseSessionManager {
@@ -8,6 +8,8 @@ export class LawHouseSessionManager {
 	honestiumSize = 3;
 
 	private residents: Resident[];
+	private companies: Company[];
+
 	private sessionaries: Resident[] = [];
 	private session: LawHouseSession;
 
@@ -43,6 +45,11 @@ export class LawHouseSessionManager {
 			return;
 		}
 
+		this.protocol(`Collecting registered companies for legal district ${this.district.name}`);
+
+		this.companies = await this.lawHouse.collectCompanies(this.district);
+		this.protocol(`Consensus for ${this.district.name}: ${this.companies.length} companies`);
+
 		const sessionaryPool = [...this.residents];
 		sessionaryPool.sort(() => Math.random() - 0.5);
 
@@ -72,13 +79,6 @@ export class LawHouseSessionManager {
 		await this.session.update();
 	}
 
-	private async getOpenBills() {
-		return await this.district.bills
-			.where(bill => bill.scopeId == this.district.id)
-			.where(bill => bill.certified == null)
-			.toArray();
-	}
-
 	private async protocol(message: string) {
 		console.log(`[law-house session ${this.district.name}]: ${message}`);
 
@@ -87,6 +87,14 @@ export class LawHouseSessionManager {
 		await this.session.update();
 	}
 
+	private async getOpenBills() {
+		return await this.district.bills
+			.where(bill => bill.scopeId == this.district.id)
+			.where(bill => bill.certified == null)
+			.toArray();
+	}
+
+	// write honestiums for bills
 	private async writeHonestiums() {
 		for (let bill of await this.getOpenBills()) {
 			const honestiums = await bill.honestiums.toArray();
@@ -143,6 +151,7 @@ export class LawHouseSessionManager {
 		}
 	}
 
+	// certifiy completed elections
 	private async certifyBills() {
 		for (let bill of await this.getOpenBills()) {
 			if (bill.mailed) {
@@ -163,6 +172,18 @@ export class LawHouseSessionManager {
 
 					await bill.update();
 				}
+			}
+		}
+	}
+
+	// incorporate companies
+	private async incorporateCompanies() {
+		for (let company of this.companies) {
+			if (!company.incorporated) {
+				company.purpose = await this.language.respondText(this.language.extractCompanyPurpose(), company.description);
+				company.incorporated = new Date();
+
+				await company.update();
 			}
 		}
 	}

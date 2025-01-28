@@ -71,6 +71,7 @@ export class BridgeViewModel {
 export class CompanySummaryModel {
 	id: string;
 	name: string;
+	purpose: string;
 	tag: string;
 	type: CompanyType;
 
@@ -78,6 +79,7 @@ export class CompanySummaryModel {
 		const item = new CompanySummaryModel();
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.purpose === undefined || (item.purpose = raw.purpose === null ? null : `${raw.purpose}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		raw.type === undefined || (item.type = raw.type)
 		
@@ -770,7 +772,9 @@ export class CompanyViewModel {
 	created: Date;
 	description: string;
 	id: string;
+	incorporated: Date;
 	name: string;
+	purpose: string;
 	tag: string;
 	type: CompanyType;
 
@@ -780,7 +784,9 @@ export class CompanyViewModel {
 		raw.created === undefined || (item.created = raw.created ? new Date(raw.created) : null)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.incorporated === undefined || (item.incorporated = raw.incorporated ? new Date(raw.incorporated) : null)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.purpose === undefined || (item.purpose = raw.purpose === null ? null : `${raw.purpose}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		raw.type === undefined || (item.type = raw.type)
 		

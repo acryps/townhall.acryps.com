@@ -8,11 +8,13 @@ export class CompanySummaryModel extends ViewModel<Company> {
 
 	name;
 	type;
+	purpose;
 }
 
 export class CompanyViewModel extends CompanySummaryModel {
 	description;
 	created;
+	incorporated;
 
 	offices: OfficeViewModel[];
 }

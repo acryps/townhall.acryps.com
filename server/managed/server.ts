@@ -992,6 +992,7 @@ ViewModel.mappings = {
 			return {
 				id: this.$$model.id,
 				name: this.$$model.name,
+				purpose: this.$$model.purpose,
 				tag: this.$$model.tag,
 				type: this.$$model.type
 			}
@@ -1025,6 +1026,7 @@ ViewModel.mappings = {
 			return {
 				id: true,
 				name: true,
+				purpose: true,
 				tag: true,
 				type: true
 			};
@@ -1034,6 +1036,7 @@ ViewModel.mappings = {
 			const item = new CompanySummaryModel(null);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"purpose" in data && (item.purpose = data.purpose === null ? null : `${data.purpose}`);
 			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 			"type" in data && (item.type = data.type === null ? null : data.type);
 
@@ -1051,6 +1054,7 @@ ViewModel.mappings = {
 			
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"purpose" in viewModel && (model.purpose = viewModel.purpose === null ? null : `${viewModel.purpose}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 			"type" in viewModel && (model.type = viewModel.type === null ? null : viewModel.type);
 
@@ -3930,7 +3934,9 @@ ViewModel.mappings = {
 				created: this.$$model.created,
 				description: this.$$model.description,
 				id: this.$$model.id,
+				incorporated: this.$$model.incorporated,
 				name: this.$$model.name,
+				purpose: this.$$model.purpose,
 				tag: this.$$model.tag,
 				type: this.$$model.type
 			}
@@ -3971,7 +3977,9 @@ ViewModel.mappings = {
 				created: true,
 				description: true,
 				id: true,
+				incorporated: true,
 				name: true,
+				purpose: true,
 				tag: true,
 				type: true
 			};
@@ -3983,7 +3991,9 @@ ViewModel.mappings = {
 			"created" in data && (item.created = data.created === null ? null : new Date(data.created));
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"incorporated" in data && (item.incorporated = data.incorporated === null ? null : new Date(data.incorporated));
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"purpose" in data && (item.purpose = data.purpose === null ? null : `${data.purpose}`);
 			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 			"type" in data && (item.type = data.type === null ? null : data.type);
 
@@ -4003,7 +4013,9 @@ ViewModel.mappings = {
 			"created" in viewModel && (model.created = viewModel.created === null ? null : new Date(viewModel.created));
 			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"incorporated" in viewModel && (model.incorporated = viewModel.incorporated === null ? null : new Date(viewModel.incorporated));
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"purpose" in viewModel && (model.purpose = viewModel.purpose === null ? null : `${viewModel.purpose}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 			"type" in viewModel && (model.type = viewModel.type === null ? null : viewModel.type);
 

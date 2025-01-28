@@ -34,6 +34,7 @@ export interface BridgeViewModel {
 export interface CompanySummaryModel {
     id: string;
 	name: string;
+	purpose: string;
 	tag: string;
 	type: CompanyType;
 }
@@ -326,7 +327,9 @@ export interface CompanyViewModel {
 	created: Date;
 	description: string;
 	id: string;
+	incorporated: Date;
 	name: string;
+	purpose: string;
 	tag: string;
 	type: CompanyType;
 }

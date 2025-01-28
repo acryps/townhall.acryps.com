@@ -39,7 +39,7 @@ DbClient.connectedClient.connect().then(async () => {
 	await life.load();
 
 	const lawHouse = new LawHouse(database, new Language(), life);
-	// lawHouse.schedule();
+	lawHouse.schedule();
 
 	// life.vote();
 

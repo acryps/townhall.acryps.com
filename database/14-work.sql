@@ -35,3 +35,7 @@ CREATE TABLE office (
 	company_id UUID CONSTRAINT company__offices REFERENCES company (id),
 	property_id UUID CONSTRAINT property__offices REFERENCES property (id)
 );
+
+-- legal incorporation
+ALTER TABLE company ADD incorporated TIMESTAMP;
+ALTER TABLE company ADD purpose TEXT;

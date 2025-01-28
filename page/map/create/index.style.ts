@@ -1,4 +1,4 @@
-import { alignItems, bottom, child, display, flexDirection, fontSize, fontWeight, margin, marginBlock, marginBottom, rem, textAlign } from "@acryps/style";
+import { alignItems, aspectRatio, bottom, child, display, flexDirection, fontSize, fontWeight, height, margin, marginBlock, marginBottom, ratio, rem, textAlign } from "@acryps/style";
 import { collection, collectionItem } from "../../shared/collection.style";
 import { pageGutter } from "../../index.style";
 import { card } from "../../shared/card.style";
@@ -7,6 +7,8 @@ export const createFeatureStyle = () => child('ui-create-feature',
 	display('block'),
 
 	child('ui-map-container',
+		aspectRatio(ratio(4, 3)),
+
 		margin(pageGutter.invert()),
 		marginBottom(pageGutter)
 	),

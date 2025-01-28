@@ -478,7 +478,9 @@ export class ChatInteraction extends Entity<ChatInteractionQueryProxy> {
 export class CompanyQueryProxy extends QueryProxy {
 	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get incorporated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get purpose(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get type(): "company" | "government_company" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
@@ -489,7 +491,9 @@ export class Company extends Entity<CompanyQueryProxy> {
 		created: Date;
 	description: string;
 	declare id: string;
+	incorporated: Date;
 	name: string;
+	purpose: string;
 	tag: string;
 	type: CompanyType;
 	
@@ -499,7 +503,9 @@ export class Company extends Entity<CompanyQueryProxy> {
 			created: { type: "timestamp", name: "created" },
 			description: { type: "text", name: "description" },
 			id: { type: "uuid", name: "id" },
+			incorporated: { type: "timestamp", name: "incorporated" },
 			name: { type: "text", name: "name" },
+			purpose: { type: "text", name: "purpose" },
 			tag: { type: "text", name: "tag" },
 			type: { type: "company_type", name: "type" }
 		},

@@ -1,4 +1,4 @@
-import { Bill, BillHonestium, Borough, Resident, ResidentFigure, ResidentRelationship } from "../managed/database";
+import { Bill, BillHonestium, Borough, Company, Resident, ResidentFigure, ResidentRelationship } from "../managed/database";
 import { toSimulatedTime } from "../../interface/time";
 import { NameType } from "./name";
 import { Gender } from "./gender";
@@ -145,6 +145,14 @@ export class Language {
 		All voting is anonymous, and everybody is free to express their beliefs, even if they would be percieved as distruptive or evil by other people.
 
 		${this.environment()}
+		${this.metaRules()}
+	`;
+
+	readonly extractCompanyPurpose = () => `
+		What is the short company type (like: "Investment Bank", "Trading Company", "Car Rental", "Railway") of this company based on this description?
+		The answer should be as short as possible.
+		Do not include "Company" or any other similar term.
+
 		${this.metaRules()}
 	`;
 

@@ -1,6 +1,6 @@
 import { Life } from "..";
 import { toSimulatedAge } from "../../../interface/time";
-import { BillHonestium, DbContext, District, LawHouseSession, Property, Resident, Vote } from "../../managed/database";
+import { BillHonestium, Company, DbContext, District, LawHouseSession, Property, Resident, Vote } from "../../managed/database";
 import { Language } from "../language";
 import { LawHouseSessionManager } from "./session";
 
@@ -72,6 +72,28 @@ export class LawHouse {
 		}
 
 		return residents;
+	}
+
+	async collectCompanies(district: District) {
+		// find people who need to vote on this bill
+		const boroughs = await this.collectBoroughs(district);
+
+		// find residents
+		const companies: Company[] = [];
+
+		for (let borough of boroughs) {
+			for (let property of await borough.properties.toArray()) {
+				for (let office of await property.offices.toArray()) {
+					const company = await office.company.fetch();
+
+					if (!companies.some(existing => existing.id == company.id)) {
+						companies.push(company);
+					}
+				}
+			}
+		}
+
+		return companies;
 	}
 
 	private async collectBoroughs(district: District) {

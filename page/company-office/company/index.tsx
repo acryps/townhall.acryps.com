@@ -15,11 +15,20 @@ export class CompanyPage extends Component {
 
 	render() {
 		return <ui-company>
+			{!this.company.incorporated && <ui-alert>
+				Company has not been legally incorporated yet.
+				The next law house session for the main office should do this automatically.
+			</ui-alert>}
+
 			<ui-name>
 				{this.company.name}
 			</ui-name>
 
 			{this.renderType()}
+
+			{this.company.purpose && <ui-purpose>
+				{this.company.purpose}
+			</ui-purpose>}
 
 			<ui-founding>
 				Founded {this.company.created.toLocaleDateString()}, {toSimulatedAge(this.company.created)} years ago.

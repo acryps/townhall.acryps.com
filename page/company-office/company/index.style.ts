@@ -1,9 +1,18 @@
-import { aspectRatio, child, display, flexDirection, flexGrow, fontSize, fontWeight, justifyContent, margin, marginBottom, marginInline, overflow, percentage, ratio, rem, textAlign, whiteSpace, width } from "@acryps/style";
+import { aspectRatio, backgroundColor, child, color, display, flexDirection, flexGrow, fontSize, fontWeight, justifyContent, margin, marginBottom, marginInline, overflow, padding, percentage, ratio, rem, textAlign, whiteSpace, width } from "@acryps/style";
 import { card } from "../../shared/card.style";
 import { collection, collectionItem } from "../../shared/collection.style";
+import { infoColor, pageBackgroundColor, pageTextColor, positiveColor } from "../../index.style";
 
 export const companyStyle = () => child('ui-company',
 	display('block'),
+
+	child('ui-alert',
+		display('block'),
+		padding(rem(1)),
+		marginBottom(rem(2)),
+
+		backgroundColor(infoColor)
+	),
 
 	child('ui-name',
 		display('block'),
@@ -18,6 +27,13 @@ export const companyStyle = () => child('ui-company',
 		marginBottom(rem(1)),
 
 		fontWeight('bold'),
+		textAlign('center')
+	),
+
+	child('ui-purpose',
+		display('block'),
+		marginBottom(rem(1)),
+
 		textAlign('center')
 	),
 

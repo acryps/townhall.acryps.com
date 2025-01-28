@@ -2,7 +2,7 @@
 	"name": "server-townhall",
 	"scripts": {
 		"build": "npx vlserver compile && esbuild index.ts --bundle --outfile=.built/index.js --platform=node --target=es2018 --external:express-ws --external:sharp --external:skia-canvas --external:pg --external:ollama && vlquery compile",
-		"start": "npm run build && environment node .built/index.js",
+		"start": "npm run build && environment node --max-old-space-size=8192 .built/index.js",
 		"typecheck": "npx vlserver compile && tsc --noEmit",
 		"database:update": "environment vlquery create-context"
 	},

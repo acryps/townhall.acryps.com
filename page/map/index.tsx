@@ -29,9 +29,9 @@ export class MapPage extends Component {
 		this.map.show(new Point(+this.parameters.x, +this.parameters.y), 1 / ((+this.parameters.zoom / this.zoomAccuracy) ** 2));
 
 		requestAnimationFrame(() => {
-			registerInteration(this.map, point => {
-				this.parameters.x = point.x.toFixed(0);
-				this.parameters.y = point.y.toFixed(0);
+			registerInteration(this.map, () => {
+				this.parameters.x = this.map.cursor.x;
+				this.parameters.y = this.map.cursor.y;
 			}, scale => {
 				this.parameters.zoom = (Math.sqrt(1 / scale) * this.zoomAccuracy).toFixed(0);
 			}, pick => {
@@ -41,6 +41,8 @@ export class MapPage extends Component {
 
 		return <ui-map>
 			{this.map}
+
+			<ui-map-marker />
 
 			<ui-tools>
 				{this.map.drawing && (this.map.drawingClosePossible.map(possible => possible ? <ui-action ui-click={() => {

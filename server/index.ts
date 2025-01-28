@@ -52,7 +52,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new BaseTileServer(app, database);
 	new PropertyTileServer(app, database);
 	new BoroughTileServer(app, database);
-	new MovementTileServer(app, database);
+	// new MovementTileServer(app, database);
 
 	// life.tick();
 	/// new FillLife(life, db).fillEmptyDwellings();

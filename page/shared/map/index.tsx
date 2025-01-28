@@ -1,7 +1,7 @@
 import { Component } from "@acryps/page";
 import { Point } from "../../../interface/point";
 import { MapLayer } from "./layer";
-import { mapOverdraw, mapPixelWidth, subpixelOffsetX, subpixelOffsetY } from "./index.style";
+import { mapOverdraw, mapPixelHeight, mapPixelWidth, mapSubpixelHeight, mapSubpixelWidth, subpixelOffsetX, subpixelOffsetY } from "./index.style";
 import { baseLayer } from "./layers";
 import { drawDanwinstonLine } from "../../../interface/line";
 import { Observable } from "@acryps/page-observable";
@@ -19,13 +19,20 @@ export class MapComponent extends Component {
 
 	canvas: HTMLCanvasElement;
 	context: CanvasRenderingContext2D;
+
 	width: number;
 	height: number;
+
+	subpixelWidth: number;
+	subpixelHeight: number;
 
 	drawing?: Point[];
 	drawingClosePossible = new Observable<boolean>(false);
 
 	highlightedShape: Point[];
+
+	subpixel = new Point(0, 0);
+	pixelSize = 0;
 
 	layers: MapLayer[] = [
 		baseLayer
@@ -33,8 +40,10 @@ export class MapComponent extends Component {
 
 	// centers the map around this point (intially)
 	show(center: Point, scale: number) {
-		this.center = center;
+		this.center = center.floor().copy(0.5, 0.5);
 		this.scale = scale;
+
+		console.debug(this.center)
 
 		return this;
 	}
@@ -134,24 +143,29 @@ export class MapComponent extends Component {
 	private resize() {
 		const boundingBox = this.rootNode.getBoundingClientRect();
 
-		this.width = Math.floor(boundingBox.width * this.scale);
-		this.height = Math.floor(boundingBox.height * this.scale);
+		this.subpixelWidth = boundingBox.width * this.scale;
+		this.subpixelHeight = boundingBox.height * this.scale;
 
-		if (this.width < this.minimumWidth) {
+		if (this.subpixelWidth < this.minimumWidth) {
 			this.scale = this.minimumWidth / boundingBox.width;
 
 			return this.resize();
 		}
 
-		if (this.width > this.maximumWidth) {
+		if (this.subpixelWidth > this.maximumWidth) {
 			this.scale = this.maximumWidth / boundingBox.width;
 
 			return this.resize();
 		}
 
-		// always render two pixel too much, to compensate the sub pixel offset
-		this.width += mapOverdraw;
-		this.height += mapOverdraw;
+		this.pixelSize = boundingBox.width / this.subpixelWidth;
+
+		// always render some pixel too much, to compensate the sub pixel offset
+		this.subpixelWidth += mapOverdraw;
+		this.subpixelHeight += mapOverdraw;
+
+		this.width = Math.floor(this.subpixelWidth);
+		this.height = Math.floor(this.subpixelHeight);
 	}
 
 	private updateScale() {
@@ -159,7 +173,14 @@ export class MapComponent extends Component {
 		this.canvas.width = this.width;
 		this.canvas.height = this.height;
 
+		this.canvas.style.width = `${this.pixelSize * this.width}px`;
+		this.canvas.style.height = `${this.pixelSize * this.height}px`;
+
 		this.canvas.style.setProperty(mapPixelWidth.propertyName, this.width.toString());
+		this.canvas.style.setProperty(mapPixelHeight.propertyName, this.height.toString());
+
+		this.canvas.style.setProperty(mapSubpixelWidth.propertyName, this.subpixelWidth.toString());
+		this.canvas.style.setProperty(mapSubpixelHeight.propertyName, this.subpixelHeight.toString());
 
 		this.resize();
 		this.updateLayers();
@@ -167,16 +188,37 @@ export class MapComponent extends Component {
 
 	// updates map content
 	updateLayers() {
+		const box = this.canvas.getBoundingClientRect();
+		const bounds = this.rootNode.getBoundingClientRect();
+
+		// how much partially visible pixels are on the canvas
+		const outboard = new Point(
+			bounds.width % this.pixelSize,
+			bounds.height % this.pixelSize
+		);
+
 		// set subpixel offsets
 		//
 		// moves map slightly (within one map pixel) to allow for floating-point movement without jitter
 		// the map is expanded by one pixel to the bottom right to prevent the bottom pixel from not being rendered
 		// everyting is rendered to the top left pixel, which is only partially shown
-		this.canvas.style.setProperty(subpixelOffsetX.propertyName, (this.center.x - Math.floor(this.center.x)).toString());
-		this.canvas.style.setProperty(subpixelOffsetY.propertyName, (this.center.y - Math.floor(this.center.y)).toString());
+		this.subpixel = new Point(
+			(this.center.x - Math.floor(this.center.x)) * this.pixelSize,
+			(this.center.y - Math.floor(this.center.y)) * this.pixelSize
+		);
+
+		// source of this not found yet
+		const oddOffset = new Point(
+			this.width % 2 ? 0.5 : 0,
+			this.height % 2 ? 0.5 : 0
+		);
+
+		// it does not work in styles as the width/height are relative
+		this.canvas.style.left = `${-this.subpixel.x + outboard.x / 2 - mapOverdraw / 2 * this.pixelSize - oddOffset.x * this.pixelSize}px`;
+		this.canvas.style.top = `${-this.subpixel.y + outboard.y / 2 - mapOverdraw / 2 * this.pixelSize - oddOffset.y * this.pixelSize}px`;
 
 		for (let layer of this.layers) {
-			layer.update(this.center.floor(), this.width, this.height).then(() => {
+			layer.update(this.cursor, this.width, this.height).then(() => {
 				this.renderLayers();
 			});
 		}
@@ -191,11 +233,20 @@ export class MapComponent extends Component {
 		this.context.clearRect(0, 0, this.width, this.height);
 		this.renderLayerBuffers();
 
-		// the 1 corrects the subpixel offset
+		// top most pixel offset
+		// point 0,0 in canvas converted to map location
 		const offset = new Point(
-			Math.floor(this.center.x - Math.ceil(this.width / 2)) + 1,
-			Math.floor(this.center.y - Math.ceil(this.height / 2)) + 1
+			Math.floor(this.center.x - this.width / 2),
+			Math.floor(this.center.y - this.height / 2)
 		);
+
+		// console.clear();
+
+		console.debug('center', this.center);
+		console.debug('cursor', this.cursor);
+		console.debug('offset', offset);
+		console.debug('subpixel', this.subpixel);
+		console.debug('size', this.width, this.height);
 
 		if (this.drawing) {
 			if (this.drawing.length) {
@@ -297,13 +348,16 @@ export class MapComponent extends Component {
 			}
 		}
 
+		this.context.fillStyle = 'blue';
+		this.context.fillRect(-offset.x, -offset.y, 1, 1);
+
 		this.context.restore();
 	}
 
 	private renderLayerBuffers() {
 		// copy layer buffers to main context
 		for (let layer of this.layers) {
-			const image = layer.render(this.center.floor(), this.width, this.height);
+			const image = layer.render(this.cursor, this.width, this.height);
 
 			this.context.drawImage(image, 0, 0);
 		}

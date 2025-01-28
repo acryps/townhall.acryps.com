@@ -1,5 +1,6 @@
 import { Pc } from "@acryps/style";
 import { Point, PackedPoint } from "../../../interface/point";
+import { mapOverdraw } from "./index.style";
 
 export class MapLayer {
 	// null tiles are loading - or failed to load

@@ -1,4 +1,4 @@
-import { alignItems, alignSelf, backgroundColor, borderTop, bottom, boxShadow, child, color, display, flexDirection, fontSize, gap, height, hex, imageRendering, inset, insetInline, justifyContent, margin, marginInline, marginLeft, marginTop, maxWidth, Number, padding, percentage, position, px, rem, select, textAlign, Variable, width } from "@acryps/style";
+import { alignItems, alignSelf, backgroundColor, border, borderTop, bottom, boxShadow, child, color, display, flexDirection, fontSize, gap, height, hex, imageRendering, inset, insetInline, justifyContent, margin, marginInline, marginLeft, marginTop, maxWidth, Number, overflow, padding, percentage, pointerEvents, position, px, rem, select, textAlign, Variable, width } from "@acryps/style";
 import { pageTextColor, navigationBackgroundColor, navigationBorderColor, pageGutter, pageBackgroundColor } from "../index.style";
 import { buttonStyle } from "../shared/index.style";
 import { PageComponent } from "../page";
@@ -20,7 +20,17 @@ export const mapStyle = () => [
 
 		child('ui-map-container',
 			position('fixed'),
-			inset(0)
+			inset(rem(20)),
+
+			overflow('visible')
+		),
+
+		child('ui-map-marker',
+			position('fixed'),
+			inset(rem(20)),
+
+			border(px(3), 'dotted', 'currentColor'),
+			pointerEvents('none')
 		),
 
 		child('ui-tools',

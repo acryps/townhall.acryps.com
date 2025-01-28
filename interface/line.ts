@@ -5,7 +5,7 @@ type Coordinate = {
 	y: number;
 };
 
-export const drawDanwinstonLine = (context: CanvasRenderingContext2D, start: Coordinate, end: Coordinate) => {
+export const drawDanwinstonLine = (context: Partial<CanvasRenderingContext2D>, start: Coordinate, end: Coordinate) => {
 	const fillStyle = context.fillStyle;
 	context.fillStyle = context.strokeStyle;
 
@@ -19,45 +19,27 @@ export const drawDanwinstonLine = (context: CanvasRenderingContext2D, start: Coo
 	const sx = x1 < x2 ? 1 : -1;
 	const sy = y1 < y2 ? 1 : -1;
 
-	// Initialize the error term
-		let err = dx - dy;
+	let error = dx - dy;
 
-		while (true) {
-			// Draw a single pixel at the current position
-			context.fillRect(x1, y1, 1, 1);
+	while (true) {
+		context.fillRect(x1, y1, 1, 1);
 
-			// Break if we've reached the endpoint
-			if (x1 === x2 && y1 === y2) break;
-
-			// Calculate the error for the next step
-			const e2 = err * 2;
-			if (e2 > -dy) {
-				err -= dy;
-				x1 += sx;
-			}
-			if (e2 < dx) {
-				err += dx;
-				y1 += sy;
-			}
+		if (x1 == x2 && y1 == y2) {
+			break;
 		}
 
-	/*let err = dx - dy;
-
-	while (x1 != x2 && y1 != y2) {
-		const e2 = err * 2;
+		const e2 = error * 2;
 
 		if (e2 > -dy) {
-			err -= dy;
+			error -= dy;
 			x1 += sx;
 		}
 
 		if (e2 < dx) {
-			err += dx;
+			error += dx;
 			y1 += sy;
 		}
-
-		context.fillRect(x1, y1, 1, 1);
-		}*/
+	}
 
 	context.fillStyle = fillStyle;
 }

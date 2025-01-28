@@ -109,8 +109,31 @@ export class MapComponent extends Component {
 		}
 	}
 
+	// returns the map as a JPEG!
+	// yes not a PNG, because all messengers compress the images
 	capture() {
-		return new Promise<Blob>(done => this.canvas.toBlob(done, 'image/png'));
+		// scale everyting up to fit the jpeg compression block to get clean sharing
+		const jpegCompressionBlock = 8;
+
+		const superscaledCanvas = document.createElement('canvas');
+		superscaledCanvas.width = this.width * jpegCompressionBlock;
+		superscaledCanvas.height = this.height * jpegCompressionBlock;
+
+		const context = superscaledCanvas.getContext('2d');
+
+		// superscale
+		const source = this.context.getImageData(0, 0, this.width, this.height);
+
+		for (let sourceX = 0; sourceX < this.width; sourceX++) {
+			for (let sourceY = 0; sourceY < this.height; sourceY++) {
+				const sourceOffset = (sourceX + sourceY * this.width) * 4;
+
+				context.fillStyle = `rgb(${source.data.slice(sourceOffset, sourceOffset + 3).join(',')})`;
+				context.fillRect(sourceX * jpegCompressionBlock, sourceY * jpegCompressionBlock, jpegCompressionBlock, jpegCompressionBlock);
+			}
+		}
+
+		return new Promise<Blob>(done => superscaledCanvas.toBlob(done, 'image/jpeg'));
 	}
 
 	render() {

@@ -181,8 +181,12 @@ export class LawHouseSessionManager {
 	private async incorporateCompanies() {
 		for (let company of this.companies) {
 			if (!company.incorporated) {
+				this.protocol(`Create purpose description for company '${company.name}'.`);
+
 				company.purpose = await this.language.respondText(this.language.extractCompanyPurpose(), company.description);
 				company.incorporated = new Date();
+
+				this.protocol(`Company '${company.name}' incorporated as '${company.purpose}' at ${company.incorporated.toLocaleString()}.`);
 
 				await company.update();
 			}

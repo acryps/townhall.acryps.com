@@ -52,6 +52,8 @@ export class Life {
 	}
 
 	async voteBill(ballot: Vote) {
+		const fast = new Language('fast');
+
 		if (ballot.submitted) {
 			throw new Error(`Vote '${ballot.id}' already submitted`);
 		}
@@ -60,7 +62,7 @@ export class Life {
 		const bill = await ballot.bill.fetch();
 		const honestums = await bill.honestiums.toArray();
 
-		const response = await this.language.respondJSON(this.language.vote(resident),
+		const response = await fast.respondText(this.language.vote(resident),
 			await this.compileDescription(resident),
 			bill.title,
 			bill.description,
@@ -71,13 +73,20 @@ export class Life {
 			throw new Error(`Bill '${bill.tag}' already certified`);
 		}
 
-		if (typeof response != 'object' || !response.vote || !(response.vote == 'YES' || response.vote == 'NO') || !response.reason) {
+		if (!response.startsWith('YES') && !response.startsWith('NO')) {
 			return this.voteBill(ballot);
 		}
 
 		ballot.submitted = new Date();
-		ballot.pro = response.vote == 'YES';
-		ballot.reason = response.reason;
+		ballot.pro = response.startsWith('YES');
+
+		const reason = response.split(/\s/).slice(1).join(' ').trim();
+
+		if (reason) {
+			ballot.reason = reason;
+		}
+
+		console.log('+ vote', resident.givenName, resident.familyName, ballot.pro, ballot.reason);
 
 		await ballot.update();
 	}

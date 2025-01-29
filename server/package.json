@@ -14,7 +14,10 @@
 		"townhallServerAddress": "Minecraft File Server Location",
 
 		"languageModel": {
-			"model": "Language Model and Size",
+			"model": {
+				"smart": "Smart Language Model and Size",
+				"fast": "Fast Language Model and Size"
+			},
 			"host": "Language Model Host"
 		}
 	},

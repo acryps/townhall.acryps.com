@@ -96,7 +96,7 @@ export class ChatManager extends Manager {
 
 		let history = await this.getSystemMessages(chat);
 
-		const response = await Language.chat(history);
+		const response = await Language.chat(history, 'smart');
 
 		interaction.response = response.message.content?.trim();
 		interaction.responded = new Date();

@@ -1,4 +1,4 @@
-import { child, display, padding, rem, marginBottom, color, backgroundColor, fontWeight, marginTop, whiteSpace, fontStyle, paddingInline, marginRight, marginLeft, paddingLeft, borderLeft, px, Variable, border, height, justifyContent, width, percentage, background, flexDirection, alignSelf, maxWidth, paddingBlock, fontSize, textTransform, alignItems, marginBlock, style, lineHeight, position, left, right } from "@acryps/style";
+import { child, display, padding, rem, marginBottom, color, backgroundColor, fontWeight, marginTop, whiteSpace, fontStyle, paddingInline, marginRight, marginLeft, paddingLeft, borderLeft, px, Variable, border, height, justifyContent, width, percentage, background, flexDirection, alignSelf, maxWidth, paddingBlock, fontSize, textTransform, alignItems, marginBlock, style, lineHeight, position, left, right, textAlign, flexBasis, flexGrow, gap } from "@acryps/style";
 import { billTextColor, billBackgroundColor, negativeColor, positiveColor, pageBackgroundColor, pageTextColor, neutralColor } from "../../index.style";
 
 export const tickerPending = new Variable('ticker-pending');
@@ -109,24 +109,33 @@ export const billStyle = () => child('ui-bill',
 			)
 		),
 
-		child('ui-container',
-			display('flex'),
-			alignItems('flex-end'),
-			justifyContent('space-between'),
+		child('ui-count',
+			display('block'),
+			marginBlock(rem(0.25))
+		)
+			.attribute('ui-pro', textAlign('left'))
+			.attribute('ui-contra', textAlign('right')),
 
-			child('ui-impression',
+		child('ui-reasons',
+			display('flex'),
+			gap(rem(1)),
+
+			child('ui-reason',
+				flexBasis(0),
+				flexGrow(1),
+
 				display('block'),
-				maxWidth(percentage(80)),
 				paddingBlock(rem(0.5)),
 				paddingInline(rem(0.75)),
+				marginTop(rem(1)),
 
 				whiteSpace('pre-wrap'),
 
 				color(pageTextColor),
 				backgroundColor(pageBackgroundColor)
 			)
-				.attribute('ui-type', 'pro', alignSelf('flex-start'))
-				.attribute('ui-type', 'contra', alignSelf('flex-end'))
+				.attribute('ui-type', 'pro', marginRight('auto'))
+				.attribute('ui-type', 'contra', marginLeft('auto'))
 		)
 	)
 );

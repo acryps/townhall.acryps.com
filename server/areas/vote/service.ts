@@ -43,7 +43,11 @@ export class VoteService extends Service {
 	}
 
 	async getImpression(id: string, pro: boolean) {
-		const query = () => this.database.vote.where(vote => vote.billId == id && vote.pro == pro);
+		const query = () => this.database.vote
+			.where(vote => vote.billId == id)
+			.where(vote => vote.pro == pro)
+			.where(vote => vote.reason != null);
+
 		const length = await query().count();
 
 		return new VoteViewModel(await query().skip(Math.floor(length * Math.random())).first());

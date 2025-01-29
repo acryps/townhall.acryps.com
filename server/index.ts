@@ -18,6 +18,7 @@ import { GoInterface } from "./go";
 import { PropertyTileServer } from "./map/layers/shape/property";
 import { BoroughTileServer } from "./map/layers/shape/borough";
 import { MovementTileServer } from "./map/layers/heatmap/movement";
+import { PropertyUsageTileServer } from "./map/layers/shape/usage";
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
@@ -38,7 +39,7 @@ DbClient.connectedClient.connect().then(async () => {
 	const life = new Life(database);
 	await life.load();
 
-	const lawHouse = new LawHouse(database, new Language(), life);
+	const lawHouse = new LawHouse(database, new Language('smart'), life);
 	lawHouse.schedule();
 
 	// life.vote();
@@ -52,6 +53,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new BaseTileServer(app, database);
 	new PropertyTileServer(app, database);
 	new BoroughTileServer(app, database);
+	new PropertyUsageTileServer(app, database);
 	new MovementTileServer(app, database);
 
 	// life.tick();

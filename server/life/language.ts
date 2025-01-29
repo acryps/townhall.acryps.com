@@ -5,6 +5,10 @@ import { Gender } from "./gender";
 import { Ollama } from "ollama";
 
 export class Language {
+	constructor(
+		private mode: 'smart' | 'fast'
+	) { }
+
 	readonly environment = () => `
 		environment:
 		Pilegron, a fictional city.
@@ -245,18 +249,18 @@ export class Language {
 		const response = await Language.chat([
 			{ role: 'user', content: instruction },
 			...data.map(data => ({ role: 'user', content: data }))
-		]);
+		], this.mode);
 
 		return response.message.content?.trim();
 	}
 
-	static async chat(messages) {
+	static async chat(messages, mode: 'smart' | 'fast') {
 		const ollama = new Ollama({
 			host: process.env.LANGUAGE_MODEL_HOST // default: http://127.0.0.1:11434
 		});
 
 		return await ollama.chat({
-			model: process.env.LANGUAGE_MODEL_MODEL,
+			model: mode == 'smart' ? process.env.LANGUAGE_MODEL_MODEL_SMART : process.env.LANGUAGE_MODEL_MODEL_FAST,
 			messages
 		});
 	}

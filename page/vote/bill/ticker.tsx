@@ -3,7 +3,6 @@ import { BillViewModel, VoteService, VoteTickerViewModel, VoteViewModel } from "
 import { tickerContra, tickerPending, tickerPro } from "./index.style";
 
 export class VoteTickerComponent extends Component {
-	iteration = 0;
 	ticker: VoteTickerViewModel[];
 
 	proImpression: VoteViewModel;
@@ -16,27 +15,44 @@ export class VoteTickerComponent extends Component {
 	}
 
 	async onload() {
-		try {
-			const pro = ++this.iteration % 2;
+		const updateCount = async () => {
+			this.ticker = await new VoteService().getTicker(this.bill.id);
+			this.update();
 
-			if (!this.bill.certified || this.iteration == 1) {
-				this.ticker = await new VoteService().getTicker(this.bill.id);
+			// as fast as possible!
+			if (!this.bill.certified && this.loaded) {
+				setTimeout(() => updateCount(), 100);
 			}
+		};
 
+		let pro = false;
+
+		const nextReason = async () => {
 			if (pro) {
 				this.proImpression = await new VoteService().getImpression(this.bill.id, true);
-			}
 
-			if (!pro || this.iteration == 1) {
+				pro = false;
+			} else {
 				this.contraImpression = await new VoteService().getImpression(this.bill.id, false);
-			}
-		} catch {}
 
-		setTimeout(() => {
-			if (this.loaded) {
-				this.reload();
+				pro = true;
 			}
-		}, 5000);
+
+			this.update();
+		}
+
+		const reasonUpdater = setInterval(() => {
+			if (!this.loaded) {
+				clearTimeout(reasonUpdater);
+			}
+
+			nextReason();
+		}, 2500);
+
+		await updateCount();
+
+		await nextReason();
+		await nextReason();
 	}
 
 	render() {
@@ -46,40 +62,35 @@ export class VoteTickerComponent extends Component {
 		const contra = this.ticker.filter(vote => !vote.pro && vote.submitted).length;
 
 		return <ui-ticker>
-			<ui-container>
-				{this.renderImpression(true)}
-
-				<ui-count>
-					{contra}
-				</ui-count>
-			</ui-container>
+			<ui-count ui-contra>
+				{contra}
+			</ui-count>
 
 			<ui-bar style={[tickerPending.provide(pending), tickerPro.provide(pro), tickerContra.provide(contra)].join(';')}>
 				<ui-pro />
 				<ui-contra />
 			</ui-bar>
 
-			<ui-container>
-				<ui-count>
-					{pro}
-				</ui-count>
+			<ui-count ui-pro>
+				{pro}
+			</ui-count>
 
-				{this.renderImpression(false)}
-			</ui-container>
+			<ui-reasons>
+				{this.renderReason(true)}
+				{this.renderReason(false)}
+			</ui-reasons>
 		</ui-ticker>;
 	}
 
-	renderImpression(pro: boolean) {
+	renderReason(pro: boolean) {
 		const impression = pro ? this.proImpression : this.contraImpression;
 
 		if (!impression) {
 			return <ui-void></ui-void>;
 		}
 
-		return <ui-impression ui-type={pro ? 'pro' : 'contra'}>
-			<ui-reason>
-				{impression.reason}
-			</ui-reason>
-		</ui-impression>;
+		return <ui-reason>
+			{impression.reason}
+		</ui-reason>;
 	}
 }

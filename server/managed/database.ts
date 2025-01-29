@@ -2,6 +2,7 @@ import { Entity, DbSet, RunContext, QueryUUID, QueryProxy, QueryString, QueryJSO
 
 export class CompanyType extends QueryEnum {
 	static readonly company = "company";
+	static readonly department = "department";
 	static readonly governmentCompany = "government_company";
 }
 
@@ -482,7 +483,7 @@ export class CompanyQueryProxy extends QueryProxy {
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get purpose(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get type(): "company" | "government_company" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get type(): "company" | "department" | "government_company" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class Company extends Entity<CompanyQueryProxy> {

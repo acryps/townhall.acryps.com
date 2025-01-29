@@ -57,6 +57,10 @@ export class CompanyOfficePage extends Component {
 			case CompanyType.governmentCompany: {
 				return 'Govcom.'
 			}
+
+			case CompanyType.department: {
+				return 'Dep.'
+			}
 		}
 	}
 }

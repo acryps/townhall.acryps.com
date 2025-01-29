@@ -1,5 +1,6 @@
 export enum CompanyType {
 	company = "company",
+	department = "department",
 	governmentCompany = "government_company"
 }
 

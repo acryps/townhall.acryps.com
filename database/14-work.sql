@@ -39,3 +39,6 @@ CREATE TABLE office (
 -- legal incorporation
 ALTER TABLE company ADD incorporated TIMESTAMP;
 ALTER TABLE company ADD purpose TEXT;
+
+-- government agencies are companies too
+ALTER TYPE company_type ADD VALUE 'department';

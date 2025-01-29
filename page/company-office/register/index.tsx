@@ -48,6 +48,10 @@ export class RegisterCompanyPage extends Component {
 					<option ui-value={CompanyType.governmentCompany}>
 						Government Company (Govcom)
 					</option>
+
+					<option ui-value={CompanyType.department}>
+						Government Department
+					</option>
 				</select>
 			</ui-field>
 

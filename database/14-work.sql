@@ -42,3 +42,6 @@ ALTER TABLE company ADD purpose TEXT;
 
 -- government agencies are companies too
 ALTER TYPE company_type ADD VALUE 'department';
+
+-- non profits
+ALTER TYPE company_type ADD VALUE 'guild';

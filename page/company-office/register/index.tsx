@@ -42,7 +42,15 @@ export class RegisterCompanyPage extends Component {
 
 				<select $ui-value={this.type}>
 					<option ui-value={CompanyType.company}>
-						Private Company
+						Privately Held Company
+					</option>
+
+					<option ui-value={CompanyType.nonProfit}>
+						Non-Profit
+					</option>
+
+					<option ui-value={CompanyType.guild}>
+						Guild (Workers Club/Union)
 					</option>
 
 					<option ui-value={CompanyType.governmentCompany}>

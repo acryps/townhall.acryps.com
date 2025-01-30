@@ -1,14 +1,16 @@
 import { Entity, DbSet, RunContext, QueryUUID, QueryProxy, QueryString, QueryJSON, QueryTimeStamp, QueryNumber, QueryTime, QueryDate, QueryBoolean, QueryBuffer, QueryEnum, ForeignReference, PrimaryReference, View, ViewSet } from 'vlquery';
 
+export class MapType extends QueryEnum {
+	static readonly night = "night";
+	static readonly overworld = "overworld";
+}
+
 export class CompanyType extends QueryEnum {
 	static readonly company = "company";
 	static readonly department = "department";
 	static readonly governmentCompany = "government_company";
-}
-
-export class MapType extends QueryEnum {
-	static readonly night = "night";
-	static readonly overworld = "overworld";
+	static readonly guild = "guild";
+	static readonly nonProfit = "non_profit";
 }
 
 export class ArticleQueryProxy extends QueryProxy {
@@ -483,7 +485,7 @@ export class CompanyQueryProxy extends QueryProxy {
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get purpose(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get type(): "company" | "department" | "government_company" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get type(): "company" | "department" | "government_company" | "guild" | "non_profit" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class Company extends Entity<CompanyQueryProxy> {

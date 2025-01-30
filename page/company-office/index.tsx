@@ -54,6 +54,14 @@ export class CompanyOfficePage extends Component {
 				return 'Co.';
 			}
 
+			case CompanyType.guild: {
+				return 'Gld.';
+			}
+
+			case CompanyType.nonProfit: {
+				return 'N.p.';
+			}
+
 			case CompanyType.governmentCompany: {
 				return 'Govcom.'
 			}

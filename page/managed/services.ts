@@ -1,7 +1,9 @@
 export enum CompanyType {
 	company = "company",
 	department = "department",
-	governmentCompany = "government_company"
+	governmentCompany = "government_company",
+	guild = "guild",
+	nonProfit = "non_profit"
 }
 
 export class BoroughSummaryModel {

@@ -19,13 +19,16 @@ export class MovementTileServer extends HeatmapTileServer {
 			'movement',
 
 			250,
-			100,
+			[100, 0, 5],
 
-			async (minX, minY, maxX, maxY) => {
-				return this.movements
-					.filter(movement => movement.x >= minX && movement.x <= maxX)
-					.filter(movement => movement.y >= minY && movement.y <= maxY);
-			}
+			async (minX, minY, maxX, maxY) => this.movements
+				.filter(movement => movement.x >= minX && movement.x <= maxX)
+				.filter(movement => movement.y >= minY && movement.y <= maxY)
+				.map(movement => ({
+					x: movement.x,
+					y: movement.y,
+					dimension: movement.driving ? 2 : 0
+				}))
 		);
 	}
 
@@ -34,7 +37,7 @@ export class MovementTileServer extends HeatmapTileServer {
 		const end = new Date(+start + 1000 * 60 * 60 * 24 * 7);
 
 		const movements = await database.movement
-			.includeTree({ x: true, y: true })
+			.includeTree({ x: true, y: true, driving: true })
 			.where(movement => movement.time.isAfter(start) && movement.time.isBefore(end))
 			.toArray();
 

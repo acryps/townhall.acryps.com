@@ -1,5 +1,5 @@
-import { Bill, BillHonestium, Borough, Company, Resident, ResidentFigure, ResidentRelationship } from "../managed/database";
-import { toSimulatedTime } from "../../interface/time";
+import { Bill, BillHonestium, Borough, Company, District, Resident, ResidentFigure, ResidentRelationship } from "../managed/database";
+import { toSimulatedAge, toSimulatedTime } from "../../interface/time";
 import { NameType } from "./name";
 import { Gender } from "./gender";
 import { Ollama } from "ollama";
@@ -108,17 +108,21 @@ export class Language {
 		${this.metaRules()}
 	`;
 
-	readonly writeHonestiumQuestion = (pro: boolean, peers: BillHonestium[]) => `
-		In our fictional voting system, anybody can propose a new bill, even without legal knowledge.
-		But the commitee or person submitting the bill must answer multiple pro and contra questions honestly - a so called Honestium.
-		Given the bill, write a ${pro ? 'pro' : 'contra'} question asking about a ${pro ? 'positive' : 'negative'} aspect of this bill.
-		Only write one question.
+	readonly lawHouseDebateIntor = (district: District) => `
+		Random inhabitants of the legal district ${district.name} have been selected to participate in this Law House session. Each session has to work through some tasks which have accumulated over the past couple days.
+
+		${this.environment()}
+	`;
+
+	readonly writeHonestiumQuestion = (pro: boolean, bill: Bill, peers: BillHonestium[]) => `
+		Anybody can propose a bill in our city. They must write a name and description, and then the Law House asks them 6 questions, so called Honestiums, three pro their bill, three against. They then have to answer those questions under oath. Their bill, including the six questions and answers are then sent to voters who can then vote. The sessioners must now decide on a ${pro ? 'pro' : 'contra'} "Honestium", for the bill ${bill.tag}. The honestium has to be a question, it will be answered by someone else. The sessioners must find a fair question.
+
+		${bill.tag}:
+		${bill.title}
+		${bill.description}
 
 		Avoid asking questions like the following questions, as they have already been raised:
 		${peers.map(honestium => `- ${honestium.pro ? 'pro' : 'contra'}: ${honestium.question}`).join('\n')}
-
-		${this.environment()}
-		${this.metaRules()}
 	`;
 
 	readonly verifyHonestiumQuestion = (pro: boolean, question: string) => `
@@ -262,6 +266,80 @@ export class Language {
 		return await ollama.chat({
 			model: mode == 'smart' ? process.env.LANGUAGE_MODEL_MODEL_SMART : process.env.LANGUAGE_MODEL_MODEL_FAST,
 			messages
+		});
+	}
+
+	async debate(
+		introduction: string,
+		people: Resident[],
+		task: string,
+		onmessage: (person: Resident, message: string) => Promise<any>,
+	) {
+		return new Promise<string>(async done => {
+			const history = [
+				{
+					role: 'system',
+					content: `
+					${introduction}
+
+					Present at this debate are the following people:
+					${people.map(person => `${person.id}: ${person.givenName} ${person.familyName}, aged ${toSimulatedAge(person.birthday)}`).join('\n')}
+
+					${task}
+
+					Hold a conversation between the sessioners, in the following format:
+					SAY("PERSON ID", "MESSAGE")
+
+					The participants should argue and make sure that a consensus is reached. They can get angry, this debate does not have to be very civil. They can cut eachother off. They do not have to be nice to eachother. They should bring in their background, stand for their values and go all in. They are allowed to be rude. Keep arguing for a long time, this doesn't have to end quickly, each person should talk multiple times.
+
+					Once a conclusion has been found and all involved sessioners agree, respond with:
+					CONCLUSION("RESULT").
+
+					Only respond with one message at a time.
+				`
+				}
+			];
+
+			// safeguard
+			let iterations = 0;
+
+			while (iterations++ < 250) {
+				const response = await Language.chat(history, 'smart');
+
+				for (let match of response.message.content.match(/(SAY\s*\(\s*"?[0-9a-f-]+"?\s*,\s*\"(.*)\"\s*\))|(CONCLUSION\s*\(\s*\"(.*)\"\s*\))/g)) {
+					const strings = match.match(/\"(.*?)\"/g).map(line => line.replace('"', '').replace('"', '').trim());
+
+					switch (match.split('(')[0].trim().toLowerCase()) {
+						case 'say': {
+							const person = people.find(person => person.id == strings[0]);
+
+							if (!person) {
+								continue;
+							}
+
+							const content = strings[1];
+
+							await onmessage(
+								person,
+								content
+							);
+
+							history.push({
+								role: 'assistant',
+								content
+							});
+
+							break;
+						}
+
+						case 'conclusion': {
+							done(strings[0]);
+
+							return;
+						}
+					}
+				}
+			}
 		});
 	}
 

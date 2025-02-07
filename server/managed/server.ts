@@ -64,6 +64,7 @@ import { VoteService } from "././../areas/vote/service";
 import { OfficeSummaryModel } from "./../areas/company.view";
 import { TenantViewModel } from "./../areas/property.view";
 import { LawHouseSessionaryViewModel } from "./../areas/law-house/session";
+import { LawHouseSessionProtocolViewModel } from "./../areas/law-house/session";
 import { TenancyViewModel } from "./../areas/life/resident";
 import { ArticleImageViewModel } from "./../areas/publication/article";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
@@ -83,6 +84,7 @@ import { HistoricListingGrade } from "./../managed/database";
 import { HistoricListingModifier } from "./../managed/database";
 import { LawHouseSession } from "./../managed/database";
 import { LawHouseSessionary } from "./../managed/database";
+import { LawHouseSessionProtocol } from "./../managed/database";
 import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
 import { Article } from "./../managed/database";
@@ -2260,6 +2262,81 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[LawHouseSessionProtocolViewModel.name]: class ComposedLawHouseSessionProtocolViewModel extends LawHouseSessionProtocolViewModel {
+		async map() {
+			return {
+				person: new ResidentSummaryModel(await BaseServer.unwrap(this.$$model.person)),
+				id: this.$$model.id,
+				message: this.$$model.message,
+				said: this.$$model.said
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get person() {
+					return ViewModel.mappings[ResidentSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "person-LawHouseSessionProtocolViewModel"]
+					);
+				},
+				id: true,
+				message: true,
+				said: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new LawHouseSessionProtocolViewModel(null);
+			"person" in data && (item.person = data.person && ViewModel.mappings[ResidentSummaryModel.name].toViewModel(data.person));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"message" in data && (item.message = data.message === null ? null : `${data.message}`);
+			"said" in data && (item.said = data.said === null ? null : new Date(data.said));
+
+			return item;
+		}
+
+		static async toModel(viewModel: LawHouseSessionProtocolViewModel) {
+			let model: LawHouseSessionProtocol;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(LawHouseSessionProtocol).find(viewModel.id)
+			} else {
+				model = new LawHouseSessionProtocol();
+			}
+			
+			"person" in viewModel && (model.person.id = viewModel.person ? viewModel.person.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"message" in viewModel && (model.message = viewModel.message === null ? null : `${viewModel.message}`);
+			"said" in viewModel && (model.said = viewModel.said === null ? null : new Date(viewModel.said));
+
+			return model;
+		}
+	},
 	[ResidentSummaryModel.name]: class ComposedResidentSummaryModel extends ResidentSummaryModel {
 		async map() {
 			return {
@@ -4110,10 +4187,10 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				scope: new DistrictViewModel(await BaseServer.unwrap(this.$$model.scope)),
+				protocol: (await this.$$model.protocol.includeTree(ViewModel.mappings[LawHouseSessionProtocolViewModel.name].items).toArray()).map(item => new LawHouseSessionProtocolViewModel(item)),
 				sessionaries: (await this.$$model.sessionaries.includeTree(ViewModel.mappings[LawHouseSessionaryViewModel.name].items).toArray()).map(item => new LawHouseSessionaryViewModel(item)),
 				ended: this.$$model.ended,
 				id: this.$$model.id,
-				protocol: this.$$model.protocol,
 				started: this.$$model.started
 			}
 		};
@@ -4150,6 +4227,12 @@ ViewModel.mappings = {
 						[...parents, "scope-LawHouseSessionViewModel"]
 					);
 				},
+				get protocol() {
+					return ViewModel.mappings[LawHouseSessionProtocolViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "protocol-LawHouseSessionViewModel"]
+					);
+				},
 				get sessionaries() {
 					return ViewModel.mappings[LawHouseSessionaryViewModel.name].getPrefetchingProperties(
 						level,
@@ -4158,7 +4241,6 @@ ViewModel.mappings = {
 				},
 				ended: true,
 				id: true,
-				protocol: true,
 				started: true
 			};
 		};
@@ -4166,10 +4248,10 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new LawHouseSessionViewModel(null);
 			"scope" in data && (item.scope = data.scope && ViewModel.mappings[DistrictViewModel.name].toViewModel(data.scope));
+			"protocol" in data && (item.protocol = data.protocol && [...data.protocol].map(i => ViewModel.mappings[LawHouseSessionProtocolViewModel.name].toViewModel(i)));
 			"sessionaries" in data && (item.sessionaries = data.sessionaries && [...data.sessionaries].map(i => ViewModel.mappings[LawHouseSessionaryViewModel.name].toViewModel(i)));
 			"ended" in data && (item.ended = data.ended === null ? null : new Date(data.ended));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
-			"protocol" in data && (item.protocol = data.protocol === null ? null : `${data.protocol}`);
 			"started" in data && (item.started = data.started === null ? null : new Date(data.started));
 
 			return item;
@@ -4185,10 +4267,10 @@ ViewModel.mappings = {
 			}
 			
 			"scope" in viewModel && (model.scope.id = viewModel.scope ? viewModel.scope.id : null);
+			"protocol" in viewModel && (null);
 			"sessionaries" in viewModel && (null);
 			"ended" in viewModel && (model.ended = viewModel.ended === null ? null : new Date(viewModel.ended));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
-			"protocol" in viewModel && (model.protocol = viewModel.protocol === null ? null : `${viewModel.protocol}`);
 			"started" in viewModel && (model.started = viewModel.started === null ? null : new Date(viewModel.started));
 
 			return model;

@@ -154,6 +154,13 @@ export interface LawHouseSessionaryViewModel {
 	id: string;
 }
 
+export interface LawHouseSessionProtocolViewModel {
+    person: ResidentSummaryModel;
+	id: string;
+	message: string;
+	said: Date;
+}
+
 export interface ResidentSummaryModel {
     birthday: Date;
 	familyName: string;
@@ -347,9 +354,9 @@ export interface OfficeViewModel {
 
 export interface LawHouseSessionViewModel {
     scope: DistrictViewModel;
+	protocol: LawHouseSessionProtocolViewModel[];
 	sessionaries: LawHouseSessionaryViewModel[];
 	ended: Date;
 	id: string;
-	protocol: string;
 	started: Date;
 }

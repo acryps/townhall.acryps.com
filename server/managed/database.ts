@@ -697,17 +697,16 @@ export class HistoricListingModifier extends Entity<HistoricListingModifierQuery
 export class LawHouseSessionQueryProxy extends QueryProxy {
 	get scope(): Partial<DistrictQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get ended(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get protocol(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get scopeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get started(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class LawHouseSession extends Entity<LawHouseSessionQueryProxy> {
 	get scope(): Partial<ForeignReference<District>> { return this.$scope; }
-	sessionaries: PrimaryReference<LawHouseSessionary, LawHouseSessionaryQueryProxy>;
+	protocol: PrimaryReference<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy>;
+		sessionaries: PrimaryReference<LawHouseSessionary, LawHouseSessionaryQueryProxy>;
 		ended: Date;
 	declare id: string;
-	protocol: string;
 	scopeId: string;
 	started: Date;
 	
@@ -716,7 +715,6 @@ export class LawHouseSession extends Entity<LawHouseSessionQueryProxy> {
 		columns: {
 			ended: { type: "timestamp", name: "ended" },
 			id: { type: "uuid", name: "id" },
-			protocol: { type: "text", name: "protocol" },
 			scopeId: { type: "uuid", name: "scope_id" },
 			started: { type: "timestamp", name: "started" }
 		},
@@ -729,7 +727,8 @@ export class LawHouseSession extends Entity<LawHouseSessionQueryProxy> {
 		super();
 		
 		this.$scope = new ForeignReference<District>(this, "scopeId", District);
-	this.sessionaries = new PrimaryReference<LawHouseSessionary, LawHouseSessionaryQueryProxy>(this, "sessionId", LawHouseSessionary);
+	this.protocol = new PrimaryReference<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy>(this, "sessionId", LawHouseSessionProtocol);
+		this.sessionaries = new PrimaryReference<LawHouseSessionary, LawHouseSessionaryQueryProxy>(this, "sessionId", LawHouseSessionary);
 	}
 	
 	private $scope: ForeignReference<District>;
@@ -741,6 +740,72 @@ export class LawHouseSession extends Entity<LawHouseSessionQueryProxy> {
 			this.scopeId = value.id as string;
 		} else {
 			this.scopeId = null;
+		}
+	}
+
+	
+}
+			
+export class LawHouseSessionProtocolQueryProxy extends QueryProxy {
+	get person(): Partial<ResidentQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get session(): Partial<LawHouseSessionQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get message(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get personId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get said(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get sessionId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class LawHouseSessionProtocol extends Entity<LawHouseSessionProtocolQueryProxy> {
+	get person(): Partial<ForeignReference<Resident>> { return this.$person; }
+	get session(): Partial<ForeignReference<LawHouseSession>> { return this.$session; }
+	declare id: string;
+	message: string;
+	personId: string;
+	said: Date;
+	sessionId: string;
+	
+	$$meta = {
+		source: "law_house_session_protocol",
+		columns: {
+			id: { type: "uuid", name: "id" },
+			message: { type: "text", name: "message" },
+			personId: { type: "uuid", name: "person_id" },
+			said: { type: "timestamp", name: "said" },
+			sessionId: { type: "uuid", name: "session_id" }
+		},
+		get set(): DbSet<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy> { 
+			return new DbSet<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy>(LawHouseSessionProtocol, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$person = new ForeignReference<Resident>(this, "personId", Resident);
+	this.$session = new ForeignReference<LawHouseSession>(this, "sessionId", LawHouseSession);
+	}
+	
+	private $person: ForeignReference<Resident>;
+
+	set person(value: Partial<ForeignReference<Resident>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.personId = value.id as string;
+		} else {
+			this.personId = null;
+		}
+	}
+
+	private $session: ForeignReference<LawHouseSession>;
+
+	set session(value: Partial<ForeignReference<LawHouseSession>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.sessionId = value.id as string;
+		} else {
+			this.sessionId = null;
 		}
 	}
 
@@ -2065,6 +2130,7 @@ export class DbContext {
 	historicListingGrade: DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>;
 	historicListingModifier: DbSet<HistoricListingModifier, HistoricListingModifierQueryProxy>;
 	lawHouseSession: DbSet<LawHouseSession, LawHouseSessionQueryProxy>;
+	lawHouseSessionProtocol: DbSet<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy>;
 	lawHouseSessionary: DbSet<LawHouseSessionary, LawHouseSessionaryQueryProxy>;
 	mapTile: DbSet<MapTile, MapTileQueryProxy>;
 	movement: DbSet<Movement, MovementQueryProxy>;
@@ -2104,6 +2170,7 @@ export class DbContext {
 		this.historicListingGrade = new DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>(HistoricListingGrade, this.runContext);
 		this.historicListingModifier = new DbSet<HistoricListingModifier, HistoricListingModifierQueryProxy>(HistoricListingModifier, this.runContext);
 		this.lawHouseSession = new DbSet<LawHouseSession, LawHouseSessionQueryProxy>(LawHouseSession, this.runContext);
+		this.lawHouseSessionProtocol = new DbSet<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy>(LawHouseSessionProtocol, this.runContext);
 		this.lawHouseSessionary = new DbSet<LawHouseSessionary, LawHouseSessionaryQueryProxy>(LawHouseSessionary, this.runContext);
 		this.mapTile = new DbSet<MapTile, MapTileQueryProxy>(MapTile, this.runContext);
 		this.movement = new DbSet<Movement, MovementQueryProxy>(Movement, this.runContext);

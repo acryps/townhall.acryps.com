@@ -1,4 +1,4 @@
-import { border, boxShadow, child, display, fontWeight, hex, marginBottom, padding, px, rem, whiteSpace } from "@acryps/style";
+import { border, boxShadow, child, display, fontSize, fontWeight, gap, hex, margin, marginBottom, padding, px, rem, whiteSpace } from "@acryps/style";
 
 export const sessionStyle = () => child('ui-session',
 	display('block'),
@@ -22,9 +22,24 @@ export const sessionStyle = () => child('ui-session',
 
 	child('ui-protocol',
 		display('block'),
-		padding(rem(1)),
 
-		whiteSpace('pre-wrap'),
-		border(px(1), 'solid', 'currentColor')
+		border(px(1), 'solid', 'currentColor'),
+
+		child('ui-item',
+			display('block'),
+			margin(rem(1)),
+
+			child('ui-message',
+				display('block'),
+				whiteSpace('pre-wrap')
+			),
+
+			child('ui-tagline',
+				display('flex'),
+				gap(rem(1)),
+
+				fontSize(rem(0.8))
+			)
+		)
 	)
 );

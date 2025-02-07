@@ -1,5 +1,5 @@
 import { ViewModel } from "vlserver";
-import { LawHouseSession, LawHouseSessionary } from "../../managed/database";
+import { LawHouseSession, LawHouseSessionary, LawHouseSessionProtocol } from "../../managed/database";
 import { ResidentSummaryModel } from "../life/resident";
 import { DistrictViewModel } from "../vote/district";
 
@@ -13,8 +13,7 @@ export class LawHouseSessionSummaryModel extends ViewModel<LawHouseSession> {
 }
 
 export class LawHouseSessionViewModel extends LawHouseSessionSummaryModel {
-	protocol;
-
+	protocol: LawHouseSessionProtocolViewModel[];
 	sessionaries: LawHouseSessionaryViewModel[];
 }
 
@@ -22,4 +21,12 @@ export class LawHouseSessionaryViewModel extends ViewModel<LawHouseSessionary> {
 	id;
 
 	resident: ResidentSummaryModel;
+}
+
+export class LawHouseSessionProtocolViewModel extends ViewModel<LawHouseSessionProtocol> {
+	id;
+
+	said;
+	message;
+	person: ResidentSummaryModel;
 }

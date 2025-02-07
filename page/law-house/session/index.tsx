@@ -30,7 +30,21 @@ export class LawHouseSessionPage extends Component {
 			</ui-sessionaries>
 
 			<ui-protocol>
-				{this.session.protocol}
+				{this.session.protocol.map(item => <ui-item>
+					<ui-message>
+						{item.message}
+					</ui-message>
+
+					<ui-tagline>
+						<ui-time>
+							{item.said.toLocaleTimeString()}
+						</ui-time>
+
+						{item.person && <ui-name>
+							{item.person.givenName} {item.person.familyName}
+						</ui-name>}
+					</ui-tagline>
+				</ui-item>)}
 			</ui-protocol>
 		</ui-session>;
 	}

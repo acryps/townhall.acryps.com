@@ -1,6 +1,6 @@
 import { LawHouse } from ".";
 import { Life } from "..";
-import { BillHonestium, Company, DbContext, District, LawHouseSession, LawHouseSessionary, Resident, ResidentEventView, Vote } from "../../managed/database";
+import { BillHonestium, Company, DbContext, District, LawHouseSession, LawHouseSessionary, LawHouseSessionProtocol, Resident, ResidentEventView, Vote } from "../../managed/database";
 import { Language } from "../language";
 
 export class LawHouseSessionManager {
@@ -80,12 +80,15 @@ export class LawHouseSessionManager {
 		await this.session.update();
 	}
 
-	private async protocol(message: string) {
+	private async protocol(message: string, person?: Resident) {
 		console.log(`[law-house session ${this.district.name}]: ${message}`);
 
-		this.session.protocol += `${new Date().toLocaleString()}: ${message}\n\n`;
+		const protocol = new LawHouseSessionProtocol();
+		protocol.said = new Date();
+		protocol.person = person;
+		protocol.message = message;
 
-		await this.session.update();
+		await protocol.create();
 	}
 
 	private async getOpenBills() {
@@ -108,7 +111,13 @@ export class LawHouseSessionManager {
 				const honestium = new BillHonestium();
 				honestium.bill = bill;
 				honestium.pro = pro;
-				honestium.question = await this.language.respondText(this.language.writeHonestiumQuestion(pro, honestiums));
+
+				honestium.question = await this.language.debate(
+					this.language.lawHouseDebateIntor(this.district),
+					this.sessionaries,
+					this.language.writeHonestiumQuestion(pro, bill, honestiums),
+					async (person, message) => this.protocol(message, person)
+				);
 
 				await honestium.create();
 

@@ -362,6 +362,23 @@ export class LawHouseSessionaryViewModel {
 	}
 }
 
+export class LawHouseSessionProtocolViewModel {
+	person: ResidentSummaryModel;
+	id: string;
+	message: string;
+	said: Date;
+
+	private static $build(raw) {
+		const item = new LawHouseSessionProtocolViewModel();
+		raw.person === undefined || (item.person = raw.person ? ResidentSummaryModel["$build"](raw.person) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.message === undefined || (item.message = raw.message === null ? null : `${raw.message}`)
+		raw.said === undefined || (item.said = raw.said ? new Date(raw.said) : null)
+		
+		return item;
+	}
+}
+
 export class ResidentSummaryModel {
 	birthday: Date;
 	familyName: string;
@@ -818,19 +835,19 @@ export class OfficeViewModel {
 
 export class LawHouseSessionViewModel {
 	scope: DistrictViewModel;
+	protocol: LawHouseSessionProtocolViewModel[];
 	sessionaries: LawHouseSessionaryViewModel[];
 	ended: Date;
 	id: string;
-	protocol: string;
 	started: Date;
 
 	private static $build(raw) {
 		const item = new LawHouseSessionViewModel();
 		raw.scope === undefined || (item.scope = raw.scope ? DistrictViewModel["$build"](raw.scope) : null)
+		raw.protocol === undefined || (item.protocol = raw.protocol ? raw.protocol.map(i => LawHouseSessionProtocolViewModel["$build"](i)) : null)
 		raw.sessionaries === undefined || (item.sessionaries = raw.sessionaries ? raw.sessionaries.map(i => LawHouseSessionaryViewModel["$build"](i)) : null)
 		raw.ended === undefined || (item.ended = raw.ended ? new Date(raw.ended) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
-		raw.protocol === undefined || (item.protocol = raw.protocol === null ? null : `${raw.protocol}`)
 		raw.started === undefined || (item.started = raw.started ? new Date(raw.started) : null)
 		
 		return item;

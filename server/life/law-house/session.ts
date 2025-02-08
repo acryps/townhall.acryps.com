@@ -87,6 +87,7 @@ export class LawHouseSessionManager {
 		protocol.said = new Date();
 		protocol.person = person;
 		protocol.message = message;
+		protocol.session = this.session;
 
 		await protocol.create();
 	}

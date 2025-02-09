@@ -24,7 +24,6 @@ export class LawHouseSessionManager {
 	async execute() {
 		this.session = new LawHouseSession();
 		this.session.started = new Date();
-		this.session.protocol = '';
 		this.session.scope = this.district;
 
 		await this.session.create();
@@ -193,7 +192,13 @@ export class LawHouseSessionManager {
 			if (!company.incorporated) {
 				this.protocol(`Create purpose description for company '${company.name}'.`);
 
-				company.purpose = await this.language.respondText(this.language.extractCompanyPurpose(), company.description);
+				company.purpose = await this.language.debate(
+					this.language.lawHouseDebateIntor(this.district),
+					this.sessionaries,
+					this.language.extractCompanyPurpose(company),
+					(person, message) => this.protocol(message, person)
+				);
+
 				company.incorporated = new Date();
 
 				this.protocol(`Company '${company.name}' incorporated as '${company.purpose}' at ${company.incorporated.toLocaleString()}.`);

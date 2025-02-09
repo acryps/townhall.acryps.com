@@ -156,12 +156,13 @@ export class Language {
 		${this.metaRules()}
 	`;
 
-	readonly extractCompanyPurpose = () => `
-		What is the short company type (like: "Investment Bank", "Trading Company", "Car Rental", "Railway") of this company based on this description?
+	readonly extractCompanyPurpose = (company: Company) => `
+		What is the short company type (like: "Investment Bank", "Trading Company", "Car Rental", "Railway") of ${company.name} based on this description?
 		The answer should be as short as possible.
 		Do not include "Company" or any other similar term.
 
-		${this.metaRules()}
+		Name of company: ${company.name}
+		Description: ${company.description}
 	`;
 
 	async respondText(instruction: string, ...data: string[]): Promise<string> {

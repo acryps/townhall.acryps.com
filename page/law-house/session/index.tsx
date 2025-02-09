@@ -30,7 +30,7 @@ export class LawHouseSessionPage extends Component {
 			</ui-sessionaries>
 
 			<ui-protocol>
-				{this.session.protocol.map(item => <ui-item>
+				{this.session.protocol.toSorted((a, b) => +a.said - +b.said).map(item => <ui-item>
 					<ui-message>
 						{item.message}
 					</ui-message>

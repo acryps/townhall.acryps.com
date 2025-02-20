@@ -1,27 +1,19 @@
 import { Component } from "@acryps/page";
+import { ImpressionService, ImpressionViewModel } from "../managed/services";
 
 export class ImpressionsComponent extends Component {
-	items = [
-		{
-			title: 'Town Square, Inverporshire',
-			image: 'inverportshire'
-		},
-		{
-			title: 'Law House, Hornaby',
-			image: 'law-house'
-		},
-		{
-			title: 'Market and Town Square, Calderstone',
-			image: 'calderstone'
-		}
-	];
-
-	index = -1;
+	index: number;
+	impressions: ImpressionViewModel[];
 
 	async onload() {
+		if (!this.impressions) {
+			this.impressions = await new ImpressionService().list();
+			this.index = Math.floor(this.impressions.length * Math.random());
+		}
+
 		this.index++;
 
-		if (this.index == this.items.length) {
+		if (this.index == this.impressions.length) {
 			this.index = 0;
 		}
 
@@ -33,14 +25,18 @@ export class ImpressionsComponent extends Component {
 	}
 
 	render() {
-		const item = this.items[this.index];
+		const last = this.impressions[this.index - 1] ?? this.impressions.at(-1);
+		const current = this.impressions[this.index];
+		const next = this.impressions[this.index + 1] ?? this.impressions[0];
 
 		return <ui-impression>
-			<img src={`/assets/impressions/${item.image}.jpg`} />
+			<img ui-next src={`/impression/image/${next.id}`} />
+			<img ui-last src={`/impression/image/${last.id}`} />
+			<img ui-current src={`/impression/image/${current.id}`} />
 
-			<ui-name>
-				{item.title}
-			</ui-name>
+			{current.title && <ui-name>
+				{current.title}
+			</ui-name>}
 		</ui-impression>;
 	}
 }

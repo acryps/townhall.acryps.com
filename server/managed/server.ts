@@ -30,6 +30,8 @@ import { HistoricListingGradeViewModel } from "././../areas/history-listing/grad
 import { PropertyHistoricListingModifierViewModel } from "././../areas/history-listing/link.view";
 import { HistoricListingModifierViewModel } from "././../areas/history-listing/modifier.view";
 import { HistoricListingService } from "././../areas/history-listing/listing.service";
+import { ImpressionViewModel } from "././../areas/impressions/impression";
+import { ImpressionService } from "././../areas/impressions/service";
 import { LawHouseSessionSummaryModel } from "././../areas/law-house/session";
 import { LawHouseSessionViewModel } from "././../areas/law-house/session";
 import { LawHouseService } from "././../areas/law-house/service";
@@ -82,6 +84,7 @@ import { Street } from "./../managed/database";
 import { WaterBody } from "./../managed/database";
 import { HistoricListingGrade } from "./../managed/database";
 import { HistoricListingModifier } from "./../managed/database";
+import { Impression } from "./../managed/database";
 import { LawHouseSession } from "./../managed/database";
 import { LawHouseSessionary } from "./../managed/database";
 import { LawHouseSessionProtocol } from "./../managed/database";
@@ -122,6 +125,10 @@ Inject.mappings = {
 	},
 	"HistoricListingService": {
 		objectConstructor: HistoricListingService,
+		parameters: ["DbContext"]
+	},
+	"ImpressionService": {
+		objectConstructor: ImpressionService,
 		parameters: ["DbContext"]
 	},
 	"LawHouseService": {
@@ -460,6 +467,15 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(HistoricListingService),
 			(controller, params) => controller.removeModifier(
 				params["kzaWBqZmJtMjV6bTRjaDNoMWQ2Z2dxZn"]
+			)
+		);
+
+		this.expose(
+			"FpMHF2ZmRrN215Y2xuMmU0cmgza2hscT",
+			{},
+			inject => inject.construct(ImpressionService),
+			(controller, params) => controller.list(
+				
 			)
 		);
 
@@ -2116,6 +2132,68 @@ ViewModel.mappings = {
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"shortName" in viewModel && (model.shortName = viewModel.shortName === null ? null : `${viewModel.shortName}`);
+
+			return model;
+		}
+	},
+	[ImpressionViewModel.name]: class ComposedImpressionViewModel extends ImpressionViewModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				title: this.$$model.title
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				title: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ImpressionViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ImpressionViewModel) {
+			let model: Impression;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Impression).find(viewModel.id)
+			} else {
+				model = new Impression();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
 
 			return model;
 		}

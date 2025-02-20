@@ -332,6 +332,19 @@ export class HistoricListingModifierViewModel {
 	}
 }
 
+export class ImpressionViewModel {
+	id: string;
+	title: string;
+
+	private static $build(raw) {
+		const item = new ImpressionViewModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
+		
+		return item;
+	}
+}
+
 export class LawHouseSessionSummaryModel {
 	scope: DistrictViewModel;
 	ended: Date;
@@ -1494,6 +1507,29 @@ export class HistoricListingService {
 
 			if ("aborted" in r) {
 				throw new Error("request aborted by server");
+			}
+		});
+	}
+}
+
+export class ImpressionService {
+	async list(): Promise<Array<ImpressionViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("FpMHF2ZmRrN215Y2xuMmU0cmgza2hscT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ImpressionViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
 			}
 		});
 	}

@@ -142,6 +142,11 @@ export interface HistoricListingModifierViewModel {
 	shortName: string;
 }
 
+export interface ImpressionViewModel {
+    id: string;
+	title: string;
+}
+
 export interface LawHouseSessionSummaryModel {
     scope: DistrictViewModel;
 	ended: Date;

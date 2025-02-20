@@ -19,6 +19,7 @@ import { PropertyTileServer } from "./map/layers/shape/property";
 import { BoroughTileServer } from "./map/layers/shape/borough";
 import { MovementTileServer } from "./map/layers/heatmap/movement";
 import { PropertyUsageTileServer } from "./map/layers/shape/usage";
+import { ImpressionImageInterface } from "./areas/impressions/interface";
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
@@ -78,6 +79,7 @@ DbClient.connectedClient.connect().then(async () => {
 
 	new ArticleImageInterface(app, database);
 	new ResidentImageInterface(app, database, life);
+	new ImpressionImageInterface(app, database);
 
 	app.createInjector = context => new Inject({
 		Context: context,

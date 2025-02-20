@@ -1,4 +1,4 @@
-import { alignContent, alignItems, aspectRatio, backdropFilter, backgroundColor, border, bottom, boxShadow, brightness, child, color, ColorValue, contrast, display, flexDirection, flexWrap, fontSize, fontStyle, fontWeight, gap, grayscale, height, hex, Hex, inset, insetInline, invert, justifyContent, left, lineHeight, margin, marginBlock, marginBottom, marginInline, marginRight, marginTop, maxHeight, objectFit, padding, percentage, position, px, ratio, rem, style, textAlign, Variable, vh, width } from "@acryps/style";
+import { alignContent, alignItems, aspectRatio, backdropFilter, backgroundColor, border, bottom, boxShadow, brightness, child, color, ColorValue, contrast, display, flexDirection, flexWrap, fontSize, fontStyle, fontWeight, gap, grayscale, height, hex, Hex, inset, insetInline, invert, justifyContent, left, lineHeight, margin, marginBlock, marginBottom, marginInline, marginRight, marginTop, maxHeight, Mm, objectFit, padding, percentage, position, px, ratio, rem, style, textAlign, Variable, vh, width, zIndex } from "@acryps/style";
 import { buttonStyle } from "../shared/index.style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { card } from "../shared/card.style";
@@ -25,7 +25,10 @@ export const homeStyle = () => child('ui-home',
 			height(percentage(100)),
 
 			objectFit('cover')
-		),
+		)
+			.attribute('ui-next', zIndex(1))
+			.attribute('ui-last', zIndex(2))
+			.attribute('ui-current', zIndex(3)),
 
 		child('ui-name',
 			position('absolute'),

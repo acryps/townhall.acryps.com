@@ -694,6 +694,41 @@ export class HistoricListingModifier extends Entity<HistoricListingModifierQuery
 	}
 }
 			
+export class ImpressionQueryProxy extends QueryProxy {
+	get captured(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get image(): Partial<QueryBuffer> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get locationX(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get locationY(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get mimeType(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get title(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Impression extends Entity<ImpressionQueryProxy> {
+	captured: Date;
+	declare id: string;
+	image: Buffer;
+	locationX: number;
+	locationY: number;
+	mimeType: string;
+	title: string;
+	
+	$$meta = {
+		source: "impression",
+		columns: {
+			captured: { type: "timestamp", name: "captured" },
+			id: { type: "uuid", name: "id" },
+			image: { type: "bytea", name: "image" },
+			locationX: { type: "float4", name: "location_x" },
+			locationY: { type: "float4", name: "location_y" },
+			mimeType: { type: "text", name: "mime_type" },
+			title: { type: "text", name: "title" }
+		},
+		get set(): DbSet<Impression, ImpressionQueryProxy> { 
+			return new DbSet<Impression, ImpressionQueryProxy>(Impression, null);
+		}
+	};
+}
+			
 export class LawHouseSessionQueryProxy extends QueryProxy {
 	get scope(): Partial<DistrictQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get ended(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -2129,6 +2164,7 @@ export class DbContext {
 	dwelling: DbSet<Dwelling, DwellingQueryProxy>;
 	historicListingGrade: DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>;
 	historicListingModifier: DbSet<HistoricListingModifier, HistoricListingModifierQueryProxy>;
+	impression: DbSet<Impression, ImpressionQueryProxy>;
 	lawHouseSession: DbSet<LawHouseSession, LawHouseSessionQueryProxy>;
 	lawHouseSessionProtocol: DbSet<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy>;
 	lawHouseSessionary: DbSet<LawHouseSessionary, LawHouseSessionaryQueryProxy>;
@@ -2169,6 +2205,7 @@ export class DbContext {
 		this.dwelling = new DbSet<Dwelling, DwellingQueryProxy>(Dwelling, this.runContext);
 		this.historicListingGrade = new DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>(HistoricListingGrade, this.runContext);
 		this.historicListingModifier = new DbSet<HistoricListingModifier, HistoricListingModifierQueryProxy>(HistoricListingModifier, this.runContext);
+		this.impression = new DbSet<Impression, ImpressionQueryProxy>(Impression, this.runContext);
 		this.lawHouseSession = new DbSet<LawHouseSession, LawHouseSessionQueryProxy>(LawHouseSession, this.runContext);
 		this.lawHouseSessionProtocol = new DbSet<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy>(LawHouseSessionProtocol, this.runContext);
 		this.lawHouseSessionary = new DbSet<LawHouseSessionary, LawHouseSessionaryQueryProxy>(LawHouseSessionary, this.runContext);

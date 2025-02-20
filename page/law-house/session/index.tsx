@@ -14,6 +14,7 @@ export class LawHouseSessionPage extends Component {
 
 	async onload() {
 		this.session = await new LawHouseService().getSession(this.parameters.id);
+		this.session.protocol.sort((a, b) => +a.said - +b.said);
 	}
 
 	render() {
@@ -41,7 +42,7 @@ export class LawHouseSessionPage extends Component {
 			</ui-actions>
 
 			<ui-protocol>
-				{this.session.protocol.toSorted((a, b) => +a.said - +b.said).map(item => this.renderProtocol(item))}
+				{this.session.protocol.map(item => this.renderProtocol(item))}
 			</ui-protocol>
 		</ui-session>;
 	}

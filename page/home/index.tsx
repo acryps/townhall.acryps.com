@@ -28,17 +28,12 @@ export class HomePage extends Component {
 		return <ui-home>
 			{new ImpressionsComponent()}
 
-			<ui-title>
-				City of Pilegron
-			</ui-title>
-
 			{time}
 
 			<ui-description>
-				Welcome to our minecraft server
+				Welcome to our minecraft server.
+				We are currently in the year {toSimulatedTime(new Date()).getFullYear()} but time is a bit faster here.
 			</ui-description>
-
-			{new OnlinePlayerComponent()}
 
 			<ui-topics>
 				<ui-topic ui-href={`/map/${Application.center.x}/${Application.center.y}/8`}>

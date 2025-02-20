@@ -1,4 +1,4 @@
-import { border, child, display, fontSize, height, hex, imageRendering, justifyContent, marginBottom, marginInline, maxWidth, min, paddingInline, percentage, px, rem, textAlign, vh, whiteSpace, width } from "@acryps/style";
+import { aspectRatio, border, child, display, fontSize, height, hex, imageRendering, justifyContent, marginBottom, marginInline, maxWidth, min, paddingInline, percentage, px, ratio, rem, textAlign, vh, whiteSpace, width } from "@acryps/style";
 import { boxed } from "../shared/boxed.style";
 
 export const boroughStyle = () => child('ui-borough',
@@ -46,10 +46,8 @@ export const boroughStyle = () => child('ui-borough',
 		whiteSpace('pre-wrap')
 	),
 
-	child('ui-map-preview',
-		child('img',
-			imageRendering('pixelated'),
-			width(percentage(100))
-		)
+	child('ui-map-container',
+		width(percentage(100)),
+		aspectRatio(ratio(1, 1))
 	)
 )

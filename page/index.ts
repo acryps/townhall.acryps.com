@@ -23,13 +23,13 @@ import { VotePage } from "./vote";
 import { ProposeBillPage } from "./vote/propose";
 import { HonestiumPage } from "./vote/honestium";
 import { BillPage } from "./vote/bill";
-import { rewrite } from "./rewrite";
 import { LawHousePage } from "./law-house";
 import { LawHouseSessionPage } from "./law-house/session";
 import { CompanyOfficePage } from "./company-office";
 import { RegisterCompanyPage } from "./company-office/register";
 import { CompanyPage } from "./company-office/company";
 import { CreateFeaturePage } from "./map/create";
+import { Rewrite } from '@acryps/rewrite';
 
 export class Application {
 	static router: Router;
@@ -42,8 +42,7 @@ export class Application {
 	static bridge = new GameBridge();
 
 	static async main() {
-		rewrite();
-
+		new Rewrite().activate();
 		Service.baseUrl = '/';
 
 		if (location.pathname == '/') {

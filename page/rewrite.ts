@@ -47,7 +47,7 @@ export const defaultElement = 'div';
 
 export const rewrite = () => {
 	const resetStyle = document.createElement('style');
-	resetStyle.textContent = `${[defaultElement, Object.values(namedElements),Object.keys(attributeRewrites).map(rewrite => attributeRewrites[rewrite].tag).filter(tag => tag)]}{all:unset}`;
+	resetStyle.textContent = `${[defaultElement, Object.values(namedElements), Object.keys(attributeRewrites).map(rewrite => attributeRewrites[rewrite].tag).filter(tag => tag)]}{all:unset}`;
 
 	document.head.appendChild(resetStyle);
 

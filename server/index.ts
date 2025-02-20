@@ -40,7 +40,8 @@ DbClient.connectedClient.connect().then(async () => {
 	await life.load();
 
 	const lawHouse = new LawHouse(database, new Language('smart'), life);
-	lawHouse.schedule();
+	// only run this on capable hardware!
+	// lawHouse.schedule();
 
 	// life.vote();
 

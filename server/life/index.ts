@@ -13,7 +13,7 @@ export class Life {
 	// factor of total people * random(0 - 1) rounded up
 	readonly bondingFactor = new TickFactor(this, 'bond', 0.1, 2);
 
-	readonly language = new Language();
+	readonly language = new Language('smart');
 
 	residents: Resident[];
 

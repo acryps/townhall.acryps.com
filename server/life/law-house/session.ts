@@ -116,7 +116,8 @@ export class LawHouseSessionManager {
 					this.language.lawHouseDebateIntor(this.district),
 					this.sessionaries,
 					this.language.writeHonestiumQuestion(pro, bill, honestiums),
-					async (person, message) => this.protocol(message, person)
+					async (person, message) => this.protocol(message, person),
+					async () => true
 				);
 
 				await honestium.create();
@@ -196,7 +197,8 @@ export class LawHouseSessionManager {
 					this.language.lawHouseDebateIntor(this.district),
 					this.sessionaries,
 					this.language.extractCompanyPurpose(company),
-					(person, message) => this.protocol(message, person)
+					(person, message) => this.protocol(message, person),
+					async (result) => result.split(' ').length <= 2
 				);
 
 				company.incorporated = new Date();

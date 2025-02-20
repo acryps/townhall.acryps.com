@@ -3,6 +3,7 @@ import { toSimulatedAge, toSimulatedTime } from "../../interface/time";
 import { NameType } from "./name";
 import { Gender } from "./gender";
 import { Ollama } from "ollama";
+import { writeFileSync } from "fs";
 
 export class Language {
 	constructor(
@@ -109,7 +110,8 @@ export class Language {
 	`;
 
 	readonly lawHouseDebateIntor = (district: District) => `
-		Random inhabitants of the legal district ${district.name} have been selected to participate in this Law House session. Each session has to work through some tasks which have accumulated over the past couple days.
+		Random inhabitants of the legal district ${district.name} have been selected to participate in this Law House session.
+		Each session has to work through some tasks which have accumulated over the past couple days.
 
 		${this.environment()}
 	`;
@@ -157,7 +159,7 @@ export class Language {
 	`;
 
 	readonly extractCompanyPurpose = (company: Company) => `
-		What is the short company type (like: "Investment Bank", "Trading Company", "Car Rental", "Railway") of ${company.name} based on this description?
+		The team must debate to find the short company type (like: "Investment Bank", "Trading Company", "Car Rental", "Railway") of ${company.name} based on its description?
 		The answer should be as short as possible.
 		Do not include "Company" or any other similar term.
 
@@ -275,6 +277,7 @@ export class Language {
 		people: Resident[],
 		task: string,
 		onmessage: (person: Resident, message: string) => Promise<any>,
+		validate: (response: string) => Promise<boolean>
 	) {
 		return new Promise<string>(async done => {
 			const history = [
@@ -307,6 +310,11 @@ export class Language {
 			while (iterations++ < 250) {
 				const response = await Language.chat(history, 'smart');
 
+				history.push({
+					role: 'assistant',
+					content: response.message.content
+				});
+
 				for (let match of response.message.content.match(/(SAY\s*\(\s*"?[0-9a-f-]+"?\s*,\s*\"(.*)\"\s*\))|(CONCLUSION\s*\(\s*\"(.*)\"\s*\))/g)) {
 					const strings = match.match(/\"(.*?)\"/g).map(line => line.replace('"', '').replace('"', '').trim());
 
@@ -325,18 +333,27 @@ export class Language {
 								content
 							);
 
-							history.push({
-								role: 'assistant',
-								content
-							});
-
 							break;
 						}
 
 						case 'conclusion': {
-							done(strings[0]);
+							const result = strings[0];
 
-							return;
+							if (await validate(result)) {
+								done(strings[0]);
+
+								return;
+							} else {
+								history.push({
+									role: 'system',
+									content: `
+										The response "${result}" is invalid, continue the debate, make sure to complete the task:
+										${task}
+									`
+								});
+
+								break;
+							}
 						}
 					}
 				}

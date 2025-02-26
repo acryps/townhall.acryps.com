@@ -6,7 +6,7 @@ import { drawDanwinstonLine } from "../../../../interface/line";
 
 type Shape = {
 	id: string,
-	fill: string,
+	fill?: string,
 	stroke: string,
 	bounds: Point[]
 };

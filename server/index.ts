@@ -20,6 +20,7 @@ import { BoroughTileServer } from "./map/layers/shape/borough";
 import { MovementTileServer } from "./map/layers/heatmap/movement";
 import { PropertyUsageTileServer } from "./map/layers/shape/usage";
 import { ImpressionImageInterface } from "./areas/impressions/interface";
+import { StreetTileServer } from "./map/layers/shape/street";
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
@@ -53,6 +54,7 @@ DbClient.connectedClient.connect().then(async () => {
 
 	new BaseTileServer(app, database);
 	new PropertyTileServer(app, database);
+	new StreetTileServer(app, database); // temporarely only!
 	new BoroughTileServer(app, database);
 	new PropertyUsageTileServer(app, database);
 	// new MovementTileServer(app, database);

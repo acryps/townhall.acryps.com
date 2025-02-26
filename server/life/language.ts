@@ -3,7 +3,6 @@ import { toSimulatedAge, toSimulatedTime } from "../../interface/time";
 import { NameType } from "./name";
 import { Gender } from "./gender";
 import { Ollama } from "ollama";
-import { writeFileSync } from "fs";
 
 export class Language {
 	constructor(
@@ -139,8 +138,8 @@ export class Language {
 		The question might not align with your views, nor with what you'd vote.
 		Your job is to decide wether this question is relevant to the bill.
 		Your opinion on the question does not matter, you must only say if this question is relevant to this bill.
-		Your biography will follow, pretend that you are this person.
 		This question is aimed at the sumitters of the bill, which will try to argue ${pro ? 'for' : 'against'} this question.
+		Do not reason, just respond with YES or NO.
 
 		${this.environment()}
 		${this.metaRules()}
@@ -261,6 +260,23 @@ export class Language {
 		return response.message.content?.trim();
 	}
 
+	async verify(prompt: string) {
+		let response = await this.respondText(prompt);
+		response = response.toLowerCase();
+		response = response.trim();
+		response = response.replace('"', '').replace('"', '');
+
+		if (response == 'yes') {
+			return true;
+		} else if (response == 'no') {
+			return false;
+		} else {
+			console.warn(`Invalid verification response: ${response}`);
+
+			return await this.verify(prompt);
+		}
+	}
+
 	static async chat(messages, mode: 'smart' | 'fast') {
 		const ollama = new Ollama({
 			host: process.env.LANGUAGE_MODEL_HOST // default: http://127.0.0.1:11434
@@ -286,20 +302,20 @@ export class Language {
 					content: `
 					${introduction}
 
-					Present at this debate are the following people:
-					${people.map(person => `${person.id}: ${person.givenName} ${person.familyName}, aged ${toSimulatedAge(person.birthday)}`).join('\n')}
+					Present at this debate are the following people, in the format <id>: <name>, <detail>
+					${people.map(person => `${person.id.split('-')[0]}: ${person.givenName} ${person.familyName}, aged ${toSimulatedAge(person.birthday)}`).join('\n')}
 
 					${task}
-
-					Hold a conversation between the sessioners, in the following format:
-					SAY("PERSON ID", "MESSAGE")
 
 					The participants should argue and make sure that a consensus is reached. They can get angry, this debate does not have to be very civil. They can cut eachother off. They do not have to be nice to eachother. They should bring in their background, stand for their values and go all in. They are allowed to be rude. Keep arguing for a long time, this doesn't have to end quickly, each person should talk multiple times.
 
 					Once a conclusion has been found and all involved sessioners agree, respond with:
 					CONCLUSION("RESULT").
 
-					Only respond with one message at a time.
+					Hold a conversation between the sessioners, in the following format:
+					SAY("PERSON ID", "MESSAGE")
+
+					I will tell you the ID of the person that should speak next, and you respond with one SAY or CONCLUSION response.
 				`
 				}
 			];
@@ -308,19 +324,32 @@ export class Language {
 			let iterations = 0;
 
 			while (iterations++ < 250) {
-				const response = await Language.chat(history, 'smart');
+				const speaker = people[Math.floor(Math.random() * people.length)];
 
 				history.push({
-					role: 'assistant',
-					content: response.message.content
+					role: 'user',
+					content: `${speaker.id.split('-')[0]}`
 				});
 
-				for (let match of response.message.content.match(/(SAY\s*\(\s*"?[0-9a-f-]+"?\s*,\s*\"(.*)\"\s*\))|(CONCLUSION\s*\(\s*\"(.*)\"\s*\))/g)) {
+				let response;
+				let matches: string[];
+
+				while (!matches) {
+					response = await Language.chat(history, 'smart');
+
+					if (response.message.content) {
+						matches = response.message.content.match(/(SAY\s*\(\s*"?[0-9a-f-]+"?\s*,\s*\"(.*)\"\s*\))|(CONCLUSION\s*\(\s*\"(.*)\"\s*\))/g);
+					}
+				}
+
+				history.push(response.message);
+
+				for (let match of matches) {
 					const strings = match.match(/\"(.*?)\"/g).map(line => line.replace('"', '').replace('"', '').trim());
 
 					switch (match.split('(')[0].trim().toLowerCase()) {
 						case 'say': {
-							const person = people.find(person => person.id == strings[0]);
+							const person = people.find(person => person.id.split('-')[0] == strings[0]);
 
 							if (!person) {
 								continue;

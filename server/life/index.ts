@@ -52,7 +52,7 @@ export class Life {
 	}
 
 	async voteBill(ballot: Vote) {
-		const fast = new Language('fast');
+		const fast = new Language('smart');
 
 		if (ballot.submitted) {
 			throw new Error(`Vote '${ballot.id}' already submitted`);

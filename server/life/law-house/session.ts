@@ -28,26 +28,16 @@ export class LawHouseSessionManager {
 
 		await this.session.create();
 
-		this.protocol(`Collecting population consensus for legal district ${this.district.name}`);
-
-		// find sessionaries
-		// sessionaries decide on the tasks of this session
-		this.residents = await this.lawHouse.collectLegallyCompetentResidents(this.district);
-		this.protocol(`Consensus for ${this.district.name}: ${this.residents.length} legally competent residents`);
+		await this.collectConsensus();
 
 		if (this.residents.length < this.sessionaryCount) {
-			this.protocol(`Not enough legally competent residents to hold law house session.`);
+			await this.protocol(`Not enough legally competent residents to hold law house session.`);
 
 			this.session.ended = new Date();
 			await this.session.update();
 
 			return;
 		}
-
-		this.protocol(`Collecting registered companies for legal district ${this.district.name}`);
-
-		this.companies = await this.lawHouse.collectCompanies(this.district);
-		this.protocol(`Consensus for ${this.district.name}: ${this.companies.length} companies`);
 
 		const sessionaryPool = [...this.residents];
 		sessionaryPool.sort(() => Math.random() - 0.5);
@@ -62,19 +52,64 @@ export class LawHouseSessionManager {
 			await sessionary.create();
 
 			this.sessionaries.push(resident);
-			this.protocol(`Sessionary ${resident.givenName} ${resident.familyName} present.`);
+			await this.protocol(`Sessionary ${resident.givenName} ${resident.familyName} present.`);
 		}
 
-		this.protocol(`Session tasks started.`);
+		await this.protocol(`Session tasks started.`);
 
+		await this.executeTasks();
+		await this.close();
+	}
+
+	// after session closed for some reason
+	async resume(session: LawHouseSession) {
+		this.session = session;
+
+		// restart if nothing happened yet
+		const sessionaries = await this.session.sessionaries.toArray();
+
+		if (sessionaries.length == 0) {
+			await this.execute();
+
+			return;
+		}
+
+		await this.protocol(`Session resumed after an unexpected issue occured.`);
+
+		for (let sessionary of sessionaries) {
+			this.sessionaries.push(await sessionary.resident.fetch());
+		}
+
+		await this.collectConsensus();
+
+		await this.executeTasks();
+		await this.close();
+	}
+
+	private async collectConsensus() {
+		await this.protocol(`Collecting population consensus for legal district ${this.district.name}`);
+
+		// find sessionaries
+		// sessionaries decide on the tasks of this session
+		this.residents = await this.lawHouse.collectLegallyCompetentResidents(this.district);
+		await this.protocol(`Consensus for ${this.district.name}: ${this.residents.length} legally competent residents`);
+
+		await this.protocol(`Collecting registered companies for legal district ${this.district.name}`);
+
+		this.companies = await this.lawHouse.collectCompanies(this.district);
+		await this.protocol(`Consensus for ${this.district.name}: ${this.companies.length} companies`);
+	}
+
+	private async executeTasks() {
 		await this.writeHonestiums();
 		await this.certifyBills();
 		await this.sendVotingBallots();
 		await this.incorporateCompanies();
+	}
 
+	private async close() {
 		this.session.ended = new Date();
-
-		this.protocol(`Session finished.`);
+		await this.protocol(`Session finished.`);
 
 		await this.session.update();
 	}
@@ -106,7 +141,7 @@ export class LawHouseSessionManager {
 			while (honestiums.length != this.honestiumSize * 2) {
 				const pro = honestiums.filter(honestium => honestium.pro).length < this.honestiumSize;
 
-				this.protocol(`Writing ${pro ? 'pro' : 'contra'} honestium question for bill '${bill.tag}'`);
+				await this.protocol(`Writing ${pro ? 'pro' : 'contra'} honestium question for bill '${bill.tag}'`);
 
 				const honestium = new BillHonestium();
 				honestium.bill = bill;
@@ -116,11 +151,13 @@ export class LawHouseSessionManager {
 					this.language.lawHouseDebateIntor(this.district),
 					this.sessionaries,
 					this.language.writeHonestiumQuestion(pro, bill, honestiums),
-					async (person, message) => this.protocol(message, person),
-					async () => true
+					async (person, message) => await this.protocol(message, person),
+					async (conclusion) => await this.language.verify(this.language.verifyHonestiumQuestion(pro, conclusion))
 				);
 
 				await honestium.create();
+
+				await this.protocol(`Prepared ${pro ? 'pro' : 'contra'} honestium question for bill '${bill.tag}': ${honestium.question}`);
 
 				honestiums.push(honestium);
 			}
@@ -130,13 +167,15 @@ export class LawHouseSessionManager {
 	// sends out ballots for new votes
 	private async sendVotingBallots() {
 		for (let bill of await this.getOpenBills()) {
-			if (!bill.mailed) {
-				this.protocol(`Mailing ballots for bill '${bill.tag}'`);
+			const unansweredHonestiums = await bill.honestiums.where(honestium => honestium.answered == null).count();
+
+			if (!bill.mailed && unansweredHonestiums == 0) {
+				await this.protocol(`Mailing ballots for bill '${bill.tag}'`);
 
 				bill.mailed = new Date();
 				await bill.update();
 
-				this.protocol(`Summarizing bill '${bill.tag}' for voters`);
+				await this.protocol(`Summarizing bill '${bill.tag}' for voters`);
 				const honestiums = await bill.honestiums.toArray();
 				bill.summary = await this.language.summarize(`
 					${bill.title}
@@ -147,7 +186,7 @@ export class LawHouseSessionManager {
 
 				await bill.update();
 
-				this.protocol(`Sending ballots to ${this.residents.length} residents`);
+				await this.protocol(`Sending ballots to ${this.residents.length} residents`);
 
 				for (let resident of this.residents) {
 					const vote = new Vote();
@@ -157,7 +196,7 @@ export class LawHouseSessionManager {
 					await vote.create();
 				}
 
-				this.protocol(`Sent ballots`);
+				await this.protocol(`Sent ballots`);
 			}
 		}
 	}
@@ -166,20 +205,20 @@ export class LawHouseSessionManager {
 	private async certifyBills() {
 		for (let bill of await this.getOpenBills()) {
 			if (bill.mailed) {
-				this.protocol(`Reviewing votes for '${bill.tag}'`);
+				await this.protocol(`Reviewing votes for '${bill.tag}'`);
 
 				const openVotes = await bill.votes.where(vote => vote.submitted == null).count();
-				this.protocol(`${openVotes} open ballots found for '${bill.tag}'`);
+				await this.protocol(`${openVotes} open ballots found for '${bill.tag}'`);
 
 				if (openVotes == 0) {
-					this.protocol(`Votes complete for bill '${bill.tag}'`);
+					await this.protocol(`Votes complete for bill '${bill.tag}'`);
 
 					const votes = await bill.votes.toArray();
 
 					bill.pro = votes.filter(vote => vote.pro).length > votes.length / 2;
 					bill.certified = new Date();
 
-					this.protocol(`Bill '${bill.tag}' certified as ${bill.pro ? 'PRO' : 'CONTRA'} at ${bill.certified.toLocaleString()}.`);
+					await this.protocol(`Bill '${bill.tag}' certified as ${bill.pro ? 'PRO' : 'CONTRA'} at ${bill.certified.toLocaleString()}.`);
 
 					await bill.update();
 				}
@@ -191,19 +230,19 @@ export class LawHouseSessionManager {
 	private async incorporateCompanies() {
 		for (let company of this.companies) {
 			if (!company.incorporated) {
-				this.protocol(`Create purpose description for company '${company.name}'.`);
+				await this.protocol(`Create purpose description for company '${company.name}'.`);
 
 				company.purpose = await this.language.debate(
 					this.language.lawHouseDebateIntor(this.district),
 					this.sessionaries,
 					this.language.extractCompanyPurpose(company),
-					(person, message) => this.protocol(message, person),
+					async (person, message) => await this.protocol(message, person),
 					async (result) => result.split(' ').length <= 2
 				);
 
 				company.incorporated = new Date();
 
-				this.protocol(`Company '${company.name}' incorporated as '${company.purpose}' at ${company.incorporated.toLocaleString()}.`);
+				await this.protocol(`Company '${company.name}' incorporated as '${company.purpose}' at ${company.incorporated.toLocaleString()}.`);
 
 				await company.update();
 			}

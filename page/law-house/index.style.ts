@@ -3,11 +3,14 @@ import { collection, collectionItem } from "../shared/collection.style";
 import { pageGutter } from "../index.style";
 import { card } from "../shared/card.style";
 import { sessionStyle } from "./session/index.style";
+import { topicHeaderStyle } from "../shared/topic-header.style";
 
 export const lawHouseStyle = () => child('ui-law-house',
 	display('block'),
 
 	sessionStyle(),
+
+	topicHeaderStyle(),
 
 	child('img',
 		width(percentage(100).add(pageGutter).add(pageGutter)),

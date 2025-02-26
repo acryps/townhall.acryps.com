@@ -5,6 +5,7 @@ import { registerCompanyStyle } from "./register/index.style";
 import { companyStyle } from "./company/index.style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { card } from "../shared/card.style";
+import { topicHeaderStyle } from "../shared/topic-header.style";
 
 export const companyOfficeStyle = () => child('ui-company-office',
 	boxed(),
@@ -12,18 +13,7 @@ export const companyOfficeStyle = () => child('ui-company-office',
 	registerCompanyStyle(),
 	companyStyle(),
 
-	child('ui-header',
-		display('flex'),
-		alignItems('center'),
-		columnGap(rem(1)),
-
-		padding(pageGutter),
-		margin(pageGutter.invert()),
-		marginBottom(pageGutter),
-
-		color(pageBackgroundColor),
-		backgroundColor(pageTextColor)
-	),
+	topicHeaderStyle(),
 
 	child('ui-title',
 		display('block'),

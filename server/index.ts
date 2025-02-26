@@ -42,9 +42,9 @@ DbClient.connectedClient.connect().then(async () => {
 
 	const lawHouse = new LawHouse(database, new Language('smart'), life);
 	// only run this on capable hardware!
-	// lawHouse.schedule();
+	lawHouse.schedule();
 
-	// life.vote();
+	life.vote();
 
 	/*for (let resident of await db.resident.where(resident => resident.figure == null).toArray()) {
 		console.log(resident.givenName)

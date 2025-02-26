@@ -42,9 +42,22 @@ export class LawHouse {
 
 		// check for the first time within the first 30 minutes from launch
 		// prevents multiple instances from messing with eachother
-		setTimeout(() => {
+		setTimeout(async () => {
+			await this.completeOpen();
+
 			next();
-		}, 1000 * 60 * 30 * Math.random());
+		}, 1000 * 30 * Math.random());
+	}
+
+	async completeOpen() {
+		const openSessions = await this.database.lawHouseSession
+			.where(session => session.ended == null)
+			.orderByAscending(session => session.started)
+			.toArray();
+
+		for (let session of openSessions) {
+			await new LawHouseSessionManager(this.database, this.language, this.life, await session.scope.fetch(), this).resume(session);
+		}
 	}
 
 	// only people who are responsible in a legal sense

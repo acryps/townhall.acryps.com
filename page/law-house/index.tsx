@@ -1,5 +1,6 @@
 import { Component } from "@acryps/page";
 import { LawHouseService, LawHouseSessionSummaryModel, LawHouseSessionViewModel } from "../managed/services";
+import { lawIcon } from "../assets/icons/managed";
 
 export class LawHousePage extends Component {
 	sessions: LawHouseSessionSummaryModel[];
@@ -11,6 +12,10 @@ export class LawHousePage extends Component {
 	render(child) {
 		if (child) {
 			return <ui-law-house>
+				<ui-header ui-href='/law-house'>
+					{lawIcon()} Law House
+				</ui-header>
+
 				{child}
 			</ui-law-house>
 		}

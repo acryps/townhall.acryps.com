@@ -14,6 +14,7 @@ export class PropertyUsageTileServer extends ShapeTileServer {
 
 			async () => {
 				const properties = await database.property
+					.where(property => property.deactivated == null)
 					.include(property => property.offices)
 					.include(property => property.dwellings)
 					.toArray();

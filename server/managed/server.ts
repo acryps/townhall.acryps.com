@@ -328,13 +328,13 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"1nbWp4M21wOG1naTNoM3B1bWJvbTx1ej",
+			"dta2hmZGV4dHdhZnJ4YzVnZWp2djV2Y2",
 			{
-			"ExMWt6cHEwZTJ0Y3N2cDs3ajYybXd0Zz": { type: PropertyViewModel, isArray: false, isOptional: false }
+			"E0M2J3Ymt5cDY5ZWJnMHU1ZHo2YzUyc2": { type: PropertyViewModel, isArray: false, isOptional: false }
 			},
 			inject => inject.construct(MapService),
-			(controller, params) => controller.deleteProperty(
-				params["ExMWt6cHEwZTJ0Y3N2cDs3ajYybXd0Zz"]
+			(controller, params) => controller.archiveProperty(
+				params["E0M2J3Ymt5cDY5ZWJnMHU1ZHo2YzUyc2"]
 			)
 		);
 

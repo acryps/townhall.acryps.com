@@ -1120,6 +1120,8 @@ export class PropertyQueryProxy extends QueryProxy {
 	get boroughId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get bounds(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get code(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get deactivated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get historicListingGradeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get historicListingRegisteredAt(): Partial<QueryDate> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -1138,6 +1140,8 @@ export class Property extends Entity<PropertyQueryProxy> {
 	boroughId: string;
 	bounds: string;
 	code: string;
+	created: Date;
+	deactivated: Date;
 	historicListingGradeId: string;
 	historicListingRegisteredAt: Date;
 	declare id: string;
@@ -1151,6 +1155,8 @@ export class Property extends Entity<PropertyQueryProxy> {
 			boroughId: { type: "uuid", name: "borough_id" },
 			bounds: { type: "text", name: "bounds" },
 			code: { type: "text", name: "code" },
+			created: { type: "timestamp", name: "created" },
+			deactivated: { type: "timestamp", name: "deactivated" },
 			historicListingGradeId: { type: "uuid", name: "historic_listing_grade_id" },
 			historicListingRegisteredAt: { type: "date", name: "historic_listing_registered_at" },
 			id: { type: "uuid", name: "id" },

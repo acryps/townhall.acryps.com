@@ -1,6 +1,7 @@
 import { alignItems, aspectRatio, backgroundColor, border, borderBottom, child, color, columnGap, display, flexDirection, flexWrap, fontSize, fontWeight, gap, height, lineHeight, marginBlock, marginBottom, marginInline, marginTop, Mm, objectFit, objectPosition, opacity, padding, percentage, px, ratio, rem, textAlign, textDecorationLine, vh, width } from "@acryps/style";
 import { pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 import { fieldStyle } from "../../shared/field.style";
+import { buttonStyle } from "../../shared/index.style";
 
 export const propertyStyle = () => child('ui-property',
 	display('block'),
@@ -162,6 +163,14 @@ export const propertyStyle = () => child('ui-property',
 				display('block'),
 				fontSize(rem(0.75))
 			)
+		)
+	),
+
+	child('ui-actions',
+		child('ui-action',
+			marginTop(rem(1)),
+
+			buttonStyle()
 		)
 	)
 )

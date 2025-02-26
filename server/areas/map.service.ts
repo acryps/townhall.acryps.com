@@ -29,6 +29,7 @@ export class MapService extends Service {
 	getProperties(page: number) {
 		return PropertySummaryModel.from(
 			this.db.property
+				.where(property => property.deactivated == null)
 				.orderByDescending(property => property.borough)
 				.orderByDescending(property => property.type)
 				.orderByDescending(property => property.id)
@@ -84,6 +85,7 @@ export class MapService extends Service {
 	async createProperty(shape: string) {
 		const property = new Property();
 		property.bounds = Point.pack(Point.unpack(shape));
+		property.created = new Date();
 
 		await property.create();
 
@@ -121,9 +123,25 @@ export class MapService extends Service {
 		await property.update();
 	}
 
-	async deleteProperty(propertyViewModel: PropertyViewModel) {
+	async archiveProperty(propertyViewModel: PropertyViewModel) {
 		const property = await propertyViewModel.toModel();
 
-		await property.delete();
+		if (property.historicListingGradeId) {
+			throw new Error('Historical property cannot be deactivated');
+		}
+
+		if (await property.offices.count()) {
+			throw new Error('Inactive properties cannot have any offices');
+		}
+
+		if (await property.dwellings.count()) {
+			throw new Error('Inactive properties cannot have any dwellings');
+		}
+
+		if (!property.deactivated) {
+			property.deactivated = new Date();
+		}
+
+		await property.update();
 	}
 }

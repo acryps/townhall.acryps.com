@@ -1230,11 +1230,11 @@ export class MapService {
 		});
 	}
 
-	async deleteProperty(propertyViewModel: PropertyViewModel): Promise<void> {
+	async archiveProperty(propertyViewModel: PropertyViewModel): Promise<void> {
 		const $data = new FormData();
-		$data.append("ExMWt6cHEwZTJ0Y3N2cDs3ajYybXd0Zz", Service.stringify(propertyViewModel))
+		$data.append("E0M2J3Ymt5cDY5ZWJnMHU1ZHo2YzUyc2", Service.stringify(propertyViewModel))
 
-		return await fetch(Service.toURL("1nbWp4M21wOG1naTNoM3B1bWJvbTx1ej"), {
+		return await fetch(Service.toURL("dta2hmZGV4dHdhZnJ4YzVnZWp2djV2Y2"), {
 			method: "post",
 			credentials: "include",
 			body: $data

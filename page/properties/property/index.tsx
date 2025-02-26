@@ -4,7 +4,7 @@ import { Component } from "@acryps/page";
 import { MapComponent } from "../../shared/map";
 import { Point } from "../../../interface/point";
 import { toSimulatedAge } from "../../../interface/time";
-import { addIcon } from "../../assets/icons/managed";
+import { addIcon, deleteIcon, drawIcon } from "../../assets/icons/managed";
 import { MetaGovernmentBuilding, MetaPlace } from "@acryps/metadata";
 import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
 import { CompanyOfficePage } from "../../company-office";
@@ -185,6 +185,20 @@ export class PropertyPage extends Component {
 					</ui-modifier>
 				})}
 			</ui-historic-listing>
+
+			<ui-actions>
+				<ui-action>
+					{drawIcon()} Redefine Boundaries (MISSING)
+				</ui-action>
+
+				<ui-action ui-click={async () => {
+					await new MapService().archiveProperty(this.property);
+
+					history.back();
+				}}>
+					{deleteIcon()} Archive Property
+				</ui-action>
+			</ui-actions>
 		</ui-property>
 	}
 }

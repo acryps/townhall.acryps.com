@@ -13,7 +13,10 @@ export class PropertyTileServer extends ShapeTileServer {
 			'property',
 
 			async () => {
-				const properties = await database.property.toArray();
+				const properties = await database.property
+					.where(property => property.deactivated == null)
+					.toArray();
+
 				const types = await database.propertyType.toArray();
 
 				const shapes = [];

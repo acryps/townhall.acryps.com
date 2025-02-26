@@ -151,10 +151,7 @@ export const registerInteration = (
 					const bounds = map.rootNode.getBoundingClientRect();
 
 					// TODO fix subpixel offset
-					onPick(new Point(
-						Math.floor((pointer.x - bounds.x - Math.floor(map.center.x) - map.center.x) * map.scale - map.width / 2 + map.center.x),
-						Math.floor((pointer.y - bounds.y - Math.floor(map.center.y) - map.center.y) * map.scale - map.height / 2 + map.center.y)
-					));
+					onPick(map.translate(pointer));
 				} else {
 					onMoveEnd(map.center);
 				}

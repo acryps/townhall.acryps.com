@@ -36,6 +36,8 @@ export class MapPage extends Component {
 				this.parameters.zoom = (Math.sqrt(1 / scale) * this.zoomAccuracy).toFixed(0);
 			}, pick => {
 				this.map.pick(pick);
+
+				console.log(pick);
 			});
 		});
 

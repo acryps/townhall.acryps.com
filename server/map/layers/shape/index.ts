@@ -1,15 +1,22 @@
-import { Canvas } from "skia-canvas";
+import { Canvas, CanvasRenderingContext2D } from "skia-canvas";
 import { DbContext } from "../../../managed/database";
 import { ManagedServer } from "../../../managed/server";
 import { Point } from "../../../../interface/point";
 import { drawDanwinstonLine } from "../../../../interface/line";
+
+type Shape = {
+	id: string,
+	fill: string,
+	stroke: string,
+	bounds: Point[]
+};
 
 export class ShapeTileServer {
 	constructor(
 		app: ManagedServer,
 		route: string,
 
-		fetch: () => Promise<{ id: string, fill: string, stroke: string, bounds: Point[] }[]>,
+		fetch: () => Promise<Shape[]>,
 	) {
 		const size = 500;
 
@@ -25,37 +32,7 @@ export class ShapeTileServer {
 			const context = canvas.getContext('2d');
 
 			for (let shape of shapes) {
-				// use normal algorithm for fill
-				if (shape.fill) {
-					context.beginPath();
-
-					for (let index = 0; index < shape.bounds.length; index++) {
-						const point = shape.bounds[index].subtract(offset).add(new Point(0.5, 0.5));
-
-						if (index) {
-							context.lineTo(point.x, point.y);
-						} else {
-							context.moveTo(point.x, point.y);
-						}
-					}
-
-					context.closePath();
-
-					context.fillStyle = shape.fill;
-					context.fill();
-				}
-
-				// use legally binding algorithm for strokes
-				if (shape.stroke) {
-					context.strokeStyle = shape.stroke;
-
-					for (let index = 0; index < shape.bounds.length; index++) {
-						const start = shape.bounds[index].subtract(offset);
-						const end = shape.bounds[(index + 1) % shape.bounds.length].subtract(offset);
-
-						drawDanwinstonLine(context, start, end);
-					}
-				}
+				this.render(context, offset, shape);
 			}
 
 			response.contentType('image/png');
@@ -66,39 +43,57 @@ export class ShapeTileServer {
 			const x = +request.params.x;
 			const y = +request.params.y;
 
-			const canvas = new Canvas(size, size);
-			const context = canvas.getContext('2d');
-
+			const offset = new Point(x, y);
 			const shapes = await fetch();
 
+			const canvas = new Canvas(1, 1);
+			const context = canvas.getContext('2d');
+
 			for (let shape of shapes) {
-				const bounds = Point.bounds(shape.bounds);
+				this.render(context, offset, shape);
 
-				canvas.width = bounds.width;
-				canvas.height = bounds.height;
+				const intensity = context.getImageData(0, 0, 1, 1).data[3];
 
-				context.beginPath();
-
-				for (let index = 0; index < shape.bounds.length; index++) {
-					const point = shape.bounds[index].add(new Point(0.5, 0.5));
-
-					if (index) {
-						context.lineTo(point.x - bounds.x.min, point.y - bounds.y.min);
-					} else {
-						context.moveTo(point.x - bounds.x.min, point.y - bounds.y.min);
-					}
-				}
-
-				context.fill();
-
-				const intensity = context.getImageData(x - bounds.x.min, y - bounds.y.min, 1, 1).data[3];
-
-				if (intensity == 0xff) {
+				if (intensity) {
 					return response.json(shape.id);
 				}
 			}
 
 			response.json(null);
 		});
+	}
+
+	private render(context: CanvasRenderingContext2D, offset: Point, shape: Shape) {
+		// use normal algorithm for fill
+		if (shape.fill) {
+			context.beginPath();
+
+			for (let index = 0; index < shape.bounds.length; index++) {
+				const point = shape.bounds[index].subtract(offset).add(new Point(0.5, 0.5));
+
+				if (index) {
+					context.lineTo(point.x, point.y);
+				} else {
+					context.moveTo(point.x, point.y);
+				}
+			}
+
+			context.closePath();
+
+			context.fillStyle = shape.fill;
+			context.fill();
+		}
+
+		// use legally binding algorithm for strokes
+		if (shape.stroke) {
+			context.strokeStyle = shape.stroke;
+
+			for (let index = 0; index < shape.bounds.length; index++) {
+				const start = shape.bounds[index].subtract(offset);
+				const end = shape.bounds[(index + 1) % shape.bounds.length].subtract(offset);
+
+				drawDanwinstonLine(context, start, end);
+			}
+		}
 	}
 }

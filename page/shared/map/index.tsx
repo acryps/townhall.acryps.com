@@ -162,6 +162,21 @@ export class MapComponent extends Component {
 		);
 	}
 
+	// convert screen position to map position
+	translate(cursor: Point) {
+		const boundingBox = this.canvas.getBoundingClientRect();
+		const offset = cursor.subtract(new Point(boundingBox.x, boundingBox.y));
+
+		const pixel = offset.scale(1 / this.pixelSize);
+
+		const topLeft = new Point(
+			this.cursor.x - this.width / 2 - (this.width % 2 ? 0.5 : 0),
+			this.cursor.y - this.height / 2 - (this.height % 2 ? 0.5 : 0)
+		);
+
+		return pixel.add(topLeft).floor();
+	}
+
 	private resize() {
 		const boundingBox = this.rootNode.getBoundingClientRect();
 

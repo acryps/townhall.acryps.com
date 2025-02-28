@@ -2,6 +2,7 @@ import { LawHouse } from ".";
 import { Life } from "..";
 import { BillHonestium, Company, DbContext, District, LawHouseSession, LawHouseSessionary, LawHouseSessionProtocol, Resident, ResidentEventView, Vote } from "../../managed/database";
 import { Language } from "../language";
+import { Debate } from "../interpreter/debate";
 
 export class LawHouseSessionManager {
 	sessionaryCount = 7;
@@ -115,7 +116,7 @@ export class LawHouseSessionManager {
 	}
 
 	private async protocol(message: string, person?: Resident) {
-		console.log(`[law-house session ${this.district.name}]: ${message}`);
+		console.log(`[law-house session ${this.district.name} ${person ? `${person.givenName} ${person.familyName}` : '*'}]: ${message}`);
 
 		const protocol = new LawHouseSessionProtocol();
 		protocol.said = new Date();
@@ -147,13 +148,15 @@ export class LawHouseSessionManager {
 				honestium.bill = bill;
 				honestium.pro = pro;
 
-				honestium.question = await this.language.debate(
+				const debate = new Debate(
 					this.language.lawHouseDebateIntor(this.district),
 					this.sessionaries,
 					this.language.writeHonestiumQuestion(pro, bill, honestiums),
 					async (person, message) => await this.protocol(message, person),
 					async (conclusion) => await this.language.verify(this.language.verifyHonestiumQuestion(pro, conclusion))
 				);
+
+				honestium.question = await debate.debateUntilConcluded(this.sessionaryCount * 4);
 
 				await honestium.create();
 
@@ -232,13 +235,15 @@ export class LawHouseSessionManager {
 			if (!company.incorporated) {
 				await this.protocol(`Create purpose description for company '${company.name}'.`);
 
-				company.purpose = await this.language.debate(
+				const debate = new Debate(
 					this.language.lawHouseDebateIntor(this.district),
 					this.sessionaries,
 					this.language.extractCompanyPurpose(company),
 					async (person, message) => await this.protocol(message, person),
 					async (result) => result.split(' ').length <= 2
 				);
+
+				company.purpose = await debate.debateUntilConcluded(this.sessionaryCount * 2);
 
 				company.incorporated = new Date();
 

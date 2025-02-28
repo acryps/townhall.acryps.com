@@ -1,5 +1,5 @@
 import { Component } from "@acryps/page";
-import { LawHouseService, LawHouseSessionSummaryModel, LawHouseSessionViewModel } from "../managed/services";
+import { DistrictViewModel, LawHouseService, LawHouseSessionSummaryModel, LawHouseSessionViewModel } from "../managed/services";
 import { lawIcon } from "../assets/icons/managed";
 
 export class LawHousePage extends Component {
@@ -49,22 +49,65 @@ export class LawHousePage extends Component {
 			return [];
 		}
 
+		let lastDate: string;
+
+		const days: LawHouseSessionSummaryModel[][]  = [];
+		let stack = [];
+
+		for (let session of sessions) {
+			const date = session.started.toDateString();
+
+			if (date == lastDate) {
+				stack.push(session);
+			} else {
+				days.push(stack);
+				stack = [session];
+				lastDate = date;
+			}
+		}
+
+		days.push(stack);
+
 		return <ui-sessions>
 			<ui-title>
 				{title}
 			</ui-title>
 
-			<ui-sessions>
-				{sessions.map(session => <ui-session ui-href={`session/${session.id}`}>
-					<ui-time>
-						{session.started.toLocaleDateString()}
-					</ui-time>
-
-					<ui-scope>
-						{session.scope.name}
-					</ui-scope>
-				</ui-session>)}
-			</ui-sessions>
+			<ui-calendar>
+				{days.filter(day => day.length).map(day => this.renderDay(day))}
+			</ui-calendar>
 		</ui-sessions>;
+	}
+
+	renderDay(day: LawHouseSessionSummaryModel[]) {
+		const districts: DistrictViewModel[] = [];
+
+		for (let session of day) {
+			if (!districts.find(district => district.id == session.scope.id)) {
+				districts.push(session.scope);
+			}
+		}
+
+		districts.sort((a, b) => a.name.localeCompare(b.name));
+
+		return <ui-day>
+			<ui-date>
+				{day[0].started.toLocaleDateString()}
+			</ui-date>
+
+			<ui-districts>
+				{districts.map(district => <ui-district>
+					<ui-name>
+						{district.name}
+					</ui-name>
+
+					<ui-sessions>
+						{day.filter(session => session.scope.id == district.id).map(session => <ui-session ui-href={`session/${session.id}`}>
+							{session.started.getHours().toString().padStart(2, '0')}:{session.started.getMinutes().toString().padStart(2, '0')} ({Math.ceil((+(session.ended ?? new Date()) - +session.started) / 1000 / 60)}')
+						</ui-session>)}
+					</ui-sessions>
+				</ui-district>)}
+			</ui-districts>
+		</ui-day>
 	}
 }

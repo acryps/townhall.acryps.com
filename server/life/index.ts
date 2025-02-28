@@ -42,6 +42,8 @@ export class Life {
 		const openVotes = await this.database.vote
 			.where(vote => vote.submitted == null)
 			.orderByAscending(vote => vote.id)
+			.include(vote => vote.bill)
+			.include(vote => vote.resident)
 			.toArray();
 
 		console.log(`open vote ballots: ${openVotes.length}`);
@@ -52,7 +54,7 @@ export class Life {
 	}
 
 	async voteBill(ballot: Vote) {
-		const fast = new Language('smart');
+		const fast = new Language('fast');
 
 		if (ballot.submitted) {
 			throw new Error(`Vote '${ballot.id}' already submitted`);
@@ -62,23 +64,25 @@ export class Life {
 		const bill = await ballot.bill.fetch();
 		const honestums = await bill.honestiums.toArray();
 
-		const response = await fast.respondText(this.language.vote(resident),
+		let response = await fast.respondRaw(this.language.vote(resident),
 			await this.compileDescription(resident),
 			bill.title,
 			bill.description,
 			...honestums.map(honestium => `${honestium.question}: ${honestium.answer}`)
 		);
 
+		response = response.toLowerCase();
+
 		if (bill.certified) {
 			throw new Error(`Bill '${bill.tag}' already certified`);
 		}
 
-		if (!response.startsWith('YES') && !response.startsWith('NO')) {
+		if (!response.startsWith('yes') && !response.startsWith('no')) {
 			return this.voteBill(ballot);
 		}
 
 		ballot.submitted = new Date();
-		ballot.pro = response.startsWith('YES');
+		ballot.pro = response.startsWith('yes');
 
 		const reason = response.split(/\s/).slice(1).join(' ').trim();
 

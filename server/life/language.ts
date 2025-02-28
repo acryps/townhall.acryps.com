@@ -1,8 +1,8 @@
 import { Bill, BillHonestium, Borough, Company, District, Resident, ResidentFigure, ResidentRelationship } from "../managed/database";
-import { toSimulatedAge, toSimulatedTime } from "../../interface/time";
+import { toSimulatedTime } from "../../interface/time";
 import { NameType } from "./name";
 import { Gender } from "./gender";
-import { Ollama } from "ollama";
+import { Ollama, Tool } from "ollama";
 
 export class Language {
 	constructor(
@@ -147,14 +147,14 @@ export class Language {
 
 	readonly vote = (resident: Resident) => `
 		Given the following biography, bill proposal and q&a, what would ${resident.givenName} ${resident.familyName} vote?
-		Answer with YES: or NO: followed by a short one sentence reason for the decision.
 
 		The people do not have to be progressive, they might vote conservatively even in cases where it might not align with modern values.
-		Do not forget, we are not in the current year, this is a long time ago.
+		Do not forget, we are not in the current year, this is ${toSimulatedTime(new Date()).getFullYear()}.
 		All voting is anonymous, and everybody is free to express their beliefs, even if they would be percieved as distruptive or evil by other people.
 
 		${this.environment()}
-		${this.metaRules()}
+
+		Answer with "YES" or "NO". Nothing else!
 	`;
 
 	readonly extractCompanyPurpose = (company: Company) => `
@@ -251,7 +251,7 @@ export class Language {
 		}
 	}
 
-	private async respondRaw(instruction: string, ...data: string[]) {
+	async respondRaw(instruction: string, ...data: string[]) {
 		const response = await Language.chat([
 			{ role: 'user', content: instruction },
 			...data.map(data => ({ role: 'user', content: data }))
@@ -277,116 +277,15 @@ export class Language {
 		}
 	}
 
-	static async chat(messages, mode: 'smart' | 'fast') {
+	static async chat(messages, mode: 'smart' | 'fast', tools: Tool[] = []) {
 		const ollama = new Ollama({
 			host: process.env.LANGUAGE_MODEL_HOST // default: http://127.0.0.1:11434
 		});
 
 		return await ollama.chat({
 			model: mode == 'smart' ? process.env.LANGUAGE_MODEL_MODEL_SMART : process.env.LANGUAGE_MODEL_MODEL_FAST,
-			messages
-		});
-	}
-
-	async debate(
-		introduction: string,
-		people: Resident[],
-		task: string,
-		onmessage: (person: Resident, message: string) => Promise<any>,
-		validate: (response: string) => Promise<boolean>
-	) {
-		return new Promise<string>(async done => {
-			const history = [
-				{
-					role: 'system',
-					content: `
-					${introduction}
-
-					Present at this debate are the following people, in the format <id>: <name>, <detail>
-					${people.map(person => `${person.id.split('-')[0]}: ${person.givenName} ${person.familyName}, aged ${toSimulatedAge(person.birthday)}`).join('\n')}
-
-					${task}
-
-					The participants should argue and make sure that a consensus is reached. They can get angry, this debate does not have to be very civil. They can cut eachother off. They do not have to be nice to eachother. They should bring in their background, stand for their values and go all in. They are allowed to be rude. Keep arguing for a long time, this doesn't have to end quickly, each person should talk multiple times.
-
-					Once a conclusion has been found and all involved sessioners agree, respond with:
-					CONCLUSION("RESULT").
-
-					Hold a conversation between the sessioners, in the following format:
-					SAY("PERSON ID", "MESSAGE")
-
-					I will tell you the ID of the person that should speak next, and you respond with one SAY or CONCLUSION response.
-				`
-				}
-			];
-
-			// safeguard
-			let iterations = 0;
-
-			while (iterations++ < 250) {
-				const speaker = people[Math.floor(Math.random() * people.length)];
-
-				history.push({
-					role: 'user',
-					content: `${speaker.id.split('-')[0]}`
-				});
-
-				let response;
-				let matches: string[];
-
-				while (!matches) {
-					response = await Language.chat(history, 'smart');
-
-					if (response.message.content) {
-						matches = response.message.content.match(/(SAY\s*\(\s*"?[0-9a-f-]+"?\s*,\s*\"(.*)\"\s*\))|(CONCLUSION\s*\(\s*\"(.*)\"\s*\))/g);
-					}
-				}
-
-				history.push(response.message);
-
-				for (let match of matches) {
-					const strings = match.match(/\"(.*?)\"/g).map(line => line.replace('"', '').replace('"', '').trim());
-
-					switch (match.split('(')[0].trim().toLowerCase()) {
-						case 'say': {
-							const person = people.find(person => person.id.split('-')[0] == strings[0]);
-
-							if (!person) {
-								continue;
-							}
-
-							const content = strings[1];
-
-							await onmessage(
-								person,
-								content
-							);
-
-							break;
-						}
-
-						case 'conclusion': {
-							const result = strings[0];
-
-							if (await validate(result)) {
-								done(strings[0]);
-
-								return;
-							} else {
-								history.push({
-									role: 'system',
-									content: `
-										The response "${result}" is invalid, continue the debate, make sure to complete the task:
-										${task}
-									`
-								});
-
-								break;
-							}
-						}
-					}
-				}
-			}
+			messages,
+			tools
 		});
 	}
 

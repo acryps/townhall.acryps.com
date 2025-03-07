@@ -22,7 +22,7 @@ export const registerInteration = (
 	};
 
 	const getPointer = (event: TouchEvent | MouseEvent, index = 0, allowReleasedPoints = false) => {
-		if (event instanceof TouchEvent) {
+		if (window.TouchEvent && event instanceof TouchEvent) {
 			if (!event.touches[index]) {
 				return;
 			}
@@ -34,15 +34,17 @@ export const registerInteration = (
 			return;
 		}
 
-		if (!event.buttons && !allowReleasedPoints) {
-			return;
-		}
+		if (event instanceof MouseEvent) {
+			if (!event.buttons && !allowReleasedPoints) {
+				return;
+			}
 
-		return new Point(event.clientX, event.clientY);
+			return new Point(event.clientX, event.clientY);
+		}
 	};
 
 	const getPointers = (event: TouchEvent | MouseEvent) => {
-		if (event instanceof TouchEvent) {
+		if (window.TouchEvent && event instanceof TouchEvent) {
 			const points = [];
 
 			for (let index = 0; index < event.touches.length; index++) {

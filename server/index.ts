@@ -22,18 +22,18 @@ import { PropertyUsageTileServer } from "./map/layers/shape/usage";
 import { ImpressionImageInterface } from "./areas/impressions/interface";
 import { StreetTileServer } from "./map/layers/shape/street";
 
+const runLife = process.env.RUN_LIFE == 'YES';
+
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
 
 DbClient.connectedClient.connect().then(async () => {
-	console.log("connected to database!");
+	console.log('connected to database!');
 
 	const app = new ManagedServer();
 	ws(app.app);
 
 	const database = new DbContext(new RunContext());
-	// tilecomplete(db);
-	// tileimport(db);
 
 	MapImporter.schedule(MapType.overworld, database);
 	MapImporter.schedule(MapType.night, database);
@@ -42,22 +42,25 @@ DbClient.connectedClient.connect().then(async () => {
 	await life.load();
 
 	const lawHouse = new LawHouse(database, new Language('smart'), life);
-	// only run this on capable hardware!
-	// lawHouse.schedule();
-	// life.vote();
 
-	/*for (let resident of await db.resident.where(resident => resident.figure == null).toArray()) {
+	if (runLife) {
+		lawHouse.schedule();
+		life.vote();
+	}
+
+	// add missing figures
+	/* for (let resident of await database.resident.where(resident => resident.figure == null).toArray()) {
 		console.log(resident.givenName)
 
 		await life.assignFigure(resident);
-	}*/
+	} */
 
 	new BaseTileServer(app, database);
 	new PropertyTileServer(app, database);
 	new StreetTileServer(app, database); // temporarely only!
 	new BoroughTileServer(app, database);
 	new PropertyUsageTileServer(app, database);
-	// new MovementTileServer(app, database);
+	new MovementTileServer(app, database);
 
 	// life.tick();
 	/// new FillLife(life, db).fillEmptyDwellings();
@@ -67,8 +70,6 @@ DbClient.connectedClient.connect().then(async () => {
 	const connections = [];
 
 	(app.app as any).ws('/game', socket => connections.push(socket));
-
-	// new Proxy(app);
 
 	new GameBridge(app, database, message => {
 		for (let connection of connections) {
@@ -95,9 +96,6 @@ DbClient.connectedClient.connect().then(async () => {
 	app.use(new StaticFileRoute('/assets/', join(process.cwd(), '..', 'page', 'assets')));
 	app.use(new StaticFileRoute('/bundle/', join(process.cwd(), '..', 'page', '.built')));
 	app.app.use('*', (request, response) => response.sendFile(join(process.cwd(), '..', 'page', 'assets', 'index.html')));
-
-	// const movementHeatmap = new MovementHeatmap(db);
-	// movementHeatmap.render();
 
 	app.start(+process.env.PORT || 7420);
 });

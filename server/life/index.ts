@@ -64,6 +64,8 @@ export class Life {
 		const bill = await ballot.bill.fetch();
 		const honestums = await bill.honestiums.toArray();
 
+		console.log('vote', bill.title, resident.id, resident.givenName, resident.familyName);
+
 		let response = await fast.respondRaw(this.language.vote(resident),
 			await this.compileDescription(resident),
 			bill.title,
@@ -78,6 +80,8 @@ export class Life {
 		}
 
 		if (!response.startsWith('yes') && !response.startsWith('no')) {
+			console.log(response);
+
 			return this.voteBill(ballot);
 		}
 
@@ -93,6 +97,13 @@ export class Life {
 		console.log('+ vote', resident.givenName, resident.familyName, ballot.pro, ballot.reason);
 
 		await ballot.update();
+	}
+
+	async assignPoliticalTags(resident: Resident) {
+		const labels = await this.language.respondTextArray(this.language.assignPoliticalLabels(resident));
+
+		resident.politicalSetting = labels.join(', ');
+		await resident.update();
 	}
 
 	async assignFigure(resident: Resident) {
@@ -211,7 +222,9 @@ export class Life {
 
 		await resident.create();
 		this.residents.push(resident);
-		this.assignFigure(resident);
+
+		await this.assignFigure(resident);
+		await this.assignPoliticalTags(resident);
 
 		console.log(`+ spawn ${resident.tag} ${resident.givenName} ${resident.familyName}`);
 

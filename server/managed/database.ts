@@ -1396,6 +1396,7 @@ export class ResidentQueryProxy extends QueryProxy {
 	get figureId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get givenName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get mainTenancyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get politicalSetting(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
@@ -1414,6 +1415,7 @@ export class Resident extends Entity<ResidentQueryProxy> {
 	givenName: string;
 	declare id: string;
 	mainTenancyId: string;
+	politicalSetting: string;
 	tag: string;
 	
 	$$meta = {
@@ -1426,6 +1428,7 @@ export class Resident extends Entity<ResidentQueryProxy> {
 			givenName: { type: "text", name: "given_name" },
 			id: { type: "uuid", name: "id" },
 			mainTenancyId: { type: "uuid", name: "main_tenancy_id" },
+			politicalSetting: { type: "text", name: "political_setting" },
 			tag: { type: "text", name: "tag" }
 		},
 		get set(): DbSet<Resident, ResidentQueryProxy> { 

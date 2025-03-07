@@ -7,6 +7,7 @@ export class Debate {
 
 	private intepreter = new Interpreter();
 
+	prepared = false;
 	iterations = 0;
 
 	messages = 0;
@@ -22,12 +23,33 @@ export class Debate {
 		private task: string,
 		private onmessage: (person: Resident, message: string) => Promise<any>,
 		private validate: (response: string) => Promise<boolean>,
-	) {
+	) {}
+
+	async prepare() {
+		if (this.prepared) {
+			return;
+		}
+
+		this.prepared = true;
+
+		const peopleDescriptions = [];
+
+		for (let person of this.people) {
+			const tenancy = await person.mainTenancy.fetch();
+			const dwelling = await tenancy?.dwelling.fetch();
+			const property = await dwelling?.property.fetch();
+			const borough = await property?.borough.fetch();
+
+			peopleDescriptions.push(`${person.id.split('-')[0]}: ${person.givenName} ${person.familyName}, aged ${toSimulatedAge(person.birthday)}, living in ${borough?.name ?? 'the city'}, ${person.politicalSetting}`);
+		}
+
+		console.log(peopleDescriptions)
+
 		this.intepreter.remember([new SystemMessage(`
 			${this.introduction}
 
 			Present at this debate are the following people, in the format <id>: <name>, <detail>
-			${this.people.map(person => `${person.id.split('-')[0]}: ${person.givenName} ${person.familyName}, aged ${toSimulatedAge(person.birthday)}`).join('\n')}
+			${peopleDescriptions.map(description => `- ${description}`).join('\n')}
 
 			${this.task}
 
@@ -57,20 +79,22 @@ export class Debate {
 		});
 
 		this.intepreter.addTool('speak', [{ name: 'id', type: String }, { name: 'message', type: String }, { name: 'refer', type: String, optional: true }], async (id, message, refer) => {
-			const person = people.find(person => person.id.split('-')[0] == id);
+			const person = this.people.find(person => person.id.split('-')[0] == id);
 
 			if (!person) {
 				throw new Error(`Person not found: ${id}`);
 			}
 
 			// might be null
-			this.refer = people.find(person => person.id.split('-')[0] == refer);
+			this.refer = this.people.find(person => person.id.split('-')[0] == refer);
 
 			await this.onmessage(person, message);
 		});
 	}
 
 	async debateUntilConcluded(length: number) {
+		await this.prepare();
+
 		this.length = length;
 
 		while (!this.conclusion) {
@@ -99,7 +123,7 @@ export class Debate {
 		console.log(speaker.givenName, remainingMessages);
 
 		await this.intepreter.execute(
-			new UserMessage(`It is ${speaker.givenName} ${speaker.familyName} (id: ${speaker.id.split('-')[0]}) turn to speak now. A conclusion should be reached in ${remainingMessages} messages.`)
+			new UserMessage(`It is ${speaker.givenName} ${speaker.familyName} (id: ${speaker.id.split('-')[0]}) turn to speak now. A conclusion should be reached in ${remainingMessages} messages or earlier, if the solution is clear.`)
 		);
 
 		this.messages++;

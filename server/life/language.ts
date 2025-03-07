@@ -94,6 +94,18 @@ export class Language {
 		${this.metaRules()}
 	`;
 
+	readonly assignPoliticalLabels = (resident: Resident) => `
+		Given the following fictional persons story, what political labels would you associate with them?
+		Respond with a list of labels that apply.
+
+		Accelerationist, Agrarian, Alt-Left, Alt-Right, Anarchist, Anarcho-Capitalist, Anarcho-Communist, Anarcho-Primitivist, Anarcho-Syndicalist, Authoritarian, Centrist, Centrism, Christian Democrat, Christian Fundamentalist, Classical Liberal, Collectivist, Communist, Conservative, Corporatist, Democratic Socialist, Distributist, Eco-Fascist, Eco-Socialist, Ecologist, Far-Left, Far-Right, Fascist, Feminist, Georgist, Globalist, Green, Humanist, Identitarian, Individualist, Internationalist, Islamist, Juche, Labor Zionist, Laissez-Faire, Liberal, Libertarian, Libertarian Socialist, Maoist, Marxist, Marxist-Leninist, Minarchist, Moderate, Monarchist, National Anarchist, National Bolshevik, National Conservative, National Socialist, Nationalist, Neoconservative, Neoliberal, Paleoconservative, Pan-Africanist, Populist, Post-Liberal, Progressive, Radical Centrist, Reactionary, Republican, Separatist, Social Conservative, Social Democrat, Social Liberal, Socialist, Stalinist, Syndicalist, Technocrat, Theocrat, Third Position, Traditionalist, Trotskyist, Ultranationalist, Voluntaryist, Zionist
+
+		${resident.biography}
+
+		${this.environment()}
+		${this.metaRules()}
+	`;
+
 	readonly classifyBond = (initiator: Resident, peer: Resident) => `
 		Given the following story, what type of bond do ${initiator.givenName} and ${peer.givenName} have?
 		Is this a relationship, a friendship, a business relation, an affair, ... or what?

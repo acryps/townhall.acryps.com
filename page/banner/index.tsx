@@ -1,5 +1,6 @@
 import { Component } from "@acryps/page";
 import { HistoryEntryViewModel } from "../managed/services";
+import { Rgb, rgb } from "@acryps/style";
 
 export class BannerComponent extends Component {
 	private readonly generatorFunctionSignature = 'layerGenerator';
@@ -7,7 +8,25 @@ export class BannerComponent extends Component {
 	readonly width = 20;
 	readonly height = 40;
 
-	static readonly colors = ['black', 'blue', 'brown', 'cyan', 'gray', 'green', 'lightBlue', 'lightGray', 'lime', 'magenta', 'orange', 'pink', 'purple', 'red', 'white', 'yellow'];
+	// from https://www.planetminecraft.com/banner/
+	static readonly colors: Record<string, Rgb> = {
+		white: rgb(249, 255, 254),
+		lightGray: rgb(157, 157, 151),
+		gray: rgb(71, 79, 82),
+		black: rgb(29, 29, 33),
+		yellow: rgb(254, 216, 61),
+		orange: rgb(249, 128, 29),
+		red: rgb(176, 46, 38),
+		brown: rgb(131, 84, 50),
+		lime: rgb(128, 199, 31),
+		green: rgb(94, 124, 22),
+		lightBlue: rgb(58, 179, 218),
+		cyan: rgb(22, 156, 156),
+		blue: rgb(60, 68, 170),
+		pink: rgb(243, 139, 170),
+		magenta: rgb(199, 78, 189),
+		purple: rgb(137, 50, 184)
+	};
 
 	static maxLayerCount = 7;
 
@@ -58,7 +77,7 @@ export class BannerComponent extends Component {
 
 				const bannerCanvas = new OffscreenCanvas(this.width, this.height);
 				const bannerContext = bannerCanvas.getContext('2d');
-				bannerContext.fillStyle = this.baseColor;
+				bannerContext.fillStyle = BannerComponent.colors[this.baseColor].toValueString();
 				bannerContext.fillRect(0, 0, this.width, this.height);
 
 				const placingCanvas = new OffscreenCanvas(this.width, this.height);
@@ -66,19 +85,16 @@ export class BannerComponent extends Component {
 
 				for (let layer of this.layers) {
 					// use disused source canvas to convert color string to bitmap color value
-					sourceContext.fillStyle = layer.color;
-					sourceContext.fillRect(0, 0, 1, 1);
-
-					const color = sourceContext.getImageData(0, 0, 1, 1);
+					const color = BannerComponent.colors[layer.color];
 					const image = new ImageData(this.width, this.height);
 
 					for (let x = 0; x < this.width; x++) {
 						for (let y = 0; y < this.height; y++) {
 							const intensity = 0xff - sourceData.data[(y * sourceCanvas.width + x + layer.offset * this.width) * 4 + 3];
 
-							image.data[(y * this.width + x) * 4 + 0] = color.data[0];
-							image.data[(y * this.width + x) * 4 + 1] = color.data[1];
-							image.data[(y * this.width + x) * 4 + 2] = color.data[2];
+							image.data[(y * this.width + x) * 4 + 0] = +color.red;
+							image.data[(y * this.width + x) * 4 + 1] = +color.green;
+							image.data[(y * this.width + x) * 4 + 2] = +color.blue;
 							image.data[(y * this.width + x) * 4 + 3] = intensity;
 						}
 					}

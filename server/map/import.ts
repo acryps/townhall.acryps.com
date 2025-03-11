@@ -1,83 +1,73 @@
 import { createHash } from "crypto";
 import { DbContext, MapTile, MapType } from "../managed/database";
 import { Canvas, CanvasRenderingContext2D, loadImage } from "skia-canvas";
+import { Point } from "../../interface/point";
 
 export class MapImporter {
 	static readonly tile = 250;
-	readonly size = 8000;
+	static readonly debounce = 1000 * 30;
 
-	readonly regions = this.size / MapImporter.tile;
+	private static instance: MapImporter;
 
-	private lastMapHash: string;
+	changedRegions: Point[] = [];
 
 	constructor(
-		private type: MapType,
 		private database: DbContext
-	) {}
-
-	static schedule(type: MapType, database: DbContext) {
-		const importer = new MapImporter(type, database);
-
-		const next = () => importer.update()
-			.then(() => setTimeout(() => next(), 1000 * 60 * 5))
-			.catch(error => {
-				console.warn('map import failed', error);
-
-				setTimeout(() => next(), 1000 * 60 * 1);
-			});
-
-		next();
-	}
-
-	async update() {
-		console.log(new Date().toISOString(), 'updating map...');
-
-		const source = Buffer.from(
-			await fetch(`http://minecraft.acryps.com:9941/${this.type == MapType.overworld ? 'map' : 'night'}.png`)
-				.then(response => response.arrayBuffer())
-		);
-
-		// skip re-importing the same map
-		const mapHash = createHash('sha1').update(source).digest('base64');
-
-		if (mapHash == this.lastMapHash) {
-			return;
+	) {
+		if (MapImporter.instance) {
+			throw new Error('Multiple MapImporters running.');
 		}
 
-		console.log(`new map: ${mapHash}`);
+		MapImporter.instance = this;
+	}
 
-		this.lastMapHash = mapHash;
+	// call when a change is suspected at the location
+	static poke(point: Point) {
+		const region = new Point(point.x / MapImporter.tile, point.y / MapImporter.tile).floor();
 
-		const map = await loadImage(source);
+		if (!MapImporter.instance.changedRegions.find(peer => peer.x == region.x && peer.y == region.y)) {
+			MapImporter.instance.changedRegions.push(region);
 
-		const canvas = new Canvas(MapImporter.tile, MapImporter.tile);
-		const context = canvas.getContext('2d');
+			setTimeout(async () => {
+				await MapImporter.instance.update(region);
 
-		const date = new Date();
+				MapImporter.instance.changedRegions.splice(MapImporter.instance.changedRegions.indexOf(region), 1);
+			}, MapImporter.debounce);
+		}
+	}
 
-		for (let x = 0; x < this.regions; x++) {
-			for (let y = 0; y < this.regions; y++) {
-				context.clearRect(0, 0, MapImporter.tile, MapImporter.tile);
-				context.drawImage(map, -x * MapImporter.tile, -y * MapImporter.tile);
+	async update(region: Point) {
+		console.log(`[render] region ${region.x} ${region.y}`);
 
-				const image = await canvas.toBuffer('png');
+		for (let type of [MapType.overworld, MapType.night]) {
+			const source = Buffer.from(
+				await fetch(`http://minecraft.acryps.com:9994/${type == MapType.overworld ? 'day' : 'night'}/${region.x}/${region.y}`)
+					.then(response => response.arrayBuffer())
+			);
 
-				const hash = createHash('sha1').update(image).digest('base64');
+			const tile = await loadImage(source);
 
-				if (await this.database.mapTile.where(tile => tile.hash.valueOf() == hash).count() == 0) {
-					const entry = new MapTile();
-					entry.image = image;
-					entry.regionX = x - this.regions / 2;
-					entry.regionY = y - this.regions / 2;
-					entry.captured = date;
-					entry.hash = hash;
-					entry.complete = !this.hasHoles(context);
-					entry.type = this.type;
+			const canvas = new Canvas(MapImporter.tile, MapImporter.tile);
+			const context = canvas.getContext('2d');
 
-					await entry.create();
+			context.drawImage(tile, 0, 0);
 
-					console.log('+tile', x, y);
-				}
+			const image = await canvas.toBuffer('png');
+			const hash = createHash('sha1').update(image).digest('base64');
+
+			if (await this.database.mapTile.where(tile => tile.hash.valueOf() == hash).count() == 0) {
+				const entry = new MapTile();
+				entry.image = image;
+				entry.regionX = region.x;
+				entry.regionY = region.y;
+				entry.captured = new Date();
+				entry.hash = hash;
+				entry.complete = !this.hasHoles(context);
+				entry.type = type;
+
+				await entry.create();
+
+				console.log(`[render] + ${region.x} ${region.y}`);
 			}
 		}
 	}

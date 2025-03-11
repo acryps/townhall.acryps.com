@@ -35,8 +35,7 @@ DbClient.connectedClient.connect().then(async () => {
 
 	const database = new DbContext(new RunContext());
 
-	MapImporter.schedule(MapType.overworld, database);
-	MapImporter.schedule(MapType.night, database);
+	new MapImporter(database);
 
 	const life = new Life(database);
 	await life.load();

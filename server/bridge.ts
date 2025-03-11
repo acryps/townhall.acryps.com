@@ -1,7 +1,9 @@
 import { JoinMessage, LeaveMessage, Message, MoveMessage } from "../interface";
+import { Point } from "../interface/point";
 import { PlayerViewModel } from "./areas/player.view";
 import { DbContext, Movement, Player } from "./managed/database";
 import { ManagedServer } from "./managed/server";
+import { MapImporter } from "./map/import";
 
 export class GameBridge {
 	constructor(
@@ -61,6 +63,8 @@ export class GameBridge {
 			movement.create();
 
 			response.end();
+
+			MapImporter.poke(new Point(movement.x, movement.y));
 		});
 
 		app.app.get('/in/drive/:uuid/:x/:y', async (request, response) => {

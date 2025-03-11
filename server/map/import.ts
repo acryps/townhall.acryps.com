@@ -5,7 +5,12 @@ import { Point } from "../../interface/point";
 
 export class MapImporter {
 	static readonly tile = 250;
+
 	static readonly debounce = 1000 * 30;
+
+	// the server saves every 600 ticks (30s), but it might take longer
+	// this makes sure that all tiles are saved at some point
+	static readonly sureSaved = 1000 * 60 * 5;
 
 	private static instance: MapImporter;
 
@@ -33,6 +38,8 @@ export class MapImporter {
 
 				MapImporter.instance.changedRegions.splice(MapImporter.instance.changedRegions.indexOf(region), 1);
 			}, MapImporter.debounce);
+
+			setTimeout(() => MapImporter.instance.update(region), MapImporter.sureSaved);
 		}
 	}
 

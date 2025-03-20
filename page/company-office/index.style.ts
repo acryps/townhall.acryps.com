@@ -6,12 +6,16 @@ import { companyStyle } from "./company/index.style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { card } from "../shared/card.style";
 import { topicHeaderStyle } from "../shared/topic-header.style";
+import { officeStyle } from "./office/index.style";
+import { workOfferStyle } from "./work-offer/index.style";
 
 export const companyOfficeStyle = () => child('ui-company-office',
 	boxed(),
 
 	registerCompanyStyle(),
 	companyStyle(),
+	officeStyle(),
+	workOfferStyle(),
 
 	topicHeaderStyle(),
 

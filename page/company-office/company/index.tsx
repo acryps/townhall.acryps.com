@@ -3,6 +3,7 @@ import { CompanyOfficeService, CompanyType, CompanyViewModel } from "../../manag
 import { toSimulatedAge } from "../../../interface/time";
 import { MapComponent } from "../../shared/map";
 import { Point } from "../../../interface/point";
+import { convertToCompanyTypeName } from "./type";
 
 export class CompanyPage extends Component {
 	declare parameters: { tag };
@@ -24,7 +25,9 @@ export class CompanyPage extends Component {
 				{this.company.name}
 			</ui-name>
 
-			{this.renderType()}
+			<ui-type>
+				{convertToCompanyTypeName(this.company)}
+			</ui-type>
 
 			{this.company.purpose && <ui-purpose>
 				{this.company.purpose}
@@ -39,34 +42,14 @@ export class CompanyPage extends Component {
 			</ui-description>
 
 			<ui-offices>
-				{this.company.offices.map(office => <ui-office ui-href={`/property/${office.property.id}`}>
+				{this.company.offices.map(office => <ui-office ui-href={`../../office/${office.id}`}>
 					{new MapComponent().highlight(Point.unpack(office.property.bounds))}
 
 					<ui-name>
 						{office.name}
 					</ui-name>
-
-					<ui-capacity>
-						{office.capacity} worker capacity
-					</ui-capacity>
 				</ui-office>)}
 			</ui-offices>
 		</ui-company>;
-	}
-
-	renderType() {
-		switch (this.company.type) {
-			case CompanyType.company: {
-				return <ui-type>
-					Private Company
-				</ui-type>
-			}
-
-			case CompanyType.company: {
-				return <ui-type>
-					Government Company
-				</ui-type>
-			}
-		}
 	}
 }

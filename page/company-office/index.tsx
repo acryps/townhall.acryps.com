@@ -37,7 +37,7 @@ export class CompanyOfficePage extends Component {
 			<ui-companies>
 				{this.companies.map(company => <ui-company ui-href={`company/${company.tag}`}>
 					<ui-name>
-						{company.name} {CompanyOfficePage.convertCompanyTypeName(company.type)}
+						{company.name}
 					</ui-name>
 
 					{company.purpose && <ui-purpose>
@@ -46,29 +46,5 @@ export class CompanyOfficePage extends Component {
 				</ui-company>)}
 			</ui-companies>
 		</ui-company-office>
-	}
-
-	static convertCompanyTypeName(type: CompanyType) {
-		switch (type) {
-			case CompanyType.company: {
-				return 'Co.';
-			}
-
-			case CompanyType.guild: {
-				return 'Gld.';
-			}
-
-			case CompanyType.nonProfit: {
-				return 'N.p.';
-			}
-
-			case CompanyType.governmentCompany: {
-				return 'Govcom.'
-			}
-
-			case CompanyType.department: {
-				return 'Dep.'
-			}
-		}
 	}
 }

@@ -91,13 +91,30 @@ export class CompanySummaryModel {
 }
 
 export class OfficeSummaryModel {
+	property: PropertySummaryModel;
 	id: string;
 	name: string;
 
 	private static $build(raw) {
 		const item = new OfficeSummaryModel();
+		raw.property === undefined || (item.property = raw.property ? PropertySummaryModel["$build"](raw.property) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		
+		return item;
+	}
+}
+
+export class OfficeCapacityViewModel {
+	id: string;
+	issued: Date;
+	size: number;
+
+	private static $build(raw) {
+		const item = new OfficeCapacityViewModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.issued === undefined || (item.issued = raw.issued ? new Date(raw.issued) : null)
+		raw.size === undefined || (item.size = raw.size === null ? null : +raw.size)
 		
 		return item;
 	}
@@ -280,6 +297,42 @@ export class WaterBodyViewModel {
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.namePath === undefined || (item.namePath = raw.namePath === null ? null : `${raw.namePath}`)
+		
+		return item;
+	}
+}
+
+export class WorkOfferSummaryModel {
+	closed: Date;
+	count: number;
+	id: string;
+	title: string;
+
+	private static $build(raw) {
+		const item = new WorkOfferSummaryModel();
+		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
+		raw.count === undefined || (item.count = raw.count === null ? null : +raw.count)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
+		
+		return item;
+	}
+}
+
+export class WorkContractViewModel {
+	worker: ResidentSummaryModel;
+	canceled: Date;
+	id: string;
+	match: string;
+	signed: Date;
+
+	private static $build(raw) {
+		const item = new WorkContractViewModel();
+		raw.worker === undefined || (item.worker = raw.worker ? ResidentSummaryModel["$build"](raw.worker) : null)
+		raw.canceled === undefined || (item.canceled = raw.canceled ? new Date(raw.canceled) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.match === undefined || (item.match = raw.match === null ? null : `${raw.match}`)
+		raw.signed === undefined || (item.signed = raw.signed ? new Date(raw.signed) : null)
 		
 		return item;
 	}
@@ -801,7 +854,7 @@ export class VoteTickerViewModel {
 }
 
 export class CompanyViewModel {
-	offices: OfficeViewModel[];
+	offices: OfficeSummaryModel[];
 	created: Date;
 	description: string;
 	id: string;
@@ -813,7 +866,7 @@ export class CompanyViewModel {
 
 	private static $build(raw) {
 		const item = new CompanyViewModel();
-		raw.offices === undefined || (item.offices = raw.offices ? raw.offices.map(i => OfficeViewModel["$build"](i)) : null)
+		raw.offices === undefined || (item.offices = raw.offices ? raw.offices.map(i => OfficeSummaryModel["$build"](i)) : null)
 		raw.created === undefined || (item.created = raw.created ? new Date(raw.created) : null)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
@@ -829,18 +882,45 @@ export class CompanyViewModel {
 
 export class OfficeViewModel {
 	company: CompanySummaryModel;
+	capacityGrants: OfficeCapacityViewModel[];
+	workOffers: WorkOfferSummaryModel[];
 	property: PropertySummaryModel;
-	capacity: number;
 	id: string;
 	name: string;
 
 	private static $build(raw) {
 		const item = new OfficeViewModel();
 		raw.company === undefined || (item.company = raw.company ? CompanySummaryModel["$build"](raw.company) : null)
+		raw.capacityGrants === undefined || (item.capacityGrants = raw.capacityGrants ? raw.capacityGrants.map(i => OfficeCapacityViewModel["$build"](i)) : null)
+		raw.workOffers === undefined || (item.workOffers = raw.workOffers ? raw.workOffers.map(i => WorkOfferSummaryModel["$build"](i)) : null)
 		raw.property === undefined || (item.property = raw.property ? PropertySummaryModel["$build"](raw.property) : null)
-		raw.capacity === undefined || (item.capacity = raw.capacity === null ? null : +raw.capacity)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		
+		return item;
+	}
+}
+
+export class WorkOfferViewModel {
+	workContracts: WorkContractViewModel[];
+	office: OfficeViewModel;
+	closed: Date;
+	count: number;
+	id: string;
+	offered: Date;
+	task: string;
+	title: string;
+
+	private static $build(raw) {
+		const item = new WorkOfferViewModel();
+		raw.workContracts === undefined || (item.workContracts = raw.workContracts ? raw.workContracts.map(i => WorkContractViewModel["$build"](i)) : null)
+		raw.office === undefined || (item.office = raw.office ? OfficeViewModel["$build"](raw.office) : null)
+		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
+		raw.count === undefined || (item.count = raw.count === null ? null : +raw.count)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.offered === undefined || (item.offered = raw.offered ? new Date(raw.offered) : null)
+		raw.task === undefined || (item.task = raw.task === null ? null : `${raw.task}`)
+		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
 		
 		return item;
 	}
@@ -1308,6 +1388,48 @@ export class CompanyOfficeService {
 				const d = r.data;
 
 				return d === null ? null : CompanyViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getOffice(id: string): Promise<OfficeViewModel> {
+		const $data = new FormData();
+		$data.append("lpOWp4Z3Rzenc1YWdzejttZGZmcnI5Zz", Service.stringify(id))
+
+		return await fetch(Service.toURL("Y4ZDhseWFuYXZib3g2cjgycjQ4aD91Nz"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : OfficeViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getWorkOffer(id: string): Promise<WorkOfferViewModel> {
+		const $data = new FormData();
+		$data.append("M1dmQ1MWM4dDFqOTVjYTVzd2ZzcXhvbX", Service.stringify(id))
+
+		return await fetch(Service.toURL("VyOGRxMXZndXV6Mj1vN2lqZ2U2dGllMz"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : WorkOfferViewModel["$build"](d);
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

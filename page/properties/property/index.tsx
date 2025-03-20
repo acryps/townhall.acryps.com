@@ -8,6 +8,7 @@ import { addIcon, deleteIcon, drawIcon } from "../../assets/icons/managed";
 import { MetaGovernmentBuilding, MetaPlace } from "@acryps/metadata";
 import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
 import { CompanyOfficePage } from "../../company-office";
+import { convertToLegalCompanyName } from "../../company-office/company/type";
 
 export class PropertyPage extends Component {
 	declare parameters: { id: string };
@@ -113,13 +114,13 @@ export class PropertyPage extends Component {
 
 			<ui-offices>
 				{this.property.offices.map(office => <ui-office>
+					<ui-company ui-href={`/company-office/company/${office.company.tag}`}>
+						{convertToLegalCompanyName(office.company)}
+					</ui-company>
+
 					<ui-name>
 						{office.name ?? office.id.split('-')[0]}
 					</ui-name>
-
-					<ui-company ui-href={`/company-office/company/${office.company.tag}`}>
-						{office.company.name} {CompanyOfficePage.convertCompanyTypeName(office.company.type)}
-					</ui-company>
 				</ui-office>)}
 
 				<ui-action ui-href={`/company-office/register/${this.property.id}`}>

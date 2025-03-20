@@ -91,13 +91,13 @@ export const propertyStyle = () => child('ui-property',
 
 			borderBottom(px(1), 'dotted', 'currentColor'),
 
-			child('ui-name',
+			child('ui-company',
 				display('block'),
 
 				fontWeight('bold')
 			),
 
-			child('ui-company',
+			child('ui-name',
 				display('block')
 			)
 		),

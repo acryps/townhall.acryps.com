@@ -43,8 +43,15 @@ export interface CompanySummaryModel {
 }
 
 export interface OfficeSummaryModel {
-    id: string;
+    property: PropertySummaryModel;
+	id: string;
 	name: string;
+}
+
+export interface OfficeCapacityViewModel {
+    id: string;
+	issued: Date;
+	size: number;
 }
 
 export interface HistoryEntryViewModel {
@@ -121,6 +128,21 @@ export interface WaterBodyViewModel {
 	id: string;
 	name: string;
 	namePath: string;
+}
+
+export interface WorkOfferSummaryModel {
+    closed: Date;
+	count: number;
+	id: string;
+	title: string;
+}
+
+export interface WorkContractViewModel {
+    worker: ResidentSummaryModel;
+	canceled: Date;
+	id: string;
+	match: string;
+	signed: Date;
 }
 
 export interface HistoricListingGradeViewModel {
@@ -338,7 +360,7 @@ export interface VoteTickerViewModel {
 }
 
 export interface CompanyViewModel {
-    offices: OfficeViewModel[];
+    offices: OfficeSummaryModel[];
 	created: Date;
 	description: string;
 	id: string;
@@ -351,10 +373,22 @@ export interface CompanyViewModel {
 
 export interface OfficeViewModel {
     company: CompanySummaryModel;
+	capacityGrants: OfficeCapacityViewModel[];
+	workOffers: WorkOfferSummaryModel[];
 	property: PropertySummaryModel;
-	capacity: number;
 	id: string;
 	name: string;
+}
+
+export interface WorkOfferViewModel {
+    workContracts: WorkContractViewModel[];
+	office: OfficeViewModel;
+	closed: Date;
+	count: number;
+	id: string;
+	offered: Date;
+	task: string;
+	title: string;
 }
 
 export interface LawHouseSessionViewModel {

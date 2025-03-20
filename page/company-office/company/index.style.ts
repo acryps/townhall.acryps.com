@@ -69,15 +69,7 @@ export const companyStyle = () => child('ui-company',
 
 			child('ui-name',
 				display('block'),
-				margin(rem(1)),
-
-				fontWeight('bold')
-			),
-
-			child('ui-capacity',
-				display('block'),
-				marginInline(rem(1)),
-				marginBottom(rem(1))
+				margin(rem(1))
 			)
 		)
 	)

@@ -30,6 +30,8 @@ import { RegisterCompanyPage } from "./company-office/register";
 import { CompanyPage } from "./company-office/company";
 import { CreateFeaturePage } from "./map/create";
 import { Rewrite } from '@acryps/rewrite';
+import { OfficePage } from "./company-office/office";
+import { WorkOfferPage } from "./company-office/work-offer";
 
 export class Application {
 	static router: Router;
@@ -88,6 +90,8 @@ export class Application {
 				.route('/company-office', CompanyOfficePage
 					.route('/register/:firstOfficeId', RegisterCompanyPage)
 					.route('/company/:tag', CompanyPage)
+					.route('/office/:id', OfficePage)
+					.route('/work-offer/:id', WorkOfferPage)
 				)
 
 				.route('/create-banner', CreateBannerComponent)

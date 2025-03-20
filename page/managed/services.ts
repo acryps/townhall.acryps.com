@@ -1708,6 +1708,46 @@ export class LifeService {
 }
 
 export class PropertyService {
+	async nextUnreviewed(): Promise<PropertyViewModel> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("JiYXt4OWF4bDIxNmFxNTBtMGV3cmlxdm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : PropertyViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async reviewDone(id: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("J1eDhsazM2dW03Z2Zycz5tM2g0YWZhcT", Service.stringify(id))
+
+		return await fetch(Service.toURL("lrZWFwNmRnZDplYWN1cjM3bGJ0YmU2dG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
 	async createDwelling(propertyId: string): Promise<PropertyDwellingViewModel> {
 		const $data = new FormData();
 		$data.append("p2dHJxa2BodTR6NDZodDIxYWEyejlia2", Service.stringify(propertyId))

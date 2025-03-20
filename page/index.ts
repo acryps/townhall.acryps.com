@@ -30,6 +30,7 @@ import { RegisterCompanyPage } from "./company-office/register";
 import { CompanyPage } from "./company-office/company";
 import { CreateFeaturePage } from "./map/create";
 import { Rewrite } from '@acryps/rewrite';
+import { ReviewCompanyPage } from "./__review";
 
 export class Application {
 	static router: Router;
@@ -60,6 +61,8 @@ export class Application {
 
 				.route('/properties', PropertiesComponent)
 				.route('/property/:id', PropertyPage)
+
+				.route('/review-company', ReviewCompanyPage)
 
 				.route('/borough/:tag', BoroughPage)
 

@@ -77,7 +77,7 @@ export class BannerComponent extends Component {
 
 				const bannerCanvas = new OffscreenCanvas(this.width, this.height);
 				const bannerContext = bannerCanvas.getContext('2d');
-				bannerContext.fillStyle = BannerComponent.colors[this.baseColor].toValueString();
+				bannerContext.fillStyle = (BannerComponent.colors[this.baseColor] ?? BannerComponent.colors.white).toValueString();
 				bannerContext.fillRect(0, 0, this.width, this.height);
 
 				const placingCanvas = new OffscreenCanvas(this.width, this.height);

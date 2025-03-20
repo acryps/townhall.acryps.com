@@ -113,7 +113,7 @@ export class PropertyPage extends Component {
 			</ui-dwellings>
 
 			<ui-offices>
-				{this.property.offices.map(office => <ui-office>
+				{this.property.offices.map(office => <ui-office ui-href={`/company-office/office/${office.id}`}>
 					<ui-company ui-href={`/company-office/company/${office.company.tag}`}>
 						{convertToLegalCompanyName(office.company)}
 					</ui-company>

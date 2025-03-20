@@ -490,7 +490,6 @@ export class CompanyQueryProxy extends QueryProxy {
 
 export class Company extends Entity<CompanyQueryProxy> {
 	offices: PrimaryReference<Office, OfficeQueryProxy>;
-		workOffers: PrimaryReference<WorkOffer, WorkOfferQueryProxy>;
 		created: Date;
 	description: string;
 	declare id: string;
@@ -521,7 +520,6 @@ export class Company extends Entity<CompanyQueryProxy> {
 		super();
 		
 		this.offices = new PrimaryReference<Office, OfficeQueryProxy>(this, "companyId", Office);
-		this.workOffers = new PrimaryReference<WorkOffer, WorkOfferQueryProxy>(this, "employerId", WorkOffer);
 	}
 }
 			
@@ -1002,7 +1000,6 @@ export class Movement extends Entity<MovementQueryProxy> {
 export class OfficeQueryProxy extends QueryProxy {
 	get company(): Partial<CompanyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get property(): Partial<PropertyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get capacity(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get closed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get companyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -1012,8 +1009,9 @@ export class OfficeQueryProxy extends QueryProxy {
 
 export class Office extends Entity<OfficeQueryProxy> {
 	get company(): Partial<ForeignReference<Company>> { return this.$company; }
-	get property(): Partial<ForeignReference<Property>> { return this.$property; }
-	capacity: number;
+	capacityGrants: PrimaryReference<OfficeCapacity, OfficeCapacityQueryProxy>;
+		workOffers: PrimaryReference<WorkOffer, WorkOfferQueryProxy>;
+		get property(): Partial<ForeignReference<Property>> { return this.$property; }
 	closed: Date;
 	companyId: string;
 	declare id: string;
@@ -1024,7 +1022,6 @@ export class Office extends Entity<OfficeQueryProxy> {
 	$$meta = {
 		source: "office",
 		columns: {
-			capacity: { type: "int4", name: "capacity" },
 			closed: { type: "timestamp", name: "closed" },
 			companyId: { type: "uuid", name: "company_id" },
 			id: { type: "uuid", name: "id" },
@@ -1041,7 +1038,9 @@ export class Office extends Entity<OfficeQueryProxy> {
 		super();
 		
 		this.$company = new ForeignReference<Company>(this, "companyId", Company);
-	this.$property = new ForeignReference<Property>(this, "propertyId", Property);
+	this.capacityGrants = new PrimaryReference<OfficeCapacity, OfficeCapacityQueryProxy>(this, "officeId", OfficeCapacity);
+		this.workOffers = new PrimaryReference<WorkOffer, WorkOfferQueryProxy>(this, "officeId", WorkOffer);
+		this.$property = new ForeignReference<Property>(this, "propertyId", Property);
 	}
 	
 	private $company: ForeignReference<Company>;
@@ -1065,6 +1064,54 @@ export class Office extends Entity<OfficeQueryProxy> {
 			this.propertyId = value.id as string;
 		} else {
 			this.propertyId = null;
+		}
+	}
+
+	
+}
+			
+export class OfficeCapacityQueryProxy extends QueryProxy {
+	get office(): Partial<OfficeQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get issued(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get officeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get size(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class OfficeCapacity extends Entity<OfficeCapacityQueryProxy> {
+	get office(): Partial<ForeignReference<Office>> { return this.$office; }
+	declare id: string;
+	issued: Date;
+	officeId: string;
+	size: number;
+	
+	$$meta = {
+		source: "office_capacity",
+		columns: {
+			id: { type: "uuid", name: "id" },
+			issued: { type: "timestamp", name: "issued" },
+			officeId: { type: "uuid", name: "office_id" },
+			size: { type: "int4", name: "size" }
+		},
+		get set(): DbSet<OfficeCapacity, OfficeCapacityQueryProxy> { 
+			return new DbSet<OfficeCapacity, OfficeCapacityQueryProxy>(OfficeCapacity, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$office = new ForeignReference<Office>(this, "officeId", Office);
+	}
+	
+	private $office: ForeignReference<Office>;
+
+	set office(value: Partial<ForeignReference<Office>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.officeId = value.id as string;
+		} else {
+			this.officeId = null;
 		}
 	}
 
@@ -1126,6 +1173,7 @@ export class PropertyQueryProxy extends QueryProxy {
 	get historicListingRegisteredAt(): Partial<QueryDate> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get ownerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get reviewCompany(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get typeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
@@ -1147,6 +1195,7 @@ export class Property extends Entity<PropertyQueryProxy> {
 	declare id: string;
 	name: string;
 	ownerId: string;
+	reviewCompany: boolean;
 	typeId: string;
 	
 	$$meta = {
@@ -1162,6 +1211,7 @@ export class Property extends Entity<PropertyQueryProxy> {
 			id: { type: "uuid", name: "id" },
 			name: { type: "text", name: "name" },
 			ownerId: { type: "uuid", name: "owner_id" },
+			reviewCompany: { type: "bool", name: "review_company" },
 			typeId: { type: "uuid", name: "type_id" }
 		},
 		get set(): DbSet<Property, PropertyQueryProxy> { 
@@ -1401,13 +1451,13 @@ export class ResidentQueryProxy extends QueryProxy {
 }
 
 export class Resident extends Entity<ResidentQueryProxy> {
-	workContracts: PrimaryReference<WorkContract, WorkContractQueryProxy>;
-		get figure(): Partial<ForeignReference<ResidentFigure>> { return this.$figure; }
+	get figure(): Partial<ForeignReference<ResidentFigure>> { return this.$figure; }
 	tenancies: PrimaryReference<Tenancy, TenancyQueryProxy>;
 		get mainTenancy(): Partial<ForeignReference<Tenancy>> { return this.$mainTenancy; }
 	appointedLawHouseSessions: PrimaryReference<LawHouseSessionary, LawHouseSessionaryQueryProxy>;
 		chats: PrimaryReference<Chat, ChatQueryProxy>;
 		votes: PrimaryReference<Vote, VoteQueryProxy>;
+		workContracts: PrimaryReference<WorkContract, WorkContractQueryProxy>;
 		biography: string;
 	birthday: Date;
 	familyName: string;
@@ -1439,13 +1489,13 @@ export class Resident extends Entity<ResidentQueryProxy> {
 	constructor() {
 		super();
 		
-		this.workContracts = new PrimaryReference<WorkContract, WorkContractQueryProxy>(this, "employeeId", WorkContract);
 		this.$figure = new ForeignReference<ResidentFigure>(this, "figureId", ResidentFigure);
 	this.tenancies = new PrimaryReference<Tenancy, TenancyQueryProxy>(this, "inhabitantId", Tenancy);
 		this.$mainTenancy = new ForeignReference<Tenancy>(this, "mainTenancyId", Tenancy);
 	this.appointedLawHouseSessions = new PrimaryReference<LawHouseSessionary, LawHouseSessionaryQueryProxy>(this, "residentId", LawHouseSessionary);
 		this.chats = new PrimaryReference<Chat, ChatQueryProxy>(this, "residentId", Chat);
 		this.votes = new PrimaryReference<Vote, VoteQueryProxy>(this, "residentId", Vote);
+		this.workContracts = new PrimaryReference<WorkContract, WorkContractQueryProxy>(this, "workerId", WorkContract);
 	}
 	
 	private $figure: ForeignReference<ResidentFigure>;
@@ -2007,31 +2057,34 @@ export class WaterBody extends Entity<WaterBodyQueryProxy> {
 }
 			
 export class WorkContractQueryProxy extends QueryProxy {
-	get employee(): Partial<ResidentQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get offer(): Partial<WorkOfferQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get employeeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get ended(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get worker(): Partial<ResidentQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get canceled(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get match(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get offerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get started(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get signed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get workerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class WorkContract extends Entity<WorkContractQueryProxy> {
-	get employee(): Partial<ForeignReference<Resident>> { return this.$employee; }
 	get offer(): Partial<ForeignReference<WorkOffer>> { return this.$offer; }
-	employeeId: string;
-	ended: Date;
+	get worker(): Partial<ForeignReference<Resident>> { return this.$worker; }
+	canceled: Date;
 	declare id: string;
+	match: string;
 	offerId: string;
-	started: Date;
+	signed: Date;
+	workerId: string;
 	
 	$$meta = {
 		source: "work_contract",
 		columns: {
-			employeeId: { type: "uuid", name: "employee_id" },
-			ended: { type: "timestamp", name: "ended" },
+			canceled: { type: "timestamp", name: "canceled" },
 			id: { type: "uuid", name: "id" },
+			match: { type: "text", name: "match" },
 			offerId: { type: "uuid", name: "offer_id" },
-			started: { type: "timestamp", name: "started" }
+			signed: { type: "timestamp", name: "signed" },
+			workerId: { type: "uuid", name: "worker_id" }
 		},
 		get set(): DbSet<WorkContract, WorkContractQueryProxy> { 
 			return new DbSet<WorkContract, WorkContractQueryProxy>(WorkContract, null);
@@ -2041,22 +2094,10 @@ export class WorkContract extends Entity<WorkContractQueryProxy> {
 	constructor() {
 		super();
 		
-		this.$employee = new ForeignReference<Resident>(this, "employeeId", Resident);
-	this.$offer = new ForeignReference<WorkOffer>(this, "offerId", WorkOffer);
+		this.$offer = new ForeignReference<WorkOffer>(this, "offerId", WorkOffer);
+	this.$worker = new ForeignReference<Resident>(this, "workerId", Resident);
 	}
 	
-	private $employee: ForeignReference<Resident>;
-
-	set employee(value: Partial<ForeignReference<Resident>>) {
-		if (value) {
-			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
-
-			this.employeeId = value.id as string;
-		} else {
-			this.employeeId = null;
-		}
-	}
-
 	private $offer: ForeignReference<WorkOffer>;
 
 	set offer(value: Partial<ForeignReference<WorkOffer>>) {
@@ -2069,34 +2110,52 @@ export class WorkContract extends Entity<WorkContractQueryProxy> {
 		}
 	}
 
+	private $worker: ForeignReference<Resident>;
+
+	set worker(value: Partial<ForeignReference<Resident>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.workerId = value.id as string;
+		} else {
+			this.workerId = null;
+		}
+	}
+
 	
 }
 			
 export class WorkOfferQueryProxy extends QueryProxy {
-	get employer(): Partial<CompanyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get employerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get job(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get targetCount(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get office(): Partial<OfficeQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get closed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get count(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get offered(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get officeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get task(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get title(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class WorkOffer extends Entity<WorkOfferQueryProxy> {
-	get employer(): Partial<ForeignReference<Company>> { return this.$employer; }
-	contracts: PrimaryReference<WorkContract, WorkContractQueryProxy>;
-		description: string;
-	employerId: string;
+	workContracts: PrimaryReference<WorkContract, WorkContractQueryProxy>;
+		get office(): Partial<ForeignReference<Office>> { return this.$office; }
+	closed: Date;
+	count: number;
 	declare id: string;
-	job: string;
-	targetCount: number;
+	offered: Date;
+	officeId: string;
+	task: string;
+	title: string;
 	
 	$$meta = {
 		source: "work_offer",
 		columns: {
-			description: { type: "text", name: "description" },
-			employerId: { type: "uuid", name: "employer_id" },
+			closed: { type: "timestamp", name: "closed" },
+			count: { type: "int4", name: "count" },
 			id: { type: "uuid", name: "id" },
-			job: { type: "text", name: "job" },
-			targetCount: { type: "int4", name: "target_count" }
+			offered: { type: "timestamp", name: "offered" },
+			officeId: { type: "uuid", name: "office_id" },
+			task: { type: "text", name: "task" },
+			title: { type: "text", name: "title" }
 		},
 		get set(): DbSet<WorkOffer, WorkOfferQueryProxy> { 
 			return new DbSet<WorkOffer, WorkOfferQueryProxy>(WorkOffer, null);
@@ -2106,19 +2165,19 @@ export class WorkOffer extends Entity<WorkOfferQueryProxy> {
 	constructor() {
 		super();
 		
-		this.$employer = new ForeignReference<Company>(this, "employerId", Company);
-	this.contracts = new PrimaryReference<WorkContract, WorkContractQueryProxy>(this, "offerId", WorkContract);
+		this.workContracts = new PrimaryReference<WorkContract, WorkContractQueryProxy>(this, "offerId", WorkContract);
+		this.$office = new ForeignReference<Office>(this, "officeId", Office);
 	}
 	
-	private $employer: ForeignReference<Company>;
+	private $office: ForeignReference<Office>;
 
-	set employer(value: Partial<ForeignReference<Company>>) {
+	set office(value: Partial<ForeignReference<Office>>) {
 		if (value) {
 			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
 
-			this.employerId = value.id as string;
+			this.officeId = value.id as string;
 		} else {
-			this.employerId = null;
+			this.officeId = null;
 		}
 	}
 
@@ -2180,6 +2239,7 @@ export class DbContext {
 	mapTile: DbSet<MapTile, MapTileQueryProxy>;
 	movement: DbSet<Movement, MovementQueryProxy>;
 	office: DbSet<Office, OfficeQueryProxy>;
+	officeCapacity: DbSet<OfficeCapacity, OfficeCapacityQueryProxy>;
 	player: DbSet<Player, PlayerQueryProxy>;
 	property: DbSet<Property, PropertyQueryProxy>;
 	propertyHistoricListingModifier: DbSet<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>;
@@ -2221,6 +2281,7 @@ export class DbContext {
 		this.mapTile = new DbSet<MapTile, MapTileQueryProxy>(MapTile, this.runContext);
 		this.movement = new DbSet<Movement, MovementQueryProxy>(Movement, this.runContext);
 		this.office = new DbSet<Office, OfficeQueryProxy>(Office, this.runContext);
+		this.officeCapacity = new DbSet<OfficeCapacity, OfficeCapacityQueryProxy>(OfficeCapacity, this.runContext);
 		this.player = new DbSet<Player, PlayerQueryProxy>(Player, this.runContext);
 		this.property = new DbSet<Property, PropertyQueryProxy>(Property, this.runContext);
 		this.propertyHistoricListingModifier = new DbSet<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>(PropertyHistoricListingModifier, this.runContext);

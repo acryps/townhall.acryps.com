@@ -1,7 +1,8 @@
 import { DbClient } from "vlquery";
 import { Service } from "vlserver";
 import { Company, CompanyType, DbContext, Office } from "../../managed/database";
-import { CompanySummaryModel, CompanyViewModel } from "../company.view";
+import { CompanySummaryModel, CompanyViewModel, OfficeViewModel } from "../company.view";
+import { WorkOfferViewModel } from "../work";
 
 export class CompanyOfficeService extends Service {
 	constructor(
@@ -12,6 +13,14 @@ export class CompanyOfficeService extends Service {
 
 	async find(tag: string) {
 		return new CompanyViewModel(await this.database.company.first(company => company.tag.valueOf() == tag));
+	}
+
+	async getOffice(id: string) {
+		return new OfficeViewModel(await this.database.office.find(id));
+	}
+
+	async getWorkOffer(id: string) {
+		return new WorkOfferViewModel(await this.database.workOffer.find(id));
 	}
 
 	async getCompanies() {

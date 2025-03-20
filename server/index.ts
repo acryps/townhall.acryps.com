@@ -21,6 +21,7 @@ import { MovementTileServer } from "./map/layers/heatmap/movement";
 import { PropertyUsageTileServer } from "./map/layers/shape/usage";
 import { ImpressionImageInterface } from "./areas/impressions/interface";
 import { StreetTileServer } from "./map/layers/shape/street";
+import { createWorkOffers } from "./life/work/offers";
 
 const runLife = process.env.RUN_LIFE == 'YES';
 
@@ -34,7 +35,6 @@ DbClient.connectedClient.connect().then(async () => {
 	ws(app.app);
 
 	const database = new DbContext(new RunContext());
-
 	new MapImporter(database);
 
 	const life = new Life(database);
@@ -45,6 +45,14 @@ DbClient.connectedClient.connect().then(async () => {
 	if (runLife) {
 		lawHouse.schedule();
 		life.vote();
+
+		(async () => {
+			for (let company of await database.company.toArray()) {
+				for (let office of await company.offices.toArray()) {
+					await createWorkOffers(office);
+				}
+			}
+		})();
 	}
 
 	// add missing figures

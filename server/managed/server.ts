@@ -22,6 +22,8 @@ import { CompanyType } from "././database";
 import { Office } from "././database";
 import { CompanySummaryModel } from "././../areas/company.view";
 import { CompanyViewModel } from "././../areas/company.view";
+import { OfficeViewModel } from "././../areas/company.view";
+import { WorkOfferViewModel } from "././../areas/work";
 import { CompanyOfficeService } from "././../areas/company-office/service";
 import { PlayerViewModel } from "././../areas/player.view";
 import { GameService } from "././../areas/game/game.service";
@@ -64,7 +66,10 @@ import { VoteTickerViewModel } from "././../areas/vote/vote";
 import { VoteViewModel } from "././../areas/vote/vote";
 import { VoteService } from "././../areas/vote/service";
 import { OfficeSummaryModel } from "./../areas/company.view";
+import { OfficeCapacityViewModel } from "./../areas/company.view";
 import { TenantViewModel } from "./../areas/property.view";
+import { WorkOfferSummaryModel } from "./../areas/work";
+import { WorkContractViewModel } from "./../areas/work";
 import { LawHouseSessionaryViewModel } from "./../areas/law-house/session";
 import { LawHouseSessionProtocolViewModel } from "./../areas/law-house/session";
 import { TenancyViewModel } from "./../areas/life/resident";
@@ -73,8 +78,8 @@ import { PublicationSummaryModel } from "./../areas/publication/publication";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { HonestiumViewModel } from "./../areas/vote/bill";
-import { OfficeViewModel } from "./../areas/company.view";
 import { Bridge } from "./../managed/database";
+import { OfficeCapacity } from "./../managed/database";
 import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
 import { PropertyType } from "./../managed/database";
@@ -82,6 +87,8 @@ import { Tenancy } from "./../managed/database";
 import { Square } from "./../managed/database";
 import { Street } from "./../managed/database";
 import { WaterBody } from "./../managed/database";
+import { WorkOffer } from "./../managed/database";
+import { WorkContract } from "./../managed/database";
 import { HistoricListingGrade } from "./../managed/database";
 import { HistoricListingModifier } from "./../managed/database";
 import { Impression } from "./../managed/database";
@@ -366,6 +373,28 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(CompanyOfficeService),
 			(controller, params) => controller.find(
 				params["FodnMycHpnOHlsbmVqbzdwa2BsbHl3M3"]
+			)
+		);
+
+		this.expose(
+			"Y4ZDhseWFuYXZib3g2cjgycjQ4aD91Nz",
+			{
+			"lpOWp4Z3Rzenc1YWdzejttZGZmcnI5Zz": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(CompanyOfficeService),
+			(controller, params) => controller.getOffice(
+				params["lpOWp4Z3Rzenc1YWdzejttZGZmcnI5Zz"]
+			)
+		);
+
+		this.expose(
+			"VyOGRxMXZndXV6Mj1vN2lqZ2U2dGllMz",
+			{
+			"M1dmQ1MWM4dDFqOTVjYTVzd2ZzcXhvbX": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(CompanyOfficeService),
+			(controller, params) => controller.getWorkOffer(
+				params["M1dmQ1MWM4dDFqOTVjYTVzd2ZzcXhvbX"]
 			)
 		);
 
@@ -1082,6 +1111,7 @@ ViewModel.mappings = {
 	[OfficeSummaryModel.name]: class ComposedOfficeSummaryModel extends OfficeSummaryModel {
 		async map() {
 			return {
+				property: new PropertySummaryModel(await BaseServer.unwrap(this.$$model.property)),
 				id: this.$$model.id,
 				name: this.$$model.name
 			}
@@ -1113,6 +1143,12 @@ ViewModel.mappings = {
 			}
 
 			return {
+				get property() {
+					return ViewModel.mappings[PropertySummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "property-OfficeSummaryModel"]
+					);
+				},
 				id: true,
 				name: true
 			};
@@ -1120,6 +1156,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new OfficeSummaryModel(null);
+			"property" in data && (item.property = data.property && ViewModel.mappings[PropertySummaryModel.name].toViewModel(data.property));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 
@@ -1135,8 +1172,75 @@ ViewModel.mappings = {
 				model = new Office();
 			}
 			
+			"property" in viewModel && (model.property.id = viewModel.property ? viewModel.property.id : null);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+
+			return model;
+		}
+	},
+	[OfficeCapacityViewModel.name]: class ComposedOfficeCapacityViewModel extends OfficeCapacityViewModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				issued: this.$$model.issued,
+				size: this.$$model.size
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				issued: true,
+				size: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new OfficeCapacityViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"issued" in data && (item.issued = data.issued === null ? null : new Date(data.issued));
+			"size" in data && (item.size = data.size === null ? null : +data.size);
+
+			return item;
+		}
+
+		static async toModel(viewModel: OfficeCapacityViewModel) {
+			let model: OfficeCapacity;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(OfficeCapacity).find(viewModel.id)
+			} else {
+				model = new OfficeCapacity();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"issued" in viewModel && (model.issued = viewModel.issued === null ? null : new Date(viewModel.issued));
+			"size" in viewModel && (model.size = viewModel.size === null ? null : +viewModel.size);
 
 			return model;
 		}
@@ -1925,6 +2029,155 @@ ViewModel.mappings = {
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"namePath" in viewModel && (model.namePath = viewModel.namePath === null ? null : `${viewModel.namePath}`);
+
+			return model;
+		}
+	},
+	[WorkOfferSummaryModel.name]: class ComposedWorkOfferSummaryModel extends WorkOfferSummaryModel {
+		async map() {
+			return {
+				closed: this.$$model.closed,
+				count: this.$$model.count,
+				id: this.$$model.id,
+				title: this.$$model.title
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				closed: true,
+				count: true,
+				id: true,
+				title: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new WorkOfferSummaryModel(null);
+			"closed" in data && (item.closed = data.closed === null ? null : new Date(data.closed));
+			"count" in data && (item.count = data.count === null ? null : +data.count);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: WorkOfferSummaryModel) {
+			let model: WorkOffer;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(WorkOffer).find(viewModel.id)
+			} else {
+				model = new WorkOffer();
+			}
+			
+			"closed" in viewModel && (model.closed = viewModel.closed === null ? null : new Date(viewModel.closed));
+			"count" in viewModel && (model.count = viewModel.count === null ? null : +viewModel.count);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
+
+			return model;
+		}
+	},
+	[WorkContractViewModel.name]: class ComposedWorkContractViewModel extends WorkContractViewModel {
+		async map() {
+			return {
+				worker: new ResidentSummaryModel(await BaseServer.unwrap(this.$$model.worker)),
+				canceled: this.$$model.canceled,
+				id: this.$$model.id,
+				match: this.$$model.match,
+				signed: this.$$model.signed
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get worker() {
+					return ViewModel.mappings[ResidentSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "worker-WorkContractViewModel"]
+					);
+				},
+				canceled: true,
+				id: true,
+				match: true,
+				signed: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new WorkContractViewModel(null);
+			"worker" in data && (item.worker = data.worker && ViewModel.mappings[ResidentSummaryModel.name].toViewModel(data.worker));
+			"canceled" in data && (item.canceled = data.canceled === null ? null : new Date(data.canceled));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"match" in data && (item.match = data.match === null ? null : `${data.match}`);
+			"signed" in data && (item.signed = data.signed === null ? null : new Date(data.signed));
+
+			return item;
+		}
+
+		static async toModel(viewModel: WorkContractViewModel) {
+			let model: WorkContract;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(WorkContract).find(viewModel.id)
+			} else {
+				model = new WorkContract();
+			}
+			
+			"worker" in viewModel && (model.worker.id = viewModel.worker ? viewModel.worker.id : null);
+			"canceled" in viewModel && (model.canceled = viewModel.canceled === null ? null : new Date(viewModel.canceled));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"match" in viewModel && (model.match = viewModel.match === null ? null : `${viewModel.match}`);
+			"signed" in viewModel && (model.signed = viewModel.signed === null ? null : new Date(viewModel.signed));
 
 			return model;
 		}
@@ -4085,7 +4338,7 @@ ViewModel.mappings = {
 	[CompanyViewModel.name]: class ComposedCompanyViewModel extends CompanyViewModel {
 		async map() {
 			return {
-				offices: (await this.$$model.offices.includeTree(ViewModel.mappings[OfficeViewModel.name].items).toArray()).map(item => new OfficeViewModel(item)),
+				offices: (await this.$$model.offices.includeTree(ViewModel.mappings[OfficeSummaryModel.name].items).toArray()).map(item => new OfficeSummaryModel(item)),
 				created: this.$$model.created,
 				description: this.$$model.description,
 				id: this.$$model.id,
@@ -4124,7 +4377,7 @@ ViewModel.mappings = {
 
 			return {
 				get offices() {
-					return ViewModel.mappings[OfficeViewModel.name].getPrefetchingProperties(
+					return ViewModel.mappings[OfficeSummaryModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "offices-CompanyViewModel"]
 					);
@@ -4142,7 +4395,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new CompanyViewModel(null);
-			"offices" in data && (item.offices = data.offices && [...data.offices].map(i => ViewModel.mappings[OfficeViewModel.name].toViewModel(i)));
+			"offices" in data && (item.offices = data.offices && [...data.offices].map(i => ViewModel.mappings[OfficeSummaryModel.name].toViewModel(i)));
 			"created" in data && (item.created = data.created === null ? null : new Date(data.created));
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
@@ -4181,8 +4434,9 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				company: new CompanySummaryModel(await BaseServer.unwrap(this.$$model.company)),
+				capacityGrants: (await this.$$model.capacityGrants.includeTree(ViewModel.mappings[OfficeCapacityViewModel.name].items).toArray()).map(item => new OfficeCapacityViewModel(item)),
+				workOffers: (await this.$$model.workOffers.includeTree(ViewModel.mappings[WorkOfferSummaryModel.name].items).toArray()).map(item => new WorkOfferSummaryModel(item)),
 				property: new PropertySummaryModel(await BaseServer.unwrap(this.$$model.property)),
-				capacity: this.$$model.capacity,
 				id: this.$$model.id,
 				name: this.$$model.name
 			}
@@ -4220,13 +4474,24 @@ ViewModel.mappings = {
 						[...parents, "company-OfficeViewModel"]
 					);
 				},
+				get capacityGrants() {
+					return ViewModel.mappings[OfficeCapacityViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "capacityGrants-OfficeViewModel"]
+					);
+				},
+				get workOffers() {
+					return ViewModel.mappings[WorkOfferSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "workOffers-OfficeViewModel"]
+					);
+				},
 				get property() {
 					return ViewModel.mappings[PropertySummaryModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "property-OfficeViewModel"]
 					);
 				},
-				capacity: true,
 				id: true,
 				name: true
 			};
@@ -4235,8 +4500,9 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new OfficeViewModel(null);
 			"company" in data && (item.company = data.company && ViewModel.mappings[CompanySummaryModel.name].toViewModel(data.company));
+			"capacityGrants" in data && (item.capacityGrants = data.capacityGrants && [...data.capacityGrants].map(i => ViewModel.mappings[OfficeCapacityViewModel.name].toViewModel(i)));
+			"workOffers" in data && (item.workOffers = data.workOffers && [...data.workOffers].map(i => ViewModel.mappings[WorkOfferSummaryModel.name].toViewModel(i)));
 			"property" in data && (item.property = data.property && ViewModel.mappings[PropertySummaryModel.name].toViewModel(data.property));
-			"capacity" in data && (item.capacity = data.capacity === null ? null : +data.capacity);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 
@@ -4253,10 +4519,107 @@ ViewModel.mappings = {
 			}
 			
 			"company" in viewModel && (model.company.id = viewModel.company ? viewModel.company.id : null);
+			"capacityGrants" in viewModel && (null);
+			"workOffers" in viewModel && (null);
 			"property" in viewModel && (model.property.id = viewModel.property ? viewModel.property.id : null);
-			"capacity" in viewModel && (model.capacity = viewModel.capacity === null ? null : +viewModel.capacity);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+
+			return model;
+		}
+	},
+	[WorkOfferViewModel.name]: class ComposedWorkOfferViewModel extends WorkOfferViewModel {
+		async map() {
+			return {
+				workContracts: (await this.$$model.workContracts.includeTree(ViewModel.mappings[WorkContractViewModel.name].items).toArray()).map(item => new WorkContractViewModel(item)),
+				office: new OfficeViewModel(await BaseServer.unwrap(this.$$model.office)),
+				closed: this.$$model.closed,
+				count: this.$$model.count,
+				id: this.$$model.id,
+				offered: this.$$model.offered,
+				task: this.$$model.task,
+				title: this.$$model.title
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get workContracts() {
+					return ViewModel.mappings[WorkContractViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "workContracts-WorkOfferViewModel"]
+					);
+				},
+				get office() {
+					return ViewModel.mappings[OfficeViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "office-WorkOfferViewModel"]
+					);
+				},
+				closed: true,
+				count: true,
+				id: true,
+				offered: true,
+				task: true,
+				title: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new WorkOfferViewModel(null);
+			"workContracts" in data && (item.workContracts = data.workContracts && [...data.workContracts].map(i => ViewModel.mappings[WorkContractViewModel.name].toViewModel(i)));
+			"office" in data && (item.office = data.office && ViewModel.mappings[OfficeViewModel.name].toViewModel(data.office));
+			"closed" in data && (item.closed = data.closed === null ? null : new Date(data.closed));
+			"count" in data && (item.count = data.count === null ? null : +data.count);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"offered" in data && (item.offered = data.offered === null ? null : new Date(data.offered));
+			"task" in data && (item.task = data.task === null ? null : `${data.task}`);
+			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: WorkOfferViewModel) {
+			let model: WorkOffer;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(WorkOffer).find(viewModel.id)
+			} else {
+				model = new WorkOffer();
+			}
+			
+			"workContracts" in viewModel && (null);
+			"office" in viewModel && (model.office.id = viewModel.office ? viewModel.office.id : null);
+			"closed" in viewModel && (model.closed = viewModel.closed === null ? null : new Date(viewModel.closed));
+			"count" in viewModel && (model.count = viewModel.count === null ? null : +viewModel.count);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"offered" in viewModel && (model.offered = viewModel.offered === null ? null : new Date(viewModel.offered));
+			"task" in viewModel && (model.task = viewModel.task === null ? null : `${viewModel.task}`);
+			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
 
 			return model;
 		}

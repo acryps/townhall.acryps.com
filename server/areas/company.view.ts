@@ -1,6 +1,7 @@
 import { ViewModel } from "vlserver";
-import { Company, Office } from "../managed/database";
+import { Company, Office, OfficeCapacity } from "../managed/database";
 import { PropertySummaryModel } from "./property.summary";
+import { WorkOfferSummaryModel } from "./work";
 
 export class CompanySummaryModel extends ViewModel<Company> {
 	id;
@@ -16,18 +17,25 @@ export class CompanyViewModel extends CompanySummaryModel {
 	created;
 	incorporated;
 
-	offices: OfficeViewModel[];
+	offices: OfficeSummaryModel[];
 }
 
 export class OfficeSummaryModel extends ViewModel<Office> {
 	id;
 
 	name;
+	property: PropertySummaryModel;
 }
 
 export class OfficeViewModel extends OfficeSummaryModel {
-	capacity;
-
 	company: CompanySummaryModel;
-	property: PropertySummaryModel;
+	workOffers: WorkOfferSummaryModel[];
+	capacityGrants: OfficeCapacityViewModel[];
+}
+
+export class OfficeCapacityViewModel extends ViewModel<OfficeCapacity> {
+	id;
+
+	issued;
+	size;
 }

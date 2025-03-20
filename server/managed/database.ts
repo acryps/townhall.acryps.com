@@ -1126,7 +1126,6 @@ export class PropertyQueryProxy extends QueryProxy {
 	get historicListingRegisteredAt(): Partial<QueryDate> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get ownerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get reviewCompany(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get typeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
@@ -1148,7 +1147,6 @@ export class Property extends Entity<PropertyQueryProxy> {
 	declare id: string;
 	name: string;
 	ownerId: string;
-	reviewCompany: boolean;
 	typeId: string;
 	
 	$$meta = {
@@ -1164,7 +1162,6 @@ export class Property extends Entity<PropertyQueryProxy> {
 			id: { type: "uuid", name: "id" },
 			name: { type: "text", name: "name" },
 			ownerId: { type: "uuid", name: "owner_id" },
-			reviewCompany: { type: "bool", name: "review_company" },
 			typeId: { type: "uuid", name: "type_id" }
 		},
 		get set(): DbSet<Property, PropertyQueryProxy> { 

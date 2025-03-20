@@ -1,4 +1,4 @@
-import { backdropFilter, backgroundColor, blur, borderBottom, boxShadow, brightness, child, color, ColorValue, contrast, display, dropShadow, em, filter, fontFamily, fontSize, grayscale, height, hex, margin, outline, padding, position, px, rem, root, select, top, Variable, zIndex } from "@acryps/style";
+import { backdropFilter, backgroundColor, blur, borderBottom, boxShadow, brightness, child, color, ColorValue, contrast, display, dropShadow, em, filter, fontFamily, fontSize, grayscale, hex, margin, outline, padding, position, px, rem, root, top, Variable, zIndex } from "@acryps/style";
 import { homeStyle } from "./home/index.style";
 import { bold, boldItalic, regular, regularItalic } from "./assets/font/index.style";
 import { boroughStyle } from "./borough/index.style";
@@ -18,7 +18,6 @@ import { residentBadgeListStyle } from "./shared/resident-badge-list/index.style
 import { companyOfficeStyle } from "./company-office/index.style";
 import { propertiesStyle } from "./properties/index.style";
 import { locationMarkerStyle } from "./shared/location/index.style";
-import { buttonStyle } from "./shared/index.style";
 
 export const pageStyle = () => root(
 	bold,
@@ -35,23 +34,6 @@ export const pageStyle = () => root(
 	mapStyle(),
 	residentBadgeListStyle(),
 	locationMarkerStyle(),
-
-
-	select('ui-review',
-		child('ui-actions',
-			display('flex'),
-
-			child('ui-action', buttonStyle())
-		),
-
-		child('ui-map-container',
-			display('block'),
-			height(rem(30))
-		)
-	),
-
-
-
 
 	child('body',
 		padding(0),

@@ -3,7 +3,7 @@ import { Office, WorkContract, WorkOffer } from "../../managed/database";
 import { Interpreter, SystemMessage, UserMessage } from "../interpreter";
 import { Language } from "../language";
 import { fireWorstMatch } from "./fire";
-import { findSkills } from "./skills";
+import { findTask } from "./task";
 
 export const createWorkOffers = async (office: Office) => {
 	const interpreter = new Interpreter('smart');
@@ -31,6 +31,8 @@ export const createWorkOffers = async (office: Office) => {
 		{ name: 'count', type: Number },
 		{ name: 'name', type: String }
 	], (count: number, name: string) => {
+		name = name.trim();
+
 		const existing = assignedOffers.find(offer => offer.title == name);
 
 		if (existing) {
@@ -57,9 +59,10 @@ export const createWorkOffers = async (office: Office) => {
 		new SystemMessage(`
 			given the following company, make a list of all jobs. in total, ${capacity.size} people work at ${company.name}.
 			calling the 'job' function for every job.
+			use the singular form for the jobs name, not the plural.
 			keep the list short and make sure to distribute the people according to how many people would work in a real company, even if this means creating big groups of similar workers.
 			beware that some activities might be outsourced and are not part of this companies offices.
-			we are currently in the year ${toSimulatedTime(new Date())}.
+			we are currently in the year ${toSimulatedTime(new Date())}, beware that many jobs that exist now did not back in the day.
 
 			${existingOffers.length ? 'if possible, reuse the existing jobs and just adjust the counts. relist the existing jobs.' : ''}
 		`),
@@ -87,7 +90,7 @@ export const createWorkOffers = async (office: Office) => {
 		if (offer.id) {
 			await offer.update();
 		} else {
-			offer.task = (await findSkills(company, offer)).join(', ');
+			offer.task = await findTask(company, offer);
 
 			await offer.create();
 		}

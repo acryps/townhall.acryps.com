@@ -19,7 +19,7 @@ export class WorkOfferPage extends Component {
 			</ui-title>
 
 			<ui-task>
-				Required Skills: {this.workOffer.task}
+				{this.workOffer.task}
 			</ui-task>
 
 			<ui-description>

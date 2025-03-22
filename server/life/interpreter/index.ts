@@ -205,8 +205,6 @@ export class Interpreter {
 	}
 
 	private findJSONObject(source: string) {
-		console.log(`<<${source}>>`);
-
 		let level = 0;
 		let inString = false;
 

@@ -3,114 +3,70 @@ import { Office, WorkContract, WorkOffer } from "../../managed/database";
 import { Interpreter, SystemMessage, UserMessage } from "../interpreter";
 import { Language } from "../language";
 import { fireWorstMatch } from "./fire";
+import { adjustRoleList } from "./list";
 import { findTask } from "./task";
 
-export const createWorkOffers = async (office: Office) => {
-	const interpreter = new Interpreter('smart');
-
+export const updateWorkOffers = async (office: Office) => {
 	const company = await office.company.fetch();
 
 	const capacity = await office.capacityGrants
 		.orderByDescending(capacity => capacity.issued)
 		.first();
 
-	const existingOffers = await office.workOffers
-		.where(offer => offer.closed == null)
-		.toArray();
+	const existingOfferQuery = () => office.workOffers
+		.where(offer => offer.closed == null);
 
-	if (capacity.size == existingOffers.reduce((sum, item) => item.count + sum, 0)) {
+	const existingOffers = await existingOfferQuery().toArray();
+
+	const updatedRoles = await adjustRoleList(office, await existingOfferQuery().toArray(), capacity.size);
+
+	if (!updatedRoles.changed) {
 		return;
 	}
 
-	console.log(`worker capacity for ${company.name} (target ${capacity.size}) at office ${office.name} does not match published work offers`);
-
-	// find all required jobs
-	const assignedOffers: WorkOffer[] = [];
-
-	interpreter.addTool('job', [
-		{ name: 'count', type: Number },
-		{ name: 'name', type: String }
-	], (count: number, name: string) => {
-		name = name.trim();
-
-		const existing = assignedOffers.find(offer => offer.title == name);
-
-		if (existing) {
-			existing.count += count;
-
-			return;
-		}
-
-		let offer = existingOffers.find(offer => offer.title == name);
-
-		if (!offer) {
-			offer = new WorkOffer();
-			offer.offered = new Date();
-			offer.office = office;
-			offer.title = name;
-		}
-
-		offer.count = count;
-
-		assignedOffers.push(offer);
-	});
-
-	interpreter.remember([
-		new SystemMessage(`
-			given the following company, make a list of all jobs. in total, ${capacity.size} people work at ${company.name}.
-			calling the 'job' function for every job.
-			use the singular form for the jobs name, not the plural.
-			keep the list short and make sure to distribute the people according to how many people would work in a real company, even if this means creating big groups of similar workers.
-			beware that some activities might be outsourced and are not part of this companies offices.
-			we are currently in the year ${toSimulatedTime(new Date())}, beware that many jobs that exist now did not back in the day.
-
-			${existingOffers.length ? 'if possible, reuse the existing jobs and just adjust the counts. relist the existing jobs.' : ''}
-		`),
-		new UserMessage(`
-			company: ${company.name}
-			purpose: ${company.purpose}
-
-			${existingOffers.length ? `
-			current jobs:
-			${existingOffers.map(offer => `- ${offer.count}x ${offer.title}`)}
-			` : ''}
-		`),
-		new SystemMessage(new Language('fast').environment())
-	]);
-
-	while (assignedOffers.reduce((sum, item) => item.count + sum, 0) < capacity.size) {
-		await interpreter.execute(new SystemMessage('Continue, there are still some jobs missings.'));
-	}
-
-	// find what is missing and what is no longer required
-	const missingJobs: WorkOffer[] = [];
 	const redundantContracts: WorkContract[] = [];
 
-	for (let offer of assignedOffers) {
-		if (offer.id) {
-			await offer.update();
-		} else {
-			offer.task = await findTask(company, offer);
+	for (let created of updatedRoles.addedRoles) {
+		created.office = office;
+		created.offered = new Date();
+		created.task = await findTask(company, created);
 
-			await offer.create();
-		}
+		await created.create();
 
-		let currentContractCount = await offer.workContracts.where(contract => contract.canceled == null).count();
-
-		while (currentContractCount > offer.count) {
-			redundantContracts.push(await fireWorstMatch(offer));
-
-			currentContractCount--;
-		}
-
-		while (currentContractCount < offer.count) {
-			missingJobs.push(offer);
-
-			currentContractCount++;
-		}
+		console.log(`${company.name} newly offers ${created.title}`);
 	}
 
-	// fire people first, this is the hard part
+	for (let updated of updatedRoles.resizedRoles) {
+		let count = await updated.workContracts.where(contract => contract.canceled == null).count();
+
+		while (count > updated.count) {
+			redundantContracts.push(await fireWorstMatch(updated));
+
+			count--;
+		}
+
+		await updated.update();
+
+		console.log(`${company.name} changed ${updated.title} offer count to ${updated.count}`);
+	}
+
+	for (let removed of updatedRoles.removedRoles) {
+		redundantContracts.push(
+			...await removed.workContracts
+				.where(contract => contract.canceled == null)
+				.toArray()
+		);
+
+		removed.closed = new Date();
+		await removed.update();
+
+		console.log(`${company.name} no longer offers ${removed.title}`);
+	}
+
+	console.log(`${company.name} will terminate ${redundantContracts.length} contracts.`);
+
+	// fire people (this is the hard part)
+	// they might find new jobs at the same office
 	for (let contract of redundantContracts) {
 		contract.canceled = new Date();
 
@@ -119,5 +75,9 @@ export const createWorkOffers = async (office: Office) => {
 		console.log(`${company.name} terminated work contract ${contract.id}`);
 	}
 
-	console.log(`${company.name} is hiring ${missingJobs.length} workers`);
+	for (let offer of updatedRoles.roles) {
+		const contracts = await offer.workContracts.where(contract => contract.canceled == null).count();
+
+		console.log(`${company.name} is hiring ${offer.count - contracts} ${offer.title}`);
+	}
 };

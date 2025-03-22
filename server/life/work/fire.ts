@@ -1,5 +1,5 @@
 import { toSimulatedAge } from "../../../interface/time";
-import { WorkOffer } from "../../managed/database";
+import { WorkContract, WorkOffer } from "../../managed/database";
 import { Interpreter, SystemMessage, UserMessage } from "../interpreter";
 
 export const fireWorstMatch = async (offer: WorkOffer) => {
@@ -30,14 +30,18 @@ export const fireWorstMatch = async (offer: WorkOffer) => {
 		`)
 	]);
 
-	let fired;
+	let fired: WorkContract;
 
 	interpreter.addTool('fire', [{ type: String, name: 'id' }], id => {
+		console.log(id);
+
 		fired = contracts.find(contract => contract.id.split('-')[0] == id);
 	});
 
 	while (!fired) {
-		interpreter.execute(new UserMessage('I know this is difficult, but please execute the task'));
+		console.log('firing...');
+
+		await interpreter.execute(new UserMessage('I know this is difficult, but please execute the task'));
 	}
 
 	return fired;

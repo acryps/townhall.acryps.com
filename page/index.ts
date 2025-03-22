@@ -32,6 +32,7 @@ import { CreateFeaturePage } from "./map/create";
 import { Rewrite } from '@acryps/rewrite';
 import { OfficePage } from "./company-office/office";
 import { WorkOfferPage } from "./company-office/work-offer";
+import { CreateOfficePage } from "./company-office/office/create";
 
 export class Application {
 	static router: Router;
@@ -90,6 +91,7 @@ export class Application {
 				.route('/company-office', CompanyOfficePage
 					.route('/register/:firstOfficeId', RegisterCompanyPage)
 					.route('/company/:tag', CompanyPage)
+					.route('/office/create/:id', CreateOfficePage)
 					.route('/office/:id', OfficePage)
 					.route('/work-offer/:id', WorkOfferPage)
 				)

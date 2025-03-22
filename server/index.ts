@@ -21,7 +21,8 @@ import { MovementTileServer } from "./map/layers/heatmap/movement";
 import { PropertyUsageTileServer } from "./map/layers/shape/usage";
 import { ImpressionImageInterface } from "./areas/impressions/interface";
 import { StreetTileServer } from "./map/layers/shape/street";
-import { createWorkOffers } from "./life/work/offers";
+import { updateWorkOffers } from "./life/work/offers";
+import { adjustRoleList } from "./life/work/list";
 
 const runLife = process.env.RUN_LIFE == 'YES';
 
@@ -48,8 +49,10 @@ DbClient.connectedClient.connect().then(async () => {
 
 		(async () => {
 			for (let company of await database.company.toArray()) {
+				console.log(company.name);
+
 				for (let office of await company.offices.toArray()) {
-					await createWorkOffers(office);
+					await updateWorkOffers(office);
 				}
 			}
 		})();
@@ -67,7 +70,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new StreetTileServer(app, database); // temporarely only!
 	new BoroughTileServer(app, database);
 	new PropertyUsageTileServer(app, database);
-	new MovementTileServer(app, database);
+	// new MovementTileServer(app, database);
 
 	// life.tick();
 	/// new FillLife(life, db).fillEmptyDwellings();

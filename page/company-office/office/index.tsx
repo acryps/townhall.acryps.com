@@ -11,6 +11,10 @@ export class OfficePage extends Component {
 		this.office = await new CompanyOfficeService().getOffice(this.parameters.id);
 	}
 
+	get activeOffers() {
+		return this.office.workOffers.filter(offer => !offer.closed);
+	}
+
 	render() {
 		const currentCapacity = this.office.capacityGrants.toSorted((a, b) => +a.issued - +b.issued)[0];
 
@@ -28,7 +32,15 @@ export class OfficePage extends Component {
 			</ui-location>
 
 			<ui-capacity>
-				{currentCapacity.size} workers capacity
+				<ui-metrics>
+					<ui-planned>
+						{currentCapacity.size} workers capacity
+					</ui-planned>
+
+					<ui-offered>
+						{this.activeOffers.reduce((sum, offer) => sum + offer.count, 0)} currently offered
+					</ui-offered>
+				</ui-metrics>
 
 				<ui-action>
 					Resize office capacity
@@ -36,7 +48,7 @@ export class OfficePage extends Component {
 			</ui-capacity>
 
 			<ui-work-offers>
-				{this.office.workOffers.filter(offer => !offer.closed).toSorted((a, b) => b.count - a.count).map(offer => <ui-offer ui-href={`../../work-offer/${offer.id}`}>
+				{this.activeOffers.toSorted((a, b) => b.count - a.count).map(offer => <ui-offer ui-href={`../../work-offer/${offer.id}`}>
 					<ui-role>
 						{offer.title}
 					</ui-role>

@@ -1483,6 +1483,30 @@ export class CompanyOfficeService {
 			}
 		});
 	}
+
+	async registerOffice(name: string, companyId: string, propertyId: string, capacity: number): Promise<string> {
+		const $data = new FormData();
+		$data.append("ZyNGVpZWlsNWB2eWBjb3VqNHt2aGl4dD", Service.stringify(name))
+		$data.append("l3YzB6dWcycDFoeWFseWdha2RhMzptcT", Service.stringify(companyId))
+		$data.append("dodHJhcWgxYzd4eDF4ejNva2d6Mzl3OX", Service.stringify(propertyId))
+		$data.append("kxZTQ1eDJuMGM4NWh6ZH1vMzM3NjZpM2", Service.stringify(capacity))
+
+		return await fetch(Service.toURL("tqa350NGZlOHptNTZna2lnc2FoazpxaW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
 }
 
 export class GameService {

@@ -20,6 +20,7 @@ import { BoroughService } from "././../areas/borough/service";
 import { Company } from "././database";
 import { CompanyType } from "././database";
 import { Office } from "././database";
+import { OfficeCapacity } from "././database";
 import { CompanySummaryModel } from "././../areas/company.view";
 import { CompanyViewModel } from "././../areas/company.view";
 import { OfficeViewModel } from "././../areas/company.view";
@@ -79,7 +80,6 @@ import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { HonestiumViewModel } from "./../areas/vote/bill";
 import { Bridge } from "./../managed/database";
-import { OfficeCapacity } from "./../managed/database";
 import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
 import { PropertyType } from "./../managed/database";
@@ -423,6 +423,23 @@ export class ManagedServer extends BaseServer {
 				params["RzdmQ4NT8xem1rbWJueXIxcWR0OX5yc2"],
 				params["s1bGF2azVqaWBwazhwZmI1Z2E2Z3Jjcz"],
 				params["oxa3VqZjprbmJtcmlrdjAzNTswYmhmdm"]
+			)
+		);
+
+		this.expose(
+			"tqa350NGZlOHptNTZna2lnc2FoazpxaW",
+			{
+			"ZyNGVpZWlsNWB2eWBjb3VqNHt2aGl4dD": { type: "string", isArray: false, isOptional: false },
+				"l3YzB6dWcycDFoeWFseWdha2RhMzptcT": { type: "string", isArray: false, isOptional: false },
+				"dodHJhcWgxYzd4eDF4ejNva2d6Mzl3OX": { type: "string", isArray: false, isOptional: false },
+				"kxZTQ1eDJuMGM4NWh6ZH1vMzM3NjZpM2": { type: "number", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(CompanyOfficeService),
+			(controller, params) => controller.registerOffice(
+				params["ZyNGVpZWlsNWB2eWBjb3VqNHt2aGl4dD"],
+				params["l3YzB6dWcycDFoeWFseWdha2RhMzptcT"],
+				params["dodHJhcWgxYzd4eDF4ejNva2d6Mzl3OX"],
+				params["kxZTQ1eDJuMGM4NWh6ZH1vMzM3NjZpM2"]
 			)
 		);
 

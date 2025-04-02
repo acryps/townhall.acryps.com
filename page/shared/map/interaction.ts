@@ -149,11 +149,8 @@ export const registerInteration = (
 		if (pointers.length == 0) {
 			if (movement) {
 				if (movement.changes < 3) {
-					const pointer = getPointer(event, 0, true);
-					const bounds = map.rootNode.getBoundingClientRect();
-
 					// TODO fix subpixel offset
-					onPick(map.translate(pointer));
+					onPick(movement.map);
 				} else {
 					onMoveEnd(map.center);
 				}

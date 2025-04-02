@@ -1,17 +1,16 @@
-import { Pc } from "@acryps/style";
-import { Point, PackedPoint } from "../../../interface/point";
-import { mapOverdraw } from "./index.style";
+import { PackedPoint, Point } from "../../../../interface/point";
+import { Shape } from "../../../../interface/shape";
 
 export class MapLayer {
-	// null tiles are loading - or failed to load
-	tiles = new Map<PackedPoint, CanvasImageSource | Promise<CanvasImageSource>>();
-
 	canvas: OffscreenCanvas;
 	context: OffscreenCanvasRenderingContext2D;
 
+	// null tiles are loading - or failed to load
+	tiles = new Map<PackedPoint, CanvasImageSource | Promise<CanvasImageSource>>();
+
 	constructor(
-		private source: (x: number, y: number) => Promise<CanvasImageSource>,
-		private size: number,
+		protected source: (x: number, y: number) => Promise<CanvasImageSource>,
+		protected size: number,
 		public pick: (x: number, y: number) => Promise<string>
 	) {
 		this.canvas = new OffscreenCanvas(1, 1);
@@ -47,7 +46,7 @@ export class MapLayer {
 		await Promise.all(tasks);
 	}
 
-	private getTiles(center: Point, width: number, height: number) {
+	protected getTiles(center: Point, width: number, height: number) {
 		const tiles: Point[] = [];
 
 		const minX = Math.floor((center.x - width / 2 - this.size / 2) / this.size);
@@ -84,6 +83,40 @@ export class MapLayer {
 		}
 
 		return this.canvas;
+	}
+
+	static fromShapeSource(source: (x: number, y: number) => string, size: number, pick?: (x: number, y: number) => string, itemLink?: (item: string) => string) {
+		const canvas = new OffscreenCanvas(size, size);
+		const context = canvas.getContext('2d');
+
+		return new MapLayer(
+			async (x, y) => {
+				const shapes: Shape[] = await fetch(source(x, y)).then(response => response.json());
+				context.clearRect(0, 0, size, size);
+
+				const offset = new Point(x * size, y * size);
+
+				for (let shape of shapes) {
+					Shape.render(shape, offset, context as any);
+				}
+
+				return canvas.transferToImageBitmap();
+			},
+			size,
+			async (x, y) => {
+				if (!pick) {
+					return;
+				}
+
+				const id = await fetch(pick(x, y)).then(response => response.json());
+
+				if (!id) {
+					return;
+				}
+
+				return itemLink(id);
+			}
+		)
 	}
 
 	static fromTileSource(source: (x: number, y: number) => string, size: number, pick?: (x: number, y: number) => string, itemLink?: (item: string) => string) {

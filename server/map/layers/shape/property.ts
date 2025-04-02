@@ -28,7 +28,7 @@ export class PropertyTileServer extends ShapeTileServer {
 						id: property.id,
 						fill: type?.color ?? 'transparent',
 						stroke: property.historicListingGradeId ? '#fff' : '#000',
-						bounds: Point.unpack(property.bounds)
+						bounds: property.bounds
 					});
 				}
 

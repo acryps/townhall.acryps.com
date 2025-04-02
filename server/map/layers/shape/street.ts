@@ -24,7 +24,7 @@ export class StreetTileServer extends ShapeTileServer {
 						id: street.id,
 						fill: 'transparent',
 						stroke: '#f00',
-						bounds: [...points, ...points.reverse()]
+						bounds: Point.pack([...points, ...points.reverse()])
 					});
 				}
 
@@ -35,7 +35,7 @@ export class StreetTileServer extends ShapeTileServer {
 						id: square.id,
 						fill: '#ff05',
 						stroke: '#ff0',
-						bounds: Point.unpack(square.bounds)
+						bounds: square.bounds
 					});
 				}
 

@@ -13,7 +13,6 @@ import { BaseTileServer } from "./map/base";
 import { MapImporter } from "./map/import";
 import { LawHouse } from "./life/law-house";
 import { Language } from "./life/language";
-import { FillLife } from "./life/fill/fill";
 import { GoInterface } from "./go";
 import { PropertyTileServer } from "./map/layers/shape/property";
 import { BoroughTileServer } from "./map/layers/shape/borough";
@@ -22,7 +21,6 @@ import { PropertyUsageTileServer } from "./map/layers/shape/usage";
 import { ImpressionImageInterface } from "./areas/impressions/interface";
 import { StreetTileServer } from "./map/layers/shape/street";
 import { updateWorkOffers } from "./life/work/offers";
-import { adjustRoleList } from "./life/work/list";
 
 const runLife = process.env.RUN_LIFE == 'YES';
 

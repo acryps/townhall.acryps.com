@@ -9,6 +9,8 @@ export const registerInteration = (
 ) => {
 	const element = map.rootNode;
 
+	let start: Point;
+
 	let movement: {
 		pointers: Point[],
 		map: Point,
@@ -72,6 +74,8 @@ export const registerInteration = (
 	}
 
 	element.onmousedown = element.ontouchstart = (event: TouchEvent | MouseEvent) => {
+		start = getPointer(event);
+
 		const second = getPointer(event, 1);
 
 		if (second) {
@@ -150,7 +154,7 @@ export const registerInteration = (
 			if (movement) {
 				if (movement.changes < 3) {
 					// TODO fix subpixel offset
-					onPick(movement.map);
+					onPick(map.translate(start));
 				} else {
 					onMoveEnd(map.center);
 				}

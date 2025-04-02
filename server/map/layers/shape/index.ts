@@ -1,15 +1,7 @@
 import { Canvas, CanvasRenderingContext2D } from "skia-canvas";
-import { DbContext } from "../../../managed/database";
 import { ManagedServer } from "../../../managed/server";
 import { Point } from "../../../../interface/point";
-import { drawDanwinstonLine } from "../../../../interface/line";
-
-type Shape = {
-	id: string,
-	fill?: string,
-	stroke: string,
-	bounds: Point[]
-};
+import { Shape } from "../../../../interface/shape";
 
 export class ShapeTileServer {
 	constructor(
@@ -28,29 +20,24 @@ export class ShapeTileServer {
 
 			const shapes = await fetch();
 
-			const canvas = new Canvas(size, size);
-			const context = canvas.getContext('2d');
-
-			for (let shape of shapes) {
-				this.render(context, offset, shape);
-			}
-
-			response.contentType('image/png');
-			canvas.toBuffer('png').then(buffer => response.end(buffer));
+			response.json(shapes
+				.filter(shape => Point.touches(offset, size, Point.unpack(shape.bounds)))
+			);
 		});
 
 		app.app.get(`/pick/${route}/:x/:y`, async (request, response) => {
 			const x = +request.params.x;
 			const y = +request.params.y;
 
-			const offset = new Point(x, y);
 			const shapes = await fetch();
 
 			const canvas = new Canvas(1, 1);
 			const context = canvas.getContext('2d');
 
+			const offset = new Point(x, y);
+
 			for (let shape of shapes) {
-				this.render(context, offset, shape);
+				Shape.render(shape, offset, context as any);
 
 				const intensity = context.getImageData(0, 0, 1, 1).data[3];
 
@@ -61,39 +48,5 @@ export class ShapeTileServer {
 
 			response.json(null);
 		});
-	}
-
-	private render(context: CanvasRenderingContext2D, offset: Point, shape: Shape) {
-		// use normal algorithm for fill
-		if (shape.fill) {
-			context.beginPath();
-
-			for (let index = 0; index < shape.bounds.length; index++) {
-				const point = shape.bounds[index].subtract(offset).add(new Point(0.5, 0.5));
-
-				if (index) {
-					context.lineTo(point.x, point.y);
-				} else {
-					context.moveTo(point.x, point.y);
-				}
-			}
-
-			context.closePath();
-
-			context.fillStyle = shape.fill;
-			context.fill();
-		}
-
-		// use legally binding algorithm for strokes
-		if (shape.stroke) {
-			context.strokeStyle = shape.stroke;
-
-			for (let index = 0; index < shape.bounds.length; index++) {
-				const start = shape.bounds[index].subtract(offset);
-				const end = shape.bounds[(index + 1) % shape.bounds.length].subtract(offset);
-
-				drawDanwinstonLine(context, start, end);
-			}
-		}
 	}
 }

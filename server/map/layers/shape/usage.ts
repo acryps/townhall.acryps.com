@@ -42,7 +42,7 @@ export class PropertyUsageTileServer extends ShapeTileServer {
 						id: property.id,
 						fill: color,
 						stroke: '#000',
-						bounds: Point.unpack(property.bounds)
+						bounds: property.bounds
 					});
 				}
 

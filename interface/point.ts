@@ -143,6 +143,20 @@ export class Point {
 		return [...points].sort((a, b) => (a.x + a.y) - (b.x + b.y)).pop();
 	}
 
+	static touches(topLeft: Point, size: number, shape: Point[]) {
+		const bounds = this.bounds(shape);
+
+		if (bounds.x.min < topLeft.x || bounds.y.min < topLeft.y) {
+			return false;
+		}
+
+		if (bounds.x.max > topLeft.x + size || bounds.y.max > topLeft.y + size) {
+			return false;
+		}
+
+		return true;
+	}
+
 	static midsect(points: Point[], close: boolean) {
 		if (points.length < 2) {
 			return [];

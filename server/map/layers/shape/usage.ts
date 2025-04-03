@@ -27,12 +27,12 @@ export class PropertyUsageTileServer extends ShapeTileServer {
 
 					let color = '#fff';
 
-					const office = (await property.offices.toArray()).length > 0;
-					const dwelling = (await property.dwellings.toArray()).length > 0;
+					const offices = (await property.offices.toArray());
+					const dwelling = await property.dwellings.count() > 0;
 
-					if (office && dwelling) {
+					if (offices.length && dwelling) {
 						color = '#f0f';
-					} else if (office) {
+					} else if (offices.length) {
 						color = '#f00';
 					} else if (dwelling) {
 						color = '#00f';
@@ -42,7 +42,8 @@ export class PropertyUsageTileServer extends ShapeTileServer {
 						id: property.id,
 						fill: color,
 						stroke: '#000',
-						bounds: property.bounds
+						bounds: property.bounds,
+						name: offices.length ? offices.map(office => office.name).join('\n') : null
 					});
 				}
 

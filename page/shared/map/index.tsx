@@ -1,11 +1,12 @@
 import { Component } from "@acryps/page";
 import { Point } from "../../../interface/point";
 import { MapLayer } from "./layer";
-import { mapOverdraw, mapPixelHeight, mapPixelWidth, mapSubpixelHeight, mapSubpixelWidth, subpixelOffsetX, subpixelOffsetY } from "./index.style";
+import { labelX, labelY, mapOverdraw, mapPixelHeight, mapPixelWidth, mapPositionX, mapPositionY, mapSubpixelHeight, mapSubpixelWidth, subpixelOffsetX, subpixelOffsetY } from "./index.style";
 import { baseLayer } from "./layers";
 import { drawDanwinstonLine } from "../../../interface/line";
 import { Observable } from "@acryps/page-observable";
 import { Hex } from "@acryps/style";
+import { Label } from "./layer/label";
 
 export class MapComponent extends Component {
 	readonly defaultZoom = 4;
@@ -38,6 +39,8 @@ export class MapComponent extends Component {
 	layers: MapLayer[] = [
 		baseLayer
 	];
+
+	labelContainer: HTMLElement = <ui-labels />;
 
 	// centers the map around this point (intially)
 	show(center: Point, scale: number) {
@@ -150,6 +153,8 @@ export class MapComponent extends Component {
 
 		const container = <ui-map-container>
 			{this.canvas}
+
+			{this.labelContainer}
 		</ui-map-container>;
 
 		return container;
@@ -210,14 +215,14 @@ export class MapComponent extends Component {
 		this.canvas.width = this.width;
 		this.canvas.height = this.height;
 
-		this.canvas.style.width = `${this.pixelSize * this.width}px`;
-		this.canvas.style.height = `${this.pixelSize * this.height}px`;
+		this.labelContainer.style.width = this.canvas.style.width = `${this.pixelSize * this.width}px`;
+		this.labelContainer.style.height = this.canvas.style.height = `${this.pixelSize * this.height}px`;
 
-		this.canvas.style.setProperty(mapPixelWidth.propertyName, this.width.toString());
-		this.canvas.style.setProperty(mapPixelHeight.propertyName, this.height.toString());
+		this.rootNode.style.setProperty(mapPixelWidth.propertyName, this.width.toString());
+		this.rootNode.style.setProperty(mapPixelHeight.propertyName, this.height.toString());
 
-		this.canvas.style.setProperty(mapSubpixelWidth.propertyName, this.subpixelWidth.toString());
-		this.canvas.style.setProperty(mapSubpixelHeight.propertyName, this.subpixelHeight.toString());
+		this.rootNode.style.setProperty(mapSubpixelWidth.propertyName, this.subpixelWidth.toString());
+		this.rootNode.style.setProperty(mapSubpixelHeight.propertyName, this.subpixelHeight.toString());
 
 		this.resize();
 		this.updateLayers();
@@ -251,8 +256,8 @@ export class MapComponent extends Component {
 		);
 
 		// it does not work in styles as the width/height are relative
-		this.canvas.style.left = `${-this.subpixel.x + outboard.x / 2 - mapOverdraw / 2 * this.pixelSize - oddOffset.x * this.pixelSize}px`;
-		this.canvas.style.top = `${-this.subpixel.y + outboard.y / 2 - mapOverdraw / 2 * this.pixelSize - oddOffset.y * this.pixelSize}px`;
+		this.labelContainer.style.left = this.canvas.style.left = `${-this.subpixel.x + outboard.x / 2 - mapOverdraw / 2 * this.pixelSize - oddOffset.x * this.pixelSize}px`;
+		this.labelContainer.style.top = this.canvas.style.top = `${-this.subpixel.y + outboard.y / 2 - mapOverdraw / 2 * this.pixelSize - oddOffset.y * this.pixelSize}px`;
 
 		for (let layer of this.layers) {
 			layer.update(this.cursor, this.width, this.height).then(() => {
@@ -276,6 +281,9 @@ export class MapComponent extends Component {
 			this.cursor.x - this.width / 2 - (this.width % 2 ? 0.5 : 0),
 			this.cursor.y - this.height / 2 - (this.height % 2 ? 0.5 : 0)
 		);
+
+		this.rootNode.style.setProperty(mapPositionX.propertyName, offset.x);
+		this.rootNode.style.setProperty(mapPositionY.propertyName, offset.y);
 
 		if (this.drawing) {
 			if (this.drawing.length) {
@@ -385,6 +393,35 @@ export class MapComponent extends Component {
 		this.context.fillRect(-offset.x, -offset.y, 1, 1);
 
 		this.context.restore();
+
+		this.renderLabels();
+	}
+
+	private renderLabels() {
+		const labels: Label[] = [];
+
+		for (let layer of this.layers) {
+			labels.push(...layer.labels);
+		}
+
+		for (let label of labels) {
+			if (label.visible(this.center, this.width, this.height)) {
+				if (!label.rendered) {
+					label.rendered = <ui-label style={`
+						${labelX.propertyName}: ${label.position.x};
+						${labelY.propertyName}: ${label.position.y};
+					`}>
+						{label.name}
+					</ui-label>;
+				}
+
+				if (!label.rendered.parentElement) {
+					this.labelContainer.append(label.rendered);
+				}
+			} else if (label.rendered?.parentElement) {
+				label.rendered.remove();
+			}
+		}
 	}
 
 	private renderLayerBuffers() {

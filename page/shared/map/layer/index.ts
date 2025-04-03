@@ -1,5 +1,6 @@
 import { PackedPoint, Point } from "../../../../interface/point";
 import { Shape } from "../../../../interface/shape";
+import { Label } from "./label";
 
 export class MapLayer {
 	canvas: OffscreenCanvas;
@@ -7,6 +8,8 @@ export class MapLayer {
 
 	// null tiles are loading - or failed to load
 	tiles = new Map<PackedPoint, CanvasImageSource | Promise<CanvasImageSource>>();
+
+	labels: Label[] = [];
 
 	constructor(
 		protected source: (x: number, y: number) => Promise<CanvasImageSource>,
@@ -89,7 +92,7 @@ export class MapLayer {
 		const canvas = new OffscreenCanvas(size, size);
 		const context = canvas.getContext('2d');
 
-		return new MapLayer(
+		const layer = new MapLayer(
 			async (x, y) => {
 				const shapes: Shape[] = await fetch(source(x, y)).then(response => response.json());
 				context.clearRect(0, 0, size, size);
@@ -98,6 +101,14 @@ export class MapLayer {
 
 				for (let shape of shapes) {
 					Shape.render(shape, offset, context as any);
+
+					if (shape.name) {
+						const center = Point.center(Point.unpack(shape.bounds));
+
+						if (center.x >= x * size && center.y >= y * size && center.x <= x * size + size && center.y <= y * size + size) {
+							layer.labels.push(new Label(center, shape.name));
+						}
+					}
 				}
 
 				return canvas.transferToImageBitmap();
@@ -116,7 +127,9 @@ export class MapLayer {
 
 				return itemLink(id);
 			}
-		)
+		);
+
+		return layer;
 	}
 
 	static fromTileSource(source: (x: number, y: number) => string, size: number, pick?: (x: number, y: number) => string, itemLink?: (item: string) => string) {

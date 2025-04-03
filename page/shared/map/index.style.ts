@@ -1,4 +1,6 @@
-import { aspectRatio, backgroundColor, backgroundImage, backgroundSize, child, colorStop, display, height, hex, imageRendering, inset, linearGradient, marginLeft, marginTop, Number, overflow, percentage, pointerEvents, position, ratio, select, turn, Variable, width, zIndex } from "@acryps/style";
+import { alignItems, aspectRatio, backgroundColor, backgroundImage, backgroundSize, child, color, colorStop, display, height, hex, imageRendering, inset, justifyContent, left, linearGradient, marginLeft, marginTop, Number, overflow, padding, paddingBlock, paddingInline, percentage, pointerEvents, position, ratio, rem, Rem, select, textAlign, top, transform, translate, turn, Variable, whiteSpace, width, wordBreak, zIndex } from "@acryps/style";
+import { pageBackgroundColor, pageTextColor } from "../../index.style";
+import { PageComponent } from "../../page";
 
 export const mapPixelWidth = new Variable<Number>('map-pixel-width');
 export const mapPixelHeight = new Variable<Number>('map-pixel-height');
@@ -11,6 +13,12 @@ export const mapOverdraw = 6;
 
 export const subpixelOffsetX = new Variable<Number>('subpixel-offset-x');
 export const subpixelOffsetY = new Variable<Number>('subpixel-offset-y');
+
+export const labelX = new Variable<Number>('x');
+export const labelY = new Variable<Number>('y');
+
+export const mapPositionX = new Variable<Number>('map-x');
+export const mapPositionY = new Variable<Number>('map-y');
 
 const blankBackground = hex('0001');
 
@@ -42,5 +50,26 @@ export const mapStyle = () => select('ui-map-container',
 			percentage(100).divide(mapPixelWidth).multiply(2),
 			percentage(100).divide(mapPixelHeight).multiply(2)
 		])
+	),
+
+	child('ui-labels',
+		display('block'),
+		position('relative'),
+
+		child('ui-label',
+			position('absolute'),
+			left(labelX.subtract(mapPositionX).multiply(percentage(100).divide(mapSubpixelWidth))),
+			top(labelY.subtract(mapPositionY).multiply(percentage(100).divide(mapSubpixelHeight))),
+
+			paddingInline(rem(0.5)),
+			paddingBlock(rem(0.25)),
+			whiteSpace('pre'),
+
+			transform(translate(percentage(-50))),
+			textAlign('center'),
+
+			color(pageTextColor),
+			backgroundColor(pageBackgroundColor)
+		)
 	)
 )

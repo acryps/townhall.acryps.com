@@ -146,15 +146,15 @@ export class Point {
 	static touches(topLeft: Point, size: number, shape: Point[]) {
 		const bounds = this.bounds(shape);
 
-		if (bounds.x.min < topLeft.x || bounds.y.min < topLeft.y) {
-			return false;
+		if (bounds.x.min >= topLeft.x || bounds.y.min >= topLeft.y) {
+			return true;
 		}
 
-		if (bounds.x.max > topLeft.x + size || bounds.y.max > topLeft.y + size) {
-			return false;
+		if (bounds.x.max <= topLeft.x + size || bounds.y.max <= topLeft.y + size) {
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	static midsect(points: Point[], close: boolean) {

@@ -22,7 +22,8 @@ export class BoroughTileServer extends ShapeTileServer {
 						id: borough.id,
 						stroke: borough.color ?? 'transparent',
 						fill: (borough.color ?? '#000000') + '66',
-						bounds: borough.bounds
+						bounds: borough.bounds,
+						name: borough.name
 					});
 				}
 

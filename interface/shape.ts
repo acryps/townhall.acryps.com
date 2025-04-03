@@ -6,6 +6,7 @@ export class Shape {
 	fill?: string;
 	stroke: string;
 	bounds: PackedPointArray;
+	name: string;
 
 	static render(shape: Shape, offset: Point, context: CanvasRenderingContext2D) {
 		const bounds = Point.unpack(shape.bounds);

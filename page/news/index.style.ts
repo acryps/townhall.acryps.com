@@ -76,6 +76,10 @@ export const publicationStyle = () => child('ui-publication',
 	),
 
 	child('ui-actions',
+		display('flex'),
+		justifyContent('center'),
+		gap(rem(1)),
+
 		child('ui-action',
 			buttonStyle()
 		)

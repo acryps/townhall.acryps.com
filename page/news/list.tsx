@@ -13,7 +13,7 @@ export class ArticleListComponent extends Component {
 		let lastDate = new Date();
 
 		return <ui-articles>
-			{this.articles.map(article => {
+			{this.articles.filter(article => article.published).map(article => {
 				const element = <ui-article ui-href={`/news/article/${article.id}`}>
 					{article.images.length > 0 && <ui-images>
 						{article.images.map(image => <img src={`/article/image/${image.id}`} />)}

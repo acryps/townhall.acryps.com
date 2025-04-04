@@ -34,6 +34,7 @@ import { OfficePage } from "./company-office/office";
 import { WorkOfferPage } from "./company-office/work-offer";
 import { CreateOfficePage } from "./company-office/office/create";
 import { RegisterBoroughPage } from "./borough/register";
+import { WriteArticlePage } from "./news/write";
 
 export class Application {
 	static router: Router;
@@ -68,6 +69,7 @@ export class Application {
 				.route('/borough/register/:bounds', RegisterBoroughPage)
 				.route('/borough/:tag', BoroughPage)
 
+				.route('/news/write/:id', WriteArticlePage)
 				.route('/news/article/:id', ArticePage)
 				.route('/news/publication/:tag', PublicationPage)
 				.route('/news', NewsPage)

@@ -1964,6 +1964,128 @@ export class PublicationService {
 		});
 	}
 
+	async createArticle(publicationId: string): Promise<string> {
+		const $data = new FormData();
+		$data.append("BsdT10cmlhMDtwangxNHF2cTZ0aTMyd2", Service.stringify(publicationId))
+
+		return await fetch(Service.toURL("9naWs5bzEzaWUxNmR2MTU1cj1vbWljaD"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async saveArticle(id: string, title: string, body: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("YycTYxbmI3Yn55dzdid39lYTAyY3d2am", Service.stringify(id))
+		$data.append("doMHx0emR6cHR4aDw0eXl6NWthaHp4aG", Service.stringify(title))
+		$data.append("FpbWFvNmZlMj5mNHdhbGE3dm12MWdzNn", Service.stringify(body))
+
+		return await fetch(Service.toURL("JraWlqZDJhbmd1YnU5d3wzMHVuYj9ydX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async uploadImage(id: string, data: Blob): Promise<ArticleImageViewModel> {
+		const $data = new FormData();
+		$data.append("t4eGZoNHJuZzV0NXV0b2FuN3U3Ymk2NG", Service.stringify(id))
+		$data.append("FnNWR0eXFuYTQ4OWl4N3NsdjoyYzdkMn", data)
+
+		return await fetch(Service.toURL("cxa2RvMHp1aGg3ZDJiaGp1YmZqZjY1eH"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : ArticleImageViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async captionImage(id: string, caption: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("RrOHZhY2x5OGczenZic3hrcG93dGNiMz", Service.stringify(id))
+		$data.append("NhMW1ibDQ1M21iZ3Z3c3t3OWdsb2xvaW", Service.stringify(caption))
+
+		return await fetch(Service.toURL("R6Mng4aGRzc3kxNGVyMmQxcGRtMGc3bm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async removeImage(id: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("duZnhpOWVwandzY3pxaXVxem9nc2VwcT", Service.stringify(id))
+
+		return await fetch(Service.toURL("p0MHJzNGV4bTh3MG1nMWJ6bD00bHBmY2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async publish(id: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("loc2IzMGQxdzliYzhrZ3NwYjlrNHp4Ym", Service.stringify(id))
+
+		return await fetch(Service.toURL("V6M2k2b2I2cD1maWM0NHV0eD45eDBxbm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
 	async listNewestArticles(): Promise<Array<ArticleViewModel>> {
 		const $data = new FormData();
 		

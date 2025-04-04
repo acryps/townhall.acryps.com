@@ -51,6 +51,9 @@ import { Dwelling } from "././database";
 import { DwellingViewModel } from "././../areas/life/resident";
 import { PropertyDwellingViewModel } from "././../areas/property.view";
 import { PropertyService } from "././../areas/property/service";
+import { Article } from "././database";
+import { ArticleImage } from "././database";
+import { ArticleImageViewModel } from "././../areas/publication/article";
 import { ArticleViewModel } from "././../areas/publication/article";
 import { PublicationViewModel } from "././../areas/publication/publication";
 import { PublicationService } from "././../areas/publication/service";
@@ -74,7 +77,6 @@ import { WorkContractViewModel } from "./../areas/work";
 import { LawHouseSessionaryViewModel } from "./../areas/law-house/session";
 import { LawHouseSessionProtocolViewModel } from "./../areas/law-house/session";
 import { TenancyViewModel } from "./../areas/life/resident";
-import { ArticleImageViewModel } from "./../areas/publication/article";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
@@ -97,8 +99,6 @@ import { LawHouseSessionary } from "./../managed/database";
 import { LawHouseSessionProtocol } from "./../managed/database";
 import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
-import { Article } from "./../managed/database";
-import { ArticleImage } from "./../managed/database";
 import { Publication } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
 import { TrainStationExit } from "./../managed/database";
@@ -665,6 +665,80 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(PublicationService),
 			(controller, params) => controller.getArticle(
 				params["JhZ3kwamJnYWVyYWB6ZWYxbGRoZXB1a3"]
+			)
+		);
+
+		this.expose(
+			"9naWs5bzEzaWUxNmR2MTU1cj1vbWljaD",
+			{
+			"BsdT10cmlhMDtwangxNHF2cTZ0aTMyd2": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.createArticle(
+				params["BsdT10cmlhMDtwangxNHF2cTZ0aTMyd2"]
+			)
+		);
+
+		this.expose(
+			"JraWlqZDJhbmd1YnU5d3wzMHVuYj9ydX",
+			{
+			"YycTYxbmI3Yn55dzdid39lYTAyY3d2am": { type: "string", isArray: false, isOptional: false },
+				"doMHx0emR6cHR4aDw0eXl6NWthaHp4aG": { type: "string", isArray: false, isOptional: false },
+				"FpbWFvNmZlMj5mNHdhbGE3dm12MWdzNn": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.saveArticle(
+				params["YycTYxbmI3Yn55dzdid39lYTAyY3d2am"],
+				params["doMHx0emR6cHR4aDw0eXl6NWthaHp4aG"],
+				params["FpbWFvNmZlMj5mNHdhbGE3dm12MWdzNn"]
+			)
+		);
+
+		this.expose(
+			"cxa2RvMHp1aGg3ZDJiaGp1YmZqZjY1eH",
+			{
+			"t4eGZoNHJuZzV0NXV0b2FuN3U3Ymk2NG": { type: "string", isArray: false, isOptional: false },
+				"FnNWR0eXFuYTQ4OWl4N3NsdjoyYzdkMn": { type: "buffer", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.uploadImage(
+				params["t4eGZoNHJuZzV0NXV0b2FuN3U3Ymk2NG"],
+				params["FnNWR0eXFuYTQ4OWl4N3NsdjoyYzdkMn"]
+			)
+		);
+
+		this.expose(
+			"R6Mng4aGRzc3kxNGVyMmQxcGRtMGc3bm",
+			{
+			"RrOHZhY2x5OGczenZic3hrcG93dGNiMz": { type: "string", isArray: false, isOptional: false },
+				"NhMW1ibDQ1M21iZ3Z3c3t3OWdsb2xvaW": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.captionImage(
+				params["RrOHZhY2x5OGczenZic3hrcG93dGNiMz"],
+				params["NhMW1ibDQ1M21iZ3Z3c3t3OWdsb2xvaW"]
+			)
+		);
+
+		this.expose(
+			"p0MHJzNGV4bTh3MG1nMWJ6bD00bHBmY2",
+			{
+			"duZnhpOWVwandzY3pxaXVxem9nc2VwcT": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.removeImage(
+				params["duZnhpOWVwandzY3pxaXVxem9nc2VwcT"]
+			)
+		);
+
+		this.expose(
+			"V6M2k2b2I2cD1maWM0NHV0eD45eDBxbm",
+			{
+			"loc2IzMGQxdzliYzhrZ3NwYjlrNHp4Ym": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.publish(
+				params["loc2IzMGQxdzliYzhrZ3NwYjlrNHp4Ym"]
 			)
 		);
 

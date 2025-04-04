@@ -19,6 +19,7 @@ import { companyOfficeStyle } from "./company-office/index.style";
 import { propertiesStyle } from "./properties/index.style";
 import { locationMarkerStyle } from "./shared/location/index.style";
 import { registerBoroughStyle } from "./borough/register/index.style";
+import { writeArticleStyle } from "./news/write/index.style";
 
 export const pageStyle = () => root(
 	bold,
@@ -81,6 +82,7 @@ export const pageStyle = () => root(
 				newsStyle(),
 				publicationStyle(),
 				articleStyle(),
+				writeArticleStyle(),
 
 				populationStyle(),
 				residentStyle(),

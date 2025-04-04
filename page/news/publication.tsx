@@ -29,8 +29,16 @@ export class PublicationPage extends Component {
 			</ui-description>
 
 			<ui-actions>
-				<ui-action ui-office ui-href={`/property/${this.publication.mainOfficeId}`}>
+				<ui-action ui-href={`/property/${this.publication.mainOfficeId}`}>
 					View Office
+				</ui-action>
+
+				<ui-action ui-click={async () => {
+					const id = await new PublicationService().createArticle(this.publication.id);
+
+					this.navigate(`../../write/${id}`);
+				}}>
+					Write Article
 				</ui-action>
 			</ui-actions>
 

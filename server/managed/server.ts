@@ -16,6 +16,7 @@ import { WaterBodyViewModel } from "././../areas/water-body.view";
 import { Point } from "././../../interface/point";
 import { MapService } from "././../areas/map.service";
 import { BoroughSummaryModel } from "././../areas/borough.summary";
+import { DistrictViewModel } from "././../areas/vote/district";
 import { BoroughService } from "././../areas/borough/service";
 import { Company } from "././database";
 import { CompanyType } from "././database";
@@ -60,7 +61,6 @@ import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
 import { Bill } from "././database";
-import { DistrictViewModel } from "././../areas/vote/district";
 import { OpenHonestiumViewModel } from "././../areas/vote/honestium";
 import { BillViewModel } from "././../areas/vote/bill";
 import { VoteTickerViewModel } from "././../areas/vote/vote";
@@ -357,10 +357,36 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"pwcTdkZWRzZnswcWY4cjgzZGR4b2NpN2",
+			{
+			"lqaTR5bWd5aXl1bXlvbmN3ZjIxNGQwMn": { type: "string", isArray: false, isOptional: false },
+				"BsZmUxZ3lvdmhpbGtleHgxN3FkMGFrcj": { type: "string", isArray: false, isOptional: false },
+				"h2cTNqeWQ2NWY5ZHI5NWxsMzB6ZXR0em": { type: "string", isArray: false, isOptional: false },
+				"0xOTYybDBpMDgzaHgxbWJ2ZjR6bzIyYW": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(BoroughService),
+			(controller, params) => controller.register(
+				params["lqaTR5bWd5aXl1bXlvbmN3ZjIxNGQwMn"],
+				params["BsZmUxZ3lvdmhpbGtleHgxN3FkMGFrcj"],
+				params["h2cTNqeWQ2NWY5ZHI5NWxsMzB6ZXR0em"],
+				params["0xOTYybDBpMDgzaHgxbWJ2ZjR6bzIyYW"]
+			)
+		);
+
+		this.expose(
 			"J4amhucmNzdWdkM3gybmlvZjV4NnFodX",
 			{},
 			inject => inject.construct(BoroughService),
 			(controller, params) => controller.list(
+				
+			)
+		);
+
+		this.expose(
+			"hxczcwaDlrb2Jmc3k4MHRzOTc5cGY4dT",
+			{},
+			inject => inject.construct(BoroughService),
+			(controller, params) => controller.listDistricts(
 				
 			)
 		);

@@ -18,6 +18,7 @@ import { residentBadgeListStyle } from "./shared/resident-badge-list/index.style
 import { companyOfficeStyle } from "./company-office/index.style";
 import { propertiesStyle } from "./properties/index.style";
 import { locationMarkerStyle } from "./shared/location/index.style";
+import { registerBoroughStyle } from "./borough/register/index.style";
 
 export const pageStyle = () => root(
 	bold,
@@ -72,6 +73,7 @@ export const pageStyle = () => root(
 				mapPageStyle(),
 
 				boroughStyle(),
+				registerBoroughStyle(),
 
 				propertyStyle(),
 				propertiesStyle(),

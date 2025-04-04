@@ -140,8 +140,8 @@ export class BannerComponent extends Component {
 		])));
 	}
 
-	static get default() {
-		return new BannerComponent('#fff');
+	static get emptyBanner() {
+		return new BannerComponent('white');
 	}
 
 	get layerTypes() {

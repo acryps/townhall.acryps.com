@@ -1352,6 +1352,30 @@ export class BoroughService {
 		});
 	}
 
+	async register(bounds: string, name: string, description: string, districtId: string): Promise<string> {
+		const $data = new FormData();
+		$data.append("lqaTR5bWd5aXl1bXlvbmN3ZjIxNGQwMn", Service.stringify(bounds))
+		$data.append("BsZmUxZ3lvdmhpbGtleHgxN3FkMGFrcj", Service.stringify(name))
+		$data.append("h2cTNqeWQ2NWY5ZHI5NWxsMzB6ZXR0em", Service.stringify(description))
+		$data.append("0xOTYybDBpMDgzaHgxbWJ2ZjR6bzIyYW", Service.stringify(districtId))
+
+		return await fetch(Service.toURL("pwcTdkZWRzZnswcWY4cjgzZGR4b2NpN2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async list(): Promise<Array<BoroughSummaryModel>> {
 		const $data = new FormData();
 		
@@ -1365,6 +1389,27 @@ export class BoroughService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : BoroughSummaryModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async listDistricts(): Promise<Array<DistrictViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("hxczcwaDlrb2Jmc3k4MHRzOTc5cGY4dT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : DistrictViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

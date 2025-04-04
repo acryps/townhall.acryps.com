@@ -1,4 +1,4 @@
-import { alignContent, alignItems, child, columnGap, display, height, imageRendering, justifyContent, maxWidth, min, padding, rem, select, style, vw, width } from "@acryps/style";
+import { alignContent, alignItems, border, child, columnGap, display, height, imageRendering, justifyContent, maxWidth, min, padding, px, rem, select, style, vw, width } from "@acryps/style";
 
 export const bannerStyle = () => select('ui-banner',
 	child('img',
@@ -14,7 +14,9 @@ export const createBannerStyle = () => child('ui-create-banner',
 		justifyContent('center'),
 
 		child('img',
-			width(min(rem(20), vw(50)))
+			width(min(rem(20), vw(50))),
+
+			border(px(1), 'dashed', 'currentColor')
 		)
 	),
 

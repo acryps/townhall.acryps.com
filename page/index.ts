@@ -33,6 +33,7 @@ import { Rewrite } from '@acryps/rewrite';
 import { OfficePage } from "./company-office/office";
 import { WorkOfferPage } from "./company-office/work-offer";
 import { CreateOfficePage } from "./company-office/office/create";
+import { RegisterBoroughPage } from "./borough/register";
 
 export class Application {
 	static router: Router;
@@ -64,6 +65,7 @@ export class Application {
 				.route('/properties', PropertiesComponent)
 				.route('/property/:id', PropertyPage)
 
+				.route('/borough/register/:bounds', RegisterBoroughPage)
 				.route('/borough/:tag', BoroughPage)
 
 				.route('/news/article/:id', ArticePage)
@@ -96,8 +98,8 @@ export class Application {
 					.route('/work-offer/:id', WorkOfferPage)
 				)
 
-				.route('/create-banner', CreateBannerComponent)
 				.route('/create-banner/:code', CreateBannerComponent)
+				.route('/create-banner', CreateBannerComponent)
 
 				.route('/home', HomePage)
 		);

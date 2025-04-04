@@ -51,11 +51,11 @@ export class CreateFeaturePage extends Component {
 					</ui-name>
 				</ui-type>
 
-				<ui-type>
+				<ui-type ui-href={`/borough/register/${btoa(Point.pack(this.shape))}`}>
 					{boroughIcon()}
 
 					<ui-name>
-						Register Borough (MISSING)
+						Register Borough
 					</ui-name>
 				</ui-type>
 

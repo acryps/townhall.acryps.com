@@ -7,15 +7,19 @@ import { buttonStyle } from "../shared/index.style";
 const bodyLineHeight = 1.3;
 
 export const newsStyle = () => child('ui-news',
-	display('block'),
+	boxed(),
 
 	child('ui-publications',
-		collection(rem(20), rem(1)),
+		collection(rem(15), rem(1)),
 		marginBottom(rem(2)),
 
 		child('ui-publication',
 			collectionItem(),
 			card(),
+
+			display('flex'),
+			alignItems('center'),
+			gap(rem(1)),
 
 			child('ui-banner',
 				fontSize(0),
@@ -25,11 +29,13 @@ export const newsStyle = () => child('ui-news',
 				)
 			),
 
-			child('ui-name',
-				display('block'),
-				marginBlock(rem(0.5)),
+			child('ui-detail',
+				child('ui-name',
+					display('block'),
+					marginBottom(rem(0.5)),
 
-				fontWeight('bold')
+					fontWeight('bold')
+				)
 			)
 		)
 	),
@@ -98,58 +104,53 @@ export const articleListStyle = () => child('ui-articles',
 	),
 
 	child('ui-article',
-		display('block'),
+		display('flex'),
+		gap(rem(1)),
 		marginBottom(rem(2)),
 
-		child('ui-images',
-			display('flex'),
-			gap(rem(0.75)),
-			height(rem(5)),
-			marginBottom(rem(0.75)),
-
-			overflow('auto', 'hidden'),
-			scrollSnapType('inline'),
-
-			child('img',
-				height(percentage(100)),
-				maxWidth(vw(60)),
-
-				objectFit('cover')
-			)
-		),
-
-		child('ui-title',
+		child('ui-detail',
 			display('block'),
-			marginBottom(rem(0.5)),
 
-			fontWeight('bold'),
-			fontSize(rem(1.25))
-		),
+			child('ui-title',
+				display('block'),
+				marginBottom(rem(0.5)),
 
-		child('ui-body',
-			display('block'),
-			maxHeight(rem(3).multiply(bodyLineHeight)),
+				fontWeight('bold'),
+				fontSize(rem(1.25))
+			),
 
-			overflow('hidden'),
-			textOverflow('ellipsis'),
-			lineHeight(bodyLineHeight)
-		),
+			child('ui-body',
+				display('block'),
+				maxHeight(rem(3).multiply(bodyLineHeight)),
 
-		child('ui-publication',
-			display('flex'),
-			alignItems('center'),
-			gap(rem(0.5)),
-			marginTop(rem(0.5)),
+				overflow('hidden'),
+				textOverflow('ellipsis'),
+				lineHeight(bodyLineHeight)
+			),
 
-			fontSize(rem(0.8)),
+			child('ui-publication',
+				display('flex'),
+				alignItems('center'),
+				gap(rem(0.5)),
+				marginTop(rem(0.5)),
 
-			child('ui-banner',
-				fontSize(0),
+				fontSize(rem(0.8)),
 
-				child('img',
-					height(rem(0.9))
+				child('ui-banner',
+					fontSize(0),
+
+					child('img',
+						height(rem(0.9))
+					)
 				)
 			)
+		),
+
+		child('img',
+			height(rem(8)),
+			maxHeight(percentage(100)),
+
+			objectFit('cover')
 		)
 	)
 );

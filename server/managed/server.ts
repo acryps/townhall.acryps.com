@@ -1154,6 +1154,7 @@ ViewModel.mappings = {
 	[CompanySummaryModel.name]: class ComposedCompanySummaryModel extends CompanySummaryModel {
 		async map() {
 			return {
+				banner: this.$$model.banner,
 				id: this.$$model.id,
 				name: this.$$model.name,
 				purpose: this.$$model.purpose,
@@ -1188,6 +1189,7 @@ ViewModel.mappings = {
 			}
 
 			return {
+				banner: true,
 				id: true,
 				name: true,
 				purpose: true,
@@ -1198,6 +1200,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new CompanySummaryModel(null);
+			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"purpose" in data && (item.purpose = data.purpose === null ? null : `${data.purpose}`);
@@ -1216,6 +1219,7 @@ ViewModel.mappings = {
 				model = new Company();
 			}
 			
+			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"purpose" in viewModel && (model.purpose = viewModel.purpose === null ? null : `${viewModel.purpose}`);
@@ -3477,7 +3481,7 @@ ViewModel.mappings = {
 	[PublicationSummaryModel.name]: class ComposedPublicationSummaryModel extends PublicationSummaryModel {
 		async map() {
 			return {
-				banner: this.$$model.banner,
+				company: new CompanySummaryModel(await BaseServer.unwrap(this.$$model.company)),
 				description: this.$$model.description,
 				id: this.$$model.id,
 				name: this.$$model.name,
@@ -3511,7 +3515,12 @@ ViewModel.mappings = {
 			}
 
 			return {
-				banner: true,
+				get company() {
+					return ViewModel.mappings[CompanySummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "company-PublicationSummaryModel"]
+					);
+				},
 				description: true,
 				id: true,
 				name: true,
@@ -3521,7 +3530,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new PublicationSummaryModel(null);
-			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
+			"company" in data && (item.company = data.company && ViewModel.mappings[CompanySummaryModel.name].toViewModel(data.company));
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
@@ -3539,104 +3548,9 @@ ViewModel.mappings = {
 				model = new Publication();
 			}
 			
-			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
+			"company" in viewModel && (model.company.id = viewModel.company ? viewModel.company.id : null);
 			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
-			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
-
-			return model;
-		}
-	},
-	[PublicationViewModel.name]: class ComposedPublicationViewModel extends PublicationViewModel {
-		async map() {
-			return {
-				articles: (await this.$$model.articles.includeTree(ViewModel.mappings[ArticleViewModel.name].items).toArray()).map(item => new ArticleViewModel(item)),
-				banner: this.$$model.banner,
-				description: this.$$model.description,
-				id: this.$$model.id,
-				incorporation: this.$$model.incorporation,
-				legalName: this.$$model.legalName,
-				mainOfficeId: this.$$model.mainOfficeId,
-				name: this.$$model.name,
-				tag: this.$$model.tag
-			}
-		};
-
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
-			return {
-				get articles() {
-					return ViewModel.mappings[ArticleViewModel.name].getPrefetchingProperties(
-						level,
-						[...parents, "articles-PublicationViewModel"]
-					);
-				},
-				banner: true,
-				description: true,
-				id: true,
-				incorporation: true,
-				legalName: true,
-				mainOfficeId: true,
-				name: true,
-				tag: true
-			};
-		};
-
-		static toViewModel(data) {
-			const item = new PublicationViewModel(null);
-			"articles" in data && (item.articles = data.articles && [...data.articles].map(i => ViewModel.mappings[ArticleViewModel.name].toViewModel(i)));
-			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
-			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
-			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
-			"incorporation" in data && (item.incorporation = data.incorporation === null ? null : new Date(data.incorporation));
-			"legalName" in data && (item.legalName = data.legalName === null ? null : `${data.legalName}`);
-			"mainOfficeId" in data && (item.mainOfficeId = data.mainOfficeId === null ? null : `${data.mainOfficeId}`);
-			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
-
-			return item;
-		}
-
-		static async toModel(viewModel: PublicationViewModel) {
-			let model: Publication;
-			
-			if (viewModel.id) {
-				model = await ViewModel.globalFetchingContext.findSet(Publication).find(viewModel.id)
-			} else {
-				model = new Publication();
-			}
-			
-			"articles" in viewModel && (null);
-			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
-			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
-			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
-			"incorporation" in viewModel && (model.incorporation = viewModel.incorporation === null ? null : new Date(viewModel.incorporation));
-			"legalName" in viewModel && (model.legalName = viewModel.legalName === null ? null : `${viewModel.legalName}`);
-			"mainOfficeId" in viewModel && (model.mainOfficeId = viewModel.mainOfficeId === null ? null : `${viewModel.mainOfficeId}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 
@@ -4456,6 +4370,7 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				offices: (await this.$$model.offices.includeTree(ViewModel.mappings[OfficeSummaryModel.name].items).toArray()).map(item => new OfficeSummaryModel(item)),
+				banner: this.$$model.banner,
 				created: this.$$model.created,
 				description: this.$$model.description,
 				id: this.$$model.id,
@@ -4499,6 +4414,7 @@ ViewModel.mappings = {
 						[...parents, "offices-CompanyViewModel"]
 					);
 				},
+				banner: true,
 				created: true,
 				description: true,
 				id: true,
@@ -4513,6 +4429,7 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new CompanyViewModel(null);
 			"offices" in data && (item.offices = data.offices && [...data.offices].map(i => ViewModel.mappings[OfficeSummaryModel.name].toViewModel(i)));
+			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
 			"created" in data && (item.created = data.created === null ? null : new Date(data.created));
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
@@ -4535,6 +4452,7 @@ ViewModel.mappings = {
 			}
 			
 			"offices" in viewModel && (null);
+			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
 			"created" in viewModel && (model.created = viewModel.created === null ? null : new Date(viewModel.created));
 			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
@@ -4830,6 +4748,98 @@ ViewModel.mappings = {
 			"ended" in viewModel && (model.ended = viewModel.ended === null ? null : new Date(viewModel.ended));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"started" in viewModel && (model.started = viewModel.started === null ? null : new Date(viewModel.started));
+
+			return model;
+		}
+	},
+	[PublicationViewModel.name]: class ComposedPublicationViewModel extends PublicationViewModel {
+		async map() {
+			return {
+				company: new CompanySummaryModel(await BaseServer.unwrap(this.$$model.company)),
+				articles: (await this.$$model.articles.includeTree(ViewModel.mappings[ArticleViewModel.name].items).toArray()).map(item => new ArticleViewModel(item)),
+				description: this.$$model.description,
+				id: this.$$model.id,
+				incorporation: this.$$model.incorporation,
+				name: this.$$model.name,
+				tag: this.$$model.tag
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get company() {
+					return ViewModel.mappings[CompanySummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "company-PublicationViewModel"]
+					);
+				},
+				get articles() {
+					return ViewModel.mappings[ArticleViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "articles-PublicationViewModel"]
+					);
+				},
+				description: true,
+				id: true,
+				incorporation: true,
+				name: true,
+				tag: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new PublicationViewModel(null);
+			"company" in data && (item.company = data.company && ViewModel.mappings[CompanySummaryModel.name].toViewModel(data.company));
+			"articles" in data && (item.articles = data.articles && [...data.articles].map(i => ViewModel.mappings[ArticleViewModel.name].toViewModel(i)));
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"incorporation" in data && (item.incorporation = data.incorporation === null ? null : new Date(data.incorporation));
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PublicationViewModel) {
+			let model: Publication;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Publication).find(viewModel.id)
+			} else {
+				model = new Publication();
+			}
+			
+			"company" in viewModel && (model.company.id = viewModel.company ? viewModel.company.id : null);
+			"articles" in viewModel && (null);
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"incorporation" in viewModel && (model.incorporation = viewModel.incorporation === null ? null : new Date(viewModel.incorporation));
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 
 			return model;
 		}

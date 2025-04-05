@@ -2,6 +2,7 @@ import { Component } from "@acryps/page";
 import { ArticleViewModel, PublicationService, PublicationViewModel } from "../managed/services";
 import { BannerComponent } from "../banner";
 import { ArticleListComponent } from "./list";
+import { convertToLegalCompanyName } from "../company-office/company/type";
 
 export class PublicationPage extends Component {
 	declare parameters: { tag };
@@ -14,14 +15,14 @@ export class PublicationPage extends Component {
 
 	render() {
 		return <ui-publication>
-			{BannerComponent.unpack(this.publication.banner)}
+			{BannerComponent.unpack(this.publication.company.banner)}
 
 			<ui-name>
 				{this.publication.name}
 			</ui-name>
 
 			<ui-legal-name>
-				{this.publication.legalName}
+				{convertToLegalCompanyName(this.publication.company)}
 			</ui-legal-name>
 
 			<ui-description>
@@ -29,8 +30,8 @@ export class PublicationPage extends Component {
 			</ui-description>
 
 			<ui-actions>
-				<ui-action ui-href={`/property/${this.publication.mainOfficeId}`}>
-					View Office
+				<ui-action ui-href={`/company-office/company/${this.publication.company.tag}`}>
+					View Company
 				</ui-action>
 
 				<ui-action ui-click={async () => {

@@ -10,6 +10,7 @@ export class CompanySummaryModel extends ViewModel<Company> {
 	name;
 	type;
 	purpose;
+	banner;
 }
 
 export class CompanyViewModel extends CompanySummaryModel {

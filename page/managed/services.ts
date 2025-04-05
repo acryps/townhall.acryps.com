@@ -72,6 +72,7 @@ export class BridgeViewModel {
 }
 
 export class CompanySummaryModel {
+	banner: string;
 	id: string;
 	name: string;
 	purpose: string;
@@ -80,6 +81,7 @@ export class CompanySummaryModel {
 
 	private static $build(raw) {
 		const item = new CompanySummaryModel();
+		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.purpose === undefined || (item.purpose = raw.purpose === null ? null : `${raw.purpose}`)
@@ -611,7 +613,7 @@ export class ArticleImageViewModel {
 }
 
 export class PublicationSummaryModel {
-	banner: string;
+	company: CompanySummaryModel;
 	description: string;
 	id: string;
 	name: string;
@@ -619,36 +621,9 @@ export class PublicationSummaryModel {
 
 	private static $build(raw) {
 		const item = new PublicationSummaryModel();
-		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
+		raw.company === undefined || (item.company = raw.company ? CompanySummaryModel["$build"](raw.company) : null)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
-		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
-		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
-		
-		return item;
-	}
-}
-
-export class PublicationViewModel {
-	articles: ArticleViewModel[];
-	banner: string;
-	description: string;
-	id: string;
-	incorporation: Date;
-	legalName: string;
-	mainOfficeId: string;
-	name: string;
-	tag: string;
-
-	private static $build(raw) {
-		const item = new PublicationViewModel();
-		raw.articles === undefined || (item.articles = raw.articles ? raw.articles.map(i => ArticleViewModel["$build"](i)) : null)
-		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
-		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
-		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
-		raw.incorporation === undefined || (item.incorporation = raw.incorporation ? new Date(raw.incorporation) : null)
-		raw.legalName === undefined || (item.legalName = raw.legalName === null ? null : `${raw.legalName}`)
-		raw.mainOfficeId === undefined || (item.mainOfficeId = raw.mainOfficeId === null ? null : `${raw.mainOfficeId}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		
@@ -855,6 +830,7 @@ export class VoteTickerViewModel {
 
 export class CompanyViewModel {
 	offices: OfficeSummaryModel[];
+	banner: string;
 	created: Date;
 	description: string;
 	id: string;
@@ -867,6 +843,7 @@ export class CompanyViewModel {
 	private static $build(raw) {
 		const item = new CompanyViewModel();
 		raw.offices === undefined || (item.offices = raw.offices ? raw.offices.map(i => OfficeSummaryModel["$build"](i)) : null)
+		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
 		raw.created === undefined || (item.created = raw.created ? new Date(raw.created) : null)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
@@ -942,6 +919,29 @@ export class LawHouseSessionViewModel {
 		raw.ended === undefined || (item.ended = raw.ended ? new Date(raw.ended) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.started === undefined || (item.started = raw.started ? new Date(raw.started) : null)
+		
+		return item;
+	}
+}
+
+export class PublicationViewModel {
+	company: CompanySummaryModel;
+	articles: ArticleViewModel[];
+	description: string;
+	id: string;
+	incorporation: Date;
+	name: string;
+	tag: string;
+
+	private static $build(raw) {
+		const item = new PublicationViewModel();
+		raw.company === undefined || (item.company = raw.company ? CompanySummaryModel["$build"](raw.company) : null)
+		raw.articles === undefined || (item.articles = raw.articles ? raw.articles.map(i => ArticleViewModel["$build"](i)) : null)
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.incorporation === undefined || (item.incorporation = raw.incorporation ? new Date(raw.incorporation) : null)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		
 		return item;
 	}

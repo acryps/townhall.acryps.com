@@ -1,6 +1,7 @@
 import { ViewModel } from "vlserver";
 import { Publication } from "../../managed/database";
 import { ArticleViewModel } from "./article";
+import { CompanySummaryModel } from "../company.view";
 
 export class PublicationSummaryModel extends ViewModel<Publication> {
 	id;
@@ -8,20 +9,12 @@ export class PublicationSummaryModel extends ViewModel<Publication> {
 
 	name;
 	description;
-	banner;
+
+	company: CompanySummaryModel;
 }
 
-export class PublicationViewModel extends ViewModel<Publication> {
-	id;
-	tag;
-
-	name;
-	description;
+export class PublicationViewModel extends PublicationSummaryModel {
 	incorporation;
-	legalName;
-	banner;
-
-	mainOfficeId;
 
 	articles: ArticleViewModel[];
 }

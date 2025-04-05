@@ -35,7 +35,8 @@ export interface BridgeViewModel {
 }
 
 export interface CompanySummaryModel {
-    id: string;
+    banner: string;
+	id: string;
 	name: string;
 	purpose: string;
 	tag: string;
@@ -258,21 +259,9 @@ export interface ArticleImageViewModel {
 }
 
 export interface PublicationSummaryModel {
-    banner: string;
+    company: CompanySummaryModel;
 	description: string;
 	id: string;
-	name: string;
-	tag: string;
-}
-
-export interface PublicationViewModel {
-    articles: ArticleViewModel[];
-	banner: string;
-	description: string;
-	id: string;
-	incorporation: Date;
-	legalName: string;
-	mainOfficeId: string;
 	name: string;
 	tag: string;
 }
@@ -361,6 +350,7 @@ export interface VoteTickerViewModel {
 
 export interface CompanyViewModel {
     offices: OfficeSummaryModel[];
+	banner: string;
 	created: Date;
 	description: string;
 	id: string;
@@ -398,4 +388,14 @@ export interface LawHouseSessionViewModel {
 	ended: Date;
 	id: string;
 	started: Date;
+}
+
+export interface PublicationViewModel {
+    company: CompanySummaryModel;
+	articles: ArticleViewModel[];
+	description: string;
+	id: string;
+	incorporation: Date;
+	name: string;
+	tag: string;
 }

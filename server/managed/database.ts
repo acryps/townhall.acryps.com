@@ -479,6 +479,7 @@ export class ChatInteraction extends Entity<ChatInteractionQueryProxy> {
 }
 			
 export class CompanyQueryProxy extends QueryProxy {
+	get banner(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get incorporated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -490,7 +491,8 @@ export class CompanyQueryProxy extends QueryProxy {
 
 export class Company extends Entity<CompanyQueryProxy> {
 	offices: PrimaryReference<Office, OfficeQueryProxy>;
-		created: Date;
+		banner: string;
+	created: Date;
 	description: string;
 	declare id: string;
 	incorporated: Date;
@@ -502,6 +504,7 @@ export class Company extends Entity<CompanyQueryProxy> {
 	$$meta = {
 		source: "company",
 		columns: {
+			banner: { type: "text", name: "banner" },
 			created: { type: "timestamp", name: "created" },
 			description: { type: "text", name: "description" },
 			id: { type: "uuid", name: "id" },
@@ -1376,37 +1379,31 @@ export class PropertyType extends Entity<PropertyTypeQueryProxy> {
 }
 			
 export class PublicationQueryProxy extends QueryProxy {
-	get mainOffice(): Partial<PropertyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get banner(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get company(): Partial<CompanyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get companyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get incorporation(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get legalName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get mainOfficeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class Publication extends Entity<PublicationQueryProxy> {
-	get mainOffice(): Partial<ForeignReference<Property>> { return this.$mainOffice; }
+	get company(): Partial<ForeignReference<Company>> { return this.$company; }
 	articles: PrimaryReference<Article, ArticleQueryProxy>;
-		banner: string;
+		companyId: string;
 	description: string;
 	declare id: string;
 	incorporation: Date;
-	legalName: string;
-	mainOfficeId: string;
 	name: string;
 	tag: string;
 	
 	$$meta = {
 		source: "publication",
 		columns: {
-			banner: { type: "text", name: "banner" },
+			companyId: { type: "uuid", name: "company_id" },
 			description: { type: "text", name: "description" },
 			id: { type: "uuid", name: "id" },
 			incorporation: { type: "timestamp", name: "incorporation" },
-			legalName: { type: "text", name: "legal_name" },
-			mainOfficeId: { type: "uuid", name: "main_office_id" },
 			name: { type: "text", name: "name" },
 			tag: { type: "text", name: "tag" }
 		},
@@ -1418,19 +1415,19 @@ export class Publication extends Entity<PublicationQueryProxy> {
 	constructor() {
 		super();
 		
-		this.$mainOffice = new ForeignReference<Property>(this, "mainOfficeId", Property);
+		this.$company = new ForeignReference<Company>(this, "companyId", Company);
 	this.articles = new PrimaryReference<Article, ArticleQueryProxy>(this, "publicationId", Article);
 	}
 	
-	private $mainOffice: ForeignReference<Property>;
+	private $company: ForeignReference<Company>;
 
-	set mainOffice(value: Partial<ForeignReference<Property>>) {
+	set company(value: Partial<ForeignReference<Company>>) {
 		if (value) {
 			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
 
-			this.mainOfficeId = value.id as string;
+			this.companyId = value.id as string;
 		} else {
-			this.mainOfficeId = null;
+			this.companyId = null;
 		}
 	}
 

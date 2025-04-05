@@ -7,6 +7,8 @@ export class ArticleListComponent extends Component {
 		private articles: ArticleViewModel[]
 	) {
 		super();
+
+		this.articles = articles.toSorted((a, b) => +b.published - +a.published);
 	}
 
 	render() {
@@ -15,23 +17,23 @@ export class ArticleListComponent extends Component {
 		return <ui-articles>
 			{this.articles.filter(article => article.published).map(article => {
 				const element = <ui-article ui-href={`/news/article/${article.id}`}>
-					{article.images.length > 0 && <ui-images>
-						{article.images.map(image => <img src={`/article/image/${image.id}`} />)}
-					</ui-images>}
+					<ui-detail>
+						<ui-title>
+							{article.title}
+						</ui-title>
 
-					<ui-title>
-						{article.title}
-					</ui-title>
+						<ui-body>
+							{article.body.substring(0, 1000)}
+						</ui-body>
 
-					<ui-body>
-						{article.body.substring(0, 1000)}
-					</ui-body>
+						<ui-publication>
+							{BannerComponent.unpack(article.publication.company.banner)}
 
-					<ui-publication>
-						{BannerComponent.unpack(article.publication.banner)}
+							{article.publication.name}
+						</ui-publication>
+					</ui-detail>
 
-						{article.publication.name}
-					</ui-publication>
+					{article.images.length > 0 && <img src={`/article/image/${article.images[0].id}`} />}
 				</ui-article>;
 
 				if (lastDate.toDateString() != article.published.toDateString()) {

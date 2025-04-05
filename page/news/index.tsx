@@ -22,15 +22,17 @@ export class NewsPage extends Component {
 		return <ui-news>
 			<ui-publications>
 				{this.publications.map(publication => <ui-publication ui-href={`publication/${publication.tag}`}>
-					{BannerComponent.unpack(publication.banner)}
+					{BannerComponent.unpack(publication.company.banner)}
 
-					<ui-name>
-						{publication.name}
-					</ui-name>
+					<ui-detail>
+						<ui-name>
+							{publication.name}
+						</ui-name>
 
-					<ui-description>
-						{publication.description}
-					</ui-description>
+						<ui-description>
+							{publication.description}
+						</ui-description>
+					</ui-detail>
 				</ui-publication>)}
 			</ui-publications>
 

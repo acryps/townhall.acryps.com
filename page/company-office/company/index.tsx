@@ -3,7 +3,7 @@ import { CompanyOfficeService, CompanyType, CompanyViewModel } from "../../manag
 import { toSimulatedAge } from "../../../interface/time";
 import { MapComponent } from "../../shared/map";
 import { Point } from "../../../interface/point";
-import { convertToCompanyTypeName } from "./type";
+import { convertToCompanyTypeName } from "../../../interface/company";
 
 export class CompanyPage extends Component {
 	declare parameters: { tag };

@@ -1964,6 +1964,49 @@ export class PublicationService {
 		});
 	}
 
+	async getArticleContent(id: string): Promise<string> {
+		const $data = new FormData();
+		$data.append("IxdjlzOHlheGNtZmN1cGE0ZnV2YTZsM2", Service.stringify(id))
+
+		return await fetch(Service.toURL("N5ZjNjamYyZTBodXNqbmlpemR1dTcwbj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async listNewestArticles(page: number, publication: string): Promise<Array<ArticleViewModel>> {
+		const $data = new FormData();
+		$data.append("dzdXMydWI2ZmE4a3Vya2Q4NTpjeWc1bz", Service.stringify(page))
+		$data.append("FzenJlNHNwNmh4c2ZhaHtmejswaDVqaj", Service.stringify(publication))
+
+		return await fetch(Service.toURL("NoMX80NmgxNTFyZTB4dzB3eDBzZHFtd3"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ArticleViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async createArticle(publicationId: string): Promise<string> {
 		const $data = new FormData();
 		$data.append("BsdT10cmlhMDtwangxNHF2cTZ0aTMyd2", Service.stringify(publicationId))
@@ -2082,27 +2125,6 @@ export class PublicationService {
 
 			if ("aborted" in r) {
 				throw new Error("request aborted by server");
-			}
-		});
-	}
-
-	async listNewestArticles(): Promise<Array<ArticleViewModel>> {
-		const $data = new FormData();
-		
-
-		return await fetch(Service.toURL("F1aXFpZz05eX01dmR2cXd6dGZwdzR2dD"), {
-			method: "post",
-			credentials: "include",
-			body: $data
-		}).then(res => res.json()).then(r => {
-			if ("data" in r) {
-				const d = r.data;
-
-				return d.map(d => d === null ? null : ArticleViewModel["$build"](d));
-			} else if ("aborted" in r) {
-				throw new Error("request aborted by server");
-			} else if ("error" in r) {
-				throw new Error(r.error);
 			}
 		});
 	}

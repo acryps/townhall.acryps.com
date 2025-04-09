@@ -1,7 +1,7 @@
 import { Component } from "@acryps/page";
 import { CompanyOfficeService, WorkOfferViewModel } from "../../managed/services";
-import { convertToLegalCompanyName } from "../company/type";
 import { toSimulatedAge } from "../../../interface/time";
+import { convertToLegalCompanyName } from "../../../interface/company";
 
 export class WorkOfferPage extends Component {
 	declare parameters: { id };

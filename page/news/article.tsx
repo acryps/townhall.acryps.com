@@ -2,14 +2,18 @@ import { Component } from "@acryps/page";
 import { ArticleViewModel, PublicationService } from "../managed/services";
 import { linkText } from "../linked-text";
 import { MetaNewsArticle, MetaOrganization } from "@acryps/metadata";
+import { AnnotatedTextPart } from "../../interface/annotate";
+import { AnnotatedTextComponent } from "../shared/annotaded-text";
 
 export class ArticePage extends Component {
 	declare parameters: { id };
 
 	article: ArticleViewModel;
+	content: AnnotatedTextComponent;
 
 	async onload() {
 		this.article = await new PublicationService().getArticle(this.parameters.id);
+		this.content = new AnnotatedTextComponent(await new PublicationService().getArticleContent(this.parameters.id));
 
 		new MetaNewsArticle({
 			name: this.article.title,
@@ -39,7 +43,7 @@ export class ArticePage extends Component {
 			</ui-detail>
 
 			<ui-body>
-				{linkText(this.article.body)}
+				{this.content}
 			</ui-body>
 
 			{this.article.images.map(image => <ui-image>

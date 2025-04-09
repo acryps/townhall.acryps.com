@@ -2,7 +2,7 @@ import { Component } from "@acryps/page";
 import { ArticleViewModel, PublicationService, PublicationViewModel } from "../managed/services";
 import { BannerComponent } from "../banner";
 import { ArticleListComponent } from "./list";
-import { convertToLegalCompanyName } from "../company-office/company/type";
+import { convertToLegalCompanyName } from "../../interface/company";
 
 export class PublicationPage extends Component {
 	declare parameters: { tag };

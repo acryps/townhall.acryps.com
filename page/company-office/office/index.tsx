@@ -1,6 +1,6 @@
 import { Component } from "@acryps/page";
 import { CompanyOfficeService, OfficeViewModel } from "../../managed/services";
-import { convertToLegalCompanyName } from "../company/type";
+import { convertToLegalCompanyName } from "../../../interface/company";
 
 export class OfficePage extends Component {
 	declare parameters: { id };

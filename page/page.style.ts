@@ -20,6 +20,7 @@ import { propertiesStyle } from "./properties/index.style";
 import { locationMarkerStyle } from "./shared/location/index.style";
 import { registerBoroughStyle } from "./borough/register/index.style";
 import { writeArticleStyle } from "./news/write/index.style";
+import { annotatedTextStyle } from "./shared/annotaded-text/index.style";
 
 export const pageStyle = () => root(
 	bold,
@@ -36,6 +37,7 @@ export const pageStyle = () => root(
 	mapStyle(),
 	residentBadgeListStyle(),
 	locationMarkerStyle(),
+	annotatedTextStyle(),
 
 	child('body',
 		padding(0),

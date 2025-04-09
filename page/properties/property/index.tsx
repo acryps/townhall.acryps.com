@@ -8,7 +8,7 @@ import { addIcon, deleteIcon, drawIcon } from "../../assets/icons/managed";
 import { MetaGovernmentBuilding, MetaPlace } from "@acryps/metadata";
 import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
 import { CompanyOfficePage } from "../../company-office";
-import { convertToLegalCompanyName } from "../../company-office/company/type";
+import { convertToLegalCompanyName } from "../../../interface/company";
 
 export class PropertyPage extends Component {
 	declare parameters: { id: string };

@@ -8,7 +8,7 @@ export class NewsPage extends Component {
 	publications: PublicationSummaryModel[];
 
 	async onload() {
-		this.articles = await new PublicationService().listNewestArticles();
+		this.articles = await new PublicationService().listNewestArticles(0, null);
 		this.publications = [];
 
 		for (let article of this.articles) {

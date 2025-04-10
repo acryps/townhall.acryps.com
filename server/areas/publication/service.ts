@@ -1,7 +1,8 @@
 import { Service } from "vlserver";
-import { Article, ArticleImage, DbContext } from "../../managed/database";
+import { Article, ArticleImage, DbContext, Publication } from "../../managed/database";
 import { ArticleImageViewModel, ArticleViewModel } from "./article";
 import { PublicationViewModel } from "./publication";
+import { Annotator } from "../../annotate";
 
 export class PublicationService extends Service {
 	constructor(
@@ -18,6 +19,24 @@ export class PublicationService extends Service {
 
 	async getArticle(id: string) {
 		return new ArticleViewModel(await this.database.article.find(id));
+	}
+
+	async getArticleContent(id: string) {
+		const article = await this.database.article.find(id);
+
+		return Annotator.annotate(article.body).pack();
+	}
+
+	listNewestArticles(page: number, publication: string) {
+		let query = this.database.article
+			.where(article => article.published != null)
+			.orderByDescending(article => article.published);
+
+		if (publication) {
+			query = query.where(article => article.publicationId == publication);
+		}
+
+		return ArticleViewModel.from(query);
 	}
 
 	async createArticle(publicationId: string) {
@@ -94,13 +113,5 @@ export class PublicationService extends Service {
 		article.published = new Date();
 
 		await article.update();
-	}
-
-	listNewestArticles() {
-		return ArticleViewModel.from(
-			this.database.article
-				.where(article => article.published != null)
-				.orderByDescending(article => article.published)
-		);
 	}
 }

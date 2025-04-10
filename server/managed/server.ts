@@ -53,9 +53,11 @@ import { PropertyDwellingViewModel } from "././../areas/property.view";
 import { PropertyService } from "././../areas/property/service";
 import { Article } from "././database";
 import { ArticleImage } from "././database";
+import { Publication } from "././database";
 import { ArticleImageViewModel } from "././../areas/publication/article";
 import { ArticleViewModel } from "././../areas/publication/article";
 import { PublicationViewModel } from "././../areas/publication/publication";
+import { Annotator } from "././../annotate";
 import { PublicationService } from "././../areas/publication/service";
 import { ChatManager } from "././../areas/resident/chat/manager";
 import { ChatInteractionViewModel } from "././../areas/resident/chat/interaction";
@@ -99,7 +101,6 @@ import { LawHouseSessionary } from "./../managed/database";
 import { LawHouseSessionProtocol } from "./../managed/database";
 import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
-import { Publication } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
 import { TrainStationExit } from "./../managed/database";
 import { TrainRoute } from "./../managed/database";
@@ -669,6 +670,30 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"N5ZjNjamYyZTBodXNqbmlpemR1dTcwbj",
+			{
+			"IxdjlzOHlheGNtZmN1cGE0ZnV2YTZsM2": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.getArticleContent(
+				params["IxdjlzOHlheGNtZmN1cGE0ZnV2YTZsM2"]
+			)
+		);
+
+		this.expose(
+			"NoMX80NmgxNTFyZTB4dzB3eDBzZHFtd3",
+			{
+			"dzdXMydWI2ZmE4a3Vya2Q4NTpjeWc1bz": { type: "number", isArray: false, isOptional: false },
+				"FzenJlNHNwNmh4c2ZhaHtmejswaDVqaj": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.listNewestArticles(
+				params["dzdXMydWI2ZmE4a3Vya2Q4NTpjeWc1bz"],
+				params["FzenJlNHNwNmh4c2ZhaHtmejswaDVqaj"]
+			)
+		);
+
+		this.expose(
 			"9naWs5bzEzaWUxNmR2MTU1cj1vbWljaD",
 			{
 			"BsdT10cmlhMDtwangxNHF2cTZ0aTMyd2": { type: "string", isArray: false, isOptional: false }
@@ -739,15 +764,6 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(PublicationService),
 			(controller, params) => controller.publish(
 				params["loc2IzMGQxdzliYzhrZ3NwYjlrNHp4Ym"]
-			)
-		);
-
-		this.expose(
-			"F1aXFpZz05eX01dmR2cXd6dGZwdzR2dD",
-			{},
-			inject => inject.construct(PublicationService),
-			(controller, params) => controller.listNewestArticles(
-				
 			)
 		);
 

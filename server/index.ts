@@ -21,6 +21,7 @@ import { PropertyUsageTileServer } from "./map/layers/shape/usage";
 import { ImpressionImageInterface } from "./areas/impressions/interface";
 import { StreetTileServer } from "./map/layers/shape/street";
 import { updateWorkOffers } from "./life/work/offers";
+import { Annotator } from "./annotate";
 
 const runLife = process.env.RUN_LIFE == 'YES';
 
@@ -35,6 +36,9 @@ DbClient.connectedClient.connect().then(async () => {
 
 	const database = new DbContext(new RunContext());
 	new MapImporter(database);
+
+	const annotator = new Annotator(database);
+	annotator.load();
 
 	const life = new Life(database);
 	await life.load();

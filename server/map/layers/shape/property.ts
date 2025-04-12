@@ -13,23 +13,41 @@ export class PropertyTileServer extends ShapeTileServer {
 			'property',
 
 			async () => {
-				const properties = await database.property
-					.where(property => property.deactivated == null)
-					.toArray();
-
-				const types = await database.propertyType.toArray();
-
 				const shapes = [];
 
-				for (let property of properties) {
-					const type = types.find(type => type.id == property.typeId);
-
+				for (let borough of await database.borough.toArray()) {
 					shapes.push({
-						id: property.id,
-						fill: type?.color ?? 'transparent',
-						stroke: property.historicListingGradeId ? '#fff' : '#000',
-						bounds: property.bounds
+						fill: '#fffc',
+						stroke: '#000',
+						bounds: borough.bounds
 					});
+				}
+
+				const properties = await database.property
+					.where(property => property.deactivated == null)
+					.include(property => property.activePlotBoundary)
+					.include(property => property.buildings)
+					.toArray();
+
+				for (let property of properties) {
+					if (property.activePlotBoundaryId) {
+						const activePlotBoundary = await property.activePlotBoundary.fetch();
+
+						shapes.push({
+							id: property.id,
+							fill: '#eee',
+							stroke: property.historicListingGradeId ? '#f00' : '#000',
+							bounds: activePlotBoundary.shape
+						});
+					}
+
+					for (let building of await property.buildings.toArray()) {
+						shapes.push({
+							fill: '#ccc',
+							stroke: '#666',
+							bounds: building.boundary
+						});
+					}
 				}
 
 				return shapes;

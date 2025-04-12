@@ -1,5 +1,5 @@
-import { alignItems, alignSelf, backgroundColor, border, borderTop, bottom, boxShadow, child, color, display, flexDirection, fontSize, gap, height, hex, imageRendering, inset, insetInline, justifyContent, margin, marginInline, marginLeft, marginTop, maxWidth, Number, overflow, padding, percentage, pointerEvents, position, px, rem, select, textAlign, Variable, width } from "@acryps/style";
-import { pageTextColor, navigationBackgroundColor, navigationBorderColor, pageGutter, pageBackgroundColor } from "../index.style";
+import { alignItems, alignSelf, backgroundColor, border, borderTop, bottom, boxShadow, child, color, display, flexDirection, flexGrow, flexWrap, fontSize, gap, height, hex, imageRendering, inset, insetInline, justifyContent, margin, marginInline, marginLeft, marginTop, maxWidth, Number, overflow, padding, paddingBlock, paddingInline, percentage, pointerEvents, position, px, rem, select, textAlign, Variable, width } from "@acryps/style";
+import { pageTextColor, navigationBackgroundColor, navigationBorderColor, pageGutter, pageBackgroundColor, neutralColor } from "../index.style";
 import { buttonStyle } from "../shared/index.style";
 import { PageComponent } from "../page";
 import { createFeatureStyle } from "./create/index.style";
@@ -46,12 +46,28 @@ export const mapStyle = () => [
 
 			child('ui-drawer',
 				display('flex'),
+				flexWrap('wrap'),
 				justifyContent('space-between'),
 				padding(pageGutter.subtract(buttonPaddingSize)),
 
 				color(pageTextColor),
 				backgroundColor(navigationBackgroundColor),
 				borderTop(px(1), 'solid', navigationBorderColor),
+
+				child('ui-create-building',
+					width(percentage(100).subtract(buttonPaddingSize.multiply(2))),
+					paddingInline(buttonPaddingSize),
+					paddingBlock(buttonPaddingSize.divide(2)),
+
+					fontSize(rem(0.75)),
+					textAlign('center'),
+
+					backgroundColor(neutralColor)
+				),
+
+				child('ui-edit-plot',
+					padding(buttonPaddingSize)
+				),
 
 				select('ui-layer',
 					padding(buttonPaddingSize),

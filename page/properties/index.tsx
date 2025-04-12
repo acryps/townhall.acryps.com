@@ -1,4 +1,4 @@
-import { MapService, PropertySummaryModel } from "../managed/services";
+import { MapService, PropertyOverviewModel, PropertySummaryModel } from "../managed/services";
 import { Component } from "@acryps/page";
 import { Point } from "../../interface/point";
 import { locationMarkerStyle } from "../shared/location/index.style";
@@ -6,7 +6,7 @@ import { LocationMarkerComponent } from "../shared/location";
 import { MapComponent } from "../shared/map";
 
 export class PropertiesComponent extends Component {
-	properties: PropertySummaryModel[];
+	properties: PropertyOverviewModel[];
 
 	page = 0;
 	loadingNextPage = false;
@@ -56,11 +56,10 @@ export class PropertiesComponent extends Component {
 		return <ui-properties>
 			<ui-properties>
 				{this.properties.map(property => {
-					const points = Point.unpack(property.bounds);
-					const size = Point.size(points);
+					const points = Point.unpack(property.activePlotBoundary.shape);
 
 					return <ui-property ui-incomplete={!property.borough || !property.type} ui-href={`/property/${property.id}`}>
-						{new MapComponent().highlight(Point.unpack(property.bounds))}
+						{new MapComponent().highlight(points)}
 
 						<ui-name>
 							{property.name ?? property.id.split('-')[0]}

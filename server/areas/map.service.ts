@@ -1,12 +1,12 @@
 import { Service } from "vlserver";
-import { Borough, DbContext, Property } from "../managed/database";
+import { Borough, DbContext, PlotBoundary, Property } from "../managed/database";
 import { Proxy } from "../proxy";
 import { BoroughViewModel } from "./borough.view";
 import { BridgeViewModel } from "./bridge.view";
 import { HistoryEntryViewModel } from "./history.view";
 import { PropertyTypeViewModel } from "./property-type.view";
 import { PropertySummaryModel } from "./property.summary";
-import { PropertyViewModel } from "./property.view";
+import { PropertyOverviewModel, PropertyViewModel } from "./property.view";
 import { SquareViewModel } from "./squre.view";
 import { StreetViewModel } from "./street.view";
 import { WaterBodyViewModel } from "./water-body.view";
@@ -14,21 +14,27 @@ import { Point } from "../../interface/point";
 
 export class MapService extends Service {
 	constructor(
-		private db: DbContext
+		private database: DbContext
 	) {
 		super();
 	}
 
+	async reviewNext() {
+		return new PropertyViewModel(
+			await this.database.property.where(property => property.deactivated == null).first(property => property.reviewPlot != true)
+		);
+	}
+
 	getBoroughs() {
 		return BoroughViewModel.from(
-			this.db.borough
+			this.database.borough
 				.orderByAscending(borough => borough.name)
 		);
 	}
 
 	getProperties(page: number) {
-		return PropertySummaryModel.from(
-			this.db.property
+		return PropertyOverviewModel.from(
+			this.database.property
 				.where(property => property.deactivated == null)
 				.orderByDescending(property => property.borough)
 				.orderByDescending(property => property.type)
@@ -39,7 +45,7 @@ export class MapService extends Service {
 
 	getStreets() {
 		return StreetViewModel.from(
-			this.db.street
+			this.database.street
 				.orderByAscending(street => street.size)
 				.orderByAscending(street => street.name)
 		);
@@ -47,21 +53,21 @@ export class MapService extends Service {
 
 	getSquares() {
 		return SquareViewModel.from(
-			this.db.square
+			this.database.square
 				.orderByAscending(square => square.name)
 		);
 	}
 
 	getWaterBodies() {
 		return WaterBodyViewModel.from(
-			this.db.waterBody
+			this.database.waterBody
 				.orderByAscending(body => body.name)
 		);
 	}
 
 	getBridges() {
 		return BridgeViewModel.from(
-			this.db.bridge
+			this.database.bridge
 				.orderByAscending(bridge => bridge.name)
 		);
 	}
@@ -75,19 +81,28 @@ export class MapService extends Service {
 	}
 
 	async getPropertyTypes() {
-		return PropertyTypeViewModel.from(this.db.propertyType.orderByAscending(type => type.code));
+		return PropertyTypeViewModel.from(this.database.propertyType.orderByAscending(type => type.code));
 	}
 
 	async getProperty(id: string) {
-		return new PropertyViewModel(await this.db.property.find(id));
+		return new PropertyViewModel(await this.database.property.find(id));
 	}
 
 	async createProperty(shape: string) {
 		const property = new Property();
-		property.bounds = Point.pack(Point.unpack(shape));
 		property.created = new Date();
 
 		await property.create();
+
+		const plot = new PlotBoundary();
+		plot.shape = Point.pack(Point.unpack(shape));
+		plot.created = new Date();
+		plot.property = property;
+
+		await plot.create();
+
+		property.activePlotBoundary = plot;
+		await property.update();
 
 		return property.id;
 	}

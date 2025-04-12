@@ -35,6 +35,9 @@ import { WorkOfferPage } from "./company-office/work-offer";
 import { CreateOfficePage } from "./company-office/office/create";
 import { RegisterBoroughPage } from "./borough/register";
 import { WriteArticlePage } from "./news/write";
+import { EditPlotAction } from "./map/edit-plot";
+import { CreateBuildingAction } from "./map/create-building";
+import { Metadata } from "@acryps/metadata";
 
 export class Application {
 	static router: Router;
@@ -60,6 +63,9 @@ export class Application {
 		this.router = new PathRouter(
 			PageComponent
 				.route('/map/:x/:y/:zoom', MapPage
+					.route('/create-building/:id', CreateBuildingAction)
+					.route('/edit-plot/:id', EditPlotAction)
+
 					.route('/create/:shape', CreateFeaturePage)
 				)
 
@@ -108,8 +114,24 @@ export class Application {
 
 		registerDirectives(Component, this.router);
 
+		const applyMetadata = Metadata.prototype.apply;
+
+		Metadata.prototype.apply = function (this) {
+			console.log(this);
+
+			if ('name' in this) {
+				Application.setTitle(this.name);
+			}
+
+			applyMetadata.bind(this)();
+		};
+
 		pageStyle().apply();
 		this.router.host(document.body);
+	}
+
+	static setTitle(...parts: string[]) {
+		document.title = [...parts, 'Townhall'].filter(item => item).join(' | ');
 	}
 }
 

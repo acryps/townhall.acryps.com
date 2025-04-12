@@ -1,10 +1,20 @@
-import { alignItems, aspectRatio, backgroundColor, border, borderBottom, child, color, columnGap, display, flexDirection, flexWrap, fontSize, fontWeight, gap, height, lineHeight, marginBlock, marginBottom, marginInline, marginTop, Mm, objectFit, objectPosition, opacity, padding, percentage, px, ratio, rem, textAlign, textDecorationLine, vh, width } from "@acryps/style";
-import { pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
+import { alignItems, aspectRatio, backgroundColor, border, borderBottom, child, color, columnGap, display, flexDirection, flexWrap, fontSize, fontWeight, gap, height, imageRendering, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, Mm, objectFit, objectPosition, opacity, padding, percentage, px, ratio, rem, textAlign, textDecorationLine, vh, width } from "@acryps/style";
+import { negativeColor, neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 import { fieldStyle } from "../../shared/field.style";
 import { buttonStyle } from "../../shared/index.style";
 
 export const propertyStyle = () => child('ui-property',
 	display('block'),
+
+	child('ui-deactivated',
+		display('block'),
+		padding(rem(1)),
+		marginBottom(rem(1)),
+
+		backgroundColor(negativeColor),
+
+		textAlign('center')
+	),
 
 	child('ui-name',
 		display('block'),
@@ -37,6 +47,83 @@ export const propertyStyle = () => child('ui-property',
 
 		child('select',
 			fieldStyle()
+		)
+	),
+
+	child('ui-buildings',
+		display('block'),
+		marginBottom(rem(2)),
+
+		border(px(1), 'solid', 'currentColor'),
+
+		child('ui-building',
+			display('flex'),
+			padding(pageGutter),
+
+			borderBottom(px(1), 'dotted', 'currentColor'),
+
+			child('ui-name',
+				display('block'),
+				marginBottom(rem(0.25))
+			),
+
+			child('canvas',
+				marginLeft('auto'),
+				height(rem(5)),
+				width(rem(8)),
+				objectFit('contain'),
+
+				imageRendering('pixelated')
+			)
+		),
+
+		child('ui-action',
+			display('flex'),
+			columnGap(pageGutter),
+			alignItems('center'),
+
+			padding(pageGutter)
+		)
+	),
+
+
+	child('ui-plot-boundaries',
+		display('block'),
+		marginBottom(rem(2)),
+
+		border(px(1), 'solid', 'currentColor'),
+
+		child('ui-plot-boundary',
+			display('flex'),
+			padding(pageGutter),
+
+			opacity(0.5),
+			borderBottom(px(1), 'dotted', 'currentColor'),
+
+			child('ui-comment',
+				display('block'),
+				marginBottom(rem(0.25))
+			),
+
+			child('canvas',
+				marginLeft('auto'),
+				height(rem(5)),
+				width(rem(8)),
+				objectFit('contain'),
+
+				imageRendering('pixelated')
+			)
+		)
+			.attribute('ui-active',
+				opacity(1)
+			),
+
+		child('ui-action',
+			display('flex'),
+			columnGap(pageGutter),
+			alignItems('center'),
+
+			padding(pageGutter)
 		)
 	),
 

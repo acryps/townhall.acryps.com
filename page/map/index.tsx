@@ -7,6 +7,8 @@ import { baseLayer, boroughLayer, movementHeatmapLayer, nightLayer, propertyLaye
 import { MapLayer } from "../shared/map/layer";
 import { addIcon, boroughIcon, captureIcon, chatIcon, dayIcon, drawIcon, movementIcon, propertyRegisterIcon, residentIcon, streetIcon } from "../assets/icons/managed";
 import { Observable } from "@acryps/page-observable";
+import { CreateFeaturePage } from "./create";
+import { Action } from "../action";
 
 export class MapPage extends Component {
 	declare parameters: { x, y, zoom };
@@ -17,14 +19,26 @@ export class MapPage extends Component {
 	// 3 keeps a good balance between number length (usually max 2 characters) and accuracy
 	readonly zoomAccuracy = 3;
 
-	private map = new MapComponent();
+	map = new MapComponent();
+
+	keycode = new Map<string, MapLayer | [MapLayer, MapLayer]>()
+		.set(' ', [baseLayer, nightLayer])
+		.set('b', boroughLayer)
+		.set('p', propertyLayer);
+
+	drawing: {
+		name: string,
+		complete: (shape: Point[]) => void
+	};
 
 	render(child) {
-		if (child) {
+		if (child && !(this.child instanceof Action)) {
 			return <ui-map-child>
 				{child}
 			</ui-map-child>;
 		}
+
+		Application.setTitle(this.drawing?.name, 'Map');
 
 		this.map.show(new Point(+this.parameters.x, +this.parameters.y), 1 / ((+this.parameters.zoom / this.zoomAccuracy) ** 2));
 
@@ -39,6 +53,18 @@ export class MapPage extends Component {
 
 				console.log(pick);
 			});
+
+			onkeypress = event => {
+				const layer = this.keycode.get(event.key);
+
+				if (layer) {
+					if (Array.isArray(layer)) {
+						this.toggleLayer(layer[0], layer[1]);
+					} else {
+						this.toggleLayer(layer);
+					}
+				}
+			};
 		});
 
 		return <ui-map>
@@ -47,19 +73,20 @@ export class MapPage extends Component {
 			<ui-tools>
 				{this.map.drawing && (this.map.drawingClosePossible.map(possible => possible ? <ui-action ui-click={() => {
 					const shape = this.map.completeDrawing();
-					const packed = Point.pack(shape);
 
 					// backup if create would were to fail
-					console.log('shape', packed);
+					console.log('shape', Point.pack(shape));
 
-					this.navigate(`create/${btoa(packed)}`);
+					this.drawing.complete(shape);
 				}}>
-					{addIcon()} Add Feature
+					{addIcon()} {this.drawing.name}
 				</ui-action> : <ui-action ui-click={() => this.map.pushDrawingPoint()}>
 					{addIcon()} Add Point
 				</ui-action>))}
 
 				<ui-drawer>
+					{child}
+
 					<ui-layer ui-click={() => this.toggleLayer(baseLayer, nightLayer)}>
 						{dayIcon()}
 					</ui-layer>
@@ -112,10 +139,17 @@ export class MapPage extends Component {
 							{captureIcon()}
 						</ui-action>
 
-						<ui-action ui-click={() => {
-							if (!this.map.drawing) {
-								this.map.enableDrawing();
-								this.update();
+						<ui-action ui-click={async () => {
+							if (this.map.drawing) {
+								if (this.map.drawing.length) {
+									if (confirm('Do you want to delete the current drawing?')) {
+										this.map.completeDrawing();
+									}
+								}
+							} else {
+								const packed = Point.pack(await this.draw('Add Feature'));
+
+								this.navigate(`create/${btoa(packed)}`);
 							}
 						}}>
 							{drawIcon()}
@@ -137,5 +171,17 @@ export class MapPage extends Component {
 
 		this.map.layers = this.map.layers.filter(layer => layer);
 		this.map.updateLayers();
+	}
+
+	draw(action: string) {
+		return new Promise<Point[]>(done => {
+			this.drawing = {
+				name: action,
+				complete: shape => done(shape)
+			}
+
+			this.map.enableDrawing();
+			this.update();
+		});
 	}
 }

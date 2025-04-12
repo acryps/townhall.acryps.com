@@ -37,12 +37,14 @@ export class ShapeTileServer {
 			const offset = new Point(x, y);
 
 			for (let shape of shapes) {
-				Shape.render(shape, offset, context as any);
+				if (shape.id) {
+					Shape.render(shape, offset, context as any);
 
-				const intensity = context.getImageData(0, 0, 1, 1).data[3];
+					const intensity = context.getImageData(0, 0, 1, 1).data[3];
 
-				if (intensity) {
-					return response.json(shape.id);
+					if (intensity) {
+						return response.json(shape.id);
+					}
 				}
 			}
 

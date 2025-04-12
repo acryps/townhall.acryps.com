@@ -186,16 +186,38 @@ export class PropertySummaryModel {
 	}
 }
 
+export class PropertyOverviewModel {
+	activePlotBoundary: PlotBoundaryShapeModel;
+	borough: BoroughSummaryModel;
+	type: PropertyTypeViewModel;
+	id: string;
+	name: string;
+
+	private static $build(raw) {
+		const item = new PropertyOverviewModel();
+		raw.activePlotBoundary === undefined || (item.activePlotBoundary = raw.activePlotBoundary ? PlotBoundaryShapeModel["$build"](raw.activePlotBoundary) : null)
+		raw.borough === undefined || (item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null)
+		raw.type === undefined || (item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		
+		return item;
+	}
+}
+
 export class PropertyViewModel {
 	borough: BoroughSummaryModel;
 	historicListingGrade: HistoricListingGradeViewModel;
 	owner: PlayerViewModel;
+	buildings: BuildingSummaryModel[];
 	dwellings: PropertyDwellingViewModel[];
 	historicListingModifiers: PropertyHistoricListingModifierViewModel[];
 	offices: OfficeViewModel[];
+	plotBoundaries: PlotBoundarySummaryModel[];
 	type: PropertyTypeViewModel;
-	bounds: string;
+	activePlotBoundaryId: string;
 	code: string;
+	deactivated: Date;
 	historicListingRegisteredAt: Date;
 	id: string;
 	name: string;
@@ -205,12 +227,15 @@ export class PropertyViewModel {
 		raw.borough === undefined || (item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null)
 		raw.historicListingGrade === undefined || (item.historicListingGrade = raw.historicListingGrade ? HistoricListingGradeViewModel["$build"](raw.historicListingGrade) : null)
 		raw.owner === undefined || (item.owner = raw.owner ? PlayerViewModel["$build"](raw.owner) : null)
+		raw.buildings === undefined || (item.buildings = raw.buildings ? raw.buildings.map(i => BuildingSummaryModel["$build"](i)) : null)
 		raw.dwellings === undefined || (item.dwellings = raw.dwellings ? raw.dwellings.map(i => PropertyDwellingViewModel["$build"](i)) : null)
 		raw.historicListingModifiers === undefined || (item.historicListingModifiers = raw.historicListingModifiers ? raw.historicListingModifiers.map(i => PropertyHistoricListingModifierViewModel["$build"](i)) : null)
 		raw.offices === undefined || (item.offices = raw.offices ? raw.offices.map(i => OfficeViewModel["$build"](i)) : null)
+		raw.plotBoundaries === undefined || (item.plotBoundaries = raw.plotBoundaries ? raw.plotBoundaries.map(i => PlotBoundarySummaryModel["$build"](i)) : null)
 		raw.type === undefined || (item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null)
-		raw.bounds === undefined || (item.bounds = raw.bounds === null ? null : `${raw.bounds}`)
+		raw.activePlotBoundaryId === undefined || (item.activePlotBoundaryId = raw.activePlotBoundaryId === null ? null : `${raw.activePlotBoundaryId}`)
 		raw.code === undefined || (item.code = raw.code === null ? null : `${raw.code}`)
+		raw.deactivated === undefined || (item.deactivated = raw.deactivated ? new Date(raw.deactivated) : null)
 		raw.historicListingRegisteredAt === undefined || (item.historicListingRegisteredAt = raw.historicListingRegisteredAt ? new Date(raw.historicListingRegisteredAt) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
@@ -578,6 +603,32 @@ export class ResidentTickerModel {
 	}
 }
 
+export class BuildingShapeModel {
+	boundary: string;
+	id: string;
+
+	private static $build(raw) {
+		const item = new BuildingShapeModel();
+		raw.boundary === undefined || (item.boundary = raw.boundary === null ? null : `${raw.boundary}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		
+		return item;
+	}
+}
+
+export class PlotBoundaryShapeModel {
+	id: string;
+	shape: string;
+
+	private static $build(raw) {
+		const item = new PlotBoundaryShapeModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.shape === undefined || (item.shape = raw.shape === null ? null : `${raw.shape}`)
+		
+		return item;
+	}
+}
+
 export class ArticleViewModel {
 	images: ArticleImageViewModel[];
 	publication: PublicationSummaryModel;
@@ -924,6 +975,42 @@ export class LawHouseSessionViewModel {
 	}
 }
 
+export class BuildingSummaryModel {
+	archived: Date;
+	boundary: string;
+	created: Date;
+	id: string;
+	name: string;
+
+	private static $build(raw) {
+		const item = new BuildingSummaryModel();
+		raw.archived === undefined || (item.archived = raw.archived ? new Date(raw.archived) : null)
+		raw.boundary === undefined || (item.boundary = raw.boundary === null ? null : `${raw.boundary}`)
+		raw.created === undefined || (item.created = raw.created ? new Date(raw.created) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		
+		return item;
+	}
+}
+
+export class PlotBoundarySummaryModel {
+	changeComment: string;
+	created: Date;
+	id: string;
+	shape: string;
+
+	private static $build(raw) {
+		const item = new PlotBoundarySummaryModel();
+		raw.changeComment === undefined || (item.changeComment = raw.changeComment === null ? null : `${raw.changeComment}`)
+		raw.created === undefined || (item.created = raw.created ? new Date(raw.created) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.shape === undefined || (item.shape = raw.shape === null ? null : `${raw.shape}`)
+		
+		return item;
+	}
+}
+
 export class PublicationViewModel {
 	company: CompanySummaryModel;
 	articles: ArticleViewModel[];
@@ -984,6 +1071,27 @@ export class Service {
 }
 
 export class MapService {
+	async reviewNext(): Promise<PropertyViewModel> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("BkMD4zdnRzMTk1N3N0M3hsc3E3MHFwNz"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : PropertyViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async getBoroughs(): Promise<Array<BoroughViewModel>> {
 		const $data = new FormData();
 		
@@ -1005,7 +1113,7 @@ export class MapService {
 		});
 	}
 
-	async getProperties(page: number): Promise<Array<PropertySummaryModel>> {
+	async getProperties(page: number): Promise<Array<PropertyOverviewModel>> {
 		const $data = new FormData();
 		$data.append("IxYWZhMjR6Y3cwM2Q1cGRpb3A4YzFqaW", Service.stringify(page))
 
@@ -1017,7 +1125,7 @@ export class MapService {
 			if ("data" in r) {
 				const d = r.data;
 
-				return d.map(d => d === null ? null : PropertySummaryModel["$build"](d));
+				return d.map(d => d === null ? null : PropertyOverviewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
@@ -1912,6 +2020,69 @@ export class PropertyService {
 				const d = r.data;
 
 				return d === null ? null : PropertyDwellingViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async reviewed(propertyId: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("M4Y2lkeW12Yj4yZWVjNnI2dWM2cH5ybD", Service.stringify(propertyId))
+
+		return await fetch(Service.toURL("9sZ3czbGMxcm00NHJpaXQya2Z1MGRkbW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async createBuilding(propertyId: string, boundary: string): Promise<BuildingSummaryModel> {
+		const $data = new FormData();
+		$data.append("YyZXJidGMzOGBieWEwMTJweDVnaGc1bD", Service.stringify(propertyId))
+		$data.append("NxNDIwaWU4aXRya3V0aXJxdXVkbGkzNW", Service.stringify(boundary))
+
+		return await fetch(Service.toURL("Y2YWVmY2lsZDZ5amIxMGRubHl5bT5rcD"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : BuildingSummaryModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async editPlotBoundary(propertyId: string, boundary: string): Promise<PlotBoundarySummaryModel> {
+		const $data = new FormData();
+		$data.append("dwbmRjbWR1bGE2NjFndzJ1enw0b2VyMX", Service.stringify(propertyId))
+		$data.append("I4NmJpenJib2hzcWhoOXgxMX53bHlvdD", Service.stringify(boundary))
+
+		return await fetch(Service.toURL("BtamlqZDJobHc3OXluMmd0bWZ2Y3FhYm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : PlotBoundarySummaryModel["$build"](d);
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

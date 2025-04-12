@@ -270,6 +270,10 @@ export class MapComponent extends Component {
 
 	// render layers onto map
 	private renderLayers() {
+		if (!this.context) {
+			return;
+		}
+
 		this.context.save();
 
 		this.context.clearRect(0, 0, this.width, this.height);
@@ -284,6 +288,61 @@ export class MapComponent extends Component {
 
 		this.rootNode.style.setProperty(mapPositionX.propertyName, offset.x);
 		this.rootNode.style.setProperty(mapPositionY.propertyName, offset.y);
+
+		if (this.highlightedShape) {
+			// prepare clip area
+			const path = new Path2D();
+			this.context.beginPath();
+
+			for (let pointIndex = 0; pointIndex < this.highlightedShape.length; pointIndex++) {
+				const x = this.highlightedShape[pointIndex].x - offset.x;
+				const y = this.highlightedShape[pointIndex].y - offset.y;
+
+				if (pointIndex) {
+					path.lineTo(x, y);
+				} else {
+					path.moveTo(x, y);
+				}
+			}
+
+			// gray out map
+			const imageData = this.context.getImageData(0, 0, this.width, this.height);
+			let index = 0;
+
+			while (index < imageData.data.length) {
+				// make it a big brighter
+				const gray = (imageData.data[index] + imageData.data[index + 1] + imageData.data[index + 2]) / 4 + 0xff / 2;
+
+				imageData.data[index++] = gray;
+				imageData.data[index++] = gray;
+				imageData.data[index++] = gray;
+				index++; // alpha
+			}
+
+			this.context.putImageData(imageData, 0, 0);
+
+			// draw highlighted area in color
+			this.context.save();
+			this.context.clip(path);
+			this.renderLayerBuffers();
+
+			// draw shape
+			this.context.restore();
+
+			this.context.strokeStyle = this.drawing ? '#00f8' : '#000';
+
+			for (let pointIndex = 0; pointIndex < this.highlightedShape.length; pointIndex++) {
+				for (let x = -1; x < 1; x++) {
+					for (let y = -1; y < 1; y++) {
+						drawDanwinstonLine(
+							this.context,
+							this.highlightedShape[pointIndex].subtract(offset),
+							this.highlightedShape[(pointIndex + 1) % this.highlightedShape.length].subtract(offset)
+						);
+					}
+				}
+			}
+		}
 
 		if (this.drawing) {
 			if (this.drawing.length) {
@@ -333,60 +392,6 @@ export class MapComponent extends Component {
 			// draw cursor
 			this.context.fillStyle = '#000';
 			this.context.fillRect(cursor.x - offset.x, cursor.y - offset.y, 1, 1);
-		}
-
-		if (this.highlightedShape) {
-			// prepare clip area
-			const path = new Path2D();
-			this.context.beginPath();
-
-			for (let pointIndex = 0; pointIndex < this.highlightedShape.length; pointIndex++) {
-				const x = this.highlightedShape[pointIndex].x - offset.x;
-				const y = this.highlightedShape[pointIndex].y - offset.y;
-
-				if (pointIndex) {
-					path.lineTo(x, y);
-				} else {
-					path.moveTo(x, y);
-				}
-			}
-
-			// gray out map
-			const imageData = this.context.getImageData(0, 0, this.width, this.height);
-			let index = 0;
-
-			while (index < imageData.data.length) {
-				// make it a big brighter
-				const gray = (imageData.data[index] + imageData.data[index + 1] + imageData.data[index + 2]) / 4 + 0xff / 2;
-
-				imageData.data[index++] = gray;
-				imageData.data[index++] = gray;
-				imageData.data[index++] = gray;
-				index++; // alpha
-			}
-
-			this.context.putImageData(imageData, 0, 0);
-
-			// draw highlighted area in color
-			this.context.save();
-			this.context.clip(path);
-			this.renderLayerBuffers();
-
-			// draw shape
-			this.context.restore();
-			this.context.strokeStyle = '#000';
-
-			for (let pointIndex = 0; pointIndex < this.highlightedShape.length; pointIndex++) {
-				for (let x = -1; x < 1; x++) {
-					for (let y = -1; y < 1; y++) {
-						drawDanwinstonLine(
-							this.context,
-							this.highlightedShape[pointIndex].subtract(offset),
-							this.highlightedShape[(pointIndex + 1) % this.highlightedShape.length].subtract(offset)
-						);
-					}
-				}
-			}
 		}
 
 		this.context.fillStyle = 'blue';

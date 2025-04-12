@@ -1,6 +1,12 @@
 import { PackedPointArray, Point } from "./point";
 import { drawDanwinstonLine } from './line';
 
+export type RenderableShape = {
+	fill?: string;
+	stroke?: string;
+	bounds: PackedPointArray;
+}
+
 export class Shape {
 	id: string;
 	fill?: string;
@@ -8,7 +14,7 @@ export class Shape {
 	bounds: PackedPointArray;
 	name: string;
 
-	static render(shape: Shape, offset: Point, context: CanvasRenderingContext2D) {
+	static render(shape: RenderableShape, offset: Point, context: CanvasRenderingContext2D) {
 		const bounds = Point.unpack(shape.bounds);
 
 		// use normal algorithm for fill

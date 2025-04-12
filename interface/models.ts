@@ -81,16 +81,27 @@ export interface PropertySummaryModel {
 	name: string;
 }
 
+export interface PropertyOverviewModel {
+    activePlotBoundary: PlotBoundaryShapeModel;
+	borough: BoroughSummaryModel;
+	type: PropertyTypeViewModel;
+	id: string;
+	name: string;
+}
+
 export interface PropertyViewModel {
     borough: BoroughSummaryModel;
 	historicListingGrade: HistoricListingGradeViewModel;
 	owner: PlayerViewModel;
+	buildings: BuildingSummaryModel[];
 	dwellings: PropertyDwellingViewModel[];
 	historicListingModifiers: PropertyHistoricListingModifierViewModel[];
 	offices: OfficeViewModel[];
+	plotBoundaries: PlotBoundarySummaryModel[];
 	type: PropertyTypeViewModel;
-	bounds: string;
+	activePlotBoundaryId: string;
 	code: string;
+	deactivated: Date;
 	historicListingRegisteredAt: Date;
 	id: string;
 	name: string;
@@ -244,6 +255,16 @@ export interface ResidentTickerModel {
 	action: string;
 }
 
+export interface BuildingShapeModel {
+    boundary: string;
+	id: string;
+}
+
+export interface PlotBoundaryShapeModel {
+    id: string;
+	shape: string;
+}
+
 export interface ArticleViewModel {
     images: ArticleImageViewModel[];
 	publication: PublicationSummaryModel;
@@ -388,6 +409,21 @@ export interface LawHouseSessionViewModel {
 	ended: Date;
 	id: string;
 	started: Date;
+}
+
+export interface BuildingSummaryModel {
+    archived: Date;
+	boundary: string;
+	created: Date;
+	id: string;
+	name: string;
+}
+
+export interface PlotBoundarySummaryModel {
+    changeComment: string;
+	created: Date;
+	id: string;
+	shape: string;
 }
 
 export interface PublicationViewModel {

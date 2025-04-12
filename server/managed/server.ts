@@ -2,6 +2,7 @@ import { BaseServer, ViewModel, Inject } from "vlserver";
 
 import { Borough } from "././database";
 import { DbContext } from "././database";
+import { PlotBoundary } from "././database";
 import { Property } from "././database";
 import { Proxy } from "././../proxy";
 import { BoroughViewModel } from "././../areas/borough.view";
@@ -9,6 +10,7 @@ import { BridgeViewModel } from "././../areas/bridge.view";
 import { HistoryEntryViewModel } from "././../areas/history.view";
 import { PropertyTypeViewModel } from "././../areas/property-type.view";
 import { PropertySummaryModel } from "././../areas/property.summary";
+import { PropertyOverviewModel } from "././../areas/property.view";
 import { PropertyViewModel } from "././../areas/property.view";
 import { SquareViewModel } from "././../areas/squre.view";
 import { StreetViewModel } from "././../areas/street.view";
@@ -47,9 +49,13 @@ import { ResidentViewModel } from "././../areas/life/resident";
 import { ResidentEventView } from "././database";
 import { ResidentTickerModel } from "././../areas/life/ticker";
 import { LifeService } from "././../areas/life/service";
+import { Building } from "././database";
 import { Dwelling } from "././database";
 import { DwellingViewModel } from "././../areas/life/resident";
 import { PropertyDwellingViewModel } from "././../areas/property.view";
+import { BuildingSummaryModel } from "././../areas/property/building";
+import { PlotBoundarySummaryModel } from "././../areas/property/plot";
+import { Shape } from "././../../interface/shape";
 import { PropertyService } from "././../areas/property/service";
 import { Article } from "././database";
 import { ArticleImage } from "././database";
@@ -79,6 +85,8 @@ import { WorkContractViewModel } from "./../areas/work";
 import { LawHouseSessionaryViewModel } from "./../areas/law-house/session";
 import { LawHouseSessionProtocolViewModel } from "./../areas/law-house/session";
 import { TenancyViewModel } from "./../areas/life/resident";
+import { BuildingShapeModel } from "./../areas/property/building";
+import { PlotBoundaryShapeModel } from "./../areas/property/plot";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
@@ -175,6 +183,15 @@ Inject.mappings = {
 
 export class ManagedServer extends BaseServer {
 	prepareRoutes() {
+		this.expose(
+			"BkMD4zdnRzMTk1N3N0M3hsc3E3MHFwNz",
+			{},
+			inject => inject.construct(MapService),
+			(controller, params) => controller.reviewNext(
+				
+			)
+		);
+
 		this.expose(
 			"R2M2Z2Yjx4aGM4MzR1ZzcxdjI5Zzprbm",
 			{},
@@ -644,6 +661,43 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(PropertyService),
 			(controller, params) => controller.createDwelling(
 				params["p2dHJxa2BodTR6NDZodDIxYWEyejlia2"]
+			)
+		);
+
+		this.expose(
+			"9sZ3czbGMxcm00NHJpaXQya2Z1MGRkbW",
+			{
+			"M4Y2lkeW12Yj4yZWVjNnI2dWM2cH5ybD": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PropertyService),
+			(controller, params) => controller.reviewed(
+				params["M4Y2lkeW12Yj4yZWVjNnI2dWM2cH5ybD"]
+			)
+		);
+
+		this.expose(
+			"Y2YWVmY2lsZDZ5amIxMGRubHl5bT5rcD",
+			{
+			"YyZXJidGMzOGBieWEwMTJweDVnaGc1bD": { type: "string", isArray: false, isOptional: false },
+				"NxNDIwaWU4aXRya3V0aXJxdXVkbGkzNW": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PropertyService),
+			(controller, params) => controller.createBuilding(
+				params["YyZXJidGMzOGBieWEwMTJweDVnaGc1bD"],
+				params["NxNDIwaWU4aXRya3V0aXJxdXVkbGkzNW"]
+			)
+		);
+
+		this.expose(
+			"BtamlqZDJobHc3OXluMmd0bWZ2Y3FhYm",
+			{
+			"dwbmRjbWR1bGE2NjFndzJ1enw0b2VyMX": { type: "string", isArray: false, isOptional: false },
+				"I4NmJpenJib2hzcWhoOXgxMX53bHlvdD": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PropertyService),
+			(controller, params) => controller.editPlotBoundary(
+				params["dwbmRjbWR1bGE2NjFndzJ1enw0b2VyMX"],
+				params["I4NmJpenJib2hzcWhoOXgxMX53bHlvdD"]
 			)
 		);
 
@@ -1663,18 +1717,110 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[PropertyOverviewModel.name]: class ComposedPropertyOverviewModel extends PropertyOverviewModel {
+		async map() {
+			return {
+				activePlotBoundary: new PlotBoundaryShapeModel(await BaseServer.unwrap(this.$$model.activePlotBoundary)),
+				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.$$model.borough)),
+				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.$$model.type)),
+				id: this.$$model.id,
+				name: this.$$model.name
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get activePlotBoundary() {
+					return ViewModel.mappings[PlotBoundaryShapeModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "activePlotBoundary-PropertyOverviewModel"]
+					);
+				},
+				get borough() {
+					return ViewModel.mappings[BoroughSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "borough-PropertyOverviewModel"]
+					);
+				},
+				get type() {
+					return ViewModel.mappings[PropertyTypeViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "type-PropertyOverviewModel"]
+					);
+				},
+				id: true,
+				name: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new PropertyOverviewModel(null);
+			"activePlotBoundary" in data && (item.activePlotBoundary = data.activePlotBoundary && ViewModel.mappings[PlotBoundaryShapeModel.name].toViewModel(data.activePlotBoundary));
+			"borough" in data && (item.borough = data.borough && ViewModel.mappings[BoroughSummaryModel.name].toViewModel(data.borough));
+			"type" in data && (item.type = data.type && ViewModel.mappings[PropertyTypeViewModel.name].toViewModel(data.type));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PropertyOverviewModel) {
+			let model: Property;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Property).find(viewModel.id)
+			} else {
+				model = new Property();
+			}
+			
+			"activePlotBoundary" in viewModel && (model.activePlotBoundary.id = viewModel.activePlotBoundary ? viewModel.activePlotBoundary.id : null);
+			"borough" in viewModel && (model.borough.id = viewModel.borough ? viewModel.borough.id : null);
+			"type" in viewModel && (model.type.id = viewModel.type ? viewModel.type.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+
+			return model;
+		}
+	},
 	[PropertyViewModel.name]: class ComposedPropertyViewModel extends PropertyViewModel {
 		async map() {
 			return {
 				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.$$model.borough)),
 				historicListingGrade: new HistoricListingGradeViewModel(await BaseServer.unwrap(this.$$model.historicListingGrade)),
 				owner: new PlayerViewModel(await BaseServer.unwrap(this.$$model.owner)),
+				buildings: (await this.$$model.buildings.includeTree(ViewModel.mappings[BuildingSummaryModel.name].items).toArray()).map(item => new BuildingSummaryModel(item)),
 				dwellings: (await this.$$model.dwellings.includeTree(ViewModel.mappings[PropertyDwellingViewModel.name].items).toArray()).map(item => new PropertyDwellingViewModel(item)),
 				historicListingModifiers: (await this.$$model.historicListingModifiers.includeTree(ViewModel.mappings[PropertyHistoricListingModifierViewModel.name].items).toArray()).map(item => new PropertyHistoricListingModifierViewModel(item)),
 				offices: (await this.$$model.offices.includeTree(ViewModel.mappings[OfficeViewModel.name].items).toArray()).map(item => new OfficeViewModel(item)),
+				plotBoundaries: (await this.$$model.plotBoundaries.includeTree(ViewModel.mappings[PlotBoundarySummaryModel.name].items).toArray()).map(item => new PlotBoundarySummaryModel(item)),
 				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.$$model.type)),
-				bounds: this.$$model.bounds,
+				activePlotBoundaryId: this.$$model.activePlotBoundaryId,
 				code: this.$$model.code,
+				deactivated: this.$$model.deactivated,
 				historicListingRegisteredAt: this.$$model.historicListingRegisteredAt,
 				id: this.$$model.id,
 				name: this.$$model.name
@@ -1725,6 +1871,12 @@ ViewModel.mappings = {
 						[...parents, "owner-PropertyViewModel"]
 					);
 				},
+				get buildings() {
+					return ViewModel.mappings[BuildingSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "buildings-PropertyViewModel"]
+					);
+				},
 				get dwellings() {
 					return ViewModel.mappings[PropertyDwellingViewModel.name].getPrefetchingProperties(
 						level,
@@ -1743,14 +1895,21 @@ ViewModel.mappings = {
 						[...parents, "offices-PropertyViewModel"]
 					);
 				},
+				get plotBoundaries() {
+					return ViewModel.mappings[PlotBoundarySummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "plotBoundaries-PropertyViewModel"]
+					);
+				},
 				get type() {
 					return ViewModel.mappings[PropertyTypeViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "type-PropertyViewModel"]
 					);
 				},
-				bounds: true,
+				activePlotBoundaryId: true,
 				code: true,
+				deactivated: true,
 				historicListingRegisteredAt: true,
 				id: true,
 				name: true
@@ -1762,12 +1921,15 @@ ViewModel.mappings = {
 			"borough" in data && (item.borough = data.borough && ViewModel.mappings[BoroughSummaryModel.name].toViewModel(data.borough));
 			"historicListingGrade" in data && (item.historicListingGrade = data.historicListingGrade && ViewModel.mappings[HistoricListingGradeViewModel.name].toViewModel(data.historicListingGrade));
 			"owner" in data && (item.owner = data.owner && ViewModel.mappings[PlayerViewModel.name].toViewModel(data.owner));
+			"buildings" in data && (item.buildings = data.buildings && [...data.buildings].map(i => ViewModel.mappings[BuildingSummaryModel.name].toViewModel(i)));
 			"dwellings" in data && (item.dwellings = data.dwellings && [...data.dwellings].map(i => ViewModel.mappings[PropertyDwellingViewModel.name].toViewModel(i)));
 			"historicListingModifiers" in data && (item.historicListingModifiers = data.historicListingModifiers && [...data.historicListingModifiers].map(i => ViewModel.mappings[PropertyHistoricListingModifierViewModel.name].toViewModel(i)));
 			"offices" in data && (item.offices = data.offices && [...data.offices].map(i => ViewModel.mappings[OfficeViewModel.name].toViewModel(i)));
+			"plotBoundaries" in data && (item.plotBoundaries = data.plotBoundaries && [...data.plotBoundaries].map(i => ViewModel.mappings[PlotBoundarySummaryModel.name].toViewModel(i)));
 			"type" in data && (item.type = data.type && ViewModel.mappings[PropertyTypeViewModel.name].toViewModel(data.type));
-			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
+			"activePlotBoundaryId" in data && (item.activePlotBoundaryId = data.activePlotBoundaryId === null ? null : `${data.activePlotBoundaryId}`);
 			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
+			"deactivated" in data && (item.deactivated = data.deactivated === null ? null : new Date(data.deactivated));
 			"historicListingRegisteredAt" in data && (item.historicListingRegisteredAt = data.historicListingRegisteredAt === null ? null : new Date(data.historicListingRegisteredAt));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
@@ -1787,12 +1949,15 @@ ViewModel.mappings = {
 			"borough" in viewModel && (model.borough.id = viewModel.borough ? viewModel.borough.id : null);
 			"historicListingGrade" in viewModel && (model.historicListingGrade.id = viewModel.historicListingGrade ? viewModel.historicListingGrade.id : null);
 			"owner" in viewModel && (model.owner.id = viewModel.owner ? viewModel.owner.id : null);
+			"buildings" in viewModel && (null);
 			"dwellings" in viewModel && (null);
 			"historicListingModifiers" in viewModel && (null);
 			"offices" in viewModel && (null);
+			"plotBoundaries" in viewModel && (null);
 			"type" in viewModel && (model.type.id = viewModel.type ? viewModel.type.id : null);
-			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
+			"activePlotBoundaryId" in viewModel && (model.activePlotBoundaryId = viewModel.activePlotBoundaryId === null ? null : `${viewModel.activePlotBoundaryId}`);
 			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
+			"deactivated" in viewModel && (model.deactivated = viewModel.deactivated === null ? null : new Date(viewModel.deactivated));
 			"historicListingRegisteredAt" in viewModel && (model.historicListingRegisteredAt = viewModel.historicListingRegisteredAt === null ? null : new Date(viewModel.historicListingRegisteredAt));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
@@ -3344,6 +3509,130 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[BuildingShapeModel.name]: class ComposedBuildingShapeModel extends BuildingShapeModel {
+		async map() {
+			return {
+				boundary: this.$$model.boundary,
+				id: this.$$model.id
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				boundary: true,
+				id: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new BuildingShapeModel(null);
+			"boundary" in data && (item.boundary = data.boundary === null ? null : `${data.boundary}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: BuildingShapeModel) {
+			let model: Building;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Building).find(viewModel.id)
+			} else {
+				model = new Building();
+			}
+			
+			"boundary" in viewModel && (model.boundary = viewModel.boundary === null ? null : `${viewModel.boundary}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+
+			return model;
+		}
+	},
+	[PlotBoundaryShapeModel.name]: class ComposedPlotBoundaryShapeModel extends PlotBoundaryShapeModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				shape: this.$$model.shape
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				shape: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new PlotBoundaryShapeModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"shape" in data && (item.shape = data.shape === null ? null : `${data.shape}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PlotBoundaryShapeModel) {
+			let model: PlotBoundary;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(PlotBoundary).find(viewModel.id)
+			} else {
+				model = new PlotBoundary();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"shape" in viewModel && (model.shape = viewModel.shape === null ? null : `${viewModel.shape}`);
+
+			return model;
+		}
+	},
 	[ArticleViewModel.name]: class ComposedArticleViewModel extends ArticleViewModel {
 		async map() {
 			return {
@@ -4764,6 +5053,150 @@ ViewModel.mappings = {
 			"ended" in viewModel && (model.ended = viewModel.ended === null ? null : new Date(viewModel.ended));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"started" in viewModel && (model.started = viewModel.started === null ? null : new Date(viewModel.started));
+
+			return model;
+		}
+	},
+	[BuildingSummaryModel.name]: class ComposedBuildingSummaryModel extends BuildingSummaryModel {
+		async map() {
+			return {
+				archived: this.$$model.archived,
+				boundary: this.$$model.boundary,
+				created: this.$$model.created,
+				id: this.$$model.id,
+				name: this.$$model.name
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				archived: true,
+				boundary: true,
+				created: true,
+				id: true,
+				name: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new BuildingSummaryModel(null);
+			"archived" in data && (item.archived = data.archived === null ? null : new Date(data.archived));
+			"boundary" in data && (item.boundary = data.boundary === null ? null : `${data.boundary}`);
+			"created" in data && (item.created = data.created === null ? null : new Date(data.created));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: BuildingSummaryModel) {
+			let model: Building;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Building).find(viewModel.id)
+			} else {
+				model = new Building();
+			}
+			
+			"archived" in viewModel && (model.archived = viewModel.archived === null ? null : new Date(viewModel.archived));
+			"boundary" in viewModel && (model.boundary = viewModel.boundary === null ? null : `${viewModel.boundary}`);
+			"created" in viewModel && (model.created = viewModel.created === null ? null : new Date(viewModel.created));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+
+			return model;
+		}
+	},
+	[PlotBoundarySummaryModel.name]: class ComposedPlotBoundarySummaryModel extends PlotBoundarySummaryModel {
+		async map() {
+			return {
+				changeComment: this.$$model.changeComment,
+				created: this.$$model.created,
+				id: this.$$model.id,
+				shape: this.$$model.shape
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				changeComment: true,
+				created: true,
+				id: true,
+				shape: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new PlotBoundarySummaryModel(null);
+			"changeComment" in data && (item.changeComment = data.changeComment === null ? null : `${data.changeComment}`);
+			"created" in data && (item.created = data.created === null ? null : new Date(data.created));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"shape" in data && (item.shape = data.shape === null ? null : `${data.shape}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PlotBoundarySummaryModel) {
+			let model: PlotBoundary;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(PlotBoundary).find(viewModel.id)
+			} else {
+				model = new PlotBoundary();
+			}
+			
+			"changeComment" in viewModel && (model.changeComment = viewModel.changeComment === null ? null : `${viewModel.changeComment}`);
+			"created" in viewModel && (model.created = viewModel.created === null ? null : new Date(viewModel.created));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"shape" in viewModel && (model.shape = viewModel.shape === null ? null : `${viewModel.shape}`);
 
 			return model;
 		}

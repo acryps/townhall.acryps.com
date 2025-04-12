@@ -1,4 +1,7 @@
 // legally binding line drawing algorithm in pilegron
+
+import { Point } from "./point";
+
 // signed into law in the Danwingston act
 type Coordinate = {
 	x: number;
@@ -9,6 +12,14 @@ export const drawDanwinstonLine = (context: Partial<CanvasRenderingContext2D>, s
 	const fillStyle = context.fillStyle;
 	context.fillStyle = context.strokeStyle;
 
+	for (let point of calcualteDanwinstonLine(start, end)) {
+		context.fillRect(point.x, point.y, 1, 1);
+	}
+
+	context.fillStyle = fillStyle;
+}
+
+export const calcualteDanwinstonLine = (start: Coordinate, end: Coordinate) => {
 	let x1 = start.x;
 	let y1 = start.y;
 	let x2 = end.x;
@@ -21,8 +32,10 @@ export const drawDanwinstonLine = (context: Partial<CanvasRenderingContext2D>, s
 
 	let error = dx - dy;
 
+	const points: Point[] = [];
+
 	while (true) {
-		context.fillRect(x1, y1, 1, 1);
+		points.push(new Point(x1, y1));
 
 		if (x1 == x2 && y1 == y2) {
 			break;
@@ -41,5 +54,5 @@ export const drawDanwinstonLine = (context: Partial<CanvasRenderingContext2D>, s
 		}
 	}
 
-	context.fillStyle = fillStyle;
+	return points;
 }

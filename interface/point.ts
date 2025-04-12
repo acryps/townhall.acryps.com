@@ -1,3 +1,5 @@
+import { calcualteDanwinstonLine } from "./line";
+
 export type PackedPoint = string;
 export type PackedPointArray = string;
 
@@ -201,5 +203,173 @@ export class Point {
 		}
 
 		return midsection;
+	}
+
+	static subtract(target: Point[], ...clips: Point[][]) {
+		const pool = this.fill(target);
+
+		for (let clip of clips) {
+			for (let [packed, point] of this.fill(clip)) {
+				pool.delete(packed);
+			}
+		}
+
+		return this.outline(pool);
+	}
+
+	static plot(points: Point[], highlight?: Point) {
+		const bounds = this.bounds(points);
+		console.group('PLOT');
+
+		for (let y = bounds.y.min; y <= bounds.y.max; y++) {
+			let line = '';
+
+			for (let x = bounds.x.min; x <= bounds.x.max; x++) {
+				if (x == highlight?.x && y == highlight?.y) {
+					line += '!';
+				} else if (points.some(point => point.x == x && point.y == y)) {
+					line += '#';
+				} else {
+					line += '.';
+				}
+			}
+
+			console.log(line);
+		}
+
+		console.groupEnd();
+	}
+
+	static nextEdgePoint(point: Point, matrix: Map<string, Point>, visited: string[]) {
+		let inside = false;
+
+		for (let y = -1; y <= 1; y++) {
+			for (let x = -1; x <= 1; x++) {
+				if (x != point.x && y != point.y) {
+					const cursor = new Point(point.x + x, point.y + y);
+					const packed = cursor.pack();
+
+					if (matrix.get(packed)) {
+						inside = true;
+					} else {
+						if (inside && !visited.includes(packed)) {
+							return cursor;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	static outline(filled: Map<string, Point>) {
+		const visited = new Set<string>();
+
+		const directions = [
+			new Point(0, -1), new Point(1, -1), new Point(1, 0), new Point(1, 1), new Point(0, 1), new Point(-1, 1), new Point(-1, 0), new Point(-1, -1)
+		];
+
+		const isBulkPixel = (cursor: Point): boolean => {
+			let count = 0;
+
+			for (const offset of directions) {
+				if (filled.has(cursor.add(offset).pack())) {
+					count++;
+				}
+			}
+
+			return count >= 3;
+		};
+
+		const isEdgePixel = (cursor: Point): boolean => {
+			for (let offset of directions) {
+				if (!filled.has(cursor.add(offset).pack())) {
+					return true;
+				}
+			}
+		};
+
+		const start = filled.values().find(point => isEdgePixel(point));
+
+		this.plot(filled.values().toArray(), start);
+
+		if (!start) {
+			return [];
+		}
+
+		const outline: Point[] = [];
+		let cursor = start.copy();
+		let direction = 0;
+
+		do {
+			outline.push(cursor.copy());
+			visited.add(cursor.pack());
+
+			let found = false;
+
+			for (let nextDirectonOffset = 0; nextDirectonOffset <= directions.length; nextDirectonOffset++) {
+				const index = (direction + nextDirectonOffset) % directions.length;
+				const offset = directions[index];
+
+				const after = cursor.add(offset);
+
+				if (filled.has(after.pack()) && !visited.has(after.pack()) && isEdgePixel(after) && isBulkPixel(after)) {
+					cursor = after;
+					direction = (index + 6) % 8;
+					found = true;
+
+					break;
+				}
+			}
+
+			if (!found) break;
+		} while (cursor.pack() != start.pack());
+
+		return outline;
+	}
+
+	static fill(shape: Point[]) {
+		const pixels = new Map<PackedPoint, Point>();
+
+		if (shape.length < 3) {
+			return pixels;
+		}
+
+		const bounds = Point.bounds(shape);
+
+		for (let y = bounds.y.min; y <= bounds.y.max; y++) {
+			const intersections: number[] = [];
+
+			for (let i = 0; i < shape.length; i++) {
+				const curr = shape[i];
+				const next = shape[(i + 1) % shape.length];
+
+				if (curr.y === next.y) continue; // Ignore horizontal edges
+
+				const [top, bottom] = curr.y < next.y ? [curr, next] : [next, curr];
+				if (y < top.y || y >= bottom.y) continue;
+
+				const dx = next.x - curr.x;
+				const dy = next.y - curr.y;
+				const t = (y - curr.y) / dy;
+				const x = curr.x + t * dx;
+
+				intersections.push(x);
+			}
+
+			intersections.sort((a, b) => a - b);
+
+			for (let i = 0; i < intersections.length; i += 2) {
+				const xStart = Math.ceil(intersections[i]);
+				const xEnd = Math.floor(intersections[i + 1]);
+
+				for (let x = xStart; x <= xEnd; x++) {
+					const point = new Point(x, y);
+
+					pixels.set(point.pack(), point);
+				}
+			}
+		}
+
+		return pixels;
 	}
 }

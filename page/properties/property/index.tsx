@@ -1,14 +1,15 @@
 import { Application } from "../../index";
-import { BoroughViewModel, HistoricListingGradeViewModel, HistoricListingModifierViewModel, HistoricListingService, MapService, PropertyService, PropertyTypeViewModel, PropertyViewModel } from "../../managed/services";
+import { BoroughViewModel, HistoricListingGradeViewModel, HistoricListingModifierViewModel, HistoricListingService, MapService, PlotBoundarySummaryModel, PropertyService, PropertyTypeViewModel, PropertyViewModel } from "../../managed/services";
 import { Component } from "@acryps/page";
 import { MapComponent } from "../../shared/map";
-import { Point } from "../../../interface/point";
+import { PackedPoint, PackedPointArray, Point } from "../../../interface/point";
 import { toSimulatedAge } from "../../../interface/time";
-import { addIcon, deleteIcon, drawIcon } from "../../assets/icons/managed";
+import { addIcon, deleteIcon, drawIcon, lawIcon } from "../../assets/icons/managed";
 import { MetaGovernmentBuilding, MetaPlace } from "@acryps/metadata";
 import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
 import { CompanyOfficePage } from "../../company-office";
 import { convertToLegalCompanyName } from "../../../interface/company";
+import { BoundaryComponent } from "./boundary";
 
 export class PropertyPage extends Component {
 	declare parameters: { id: string };
@@ -20,8 +21,11 @@ export class PropertyPage extends Component {
 	grades: HistoricListingGradeViewModel[];
 	modifiers: HistoricListingModifierViewModel[];
 
+	activePlotBoundary: PlotBoundarySummaryModel;
+
 	async onload() {
 		this.property = await new MapService().getProperty(this.parameters.id);
+		this.activePlotBoundary = this.property.plotBoundaries.find(boundary => boundary.id == this.property.activePlotBoundaryId);
 
 		this.types = await new MapService().getPropertyTypes();
 		this.boroughs = await new MapService().getBoroughs();
@@ -29,7 +33,7 @@ export class PropertyPage extends Component {
 		this.grades = await new HistoricListingService().getGrades();
 		this.modifiers = await new HistoricListingService().getModifiers();
 
-		const points = Point.unpack(this.property.bounds);
+		const points = Point.unpack(this.activePlotBoundary.shape);
 		const center = Point.center(points);
 
 		new MetaPlace({
@@ -40,12 +44,18 @@ export class PropertyPage extends Component {
 	}
 
 	render() {
+		const center = Point.center(Point.unpack(this.activePlotBoundary.shape));
+
 		return <ui-property>
 			<ui-name>
 				{this.property.name || `Property #${this.property.id.substring(0, 8)}`}
 			</ui-name>
 
-			{new MapComponent().highlight(Point.unpack(this.property.bounds))}
+			{new MapComponent().highlight(Point.unpack(this.activePlotBoundary.shape))}
+
+			{this.property.deactivated && <ui-deactivated>
+				This plot has been archived {toSimulatedAge(this.property.deactivated)} years ago ({this.property.deactivated.toLocaleDateString()})
+			</ui-deactivated>}
 
 			<ui-field>
 				<label>Name</label>
@@ -86,6 +96,38 @@ export class PropertyPage extends Component {
 					</option>)}
 				</select>
 			</ui-field>
+
+			<ui-buildings>
+				{this.property.buildings.map(building => <ui-building>
+					<ui-name>
+						{building.name ?? `Building #${building.id.split('-')[0]}`}
+					</ui-name>
+
+					{new BoundaryComponent(building.boundary)}
+				</ui-building>)}
+
+				{this.property.buildings.length == 0 && <ui-action ui-click={() => this.copyBuilding(this.activePlotBoundary.shape)}>
+					{addIcon()} Use Plot Boundary as building
+				</ui-action>}
+
+				<ui-action ui-href={`/map/${center.x}/${center.y}/5/create-building/${this.property.id}`}>
+					{addIcon()} Create Building
+				</ui-action>
+			</ui-buildings>
+
+			<ui-plot-boundaries>
+				{this.property.plotBoundaries.map(boundary => <ui-plot-boundary ui-active={boundary == this.activePlotBoundary}>
+					<ui-comment>
+						{boundary.changeComment ?? `Plot Boundary #${boundary.id.split('-')[0]}`}
+					</ui-comment>
+
+					{new BoundaryComponent(boundary.shape)}
+				</ui-plot-boundary>)}
+
+				<ui-action ui-href={`/map/${center.x}/${center.y}/5/edit-plot/${this.property.id}`}>
+					{drawIcon()} Edit Plot Boundary
+				</ui-action>
+			</ui-plot-boundaries>
 
 			<ui-dwellings>
 				{this.property.dwellings.map(dwelling => <ui-dwelling>
@@ -201,5 +243,13 @@ export class PropertyPage extends Component {
 				</ui-action>
 			</ui-actions>
 		</ui-property>
+	}
+
+	async copyBuilding(source: PackedPointArray) {
+		this.property.buildings.push(
+			await new PropertyService().createBuilding(this.property.id, source)
+		);
+
+		this.update();
 	}
 }

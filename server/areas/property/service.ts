@@ -1,7 +1,11 @@
 import { Service } from "vlserver";
-import { DbContext, Dwelling } from "../../managed/database";
+import { Building, DbContext, Dwelling, PlotBoundary } from "../../managed/database";
 import { DwellingViewModel } from "../life/resident";
 import { PropertyDwellingViewModel } from "../property.view";
+import { BuildingSummaryModel } from "./building";
+import { PlotBoundarySummaryModel } from "./plot";
+import { Point } from "../../../interface/point";
+import { Shape } from "../../../interface/shape";
 
 export class PropertyService extends Service {
 	constructor(
@@ -19,5 +23,59 @@ export class PropertyService extends Service {
 		await dwelling.create();
 
 		return new PropertyDwellingViewModel(dwelling);
+	}
+
+	async reviewed(propertyId: string) {
+		const property = await this.database.property.find(propertyId);
+		property.reviewPlot = true;
+
+		await property.update();
+	}
+
+	async createBuilding(propertyId: string, boundary: string) {
+		const property = await this.database.property.find(propertyId);
+
+		const building = new Building();
+		building.property = property;
+		building.boundary = Point.pack(Point.unpack(boundary));
+		building.created = new Date();
+
+		await building.create();
+
+		return new BuildingSummaryModel(building);
+	}
+
+	async editPlotBoundary(propertyId: string, boundary: string) {
+		const property = await this.database.property.find(propertyId);
+		let shape = Point.unpack(boundary);
+
+		const properties = await this.database.property
+			.where(property => property.activePlotBoundary != null)
+			.where(property => property.deactivated == null)
+			.where(peer => peer.id != property.id)
+			.include(property => property.activePlotBoundary)
+			.toArray();
+
+		/*const clips = [];
+
+		for (let shape of properties) {
+			clips.push(
+				Point.unpack((await shape.activePlotBoundary.fetch()).shape)
+			);
+		}
+
+		shape = Point.subtract(shape, ...clips);*/
+
+		const plotBoundary = new PlotBoundary();
+		plotBoundary.property = property;
+		plotBoundary.shape = Point.pack(shape);
+		plotBoundary.created = new Date();
+
+		await plotBoundary.create();
+
+		property.activePlotBoundary = plotBoundary;
+		await property.update();
+
+		return new PlotBoundarySummaryModel(plotBoundary);
 	}
 }

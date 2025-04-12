@@ -18,7 +18,7 @@ export class PropertyTileServer extends ShapeTileServer {
 				for (let borough of await database.borough.toArray()) {
 					shapes.push({
 						fill: '#fffc',
-						stroke: '#000',
+						stroke: borough.color,
 						bounds: borough.bounds
 					});
 				}
@@ -35,7 +35,7 @@ export class PropertyTileServer extends ShapeTileServer {
 
 						shapes.push({
 							id: property.id,
-							fill: '#eee',
+							fill: '#fff',
 							stroke: property.historicListingGradeId ? '#f00' : '#000',
 							bounds: activePlotBoundary.shape
 						});

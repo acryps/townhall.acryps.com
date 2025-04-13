@@ -21,6 +21,7 @@ import { locationMarkerStyle } from "./shared/location/index.style";
 import { registerBoroughStyle } from "./borough/register/index.style";
 import { writeArticleStyle } from "./news/write/index.style";
 import { annotatedTextStyle } from "./shared/annotaded-text/index.style";
+import { streetStyle } from "./street/index.style";
 
 export const pageStyle = () => root(
 	bold,
@@ -88,6 +89,8 @@ export const pageStyle = () => root(
 
 				populationStyle(),
 				residentStyle(),
+
+				streetStyle(),
 
 				voteStyle(),
 

@@ -38,6 +38,7 @@ import { WriteArticlePage } from "./news/write";
 import { EditPlotAction } from "./map/edit-plot";
 import { CreateBuildingAction } from "./map/create-building";
 import { Metadata } from "@acryps/metadata";
+import { StreetPage } from "./street";
 
 export class Application {
 	static router: Router;
@@ -74,6 +75,8 @@ export class Application {
 
 				.route('/borough/register/:bounds', RegisterBoroughPage)
 				.route('/borough/:tag', BoroughPage)
+
+				.route('/street/:id', StreetPage)
 
 				.route('/news/write/:id', WriteArticlePage)
 				.route('/news/article/:id', ArticePage)

@@ -6,6 +6,6 @@ export const nightLayer = MapLayer.fromTileSource((x, y) => `/tile/base/night/${
 export const propertyLayer = MapLayer.fromShapeSource((x, y) => `/tile/property/${x}/${y}`, 500, (x, y) => `/pick/property/${x}/${y}`, id => `/go/${id}`);
 export const boroughLayer = MapLayer.fromShapeSource((x, y) => `/tile/borough/${x}/${y}`, 500, (x, y) => `/pick/borough/${x}/${y}`, id => `/go/${id}`);
 export const propertyUsageLayer = MapLayer.fromShapeSource((x, y) => `/tile/usage/${x}/${y}`, 500, (x, y) => `/pick/usage/${x}/${y}`, id => `/go/${id}`);
-export const streetLayer = MapLayer.fromShapeSource((x, y) => `/tile/street/${x}/${y}`, 500);
+export const streetLayer = MapLayer.fromShapeSource((x, y) => `/tile/street/${x}/${y}`, 500, (x, y) => `/pick/street/${x}/${y}`, id => `/street/${id}`);
 
 export const movementHeatmapLayer = MapLayer.fromTileSource((x, y) => `/tile/movement/${x}/${y}`, 250);

@@ -145,18 +145,16 @@ export class Point {
 		return [...points].sort((a, b) => (a.x + a.y) - (b.x + b.y)).pop();
 	}
 
-	static touches(topLeft: Point, size: number, shape: Point[]) {
+	static touches(topLeft: Point, size: number | Point, shape: Point[]) {
 		const bounds = this.bounds(shape);
 
-		if (bounds.x.min >= topLeft.x || bounds.y.min >= topLeft.y) {
-			return true;
-		}
+		const sizeX = typeof size == 'number' ? size : size.x;
+		const sizeY = typeof size == 'number' ? size : size.y;
 
-		if (bounds.x.max <= topLeft.x + size || bounds.y.max <= topLeft.y + size) {
-			return true;
-		}
+		const horizontalOverlap = topLeft.x <= bounds.x.max && topLeft.x + sizeX >= bounds.x.min;
+		const verticalOverlap = topLeft.y <= bounds.y.max && topLeft.y + sizeY >= bounds.y.min;
 
-		return false;
+		return horizontalOverlap && verticalOverlap;
 	}
 
 	static midsect(points: Point[], close: boolean) {
@@ -261,60 +259,65 @@ export class Point {
 		}
 	}
 
-	static outline(filled: Map<string, Point>) {
-		const visited = new Set<string>();
+	static merge(...shapes: Map<string, Point>[]) {
+		const merged = new Map<string, Point>();
 
-		const directions = [
-			new Point(0, -1), new Point(1, -1), new Point(1, 0), new Point(1, 1), new Point(0, 1), new Point(-1, 1), new Point(-1, 0), new Point(-1, -1)
-		];
-
-		const isBulkPixel = (cursor: Point): boolean => {
-			let count = 0;
-
-			for (const offset of directions) {
-				if (filled.has(cursor.add(offset).pack())) {
-					count++;
+		for (let shape of shapes) {
+			for (let [key, point] of shape) {
+				if (!merged.has(key)) {
+					merged.set(key, point);
 				}
 			}
+		}
 
-			return count >= 3;
-		};
+		return merged;
+	}
 
-		const isEdgePixel = (cursor: Point): boolean => {
-			for (let offset of directions) {
-				if (!filled.has(cursor.add(offset).pack())) {
+	static outline(filled: Map<string, Point>) {
+		const directions: Point[] = [
+			new Point(0, -1), new Point(1, -1),
+			new Point(1, -1), new Point(1, -1),
+			new Point(1, 0), new Point(1, 1),
+			new Point(1, 1), new Point(1, 1),
+			new Point(0, 1), new Point(-1, 1),
+			new Point(-1, 1), new Point(-1, 1),
+			new Point(-1, 0), new Point(-1, -1),
+			new Point(-1, -1), new Point(-1, -1),
+		];
+
+		const isBoundary = (center: Point) => {
+			for (const direction of directions) {
+				const neighbor = center.add(direction);
+
+				if (!filled.has(neighbor.pack())) {
 					return true;
 				}
 			}
+
+			return false;
 		};
 
-		const start = filled.values().find(point => isEdgePixel(point));
-
-		this.plot(filled.values().toArray(), start);
-
-		if (!start) {
-			return [];
-		}
+		// Find starting boundary pixel
+		const start = filled.values().find(point => isBoundary(point));
+		if (!start) return [];
 
 		const outline: Point[] = [];
-		let cursor = start.copy();
-		let direction = 0;
+		let current = start;
+		let prevDir = 0;
 
 		do {
-			outline.push(cursor.copy());
-			visited.add(cursor.pack());
-
+			outline.push(current);
 			let found = false;
 
-			for (let nextDirectonOffset = 0; nextDirectonOffset <= directions.length; nextDirectonOffset++) {
-				const index = (direction + nextDirectonOffset) % directions.length;
-				const offset = directions[index];
+			for (let i = 0; i < directions.length; i++) {
+				const dir = (prevDir + i) % directions.length;
+				const offset = directions[dir];
 
-				const after = cursor.add(offset);
+				const next = current.add(offset);
 
-				if (filled.has(after.pack()) && !visited.has(after.pack()) && isEdgePixel(after) && isBulkPixel(after)) {
-					cursor = after;
-					direction = (index + 6) % 8;
+				if (filled.has(next.pack())) {
+					current = next;
+					prevDir = (dir + directions.length - 3) % directions.length; // turn back slightly
 					found = true;
 
 					break;
@@ -322,7 +325,7 @@ export class Point {
 			}
 
 			if (!found) break;
-		} while (cursor.pack() != start.pack());
+		} while (current.pack() !== start.pack());
 
 		return outline;
 	}
@@ -340,18 +343,18 @@ export class Point {
 			const intersections: number[] = [];
 
 			for (let i = 0; i < shape.length; i++) {
-				const curr = shape[i];
+				const current = shape[i];
 				const next = shape[(i + 1) % shape.length];
 
-				if (curr.y === next.y) continue; // Ignore horizontal edges
+				if (current.y === next.y) continue; // Ignore horizontal edges
 
-				const [top, bottom] = curr.y < next.y ? [curr, next] : [next, curr];
+				const [top, bottom] = current.y < next.y ? [current, next] : [next, current];
 				if (y < top.y || y >= bottom.y) continue;
 
-				const dx = next.x - curr.x;
-				const dy = next.y - curr.y;
-				const t = (y - curr.y) / dy;
-				const x = curr.x + t * dx;
+				const dx = next.x - current.x;
+				const dy = next.y - current.y;
+				const t = (y - current.y) / dy;
+				const x = current.x + t * dx;
 
 				intersections.push(x);
 			}
@@ -371,5 +374,64 @@ export class Point {
 		}
 
 		return pixels;
+	}
+
+	static groupShapes(filled: Map<string, Point>) {
+		const visited = new Set<string>();
+		const shapes: Map<string, Point>[] = [];
+
+		for (const [key, point] of filled) {
+			if (visited.has(key)) {
+				continue;
+			}
+
+			const shape = new Map<string, Point>();
+			const queue: Point[] = [point];
+
+			while (queue.length > 0) {
+				const current = queue.pop()!;
+				const currentKey = current.pack();
+
+				if (visited.has(currentKey)) {
+					continue;
+				}
+
+				visited.add(currentKey);
+				shape.set(currentKey, current);
+
+				for (const neighbor of this.getNeighbors(filled, current)) {
+					if (!visited.has(neighbor.pack())) {
+						queue.push(neighbor);
+					}
+				}
+			}
+
+			shapes.push(shape);
+		}
+
+		return shapes;
+	}
+
+	static getNeighbors(filled: Map<string, Point>, center: Point) {
+		return [
+			filled.get(center.copy(1, 0).pack()),
+			filled.get(center.copy(-1, 0).pack()),
+			filled.get(center.copy(0, 1).pack()),
+			filled.get(center.copy(0, -1).pack())
+		].filter(point => point);
+	}
+
+	static searchMap(size: number) {
+		const points: Point[] = [];
+		const field = Math.ceil(size / 2);
+
+		for (let x = -field; x <= field; x++) {
+			for (let y = -field; y <= field; y++) {
+				points.push(new Point(x, y));
+			}
+		}
+
+		const center = new Point(0, 0);
+		return points.sort((a, b) => center.distance(a) - center.distance(b));
 	}
 }

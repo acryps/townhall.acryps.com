@@ -2367,6 +2367,50 @@ export class ChatService {
 	}
 }
 
+export class StreetService {
+	async getStreet(id: string): Promise<StreetViewModel> {
+		const $data = new FormData();
+		$data.append("dkY3R1cnN0eDFybWVyaWg3cXxnMWJscG", Service.stringify(id))
+
+		return await fetch(Service.toURL("Z0Zzg2ZmYzaHl1YWVuOHdlczRtMj9rdm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : StreetViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getPeerPlots(id: string): Promise<Array<PlotBoundaryShapeModel>> {
+		const $data = new FormData();
+		$data.append("Ztejp0b2lkNGRxM21rczN3d2YwbTF1NW", Service.stringify(id))
+
+		return await fetch(Service.toURL("JzamMxc2JrZjlvMjttaWF1aXVybXRiZD"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : PlotBoundaryShapeModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
 export class TrainService {
 	async getRoutes(): Promise<Array<TrainRouteViewModel>> {
 		const $data = new FormData();

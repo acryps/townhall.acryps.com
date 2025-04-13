@@ -68,6 +68,8 @@ import { PublicationService } from "././../areas/publication/service";
 import { ChatManager } from "././../areas/resident/chat/manager";
 import { ChatInteractionViewModel } from "././../areas/resident/chat/interaction";
 import { ChatService } from "././../areas/resident/chat/service";
+import { PlotBoundaryShapeModel } from "././../areas/property/plot";
+import { StreetService } from "././../areas/street/service";
 import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
@@ -86,7 +88,6 @@ import { LawHouseSessionaryViewModel } from "./../areas/law-house/session";
 import { LawHouseSessionProtocolViewModel } from "./../areas/law-house/session";
 import { TenancyViewModel } from "./../areas/life/resident";
 import { BuildingShapeModel } from "./../areas/property/building";
-import { PlotBoundaryShapeModel } from "./../areas/property/plot";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
@@ -170,6 +171,10 @@ Inject.mappings = {
 	"ChatManager": {
 		objectConstructor: ChatManager,
 		parameters: ["DbContext","Life"]
+	},
+	"StreetService": {
+		objectConstructor: StreetService,
+		parameters: ["DbContext"]
 	},
 	"TrainService": {
 		objectConstructor: TrainService,
@@ -853,6 +858,28 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.send(
 				params["prbXM3dnU2aTAyNDYxdWs5aWdtbnRsZn"],
 				params["J2ZXFweXFuNGd1cmQ1enFsaG14NTA5c3"]
+			)
+		);
+
+		this.expose(
+			"Z0Zzg2ZmYzaHl1YWVuOHdlczRtMj9rdm",
+			{
+			"dkY3R1cnN0eDFybWVyaWg3cXxnMWJscG": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(StreetService),
+			(controller, params) => controller.getStreet(
+				params["dkY3R1cnN0eDFybWVyaWg3cXxnMWJscG"]
+			)
+		);
+
+		this.expose(
+			"JzamMxc2JrZjlvMjttaWF1aXVybXRiZD",
+			{
+			"Ztejp0b2lkNGRxM21rczN3d2YwbTF1NW": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(StreetService),
+			(controller, params) => controller.getPeerPlots(
+				params["Ztejp0b2lkNGRxM21rczN3d2YwbTF1NW"]
 			)
 		);
 

@@ -44,10 +44,14 @@ export class MapPage extends Component {
 
 		requestAnimationFrame(() => {
 			registerInteration(this.map, () => {
-				this.parameters.x = this.map.cursor.x;
-				this.parameters.y = this.map.cursor.y;
+				this.updateParameters({
+					x: this.map.cursor.x,
+					y: this.map.cursor.y
+				});
 			}, scale => {
-				this.parameters.zoom = (Math.sqrt(1 / scale) * this.zoomAccuracy).toFixed(0);
+				this.updateParameters({
+					zoom: (Math.sqrt(1 / scale) * this.zoomAccuracy).toFixed(0)
+				});
 			}, pick => {
 				this.map.pick(pick);
 
@@ -183,5 +187,14 @@ export class MapPage extends Component {
 			this.map.enableDrawing();
 			this.update();
 		});
+	}
+
+	updateParameters(changes: Partial<typeof this.parameters>) {
+		this.parameters = {
+			...this.parameters,
+			...changes
+		};
+
+		history.replaceState(null, '', `/map/${this.parameters.x}/${this.parameters.y}/${this.parameters.zoom}`);
 	}
 }

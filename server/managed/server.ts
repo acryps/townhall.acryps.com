@@ -68,6 +68,7 @@ import { PublicationService } from "././../areas/publication/service";
 import { ChatManager } from "././../areas/resident/chat/manager";
 import { ChatInteractionViewModel } from "././../areas/resident/chat/interaction";
 import { ChatService } from "././../areas/resident/chat/service";
+import { StreetRoute } from "././database";
 import { PlotBoundaryShapeModel } from "././../areas/property/plot";
 import { StreetService } from "././../areas/street/service";
 import { TrainRouteViewModel } from "././../areas/train/route.view";
@@ -82,6 +83,7 @@ import { VoteService } from "././../areas/vote/service";
 import { OfficeSummaryModel } from "./../areas/company.view";
 import { OfficeCapacityViewModel } from "./../areas/company.view";
 import { TenantViewModel } from "./../areas/property.view";
+import { StreetRouteSummaryModel } from "./../areas/street.view";
 import { WorkOfferSummaryModel } from "./../areas/work";
 import { WorkContractViewModel } from "./../areas/work";
 import { LawHouseSessionaryViewModel } from "./../areas/law-house/session";
@@ -880,6 +882,32 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(StreetService),
 			(controller, params) => controller.getPeerPlots(
 				params["Ztejp0b2lkNGRxM21rczN3d2YwbTF1NW"]
+			)
+		);
+
+		this.expose(
+			"JicXZkOXJkMjU4dzFhN3NkNWpndXNocG",
+			{
+			"JzeHs0bDh0NG54cGRodm04cWN6MXViam": { type: "string", isArray: false, isOptional: false },
+				"w5OXc3ZGhoeWZpdDF2NjN3NGl2dzR3OG": { type: "number", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(StreetService),
+			(controller, params) => controller.setWidth(
+				params["JzeHs0bDh0NG54cGRodm04cWN6MXViam"],
+				params["w5OXc3ZGhoeWZpdDF2NjN3NGl2dzR3OG"]
+			)
+		);
+
+		this.expose(
+			"JuODM4Znd0cjhmdT4xdnpzcnBqeDcxMm",
+			{
+			"JpbDFwdmVjZmF4MHgyMmcwbXBoZ2J3NH": { type: "string", isArray: false, isOptional: false },
+				"NsN302NXZ4dzJiNWd4M2EwdWNiaTd5a2": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(StreetService),
+			(controller, params) => controller.editRoute(
+				params["JpbDFwdmVjZmF4MHgyMmcwbXBoZ2J3NH"],
+				params["NsN302NXZ4dzJiNWd4M2EwdWNiaTd5a2"]
 			)
 		);
 
@@ -2212,10 +2240,10 @@ ViewModel.mappings = {
 	[StreetViewModel.name]: class ComposedStreetViewModel extends StreetViewModel {
 		async map() {
 			return {
-				bridges: (await this.$$model.bridges.includeTree(ViewModel.mappings[BridgeViewModel.name].items).toArray()).map(item => new BridgeViewModel(item)),
+				routes: (await this.$$model.routes.includeTree(ViewModel.mappings[StreetRouteSummaryModel.name].items).toArray()).map(item => new StreetRouteSummaryModel(item)),
+				activeRouteId: this.$$model.activeRouteId,
 				id: this.$$model.id,
 				name: this.$$model.name,
-				path: this.$$model.path,
 				shortName: this.$$model.shortName,
 				size: this.$$model.size
 			}
@@ -2247,15 +2275,15 @@ ViewModel.mappings = {
 			}
 
 			return {
-				get bridges() {
-					return ViewModel.mappings[BridgeViewModel.name].getPrefetchingProperties(
+				get routes() {
+					return ViewModel.mappings[StreetRouteSummaryModel.name].getPrefetchingProperties(
 						level,
-						[...parents, "bridges-StreetViewModel"]
+						[...parents, "routes-StreetViewModel"]
 					);
 				},
+				activeRouteId: true,
 				id: true,
 				name: true,
-				path: true,
 				shortName: true,
 				size: true
 			};
@@ -2263,10 +2291,10 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new StreetViewModel(null);
-			"bridges" in data && (item.bridges = data.bridges && [...data.bridges].map(i => ViewModel.mappings[BridgeViewModel.name].toViewModel(i)));
+			"routes" in data && (item.routes = data.routes && [...data.routes].map(i => ViewModel.mappings[StreetRouteSummaryModel.name].toViewModel(i)));
+			"activeRouteId" in data && (item.activeRouteId = data.activeRouteId === null ? null : `${data.activeRouteId}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"path" in data && (item.path = data.path === null ? null : `${data.path}`);
 			"shortName" in data && (item.shortName = data.shortName === null ? null : `${data.shortName}`);
 			"size" in data && (item.size = data.size === null ? null : +data.size);
 
@@ -2282,12 +2310,82 @@ ViewModel.mappings = {
 				model = new Street();
 			}
 			
-			"bridges" in viewModel && (null);
+			"routes" in viewModel && (null);
+			"activeRouteId" in viewModel && (model.activeRouteId = viewModel.activeRouteId === null ? null : `${viewModel.activeRouteId}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"path" in viewModel && (model.path = viewModel.path === null ? null : `${viewModel.path}`);
 			"shortName" in viewModel && (model.shortName = viewModel.shortName === null ? null : `${viewModel.shortName}`);
 			"size" in viewModel && (model.size = viewModel.size === null ? null : +viewModel.size);
+
+			return model;
+		}
+	},
+	[StreetRouteSummaryModel.name]: class ComposedStreetRouteSummaryModel extends StreetRouteSummaryModel {
+		async map() {
+			return {
+				changeComment: this.$$model.changeComment,
+				created: this.$$model.created,
+				id: this.$$model.id,
+				path: this.$$model.path
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				changeComment: true,
+				created: true,
+				id: true,
+				path: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new StreetRouteSummaryModel(null);
+			"changeComment" in data && (item.changeComment = data.changeComment === null ? null : `${data.changeComment}`);
+			"created" in data && (item.created = data.created === null ? null : new Date(data.created));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"path" in data && (item.path = data.path === null ? null : `${data.path}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: StreetRouteSummaryModel) {
+			let model: StreetRoute;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(StreetRoute).find(viewModel.id)
+			} else {
+				model = new StreetRoute();
+			}
+			
+			"changeComment" in viewModel && (model.changeComment = viewModel.changeComment === null ? null : `${viewModel.changeComment}`);
+			"created" in viewModel && (model.created = viewModel.created === null ? null : new Date(viewModel.created));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"path" in viewModel && (model.path = viewModel.path === null ? null : `${viewModel.path}`);
 
 			return model;
 		}

@@ -1,5 +1,5 @@
 import { Service } from "vlserver";
-import { DbContext, PlotBoundary } from "../../managed/database";
+import { DbContext, PlotBoundary, StreetRoute } from "../../managed/database";
 import { StreetViewModel } from "../street.view";
 import { Point } from "../../../interface/point";
 import { PlotBoundaryShapeModel } from "../property/plot";
@@ -43,5 +43,26 @@ export class StreetService extends Service {
 		}
 
 		return PlotBoundaryShapeModel.from(peers);
+	}
+
+	async setWidth(id: string, width: number) {
+		const street = await this.database.street.find(id);
+		street.size = width;
+
+		await street.update();
+	}
+
+	async editRoute(id: string, path: string) {
+		const street = await this.database.street.find(id);
+
+		const route = new StreetRoute();
+		route.path = Point.pack(Point.unpack(path));
+		route.created = new Date();
+		route.street = street;
+
+		await route.create();
+
+		street.activeRoute = route;
+		await street.update();
 	}
 }

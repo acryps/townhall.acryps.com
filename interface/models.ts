@@ -127,12 +127,19 @@ export interface SquareViewModel {
 }
 
 export interface StreetViewModel {
-    bridges: BridgeViewModel[];
+    routes: StreetRouteSummaryModel[];
+	activeRouteId: string;
 	id: string;
 	name: string;
-	path: string;
 	shortName: string;
 	size: number;
+}
+
+export interface StreetRouteSummaryModel {
+    changeComment: string;
+	created: Date;
+	id: string;
+	path: string;
 }
 
 export interface WaterBodyViewModel {

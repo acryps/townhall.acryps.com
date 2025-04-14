@@ -1808,6 +1808,9 @@ export class Square extends Entity<SquareQueryProxy> {
 }
 			
 export class StreetQueryProxy extends QueryProxy {
+	get activeRoute(): Partial<StreetRouteQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get activeRouteId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get deactivated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get path(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get shortName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -1815,8 +1818,12 @@ export class StreetQueryProxy extends QueryProxy {
 }
 
 export class Street extends Entity<StreetQueryProxy> {
+	get activeRoute(): Partial<ForeignReference<StreetRoute>> { return this.$activeRoute; }
 	bridges: PrimaryReference<Bridge, BridgeQueryProxy>;
-		declare id: string;
+		routes: PrimaryReference<StreetRoute, StreetRouteQueryProxy>;
+		activeRouteId: string;
+	deactivated: Date;
+	declare id: string;
 	name: string;
 	path: string;
 	shortName: string;
@@ -1825,6 +1832,8 @@ export class Street extends Entity<StreetQueryProxy> {
 	$$meta = {
 		source: "street",
 		columns: {
+			activeRouteId: { type: "uuid", name: "active_route_id" },
+			deactivated: { type: "timestamp", name: "deactivated" },
 			id: { type: "uuid", name: "id" },
 			name: { type: "text", name: "name" },
 			path: { type: "text", name: "path" },
@@ -1839,8 +1848,75 @@ export class Street extends Entity<StreetQueryProxy> {
 	constructor() {
 		super();
 		
-		this.bridges = new PrimaryReference<Bridge, BridgeQueryProxy>(this, "streetId", Bridge);
+		this.$activeRoute = new ForeignReference<StreetRoute>(this, "activeRouteId", StreetRoute);
+	this.bridges = new PrimaryReference<Bridge, BridgeQueryProxy>(this, "streetId", Bridge);
+		this.routes = new PrimaryReference<StreetRoute, StreetRouteQueryProxy>(this, "streetId", StreetRoute);
 	}
+	
+	private $activeRoute: ForeignReference<StreetRoute>;
+
+	set activeRoute(value: Partial<ForeignReference<StreetRoute>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.activeRouteId = value.id as string;
+		} else {
+			this.activeRouteId = null;
+		}
+	}
+
+	
+}
+			
+export class StreetRouteQueryProxy extends QueryProxy {
+	get street(): Partial<StreetQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get changeComment(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get path(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get streetId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class StreetRoute extends Entity<StreetRouteQueryProxy> {
+	get street(): Partial<ForeignReference<Street>> { return this.$street; }
+	changeComment: string;
+	created: Date;
+	declare id: string;
+	path: string;
+	streetId: string;
+	
+	$$meta = {
+		source: "street_route",
+		columns: {
+			changeComment: { type: "text", name: "change_comment" },
+			created: { type: "timestamp", name: "created" },
+			id: { type: "uuid", name: "id" },
+			path: { type: "text", name: "path" },
+			streetId: { type: "uuid", name: "street_id" }
+		},
+		get set(): DbSet<StreetRoute, StreetRouteQueryProxy> { 
+			return new DbSet<StreetRoute, StreetRouteQueryProxy>(StreetRoute, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$street = new ForeignReference<Street>(this, "streetId", Street);
+	}
+	
+	private $street: ForeignReference<Street>;
+
+	set street(value: Partial<ForeignReference<Street>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.streetId = value.id as string;
+		} else {
+			this.streetId = null;
+		}
+	}
+
+	
 }
 			
 export class TenancyQueryProxy extends QueryProxy {
@@ -2379,6 +2455,7 @@ export class DbContext {
 	residentRelationship: DbSet<ResidentRelationship, ResidentRelationshipQueryProxy>;
 	square: DbSet<Square, SquareQueryProxy>;
 	street: DbSet<Street, StreetQueryProxy>;
+	streetRoute: DbSet<StreetRoute, StreetRouteQueryProxy>;
 	tenancy: DbSet<Tenancy, TenancyQueryProxy>;
 	trainRoute: DbSet<TrainRoute, TrainRouteQueryProxy>;
 	trainStation: DbSet<TrainStation, TrainStationQueryProxy>;
@@ -2423,6 +2500,7 @@ export class DbContext {
 		this.residentRelationship = new DbSet<ResidentRelationship, ResidentRelationshipQueryProxy>(ResidentRelationship, this.runContext);
 		this.square = new DbSet<Square, SquareQueryProxy>(Square, this.runContext);
 		this.street = new DbSet<Street, StreetQueryProxy>(Street, this.runContext);
+		this.streetRoute = new DbSet<StreetRoute, StreetRouteQueryProxy>(StreetRoute, this.runContext);
 		this.tenancy = new DbSet<Tenancy, TenancyQueryProxy>(Tenancy, this.runContext);
 		this.trainRoute = new DbSet<TrainRoute, TrainRouteQueryProxy>(TrainRoute, this.runContext);
 		this.trainStation = new DbSet<TrainStation, TrainStationQueryProxy>(TrainStation, this.runContext);

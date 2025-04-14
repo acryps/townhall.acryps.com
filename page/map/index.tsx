@@ -10,6 +10,8 @@ import { Observable } from "@acryps/page-observable";
 import { CreateFeaturePage } from "./create";
 import { Action } from "../action";
 
+export type DrawingType = 'closed-shape' | 'path' | 'any';
+
 export class MapPage extends Component {
 	declare parameters: { x, y, zoom };
 	declare rootNode: HTMLElement;
@@ -27,6 +29,7 @@ export class MapPage extends Component {
 		.set('p', propertyLayer);
 
 	drawing: {
+		type: DrawingType,
 		name: string,
 		complete: (shape: Point[]) => void
 	};
@@ -75,18 +78,21 @@ export class MapPage extends Component {
 			{this.map}
 
 			<ui-tools>
-				{this.map.drawing && (this.map.drawingClosePossible.map(possible => possible ? <ui-action ui-click={() => {
-					const shape = this.map.completeDrawing();
+				{this.map.drawing && <ui-actions>
+					<ui-action ui-click={() => this.map.pushDrawingPoint()}>
+						{addIcon()} Add Point
+					</ui-action>
 
-					// backup if create would were to fail
-					console.log('shape', Point.pack(shape));
-
-					this.drawing.complete(shape);
-				}}>
-					{addIcon()} {this.drawing.name}
-				</ui-action> : <ui-action ui-click={() => this.map.pushDrawingPoint()}>
-					{addIcon()} Add Point
-				</ui-action>))}
+					{this.drawing.type == 'closed-shape' ? (
+						this.map.drawingClosePossible.map(possible => possible ? <ui-action ui-click={() => this.completeDrawing()}>
+							{addIcon()} {this.drawing.name}
+						</ui-action> : <ui-action ui-disabled>
+							{addIcon()} {this.drawing.name}
+						</ui-action>)
+					) : <ui-action ui-click={() => this.completeDrawing()}>
+						{addIcon()} {this.drawing.name}
+					</ui-action>}
+				</ui-actions>}
 
 				<ui-drawer>
 					{child}
@@ -151,7 +157,7 @@ export class MapPage extends Component {
 									}
 								}
 							} else {
-								const packed = Point.pack(await this.draw('Add Feature'));
+								const packed = Point.pack(await this.draw('Add Feature', 'any'));
 
 								this.navigate(`create/${btoa(packed)}`);
 							}
@@ -162,6 +168,15 @@ export class MapPage extends Component {
 				</ui-drawer>
 			</ui-tools>
 		</ui-map>
+	}
+
+	completeDrawing() {
+		const shape = this.map.completeDrawing();
+
+		// backup if create would were to fail
+		console.log('shape', Point.pack(shape));
+
+		this.drawing.complete(shape);
 	}
 
 	toggleLayer(enable: MapLayer, disable?: MapLayer) {
@@ -177,9 +192,10 @@ export class MapPage extends Component {
 		this.map.updateLayers();
 	}
 
-	draw(action: string) {
+	draw(action: string, type: DrawingType = 'closed-shape') {
 		return new Promise<Point[]>(done => {
 			this.drawing = {
+				type,
 				name: action,
 				complete: shape => done(shape)
 			}

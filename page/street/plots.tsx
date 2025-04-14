@@ -4,29 +4,34 @@ import { calcualteDanwinstonLine } from "../../interface/line";
 import { Point } from "../../interface/point";
 import { Shape } from "../../interface/shape";
 import { ColorValue, deg, hex, Hsl, hsl, percentage } from "@acryps/style";
+import { StreetPage } from ".";
 
-export class StreetPlotsComponent extends Component {
+export class StreetPlotsPage extends Component {
+	declare parent: StreetPage;
+
 	colors: Hsl[] = [];
 	peerPlots: PlotBoundaryShapeModel[];
 
-	constructor(
-		private street: StreetViewModel
-	) {
-		super();
-	}
-
 	async onload() {
-		this.peerPlots = await new StreetService().getPeerPlots(this.street.id);
+		this.peerPlots = await new StreetService().getPeerPlots(this.parent.street.id);
 
 		for (let angle = 0; angle < 360; angle += 20) {
 			this.colors.push(hsl(deg(angle), percentage(100), percentage(50)));
 		}
 	}
 
-	render() {
-		const path = Point.unpack(this.street.path);
+	renderLoader() {
+		return <ui-plots>
+			<ui-progress>
+				Calculating Plots...
+			</ui-progress>
+		</ui-plots>
+	}
 
-		const boundary = Point.bounds(path, this.street.size);
+	render() {
+		const path = Point.unpack(this.parent.currentRoute.path);
+
+		const boundary = Point.bounds(path, this.parent.street.size);
 		const topLeft = new Point(boundary.x.min, boundary.y.min);
 
 		const canvas = document.createElement('canvas');
@@ -52,7 +57,7 @@ export class StreetPlotsComponent extends Component {
 			}
 		}
 
-		const searchField = Point.searchMap(this.street.size);
+		const searchField = Point.searchMap(this.parent.street.size);
 
 		for (let segmentIndex = 1; segmentIndex < path.length; segmentIndex++) {
 			const start = path[segmentIndex - 1];

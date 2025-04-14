@@ -39,6 +39,8 @@ import { EditPlotAction } from "./map/edit-plot";
 import { CreateBuildingAction } from "./map/create-building";
 import { Metadata } from "@acryps/metadata";
 import { StreetPage } from "./street";
+import { EditRouteAction } from "./map/edit-route";
+import { StreetPlotsPage } from "./street/plots";
 
 export class Application {
 	static router: Router;
@@ -66,6 +68,7 @@ export class Application {
 				.route('/map/:x/:y/:zoom', MapPage
 					.route('/create-building/:id', CreateBuildingAction)
 					.route('/edit-plot/:id', EditPlotAction)
+					.route('/edit-route/:id', EditRouteAction)
 
 					.route('/create/:shape', CreateFeaturePage)
 				)
@@ -76,7 +79,9 @@ export class Application {
 				.route('/borough/register/:bounds', RegisterBoroughPage)
 				.route('/borough/:tag', BoroughPage)
 
-				.route('/street/:id', StreetPage)
+				.route('/street/:id', StreetPage
+					.route('/plots', StreetPlotsPage)
+				)
 
 				.route('/news/write/:id', WriteArticlePage)
 				.route('/news/article/:id', ArticePage)

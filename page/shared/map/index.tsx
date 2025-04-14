@@ -31,7 +31,10 @@ export class MapComponent extends Component {
 	drawing?: Point[];
 	drawingClosePossible = new Observable<boolean>(false);
 
-	highlightedShape: Point[];
+	highlightedShape: {
+		shape: Point[],
+		close: boolean
+	};
 
 	subpixel = new Point(0, 0);
 	pixelSize = 0;
@@ -66,8 +69,8 @@ export class MapComponent extends Component {
 	}
 
 	// highlight an area
-	highlight(shape: Point[]) {
-		this.highlightedShape = shape;
+	highlight(shape: Point[], close = true) {
+		this.highlightedShape = { shape, close };
 		this.show(Point.center(shape), this.scale);
 
 		return this;
@@ -331,13 +334,19 @@ export class MapComponent extends Component {
 
 			this.context.strokeStyle = this.drawing ? '#00f8' : '#000';
 
-			for (let pointIndex = 0; pointIndex < this.highlightedShape.length; pointIndex++) {
+			let length = this.highlightedShape.shape.length;
+
+			if (!this.highlightedShape.close) {
+				length--;
+			}
+
+			for (let pointIndex = 0; pointIndex < length; pointIndex++) {
 				for (let x = -1; x < 1; x++) {
 					for (let y = -1; y < 1; y++) {
 						drawDanwinstonLine(
 							this.context,
-							this.highlightedShape[pointIndex].subtract(offset),
-							this.highlightedShape[(pointIndex + 1) % this.highlightedShape.length].subtract(offset)
+							this.highlightedShape.shape[pointIndex].subtract(offset),
+							this.highlightedShape.shape[(pointIndex + 1) % this.highlightedShape.shape.length].subtract(offset)
 						);
 					}
 				}

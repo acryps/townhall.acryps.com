@@ -292,21 +292,38 @@ export class SquareViewModel {
 }
 
 export class StreetViewModel {
-	bridges: BridgeViewModel[];
+	routes: StreetRouteSummaryModel[];
+	activeRouteId: string;
 	id: string;
 	name: string;
-	path: string;
 	shortName: string;
 	size: number;
 
 	private static $build(raw) {
 		const item = new StreetViewModel();
-		raw.bridges === undefined || (item.bridges = raw.bridges ? raw.bridges.map(i => BridgeViewModel["$build"](i)) : null)
+		raw.routes === undefined || (item.routes = raw.routes ? raw.routes.map(i => StreetRouteSummaryModel["$build"](i)) : null)
+		raw.activeRouteId === undefined || (item.activeRouteId = raw.activeRouteId === null ? null : `${raw.activeRouteId}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
-		raw.path === undefined || (item.path = raw.path === null ? null : `${raw.path}`)
 		raw.shortName === undefined || (item.shortName = raw.shortName === null ? null : `${raw.shortName}`)
 		raw.size === undefined || (item.size = raw.size === null ? null : +raw.size)
+		
+		return item;
+	}
+}
+
+export class StreetRouteSummaryModel {
+	changeComment: string;
+	created: Date;
+	id: string;
+	path: string;
+
+	private static $build(raw) {
+		const item = new StreetRouteSummaryModel();
+		raw.changeComment === undefined || (item.changeComment = raw.changeComment === null ? null : `${raw.changeComment}`)
+		raw.created === undefined || (item.created = raw.created ? new Date(raw.created) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.path === undefined || (item.path = raw.path === null ? null : `${raw.path}`)
 		
 		return item;
 	}
@@ -2406,6 +2423,46 @@ export class StreetService {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
 				throw new Error(r.error);
+			}
+		});
+	}
+
+	async setWidth(id: string, width: number): Promise<void> {
+		const $data = new FormData();
+		$data.append("JzeHs0bDh0NG54cGRodm04cWN6MXViam", Service.stringify(id))
+		$data.append("w5OXc3ZGhoeWZpdDF2NjN3NGl2dzR3OG", Service.stringify(width))
+
+		return await fetch(Service.toURL("JicXZkOXJkMjU4dzFhN3NkNWpndXNocG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async editRoute(id: string, path: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("JpbDFwdmVjZmF4MHgyMmcwbXBoZ2J3NH", Service.stringify(id))
+		$data.append("NsN302NXZ4dzJiNWd4M2EwdWNiaTd5a2", Service.stringify(path))
+
+		return await fetch(Service.toURL("JuODM4Znd0cjhmdT4xdnpzcnBqeDcxMm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
 			}
 		});
 	}

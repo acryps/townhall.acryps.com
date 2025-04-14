@@ -1,5 +1,5 @@
 import { ViewModel } from "vlserver";
-import { Street } from "../managed/database";
+import { Street, StreetRoute } from "../managed/database";
 import { BridgeViewModel } from "./bridge.view";
 
 export class StreetViewModel extends ViewModel<Street> {
@@ -8,8 +8,16 @@ export class StreetViewModel extends ViewModel<Street> {
 	name;
 	shortName;
 
-	path;
 	size;
 
-	bridges: BridgeViewModel[];
+	activeRouteId;
+	routes: StreetRouteSummaryModel[];
+}
+
+export class StreetRouteSummaryModel extends ViewModel<StreetRoute> {
+	id;
+	created;
+	changeComment;
+
+	path;
 }

@@ -1815,6 +1815,7 @@ export class StreetQueryProxy extends QueryProxy {
 	get path(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get shortName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get size(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class Street extends Entity<StreetQueryProxy> {
@@ -1828,6 +1829,7 @@ export class Street extends Entity<StreetQueryProxy> {
 	path: string;
 	shortName: string;
 	size: number;
+	tag: string;
 	
 	$$meta = {
 		source: "street",
@@ -1838,7 +1840,8 @@ export class Street extends Entity<StreetQueryProxy> {
 			name: { type: "text", name: "name" },
 			path: { type: "text", name: "path" },
 			shortName: { type: "text", name: "short_name" },
-			size: { type: "float4", name: "size" }
+			size: { type: "float4", name: "size" },
+			tag: { type: "text", name: "tag" }
 		},
 		get set(): DbSet<Street, StreetQueryProxy> { 
 			return new DbSet<Street, StreetQueryProxy>(Street, null);

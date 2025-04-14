@@ -1,16 +1,20 @@
-import { alignItems, border, borderBottom, child, columnGap, display, flexGrow, fontSize, fontWeight, height, imageRendering, marginBlock, marginBottom, marginInline, marginLeft, objectFit, opacity, padding, percentage, px, rem, vh, width } from "@acryps/style";
+import { alignItems, border, borderBottom, child, columnGap, display, flexGrow, fontSize, fontWeight, height, imageRendering, marginBlock, marginBottom, marginInline, marginLeft, marginTop, objectFit, opacity, padding, percentage, px, rem, vh, width } from "@acryps/style";
 import { boxed } from "../shared/boxed.style";
 import { pageGutter } from "../index.style";
 import { fieldStyle } from "../shared/field.style";
+import { buttonStyle } from "../shared/index.style";
 
 export const streetStyle = () => child('ui-street',
 	boxed(),
 
-	child('ui-name',
-		display('block'),
+	child('ui-field',
+		display('flex'),
+		marginBottom(rem(0.5)),
 
-		fontSize(rem(1.2)),
-		fontWeight('bold')
+		child('input',
+			fieldStyle(),
+			flexGrow(1)
+		)
 	),
 
 	child('ui-plots',
@@ -96,6 +100,14 @@ export const streetStyle = () => child('ui-street',
 				alignItems('center'),
 
 				padding(pageGutter)
+			)
+		),
+
+		child('ui-actions',
+			child('ui-action',
+				marginTop(rem(1)),
+
+				buttonStyle()
 			)
 		)
 	)

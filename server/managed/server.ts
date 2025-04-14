@@ -68,6 +68,7 @@ import { PublicationService } from "././../areas/publication/service";
 import { ChatManager } from "././../areas/resident/chat/manager";
 import { ChatInteractionViewModel } from "././../areas/resident/chat/interaction";
 import { ChatService } from "././../areas/resident/chat/service";
+import { Street } from "././database";
 import { StreetRoute } from "././database";
 import { PlotBoundaryShapeModel } from "././../areas/property/plot";
 import { StreetService } from "././../areas/street/service";
@@ -100,7 +101,6 @@ import { Player } from "./../managed/database";
 import { PropertyType } from "./../managed/database";
 import { Tenancy } from "./../managed/database";
 import { Square } from "./../managed/database";
-import { Street } from "./../managed/database";
 import { WaterBody } from "./../managed/database";
 import { WorkOffer } from "./../managed/database";
 import { WorkContract } from "./../managed/database";
@@ -886,6 +886,30 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"RqZ3hwc3I2a3Bhem9qZ35wYzdrcmdyYX",
+			{
+			"Ribj40ZmZsMm1xdm10ZTdtMXR3MzZlb2": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(StreetService),
+			(controller, params) => controller.createStreet(
+				params["Ribj40ZmZsMm1xdm10ZTdtMXR3MzZlb2"]
+			)
+		);
+
+		this.expose(
+			"FycnI1bWhvOHF1bmA4eD9oZWZ4eXZzYW",
+			{
+			"RhNGJhMnZvOG51Y2FtcnBrMWlqcWg0bz": { type: "string", isArray: false, isOptional: false },
+				"tqNmhkZmY2ajFrYWY1NWA5bGBjd2NzcD": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(StreetService),
+			(controller, params) => controller.rename(
+				params["RhNGJhMnZvOG51Y2FtcnBrMWlqcWg0bz"],
+				params["tqNmhkZmY2ajFrYWY1NWA5bGBjd2NzcD"]
+			)
+		);
+
+		this.expose(
 			"JicXZkOXJkMjU4dzFhN3NkNWpndXNocG",
 			{
 			"JzeHs0bDh0NG54cGRodm04cWN6MXViam": { type: "string", isArray: false, isOptional: false },
@@ -908,6 +932,17 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.editRoute(
 				params["JpbDFwdmVjZmF4MHgyMmcwbXBoZ2J3NH"],
 				params["NsN302NXZ4dzJiNWd4M2EwdWNiaTd5a2"]
+			)
+		);
+
+		this.expose(
+			"VlbjRmY2JldGYydjdna2o0NXVzZT9jZH",
+			{
+			"5jM250bjp0Z3Y0b2YzZH41aGR6bGtka3": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(StreetService),
+			(controller, params) => controller.archive(
+				params["5jM250bjp0Z3Y0b2YzZH41aGR6bGtka3"]
 			)
 		);
 

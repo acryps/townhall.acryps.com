@@ -7,7 +7,7 @@ import { calcualteDanwinstonLine } from "../../interface/line";
 import { propertyLayer } from "../shared/map/layers";
 import { StreetPlotsPage } from "./plots";
 import { RouteComponent } from "./route";
-import { addIcon, drawIcon, streetIcon } from "../assets/icons/managed";
+import { addIcon, deleteIcon, drawIcon, streetIcon } from "../assets/icons/managed";
 
 export class StreetPage extends Component {
 	declare parameters: { id };
@@ -26,13 +26,13 @@ export class StreetPage extends Component {
 		const map = new MapComponent().highlight(path, false);
 
 		return <ui-street>
-			<ui-name>
-				{this.street.name}
-			</ui-name>
-
-			<ui-grade>
-				Width {this.street.size}b
-			</ui-grade>
+			<ui-field>
+				<input
+					placeholder='Name (including Street)'
+					$ui-value={this.street.name}
+					ui-change={() => new StreetService().rename(this.street.id, this.street.name)}
+				/>
+			</ui-field>
 
 			{child ?? <ui-content>
 				{map}
@@ -57,12 +57,12 @@ export class StreetPage extends Component {
 						/>
 					</ui-field>
 
-					{this.street.routes.map(route => <ui-route ui-active={route.id == this.currentRoute.id}>
+					{this.street.routes.map((route, index) => <ui-route ui-active={route.id == this.currentRoute.id}>
 						<ui-name>
 							{route.changeComment ?? `Route #${route.id.split('-')[0]}`}
 						</ui-name>
 
-						{new RouteComponent(route.path)}
+						{new RouteComponent(route.path, this.street.routes[index - 1]?.path)}
 					</ui-route>)}
 
 					<ui-action ui-href={`/map/${center.x}/${center.y}/5/edit-route/${this.street.id}`}>
@@ -73,6 +73,16 @@ export class StreetPage extends Component {
 						{streetIcon()} View Plots
 					</ui-action>
 				</ui-routes>
+
+				<ui-actions>
+					<ui-action ui-click={async () => {
+						await new StreetService().archive(this.street.id);
+
+						history.back();
+					}}>
+						{deleteIcon()} Archive Property
+					</ui-action>
+				</ui-actions>
 			</ui-content>}
 		</ui-street>
 	}

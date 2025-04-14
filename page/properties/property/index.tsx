@@ -230,10 +230,6 @@ export class PropertyPage extends Component {
 			</ui-historic-listing>
 
 			<ui-actions>
-				<ui-action>
-					{drawIcon()} Redefine Boundaries (MISSING)
-				</ui-action>
-
 				<ui-action ui-click={async () => {
 					await new MapService().archiveProperty(this.property);
 

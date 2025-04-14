@@ -3,7 +3,7 @@ import { Point } from "../../../interface/point";
 import { MapComponent } from "../../shared/map";
 import { LocationMarkerComponent } from "../../shared/location";
 import { boroughIcon, propertyRegisterIcon, streetIcon } from "../../assets/icons/managed";
-import { MapService } from "../../managed/services";
+import { MapService, StreetService } from "../../managed/services";
 
 export class CreateFeaturePage extends Component {
 	declare parameters: { shape };
@@ -59,11 +59,11 @@ export class CreateFeaturePage extends Component {
 					</ui-name>
 				</ui-type>
 
-				<ui-type>
+				<ui-type ui-click={async () => this.navigate(`/street/${await new StreetService().createStreet(Point.pack(this.shape))}`)}>
 					{streetIcon()}
 
 					<ui-name>
-						Register Street (MISSING)
+						Register Street
 					</ui-name>
 				</ui-type>
 

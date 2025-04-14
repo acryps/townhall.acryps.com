@@ -15,27 +15,20 @@ export class StreetTileServer extends ShapeTileServer {
 			async () => {
 				const shapes = [];
 
-				const streets = await database.street.toArray();
+				const streets = await database.street
+					.where(street => street.deactivated == null)
+					.include(street => street.activeRoute)
+					.toArray();
 
 				for (let street of streets) {
-					const points = Point.unpack(street.path);
+					const route = await street.activeRoute.fetch();
+					const points = Point.unpack(route.path);
 
 					shapes.push({
 						id: street.id,
 						fill: 'transparent',
 						stroke: '#f00',
 						bounds: Point.pack([...points, ...points.reverse()])
-					});
-				}
-
-				const squares = await database.square.toArray();
-
-				for (let square of squares) {
-					shapes.push({
-						id: square.id,
-						fill: '#ff05',
-						stroke: '#ff0',
-						bounds: square.bounds
 					});
 				}
 

@@ -2427,6 +2427,47 @@ export class StreetService {
 		});
 	}
 
+	async createStreet(path: string): Promise<string> {
+		const $data = new FormData();
+		$data.append("Ribj40ZmZsMm1xdm10ZTdtMXR3MzZlb2", Service.stringify(path))
+
+		return await fetch(Service.toURL("RqZ3hwc3I2a3Bhem9qZ35wYzdrcmdyYX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async rename(id: string, name: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("RhNGJhMnZvOG51Y2FtcnBrMWlqcWg0bz", Service.stringify(id))
+		$data.append("tqNmhkZmY2ajFrYWY1NWA5bGBjd2NzcD", Service.stringify(name))
+
+		return await fetch(Service.toURL("FycnI1bWhvOHF1bmA4eD9oZWZ4eXZzYW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
 	async setWidth(id: string, width: number): Promise<void> {
 		const $data = new FormData();
 		$data.append("JzeHs0bDh0NG54cGRodm04cWN6MXViam", Service.stringify(id))
@@ -2453,6 +2494,25 @@ export class StreetService {
 		$data.append("NsN302NXZ4dzJiNWd4M2EwdWNiaTd5a2", Service.stringify(path))
 
 		return await fetch(Service.toURL("JuODM4Znd0cjhmdT4xdnpzcnBqeDcxMm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async archive(id: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("5jM250bjp0Z3Y0b2YzZH41aGR6bGtka3", Service.stringify(id))
+
+		return await fetch(Service.toURL("VlbjRmY2JldGYydjdna2o0NXVzZT9jZH"), {
 			method: "post",
 			credentials: "include",
 			body: $data

@@ -10,6 +10,7 @@ CREATE TABLE street_route (
 
 ALTER TABLE street ADD deactivated TIMESTAMP;
 ALTER TABLE street ADD active_route_id UUID CONSTRAINT active_route__ REFERENCES street_route (id);
+ALTER TABLE street ADD tag TEXT UNIQUE;
 
 INSERT INTO street_route (created, path, street_id)
 SELECT NOW(), path, id

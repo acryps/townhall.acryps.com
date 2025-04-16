@@ -22,6 +22,7 @@ import { ImpressionImageInterface } from "./areas/impressions/interface";
 import { StreetTileServer } from "./map/layers/shape/street";
 import { updateWorkOffers } from "./life/work/offers";
 import { Annotator } from "./annotate";
+import { PlotterInterface } from "./plot/interface";
 
 const runLife = process.env.RUN_LIFE == 'YES';
 
@@ -94,6 +95,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new ArticleImageInterface(app, database);
 	new ResidentImageInterface(app, database, life);
 	new ImpressionImageInterface(app, database);
+	new PlotterInterface(app, database);
 
 	app.createInjector = context => new Inject({
 		Context: context,

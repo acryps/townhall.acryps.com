@@ -4,7 +4,7 @@ import { Component } from "@acryps/page";
 import { MapComponent } from "../../shared/map";
 import { PackedPoint, PackedPointArray, Point } from "../../../interface/point";
 import { toSimulatedAge } from "../../../interface/time";
-import { addIcon, deleteIcon, drawIcon, lawIcon } from "../../assets/icons/managed";
+import { addIcon, captureIcon, deleteIcon, drawIcon, lawIcon } from "../../assets/icons/managed";
 import { MetaGovernmentBuilding, MetaPlace } from "@acryps/metadata";
 import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
 import { CompanyOfficePage } from "../../company-office";
@@ -238,6 +238,18 @@ export class PropertyPage extends Component {
 						history.back();
 					}}>
 						{deleteIcon()} Archive Property
+					</ui-action>
+
+					<ui-action ui-click={() => {
+						const boundary = Point.bounds(Point.unpack(this.activePlotBoundary.shape), 50);
+
+						const link = document.createElement('a');
+						link.href = `/plot/${boundary.x.min}/${boundary.y.min}/${Math.max(boundary.width, boundary.height)}`;
+						link.download = `Property ${this.property.id.split('-')[0]}`;
+
+						link.click();
+					}}>
+						{captureIcon()} Download Property Register Entry
 					</ui-action>
 				</ui-actions>
 			</ui-content>}

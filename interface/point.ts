@@ -45,6 +45,10 @@ export class Point {
 	}
 
 	static unpack(source: PackedPointArray) {
+		if (!source) {
+			return [];
+		}
+
 		return source.split(";").map(source => new Point(+source.split(",")[0], +source.split(",")[1]))
 	}
 

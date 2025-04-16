@@ -166,19 +166,19 @@ export class PropertyTypeViewModel {
 }
 
 export class PropertySummaryModel {
+	activePlotBoundary: PlotBoundaryShapeModel;
 	borough: BoroughSummaryModel;
 	historicListingGrade: HistoricListingGradeViewModel;
 	type: PropertyTypeViewModel;
-	bounds: string;
 	id: string;
 	name: string;
 
 	private static $build(raw) {
 		const item = new PropertySummaryModel();
+		raw.activePlotBoundary === undefined || (item.activePlotBoundary = raw.activePlotBoundary ? PlotBoundaryShapeModel["$build"](raw.activePlotBoundary) : null)
 		raw.borough === undefined || (item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null)
 		raw.historicListingGrade === undefined || (item.historicListingGrade = raw.historicListingGrade ? HistoricListingGradeViewModel["$build"](raw.historicListingGrade) : null)
 		raw.type === undefined || (item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null)
-		raw.bounds === undefined || (item.bounds = raw.bounds === null ? null : `${raw.bounds}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		

@@ -1717,10 +1717,10 @@ ViewModel.mappings = {
 	[PropertySummaryModel.name]: class ComposedPropertySummaryModel extends PropertySummaryModel {
 		async map() {
 			return {
+				activePlotBoundary: new PlotBoundaryShapeModel(await BaseServer.unwrap(this.$$model.activePlotBoundary)),
 				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.$$model.borough)),
 				historicListingGrade: new HistoricListingGradeViewModel(await BaseServer.unwrap(this.$$model.historicListingGrade)),
 				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.$$model.type)),
-				bounds: this.$$model.bounds,
 				id: this.$$model.id,
 				name: this.$$model.name
 			}
@@ -1752,6 +1752,12 @@ ViewModel.mappings = {
 			}
 
 			return {
+				get activePlotBoundary() {
+					return ViewModel.mappings[PlotBoundaryShapeModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "activePlotBoundary-PropertySummaryModel"]
+					);
+				},
 				get borough() {
 					return ViewModel.mappings[BoroughSummaryModel.name].getPrefetchingProperties(
 						level,
@@ -1770,7 +1776,6 @@ ViewModel.mappings = {
 						[...parents, "type-PropertySummaryModel"]
 					);
 				},
-				bounds: true,
 				id: true,
 				name: true
 			};
@@ -1778,10 +1783,10 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new PropertySummaryModel(null);
+			"activePlotBoundary" in data && (item.activePlotBoundary = data.activePlotBoundary && ViewModel.mappings[PlotBoundaryShapeModel.name].toViewModel(data.activePlotBoundary));
 			"borough" in data && (item.borough = data.borough && ViewModel.mappings[BoroughSummaryModel.name].toViewModel(data.borough));
 			"historicListingGrade" in data && (item.historicListingGrade = data.historicListingGrade && ViewModel.mappings[HistoricListingGradeViewModel.name].toViewModel(data.historicListingGrade));
 			"type" in data && (item.type = data.type && ViewModel.mappings[PropertyTypeViewModel.name].toViewModel(data.type));
-			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 
@@ -1797,10 +1802,10 @@ ViewModel.mappings = {
 				model = new Property();
 			}
 			
+			"activePlotBoundary" in viewModel && (model.activePlotBoundary.id = viewModel.activePlotBoundary ? viewModel.activePlotBoundary.id : null);
 			"borough" in viewModel && (model.borough.id = viewModel.borough ? viewModel.borough.id : null);
 			"historicListingGrade" in viewModel && (model.historicListingGrade.id = viewModel.historicListingGrade ? viewModel.historicListingGrade.id : null);
 			"type" in viewModel && (model.type.id = viewModel.type ? viewModel.type.id : null);
-			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 

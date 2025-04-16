@@ -73,10 +73,10 @@ export interface PropertyTypeViewModel {
 }
 
 export interface PropertySummaryModel {
-    borough: BoroughSummaryModel;
+    activePlotBoundary: PlotBoundaryShapeModel;
+	borough: BoroughSummaryModel;
 	historicListingGrade: HistoricListingGradeViewModel;
 	type: PropertyTypeViewModel;
-	bounds: string;
 	id: string;
 	name: string;
 }

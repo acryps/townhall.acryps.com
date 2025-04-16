@@ -15,7 +15,15 @@ export class Shape {
 	name: string;
 
 	static render(shape: RenderableShape, offset: Point, context: CanvasRenderingContext2D) {
+		if (!shape) {
+			return;
+		}
+
 		const bounds = Point.unpack(shape.bounds);
+
+		if (bounds.length < 3) {
+			return;
+		}
 
 		// use normal algorithm for fill
 		if (shape.fill) {

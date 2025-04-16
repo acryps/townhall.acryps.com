@@ -116,12 +116,12 @@ export class PropertyPage extends Component {
 			</ui-buildings>
 
 			<ui-plot-boundaries>
-				{this.property.plotBoundaries.map(boundary => <ui-plot-boundary ui-active={boundary == this.activePlotBoundary}>
+				{this.property.plotBoundaries.map((boundary, index) => <ui-plot-boundary ui-active={boundary == this.activePlotBoundary}>
 					<ui-comment>
 						{boundary.changeComment ?? `Plot Boundary #${boundary.id.split('-')[0]}`}
 					</ui-comment>
 
-					{new BoundaryComponent(boundary.shape)}
+					{new BoundaryComponent(boundary.shape, this.property.plotBoundaries[index - 1]?.shape)}
 				</ui-plot-boundary>)}
 
 				<ui-action ui-href={`/map/${center.x}/${center.y}/5/edit-plot/${this.property.id}`}>

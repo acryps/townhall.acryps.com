@@ -25,13 +25,6 @@ export class PropertyService extends Service {
 		return new PropertyDwellingViewModel(dwelling);
 	}
 
-	async reviewed(propertyId: string) {
-		const property = await this.database.property.find(propertyId);
-		property.reviewPlot = true;
-
-		await property.update();
-	}
-
 	async createBuilding(propertyId: string, boundary: string) {
 		const property = await this.database.property.find(propertyId);
 
@@ -45,6 +38,19 @@ export class PropertyService extends Service {
 		return new BuildingSummaryModel(building);
 	}
 
+	async saveBuilding(viewModel: BuildingSummaryModel) {
+		const building = await viewModel.toModel();
+
+		await building.update();
+	}
+
+	async archiveBuilding(id: string) {
+		const building = await this.database.building.find(id);
+		building.archived = new Date();
+
+		await building.update();
+	}
+
 	async editPlotBoundary(propertyId: string, boundary: string) {
 		const property = await this.database.property.find(propertyId);
 		let shape = Point.unpack(boundary);
@@ -55,16 +61,6 @@ export class PropertyService extends Service {
 			.where(peer => peer.id != property.id)
 			.include(property => property.activePlotBoundary)
 			.toArray();
-
-		/*const clips = [];
-
-		for (let shape of properties) {
-			clips.push(
-				Point.unpack((await shape.activePlotBoundary.fetch()).shape)
-			);
-		}
-
-		shape = Point.subtract(shape, ...clips);*/
 
 		const plotBoundary = new PlotBoundary();
 		plotBoundary.property = property;

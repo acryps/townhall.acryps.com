@@ -132,7 +132,7 @@ export class MapService extends Service {
 		await waterBody.create();
 	}
 
-	async saveProperty(propertyViewModel: PropertySummaryModel) {
+	async saveProperty(propertyViewModel: PropertyViewModel) {
 		const property = await propertyViewModel.toModel();
 
 		await property.update();

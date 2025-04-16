@@ -41,6 +41,7 @@ import { Metadata } from "@acryps/metadata";
 import { StreetPage } from "./street";
 import { EditRouteAction } from "./map/edit-route";
 import { StreetPlotsPage } from "./street/plots";
+import { BuildingPage } from "./properties/property/building";
 
 export class Application {
 	static router: Router;
@@ -74,7 +75,9 @@ export class Application {
 				)
 
 				.route('/properties', PropertiesComponent)
-				.route('/property/:id', PropertyPage)
+				.route('/property/:id', PropertyPage
+					.route('/building/:id', BuildingPage)
+				)
 
 				.route('/borough/register/:bounds', RegisterBoroughPage)
 				.route('/borough/:tag', BoroughPage)

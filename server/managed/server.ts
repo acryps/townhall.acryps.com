@@ -349,13 +349,13 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"dzb2prZ3QwYT8xZ2ZicXc5ZnN1cGFwZj",
+			"F5djUwdW03bmAxcTlneDxoYXZiemU3Ym",
 			{
-			"NycXNhenFjaGhvZDhsdWtlYzNtd2x4d3": { type: PropertySummaryModel, isArray: false, isOptional: false }
+			"pvYjBwMX5xNGhpb2FwYWRpeWJ6OHFteT": { type: PropertyViewModel, isArray: false, isOptional: false }
 			},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.saveProperty(
-				params["NycXNhenFjaGhvZDhsdWtlYzNtd2x4d3"]
+				params["pvYjBwMX5xNGhpb2FwYWRpeWJ6OHFteT"]
 			)
 		);
 
@@ -672,17 +672,6 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"9sZ3czbGMxcm00NHJpaXQya2Z1MGRkbW",
-			{
-			"M4Y2lkeW12Yj4yZWVjNnI2dWM2cH5ybD": { type: "string", isArray: false, isOptional: false }
-			},
-			inject => inject.construct(PropertyService),
-			(controller, params) => controller.reviewed(
-				params["M4Y2lkeW12Yj4yZWVjNnI2dWM2cH5ybD"]
-			)
-		);
-
-		this.expose(
 			"Y2YWVmY2lsZDZ5amIxMGRubHl5bT5rcD",
 			{
 			"YyZXJidGMzOGBieWEwMTJweDVnaGc1bD": { type: "string", isArray: false, isOptional: false },
@@ -692,6 +681,28 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.createBuilding(
 				params["YyZXJidGMzOGBieWEwMTJweDVnaGc1bD"],
 				params["NxNDIwaWU4aXRya3V0aXJxdXVkbGkzNW"]
+			)
+		);
+
+		this.expose(
+			"JzbzZkYm5pcmNheXl3aTJrYXR1ZnMwbn",
+			{
+			"Q0amZyeDdwbzlqZ3I5ZmtmbnVxZGM1dG": { type: BuildingSummaryModel, isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PropertyService),
+			(controller, params) => controller.saveBuilding(
+				params["Q0amZyeDdwbzlqZ3I5ZmtmbnVxZGM1dG"]
+			)
+		);
+
+		this.expose(
+			"N0c3d6cDB3eGN3aXQ0bHlybntjMH9za2",
+			{
+			"9zNmQxaHQ3M3F0MTAwamRvcnlzZjduZW": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PropertyService),
+			(controller, params) => controller.archiveBuilding(
+				params["9zNmQxaHQ3M3F0MTAwamRvcnlzZjduZW"]
 			)
 		);
 

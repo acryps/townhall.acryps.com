@@ -2,6 +2,7 @@ import { alignItems, aspectRatio, backgroundColor, border, borderBottom, child, 
 import { negativeColor, neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 import { fieldStyle } from "../../shared/field.style";
 import { buttonStyle } from "../../shared/index.style";
+import { buildingStyle } from "./building/index.style";
 
 export const propertyStyle = () => child('ui-property',
 	display('block'),
@@ -23,197 +24,15 @@ export const propertyStyle = () => child('ui-property',
 		fontWeight('bold')
 	),
 
-	child('ui-map-container',
-		width(percentage(100).add(pageGutter.multiply(2))),
-		height(vh(30)),
+	buildingStyle(),
 
-		marginInline(pageGutter.invert()),
-		marginBlock(pageGutter)
-	),
+	child('ui-content',
+		child('ui-map-container',
+			width(percentage(100).add(pageGutter.multiply(2))),
+			height(vh(30)),
 
-	child('ui-field',
-		display('flex'),
-		flexDirection('column'),
-		marginBottom(rem(1)),
-
-		child('label',
-			display('block'),
-			marginBottom(rem(0.25))
-		),
-
-		child('input',
-			fieldStyle()
-		),
-
-		child('select',
-			fieldStyle()
-		)
-	),
-
-	child('ui-buildings',
-		display('block'),
-		marginBottom(rem(2)),
-
-		border(px(1), 'solid', 'currentColor'),
-
-		child('ui-building',
-			display('flex'),
-			padding(pageGutter),
-
-			borderBottom(px(1), 'dotted', 'currentColor'),
-
-			child('ui-name',
-				display('block'),
-				marginBottom(rem(0.25))
-			),
-
-			child('canvas',
-				marginLeft('auto'),
-				height(rem(5)),
-				width(rem(8)),
-				objectFit('contain'),
-
-				imageRendering('pixelated')
-			)
-		),
-
-		child('ui-action',
-			display('flex'),
-			columnGap(pageGutter),
-			alignItems('center'),
-
-			padding(pageGutter)
-		)
-	),
-
-
-	child('ui-plot-boundaries',
-		display('block'),
-		marginBottom(rem(2)),
-
-		border(px(1), 'solid', 'currentColor'),
-
-		child('ui-plot-boundary',
-			display('flex'),
-			padding(pageGutter),
-
-			opacity(0.5),
-			borderBottom(px(1), 'dotted', 'currentColor'),
-
-			child('ui-comment',
-				display('block'),
-				marginBottom(rem(0.25))
-			),
-
-			child('canvas',
-				marginLeft('auto'),
-				height(rem(5)),
-				width(rem(8)),
-				objectFit('contain'),
-
-				imageRendering('pixelated')
-			)
-		)
-			.attribute('ui-active',
-				opacity(1)
-			),
-
-		child('ui-action',
-			display('flex'),
-			columnGap(pageGutter),
-			alignItems('center'),
-
-			padding(pageGutter)
-		)
-	),
-
-	child('ui-dwellings',
-		display('block'),
-		marginBottom(rem(2)),
-
-		border(px(1), 'solid', 'currentColor'),
-
-		child('ui-dwelling',
-			display('block'),
-			padding(pageGutter),
-
-			borderBottom(px(1), 'dotted', 'currentColor'),
-
-			child('ui-name',
-				display('block'),
-				marginBottom(rem(0.25))
-			),
-
-			child('ui-vacant',
-				display('block'),
-
-				child('ui-header',
-					display('block')
-				),
-
-				child('ui-hint',
-					fontSize(rem(0.75))
-				)
-			)
-		),
-
-		child('ui-action',
-			display('flex'),
-			columnGap(pageGutter),
-			alignItems('center'),
-
-			padding(pageGutter)
-		)
-	),
-
-	child('ui-offices',
-		display('block'),
-		marginBottom(rem(2)),
-
-		border(px(1), 'solid', 'currentColor'),
-
-		child('ui-office',
-			display('block'),
-			padding(pageGutter),
-
-			borderBottom(px(1), 'dotted', 'currentColor'),
-
-			child('ui-company',
-				display('block'),
-
-				fontWeight('bold')
-			),
-
-			child('ui-name',
-				display('block')
-			)
-		),
-
-		child('ui-action',
-			display('flex'),
-			columnGap(pageGutter),
-			alignItems('center'),
-
-			padding(pageGutter)
-		)
-	),
-
-	child('ui-historic-listing',
-		display('block'),
-		padding(pageGutter),
-
-		border(px(1), 'solid', 'currentColor'),
-
-		child('ui-header',
-			display('block'),
-			marginBottom(rem(1)),
-
-			fontWeight('bold')
-		),
-
-		child('ui-date',
-			display('block'),
-			marginBottom(rem(1))
+			marginInline(pageGutter.invert()),
+			marginBlock(pageGutter)
 		),
 
 		child('ui-field',
@@ -226,38 +45,235 @@ export const propertyStyle = () => child('ui-property',
 				marginBottom(rem(0.25))
 			),
 
-			child('select',
+			child('input',
 				fieldStyle()
 			),
 
-			child('ui-hint',
-				display('block'),
-				marginTop(rem(0.25)),
-				fontSize(rem(0.75))
+			child('select',
+				fieldStyle()
 			)
 		),
 
-		child('ui-modifier',
+		child('ui-buildings',
 			display('block'),
-			marginBottom(rem(1)),
+			marginBottom(rem(2)),
+
+			border(px(1), 'solid', 'currentColor'),
+
+			child('ui-building',
+				display('flex'),
+				padding(pageGutter),
+
+				borderBottom(px(1), 'dotted', 'currentColor'),
+
+				child('ui-name',
+					display('block'),
+					marginBottom(rem(0.25))
+				),
+
+				child('canvas',
+					marginLeft('auto'),
+					height(rem(5)),
+					width(rem(8)),
+
+					objectFit('contain'),
+					objectPosition('right'),
+					imageRendering('pixelated')
+				)
+			)
+				.attribute('ui-archived',
+					child('ui-name',
+						textDecorationLine('line-through')
+					),
+
+					child('canvas',
+						height(rem(1.5))
+					)
+				),
+
+			child('ui-action',
+				display('flex'),
+				columnGap(pageGutter),
+				alignItems('center'),
+
+				padding(pageGutter)
+			)
+		),
+
+
+		child('ui-plot-boundaries',
+			display('block'),
+			marginBottom(rem(2)),
+
+			border(px(1), 'solid', 'currentColor'),
+
+			child('ui-plot-boundary',
+				display('flex'),
+				padding(pageGutter),
+
+				opacity(0.5),
+				borderBottom(px(1), 'dotted', 'currentColor'),
+
+				child('ui-comment',
+					display('block'),
+					marginBottom(rem(0.25))
+				),
+
+				child('canvas',
+					marginLeft('auto'),
+					height(rem(5)),
+					width(rem(8)),
+
+					objectFit('contain'),
+					objectPosition('right'),
+					imageRendering('pixelated')
+				)
+			)
+				.attribute('ui-active',
+					opacity(1)
+				),
+
+			child('ui-action',
+				display('flex'),
+				columnGap(pageGutter),
+				alignItems('center'),
+
+				padding(pageGutter)
+			)
+		),
+
+		child('ui-dwellings',
+			display('block'),
+			marginBottom(rem(2)),
+
+			border(px(1), 'solid', 'currentColor'),
+
+			child('ui-dwelling',
+				display('block'),
+				padding(pageGutter),
+
+				borderBottom(px(1), 'dotted', 'currentColor'),
+
+				child('ui-name',
+					display('block'),
+					marginBottom(rem(0.25))
+				),
+
+				child('ui-vacant',
+					display('block'),
+
+					child('ui-header',
+						display('block')
+					),
+
+					child('ui-hint',
+						fontSize(rem(0.75))
+					)
+				)
+			),
+
+			child('ui-action',
+				display('flex'),
+				columnGap(pageGutter),
+				alignItems('center'),
+
+				padding(pageGutter)
+			)
+		),
+
+		child('ui-offices',
+			display('block'),
+			marginBottom(rem(2)),
+
+			border(px(1), 'solid', 'currentColor'),
+
+			child('ui-office',
+				display('block'),
+				padding(pageGutter),
+
+				borderBottom(px(1), 'dotted', 'currentColor'),
+
+				child('ui-company',
+					display('block'),
+
+					fontWeight('bold')
+				),
+
+				child('ui-name',
+					display('block')
+				)
+			),
+
+			child('ui-action',
+				display('flex'),
+				columnGap(pageGutter),
+				alignItems('center'),
+
+				padding(pageGutter)
+			)
+		),
+
+		child('ui-historic-listing',
+			display('block'),
+			padding(pageGutter),
+
+			border(px(1), 'solid', 'currentColor'),
+
+			child('ui-header',
+				display('block'),
+				marginBottom(rem(1)),
+
+				fontWeight('bold')
+			),
+
+			child('ui-date',
+				display('block'),
+				marginBottom(rem(1))
+			),
 
 			child('ui-field',
 				display('flex'),
-				columnGap(rem(0.5))
+				flexDirection('column'),
+				marginBottom(rem(1)),
+
+				child('label',
+					display('block'),
+					marginBottom(rem(0.25))
+				),
+
+				child('select',
+					fieldStyle()
+				),
+
+				child('ui-hint',
+					display('block'),
+					marginTop(rem(0.25)),
+					fontSize(rem(0.75))
+				)
 			),
 
-			child('ui-grade',
+			child('ui-modifier',
 				display('block'),
-				fontSize(rem(0.75))
+				marginBottom(rem(1)),
+
+				child('ui-field',
+					display('flex'),
+					columnGap(rem(0.5))
+				),
+
+				child('ui-grade',
+					display('block'),
+					fontSize(rem(0.75))
+				)
 			)
-		)
-	),
+		),
 
-	child('ui-actions',
-		child('ui-action',
-			marginTop(rem(1)),
+		child('ui-actions',
+			child('ui-action',
+				marginTop(rem(1)),
 
-			buttonStyle()
+				buttonStyle()
+			)
 		)
 	)
 )

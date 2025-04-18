@@ -1,4 +1,4 @@
-import { alignItems, aspectRatio, backgroundColor, backgroundImage, backgroundSize, child, color, colorStop, display, height, hex, imageRendering, inset, justifyContent, left, linearGradient, marginLeft, marginTop, Number, overflow, padding, paddingBlock, paddingInline, percentage, pointerEvents, position, ratio, rem, Rem, select, textAlign, top, transform, translate, turn, Variable, whiteSpace, width, wordBreak, zIndex } from "@acryps/style";
+import { alignItems, aspectRatio, backgroundColor, backgroundImage, backgroundSize, child, color, colorStop, display, fontSize, height, hex, imageRendering, inset, justifyContent, left, linearGradient, marginLeft, marginTop, Number, opacity, overflow, padding, paddingBlock, paddingInline, percentage, pointerEvents, position, ratio, rem, Rem, select, textAlign, top, transform, translate, turn, Variable, whiteSpace, width, wordBreak, zIndex } from "@acryps/style";
 import { pageBackgroundColor, pageTextColor } from "../../index.style";
 import { PageComponent } from "../../page";
 
@@ -61,11 +61,13 @@ export const mapStyle = () => select('ui-map-container',
 			left(labelX.subtract(mapPositionX).multiply(percentage(100).divide(mapSubpixelWidth))),
 			top(labelY.subtract(mapPositionY).multiply(percentage(100).divide(mapSubpixelHeight))),
 
-			paddingInline(rem(0.5)),
-			paddingBlock(rem(0.25)),
+			paddingInline(rem(0.25)),
+			paddingBlock(rem(0.125)),
 			whiteSpace('pre'),
 
 			transform(translate(percentage(-50))),
+			fontSize(rem(0.5)),
+			opacity(0.8),
 			textAlign('center'),
 
 			color(pageTextColor),

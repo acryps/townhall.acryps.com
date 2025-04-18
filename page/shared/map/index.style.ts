@@ -1,6 +1,7 @@
 import { alignItems, aspectRatio, backgroundColor, backgroundImage, backgroundSize, child, color, colorStop, display, fontSize, height, hex, imageRendering, inset, justifyContent, left, linearGradient, marginLeft, marginTop, Number, opacity, overflow, padding, paddingBlock, paddingInline, percentage, pointerEvents, position, ratio, rem, Rem, select, textAlign, top, transform, translate, turn, Variable, whiteSpace, width, wordBreak, zIndex } from "@acryps/style";
 import { pageBackgroundColor, pageTextColor } from "../../index.style";
 import { PageComponent } from "../../page";
+import { micro } from "../../assets/font/index.style";
 
 export const mapPixelWidth = new Variable<Number>('map-pixel-width');
 export const mapPixelHeight = new Variable<Number>('map-pixel-height');
@@ -66,8 +67,10 @@ export const mapStyle = () => select('ui-map-container',
 			whiteSpace('pre'),
 
 			transform(translate(percentage(-50))),
+
+			micro,
 			fontSize(rem(0.5)),
-			opacity(0.8),
+			opacity(0.95),
 			textAlign('center'),
 
 			color(pageTextColor),

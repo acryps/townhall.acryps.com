@@ -11,3 +11,9 @@ export const regular = new Font('minecraft', fontWeight('normal'))
 
 export const regularItalic = new Font('minecraft', fontWeight('normal'), fontStyle('italic'))
 	.addSource('/assets/font/regular-italic.otf');
+
+export const headline = new Font('retro-byte', fontWeight('normal'))
+	.addSource('/assets/font/headline.ttf');
+
+export const micro = new Font('wendy-neue', fontWeight('normal'))
+	.addSource('/assets/font/micro.ttf');

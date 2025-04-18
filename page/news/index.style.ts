@@ -3,6 +3,7 @@ import { collection, collectionItem } from "../shared/collection.style";
 import { card } from "../shared/card.style";
 import { boxed } from "../shared/boxed.style";
 import { buttonStyle } from "../shared/index.style";
+import { headline } from "../assets/font/index.style";
 
 const bodyLineHeight = 1.3;
 
@@ -115,8 +116,8 @@ export const articleListStyle = () => child('ui-articles',
 				display('block'),
 				marginBottom(rem(0.5)),
 
-				fontWeight('bold'),
-				fontSize(rem(1.25))
+				headline,
+				fontSize(rem(1.75))
 			),
 
 			child('ui-body',
@@ -162,8 +163,8 @@ export const articleStyle = () => child('ui-article',
 		display('block'),
 		marginBottom(rem(1.5)),
 
-		textAlign('center'),
-		fontSize(rem(2))
+		headline,
+		fontSize(rem(2.5))
 	),
 
 	child('ui-detail',

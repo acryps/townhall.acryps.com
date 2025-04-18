@@ -302,7 +302,7 @@ export class Point {
 		};
 
 		// Find starting boundary pixel
-		const start = filled.values().find(point => isBoundary(point));
+		const start = [...filled.values()].find(point => isBoundary(point));
 		if (!start) return [];
 
 		const outline: Point[] = [];

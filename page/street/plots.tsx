@@ -82,7 +82,7 @@ export class StreetPlotsPage extends Component {
 		const shapes = Point.groupShapes(filled);
 
 		for (let shape of shapes) {
-			const boundary = Point.bounds(shape.values().toArray());
+			const boundary = Point.bounds([...shape.values()]);
 
 			if (boundary.width > 1 && boundary.height > 1) {
 				const outline = Point.outline(shape);

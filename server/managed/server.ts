@@ -685,6 +685,19 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"ExMWNsOHJ3YWFnZHNpYXhuZX1kY2Jjaj",
+			{
+			"FiOGdqZm1zM2lkejcwcH81ZXRsZzBvNX": { type: "string", isArray: false, isOptional: false },
+				"ZvNmNyYWM1c2xkemU5bzszZ3F4czczbm": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PropertyService),
+			(controller, params) => controller.setOwner(
+				params["FiOGdqZm1zM2lkejcwcH81ZXRsZzBvNX"],
+				params["ZvNmNyYWM1c2xkemU5bzszZ3F4czczbm"]
+			)
+		);
+
+		this.expose(
 			"JzbzZkYm5pcmNheXl3aTJrYXR1ZnMwbn",
 			{
 			"Q0amZyeDdwbzlqZ3I5ZmtmbnVxZGM1dG": { type: BuildingSummaryModel, isArray: false, isOptional: false }

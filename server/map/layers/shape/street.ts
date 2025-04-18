@@ -2,6 +2,7 @@ import { ShapeTileServer } from ".";
 import { Point } from "../../../../interface/point";
 import { DbContext } from "../../../managed/database";
 import { ManagedServer } from "../../../managed/server";
+import { StreetFiller } from "../../fill/street";
 
 export class StreetTileServer extends ShapeTileServer {
 	constructor(
@@ -15,19 +16,23 @@ export class StreetTileServer extends ShapeTileServer {
 			async () => {
 				const shapes = [];
 
-				const streets = await database.street
-					.where(street => street.deactivated == null)
-					.include(street => street.activeRoute)
-					.toArray();
+				for (let [street, shape] of StreetFiller.active.cached) {
+					shapes.push({
+						id: street.id,
+						fill: '#ccc',
+						stroke: '#bbb',
+						bounds: Point.pack(shape)
+					});
+				}
 
-				for (let street of streets) {
+				for (let street of StreetFiller.active.cached.keys()) {
 					const route = await street.activeRoute.fetch();
 					const points = Point.unpack(route.path);
 
 					shapes.push({
 						id: street.id,
 						fill: 'transparent',
-						stroke: '#f00',
+						stroke: '#ddd',
 						bounds: Point.pack([...points, ...points.reverse()])
 					});
 				}

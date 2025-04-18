@@ -328,7 +328,16 @@ export class Point {
 				}
 			}
 
-			if (!found) break;
+			if (outline.length > 5000) {
+				console.warn('invalid outline');
+				this.plot([...filled.values()])
+
+				return [];
+			}
+
+			if (!found) {
+				break;
+			}
 		} while (current.pack() !== start.pack());
 
 		return outline;

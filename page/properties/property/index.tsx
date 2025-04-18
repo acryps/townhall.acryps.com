@@ -90,7 +90,7 @@ export class PropertyPage extends Component {
 				<ui-field>
 					<label>Owner</label>
 
-					<select $ui-value={this.property.owner} ui-change={() => new MapService().saveProperty(this.property)}>
+					<select $ui-value={this.property.owner} ui-change={() => new PropertyService().setOwner(this.property.id, this.property.owner?.id)}>
 						<option ui-value={null}>Unclaimed</option>
 
 						{Application.players.map(player => <option ui-value={player}>

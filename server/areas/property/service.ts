@@ -38,6 +38,13 @@ export class PropertyService extends Service {
 		return new BuildingSummaryModel(building);
 	}
 
+	async setOwner(propertyId: string, ownerId: string) {
+		const property = await this.database.property.find(propertyId);
+		property.ownerId = ownerId;
+
+		await property.update();
+	}
+
 	async saveBuilding(viewModel: BuildingSummaryModel) {
 		const building = await viewModel.toModel();
 

@@ -2,6 +2,7 @@ import { ShapeTileServer } from ".";
 import { Point } from "../../../../interface/point";
 import { DbContext } from "../../../managed/database";
 import { ManagedServer } from "../../../managed/server";
+import { StreetFiller } from "../../fill/street";
 
 export class PropertyTileServer extends ShapeTileServer {
 	constructor(
@@ -43,7 +44,7 @@ export class PropertyTileServer extends ShapeTileServer {
 
 					for (let building of await property.buildings.toArray()) {
 						shapes.push({
-							fill: '#ccc',
+							fill: '#ff0',
 							stroke: '#666',
 							bounds: building.boundary
 						});

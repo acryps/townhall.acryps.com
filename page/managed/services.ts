@@ -2067,6 +2067,26 @@ export class PropertyService {
 		});
 	}
 
+	async setOwner(propertyId: string, ownerId: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("FiOGdqZm1zM2lkejcwcH81ZXRsZzBvNX", Service.stringify(propertyId))
+		$data.append("ZvNmNyYWM1c2xkemU5bzszZ3F4czczbm", Service.stringify(ownerId))
+
+		return await fetch(Service.toURL("ExMWNsOHJ3YWFnZHNpYXhuZX1kY2Jjaj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
 	async saveBuilding(viewModel: BuildingSummaryModel): Promise<void> {
 		const $data = new FormData();
 		$data.append("Q0amZyeDdwbzlqZ3I5ZmtmbnVxZGM1dG", Service.stringify(viewModel))

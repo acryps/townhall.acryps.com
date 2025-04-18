@@ -23,6 +23,7 @@ import { StreetTileServer } from "./map/layers/shape/street";
 import { updateWorkOffers } from "./life/work/offers";
 import { Annotator } from "./annotate";
 import { PlotterInterface } from "./plot/interface";
+import { StreetFiller } from "./map/fill/street";
 
 const runLife = process.env.RUN_LIFE == 'YES';
 
@@ -67,6 +68,8 @@ DbClient.connectedClient.connect().then(async () => {
 
 		await life.assignFigure(resident);
 	} */
+
+	StreetFiller.active = new StreetFiller(database).schedule();
 
 	new BaseTileServer(app, database);
 	new PropertyTileServer(app, database);

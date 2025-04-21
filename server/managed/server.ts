@@ -41,6 +41,10 @@ import { ImpressionService } from "././../areas/impressions/service";
 import { LawHouseSessionSummaryModel } from "././../areas/law-house/session";
 import { LawHouseSessionViewModel } from "././../areas/law-house/session";
 import { LawHouseService } from "././../areas/law-house/service";
+import { LegalEntityManager } from "././../areas/legal-entity/manager";
+import { LegalEntityViewModel } from "././../areas/legal-entity";
+import { LegalEntityReferenceCounter } from "././../areas/legal-entity/reference-counter";
+import { LegalEntityService } from "././../areas/legal-entity/service";
 import { Life } from "././../life";
 import { ResidentEventViewModel } from "././../areas/life/resident";
 import { ResidentRelationViewModel } from "././../areas/life/resident";
@@ -110,6 +114,7 @@ import { Impression } from "./../managed/database";
 import { LawHouseSession } from "./../managed/database";
 import { LawHouseSessionary } from "./../managed/database";
 import { LawHouseSessionProtocol } from "./../managed/database";
+import { LegalEntity } from "./../managed/database";
 import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
@@ -152,6 +157,14 @@ Inject.mappings = {
 	},
 	"LawHouseService": {
 		objectConstructor: LawHouseService,
+		parameters: ["DbContext"]
+	},
+	"LegalEntityService": {
+		objectConstructor: LegalEntityService,
+		parameters: ["LegalEntityManager"]
+	},
+	"LegalEntityManager": {
+		objectConstructor: LegalEntityManager,
 		parameters: ["DbContext"]
 	},
 	"LifeService": {
@@ -593,6 +606,26 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(LawHouseService),
 			(controller, params) => controller.getSession(
 				params["BoeXUxZGZka3ZvMGI1ZX1yZThzdmZ0NX"]
+			)
+		);
+
+		this.expose(
+			"NjbGJtbzE1cmRqdmdmaTR4cnhlZXN1Mz",
+			{
+			"JocWczYmk0MHJtYWNvcHN1ZjJ0bGZoeT": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LegalEntityService),
+			(controller, params) => controller.find(
+				params["JocWczYmk0MHJtYWNvcHN1ZjJ0bGZoeT"]
+			)
+		);
+
+		this.expose(
+			"lvYjBpYWJzd2Joajozd3VkazdhZjBobz",
+			{},
+			inject => inject.construct(LegalEntityService),
+			(controller, params) => controller.listFeatured(
+				
 			)
 		);
 
@@ -3155,6 +3188,95 @@ ViewModel.mappings = {
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"message" in viewModel && (model.message = viewModel.message === null ? null : `${viewModel.message}`);
 			"said" in viewModel && (model.said = viewModel.said === null ? null : new Date(viewModel.said));
+
+			return model;
+		}
+	},
+	[LegalEntityViewModel.name]: class ComposedLegalEntityViewModel extends LegalEntityViewModel {
+		async map() {
+			return {
+				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.$$model.borough)),
+				company: new CompanySummaryModel(await BaseServer.unwrap(this.$$model.company)),
+				resident: new ResidentSummaryModel(await BaseServer.unwrap(this.$$model.resident)),
+				id: this.$$model.id,
+				state: this.$$model.state
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get borough() {
+					return ViewModel.mappings[BoroughSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "borough-LegalEntityViewModel"]
+					);
+				},
+				get company() {
+					return ViewModel.mappings[CompanySummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "company-LegalEntityViewModel"]
+					);
+				},
+				get resident() {
+					return ViewModel.mappings[ResidentSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "resident-LegalEntityViewModel"]
+					);
+				},
+				id: true,
+				state: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new LegalEntityViewModel(null);
+			"borough" in data && (item.borough = data.borough && ViewModel.mappings[BoroughSummaryModel.name].toViewModel(data.borough));
+			"company" in data && (item.company = data.company && ViewModel.mappings[CompanySummaryModel.name].toViewModel(data.company));
+			"resident" in data && (item.resident = data.resident && ViewModel.mappings[ResidentSummaryModel.name].toViewModel(data.resident));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"state" in data && (item.state = !!data.state);
+
+			return item;
+		}
+
+		static async toModel(viewModel: LegalEntityViewModel) {
+			let model: LegalEntity;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(LegalEntity).find(viewModel.id)
+			} else {
+				model = new LegalEntity();
+			}
+			
+			"borough" in viewModel && (model.borough.id = viewModel.borough ? viewModel.borough.id : null);
+			"company" in viewModel && (model.company.id = viewModel.company ? viewModel.company.id : null);
+			"resident" in viewModel && (model.resident.id = viewModel.resident ? viewModel.resident.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"state" in viewModel && (model.state = !!viewModel.state);
 
 			return model;
 		}

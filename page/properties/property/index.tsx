@@ -10,6 +10,7 @@ import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
 import { CompanyOfficePage } from "../../company-office";
 import { convertToLegalCompanyName } from "../../../interface/company";
 import { BoundaryComponent } from "./boundary";
+import { LegalEntitySelectorComponent } from "../../shared/legal-entity/select";
 
 export class PropertyPage extends Component {
 	declare parameters: { id: string };
@@ -90,13 +91,7 @@ export class PropertyPage extends Component {
 				<ui-field>
 					<label>Owner</label>
 
-					<select $ui-value={this.property.owner} ui-change={() => new PropertyService().setOwner(this.property.id, this.property.owner?.id)}>
-						<option ui-value={null}>Unclaimed</option>
-
-						{Application.players.map(player => <option ui-value={player}>
-							{player.username}
-						</option>)}
-					</select>
+					{new LegalEntitySelectorComponent()}
 				</ui-field>
 
 				<ui-buildings>

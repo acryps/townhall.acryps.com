@@ -207,6 +207,14 @@ export interface LawHouseSessionProtocolViewModel {
 	said: Date;
 }
 
+export interface LegalEntityViewModel {
+    borough: BoroughSummaryModel;
+	company: CompanySummaryModel;
+	resident: ResidentSummaryModel;
+	id: string;
+	state: boolean;
+}
+
 export interface ResidentSummaryModel {
     birthday: Date;
 	familyName: string;

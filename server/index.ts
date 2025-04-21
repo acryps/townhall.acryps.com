@@ -24,6 +24,7 @@ import { updateWorkOffers } from "./life/work/offers";
 import { Annotator } from "./annotate";
 import { PlotterInterface } from "./plot/interface";
 import { StreetFiller } from "./map/fill/street";
+import { LegalEntityReferenceCounter } from "./areas/legal-entity/reference-counter";
 
 const runLife = process.env.RUN_LIFE == 'YES';
 
@@ -41,6 +42,8 @@ DbClient.connectedClient.connect().then(async () => {
 
 	const annotator = new Annotator(database);
 	annotator.load();
+
+	new LegalEntityReferenceCounter(database).schedule();
 
 	const life = new Life(database);
 	await life.load();

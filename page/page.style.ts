@@ -22,6 +22,7 @@ import { registerBoroughStyle } from "./borough/register/index.style";
 import { writeArticleStyle } from "./news/write/index.style";
 import { annotatedTextStyle } from "./shared/annotaded-text/index.style";
 import { streetStyle } from "./street/index.style";
+import { legalEntitySelectorStyle } from "./shared/legal-entity/select/index.style";
 
 export const pageStyle = () => root(
 	bold,
@@ -39,6 +40,7 @@ export const pageStyle = () => root(
 	residentBadgeListStyle(),
 	locationMarkerStyle(),
 	annotatedTextStyle(),
+	legalEntitySelectorStyle(),
 
 	child('body',
 		padding(0),

@@ -2,11 +2,11 @@ import { select, style, content, Font, fontFamily, fontWeight, fontStyle } from 
 
 
 export const iconFont = new Font('icons', fontWeight('normal'), fontStyle('normal'))
-	.addSource('/assets/icons/managed/font/index.eot?2f10ff460064', 'embedded-opentype')
-	.addSource('/assets/icons/managed/font/index.svg?e2ab8bea4fa5', 'svg')
-	.addSource('/assets/icons/managed/font/index.ttf?8d5523ec3599', 'truetype')
-	.addSource('/assets/icons/managed/font/index.woff?c7103fd4a500', 'woff')
-	.addSource('/assets/icons/managed/font/index.woff2?265791e90262', 'woff2');
+	.addSource('/assets/icons/managed/font/index.eot?5bd333690e1e', 'embedded-opentype')
+	.addSource('/assets/icons/managed/font/index.svg?b8c86dfefb17', 'svg')
+	.addSource('/assets/icons/managed/font/index.ttf?64d2e10825d4', 'truetype')
+	.addSource('/assets/icons/managed/font/index.woff?e580e55103a7', 'woff')
+	.addSource('/assets/icons/managed/font/index.woff2?2f3735bf7987', 'woff2');
 
 export const icons = () => select('ui-icon',
 	fontFamily(iconFont.name),
@@ -34,7 +34,8 @@ export const icons = () => select('ui-icon',
 	style('[ui-relation]').before('\f112'),
 	style('[ui-resident]').before('\f113'),
 	style('[ui-speak]').before('\f114'),
-	style('[ui-street]').before('\f115'),
+	style('[ui-state]').before('\f115'),
+	style('[ui-street]').before('\f116'),
 );
 
 const createIconElement = (name: string) => {
@@ -64,4 +65,5 @@ export const relationGraphIcon = () => createIconElement('relation-graph');
 export const relationIcon = () => createIconElement('relation');
 export const residentIcon = () => createIconElement('resident');
 export const speakIcon = () => createIconElement('speak');
+export const stateIcon = () => createIconElement('state');
 export const streetIcon = () => createIconElement('street');

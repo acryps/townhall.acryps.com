@@ -489,6 +489,25 @@ export class LawHouseSessionProtocolViewModel {
 	}
 }
 
+export class LegalEntityViewModel {
+	borough: BoroughSummaryModel;
+	company: CompanySummaryModel;
+	resident: ResidentSummaryModel;
+	id: string;
+	state: boolean;
+
+	private static $build(raw) {
+		const item = new LegalEntityViewModel();
+		raw.borough === undefined || (item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null)
+		raw.company === undefined || (item.company = raw.company ? CompanySummaryModel["$build"](raw.company) : null)
+		raw.resident === undefined || (item.resident = raw.resident ? ResidentSummaryModel["$build"](raw.resident) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.state === undefined || (item.state = !!raw.state)
+		
+		return item;
+	}
+}
+
 export class ResidentSummaryModel {
 	birthday: Date;
 	familyName: string;
@@ -1886,6 +1905,50 @@ export class LawHouseService {
 				const d = r.data;
 
 				return d === null ? null : LawHouseSessionViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class LegalEntityService {
+	async find(search: string): Promise<Array<LegalEntityViewModel>> {
+		const $data = new FormData();
+		$data.append("JocWczYmk0MHJtYWNvcHN1ZjJ0bGZoeT", Service.stringify(search))
+
+		return await fetch(Service.toURL("NjbGJtbzE1cmRqdmdmaTR4cnhlZXN1Mz"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : LegalEntityViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async listFeatured(): Promise<Array<LegalEntityViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("lvYjBpYWJzd2Joajozd3VkazdhZjBobz"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : LegalEntityViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

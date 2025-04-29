@@ -1257,7 +1257,9 @@ export class OfficeCapacity extends Entity<OfficeCapacityQueryProxy> {
 }
 			
 export class PlayerQueryProxy extends QueryProxy {
+	get legalEntity(): Partial<LegalEntityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get gameUuid(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get legalEntityId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get online(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get username(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get x(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -1265,10 +1267,12 @@ export class PlayerQueryProxy extends QueryProxy {
 }
 
 export class Player extends Entity<PlayerQueryProxy> {
+	get legalEntity(): Partial<ForeignReference<LegalEntity>> { return this.$legalEntity; }
 	properties: PrimaryReference<Property, PropertyQueryProxy>;
 		movements: PrimaryReference<Movement, MovementQueryProxy>;
 		gameUuid: string;
 	declare id: string;
+	legalEntityId: string;
 	online: boolean;
 	username: string;
 	x: number;
@@ -1279,6 +1283,7 @@ export class Player extends Entity<PlayerQueryProxy> {
 		columns: {
 			gameUuid: { type: "text", name: "game_uuid" },
 			id: { type: "uuid", name: "id" },
+			legalEntityId: { type: "uuid", name: "legal_entity_id" },
 			online: { type: "bool", name: "online" },
 			username: { type: "text", name: "username" },
 			x: { type: "float4", name: "x" },
@@ -1292,9 +1297,24 @@ export class Player extends Entity<PlayerQueryProxy> {
 	constructor() {
 		super();
 		
-		this.properties = new PrimaryReference<Property, PropertyQueryProxy>(this, "ownerId", Property);
+		this.$legalEntity = new ForeignReference<LegalEntity>(this, "legalEntityId", LegalEntity);
+	this.properties = new PrimaryReference<Property, PropertyQueryProxy>(this, "playerOwnerId", Property);
 		this.movements = new PrimaryReference<Movement, MovementQueryProxy>(this, "playerId", Movement);
 	}
+	
+	private $legalEntity: ForeignReference<LegalEntity>;
+
+	set legalEntity(value: Partial<ForeignReference<LegalEntity>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.legalEntityId = value.id as string;
+		} else {
+			this.legalEntityId = null;
+		}
+	}
+
+	
 }
 			
 export class PlotBoundaryQueryProxy extends QueryProxy {
@@ -1363,7 +1383,7 @@ export class PropertyQueryProxy extends QueryProxy {
 	get historicListingGradeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get historicListingRegisteredAt(): Partial<QueryDate> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get ownerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get playerOwnerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get reviewCompany(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get reviewPlot(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get typeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -1391,7 +1411,7 @@ export class Property extends Entity<PropertyQueryProxy> {
 	historicListingRegisteredAt: Date;
 	declare id: string;
 	name: string;
-	ownerId: string;
+	playerOwnerId: string;
 	reviewCompany: boolean;
 	reviewPlot: boolean;
 	typeId: string;
@@ -1409,7 +1429,7 @@ export class Property extends Entity<PropertyQueryProxy> {
 			historicListingRegisteredAt: { type: "date", name: "historic_listing_registered_at" },
 			id: { type: "uuid", name: "id" },
 			name: { type: "text", name: "name" },
-			ownerId: { type: "uuid", name: "owner_id" },
+			playerOwnerId: { type: "uuid", name: "player_owner_id" },
 			reviewCompany: { type: "bool", name: "review_company" },
 			reviewPlot: { type: "bool", name: "review_plot" },
 			typeId: { type: "uuid", name: "type_id" }
@@ -1425,7 +1445,7 @@ export class Property extends Entity<PropertyQueryProxy> {
 		this.$activePlotBoundary = new ForeignReference<PlotBoundary>(this, "activePlotBoundaryId", PlotBoundary);
 	this.$borough = new ForeignReference<Borough>(this, "boroughId", Borough);
 	this.$historicListingGrade = new ForeignReference<HistoricListingGrade>(this, "historicListingGradeId", HistoricListingGrade);
-	this.$owner = new ForeignReference<Player>(this, "ownerId", Player);
+	this.$owner = new ForeignReference<Player>(this, "playerOwnerId", Player);
 	this.buildings = new PrimaryReference<Building, BuildingQueryProxy>(this, "propertyId", Building);
 		this.dwellings = new PrimaryReference<Dwelling, DwellingQueryProxy>(this, "propertyId", Dwelling);
 		this.historicListingModifiers = new PrimaryReference<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>(this, "propertyId", PropertyHistoricListingModifier);
@@ -1477,9 +1497,9 @@ export class Property extends Entity<PropertyQueryProxy> {
 		if (value) {
 			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
 
-			this.ownerId = value.id as string;
+			this.playerOwnerId = value.id as string;
 		} else {
-			this.ownerId = null;
+			this.playerOwnerId = null;
 		}
 	}
 

@@ -56,7 +56,7 @@ SELECT
 	1 -- fully owned
 FROM property
 	INNER JOIN player ON player.id = property.player_owner_id
-WHERE property.player_owner_id;
+WHERE property.player_owner_id IS NOT NULL;
 
 -- verify ownership
 -- valuations must be created in code

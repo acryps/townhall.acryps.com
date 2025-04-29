@@ -58,7 +58,9 @@ export class LegalEntityReferenceCounter {
 			for (let reference of references) {
 				const entity = referenceCounter.find(item => item.entity.id == reference[source.$column]);
 
-				entity.references++;
+				if (entity) {
+					entity.references++;
+				}
 			}
 		}
 

@@ -2,6 +2,7 @@ import { Manager } from "vlserver";
 import { DbContext, LegalEntity, LegalEntityQueryProxy } from "../../managed/database";
 import { DbSet, Entity, Queryable } from "vlquery";
 import { LegalEntityViewModel } from ".";
+import { LegalEntityReferenceCounter } from "./reference-counter";
 
 export class LegalEntityManager extends Manager {
 	constructor(
@@ -36,8 +37,14 @@ export class LegalEntityManager extends Manager {
 			),
 		]);
 
+		if ('state'.startsWith(search)) {
+			results.push([
+				await this.database.legalEntity.first(entity => entity.state == true)
+			]);
+		}
+
 		const entities = results.flat();
-		entities.sort((a, b) => a.id.localeCompare(b.id));
+		entities.sort((a, b) => this.rank(b) - this.rank(a));
 
 		return entities;
 	}
@@ -72,5 +79,15 @@ export class LegalEntityManager extends Manager {
 		}
 
 		return entities;
+	}
+
+	private rank(item: LegalEntity) {
+		const index = LegalEntityReferenceCounter.active.ranked.indexOf(item);
+
+		if (index == -1) {
+			return Infinity;
+		}
+
+		return index;
 	}
 }

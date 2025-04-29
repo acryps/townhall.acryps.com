@@ -1,5 +1,5 @@
 import { ViewModel } from "vlserver";
-import { Dwelling, Property, Tenancy } from "../managed/database";
+import { Dwelling, Property, PropertyOwner, Tenancy } from "../managed/database";
 import { BoroughSummaryModel } from "./borough.summary";
 import { HistoricListingGradeViewModel } from "./history-listing/grade.view";
 import { PropertyHistoricListingModifierViewModel } from "./history-listing/link.view";
@@ -9,6 +9,9 @@ import { ResidentSummaryModel } from "./life/resident";
 import { OfficeViewModel } from "./company.view";
 import { BuildingSummaryModel } from "./property/building";
 import { PlotBoundaryShapeModel, PlotBoundarySummaryModel } from "./property/plot";
+import { exit } from "process";
+import { LegalEntityViewModel } from "./legal-entity";
+import { ValuationSummaryModel } from "./trade/valuation.view";
 
 export class PropertyOverviewModel extends ViewModel<Property> {
 	id;
@@ -30,7 +33,6 @@ export class PropertyViewModel extends ViewModel<Property> {
 	historicListingGrade: HistoricListingGradeViewModel;
 	historicListingModifiers: PropertyHistoricListingModifierViewModel[];
 
-	owner: PlayerViewModel;
 	borough: BoroughSummaryModel;
 	type: PropertyTypeViewModel;
 
@@ -41,6 +43,19 @@ export class PropertyViewModel extends ViewModel<Property> {
 
 	activePlotBoundaryId;
 	plotBoundaries: PlotBoundarySummaryModel[];
+
+	owners: PropertyOwnerViewModel[];
+}
+
+export class PropertyOwnerViewModel extends ViewModel<PropertyOwner> {
+	id;
+
+	owner: LegalEntityViewModel;
+
+	aquired;
+	aquiredValuation: ValuationSummaryModel;
+	sold;
+	share;
 }
 
 export class PropertyDwellingViewModel extends ViewModel<Dwelling> {

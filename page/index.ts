@@ -42,6 +42,8 @@ import { StreetPage } from "./street";
 import { EditRouteAction } from "./map/edit-route";
 import { StreetPlotsPage } from "./street/plots";
 import { BuildingPage } from "./properties/property/building";
+import { ValuationPage } from "./trade/valuation";
+import { PropertyOwnershipPage } from "./properties/property/ownership";
 
 export class Application {
 	static router: Router;
@@ -77,6 +79,7 @@ export class Application {
 				.route('/properties', PropertiesComponent)
 				.route('/property/:id', PropertyPage
 					.route('/building/:id', BuildingPage)
+					.route('/ownership', PropertyOwnershipPage)
 				)
 
 				.route('/borough/register/:bounds', RegisterBoroughPage)
@@ -95,6 +98,8 @@ export class Application {
 					.route('/chat/:chat', ChatPage)
 					.route('/relations', RelationsPage)
 				)
+
+				.route('/trade/valuation', ValuationPage)
 
 				.route('/population', PopulationPage)
 

@@ -11,6 +11,7 @@ import { CompanyOfficePage } from "../../company-office";
 import { convertToLegalCompanyName } from "../../../interface/company";
 import { BoundaryComponent } from "./boundary";
 import { LegalEntitySelectorComponent } from "../../shared/legal-entity/select";
+import { LegalEntityComponent } from "../../shared/legal-entity";
 
 export class PropertyPage extends Component {
 	declare parameters: { id: string };
@@ -47,6 +48,7 @@ export class PropertyPage extends Component {
 	render(child) {
 		const center = Point.center(Point.unpack(this.activePlotBoundary.shape));
 		const activeBuildings = this.property.buildings.filter(building => !building.archived);
+		const activeOwners = this.property.owners.filter(owner => !owner.sold);
 
 		return <ui-property>
 			<ui-name>
@@ -88,11 +90,32 @@ export class PropertyPage extends Component {
 					</select>
 				</ui-field>
 
-				<ui-field>
-					<label>Owner</label>
+				<ui-ownership-structure>
+					{activeOwners.length ? activeOwners.map(owner => <ui-owner>
+						{new LegalEntityComponent(owner.owner)}
 
-					{new LegalEntitySelectorComponent()}
-				</ui-field>
+						{activeOwners.length != 1 && <ui-share>
+							{(owner.share * 100).toFixed(0)}%
+						</ui-share>}
+					</ui-owner>) : <ui-field ui-quick-assign>
+						<label>
+							Quick Assign one owner
+						</label>
+
+						{new LegalEntitySelectorComponent()
+							.onSelect(async entity => {
+								this.property.owners = [
+									await new PropertyService().assignSoleOwner(this.property.id, entity.id)
+								];
+
+								this.update();
+							})}
+					</ui-field>}
+
+					<ui-action ui-href='ownership'>
+						Manage Ownership Structure
+					</ui-action>
+				</ui-ownership-structure>
 
 				<ui-buildings>
 					{this.property.buildings.map(building => <ui-building ui-href={`building/${building.id}`} ui-archived={!!building.archived}>

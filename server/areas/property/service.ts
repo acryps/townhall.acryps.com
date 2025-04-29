@@ -1,15 +1,17 @@
 import { Service } from "vlserver";
-import { Building, DbContext, Dwelling, PlotBoundary } from "../../managed/database";
+import { Building, DbContext, Dwelling, PlotBoundary, PropertyOwner } from "../../managed/database";
 import { DwellingViewModel } from "../life/resident";
-import { PropertyDwellingViewModel } from "../property.view";
+import { PropertyDwellingViewModel, PropertyOwnerViewModel } from "../property.view";
 import { BuildingSummaryModel } from "./building";
 import { PlotBoundarySummaryModel } from "./plot";
 import { Point } from "../../../interface/point";
 import { Shape } from "../../../interface/shape";
+import { TradeManager } from "../trade/manager";
 
 export class PropertyService extends Service {
 	constructor(
-		private database: DbContext
+		private database: DbContext,
+		private tradeManager: TradeManager
 	) {
 		super();
 	}
@@ -38,11 +40,26 @@ export class PropertyService extends Service {
 		return new BuildingSummaryModel(building);
 	}
 
-	async setOwner(propertyId: string, ownerId: string) {
+	async assignSoleOwner(propertyId: string, entityId: string) {
 		const property = await this.database.property.find(propertyId);
-		property.ownerId = ownerId;
+		const entity = await this.database.legalEntity.find(entityId);
 
-		await property.update();
+		const owner = new PropertyOwner();
+		owner.property = property;
+		owner.owner = entity;
+
+		owner.aquired = new Date();
+		owner.share = 1;
+
+		await owner.create();
+
+		this.tradeManager.valueateProperty(property).then(async valuation => {
+			owner.aquiredValuation = valuation;
+
+			await owner.update();
+		});
+
+		return new PropertyOwnerViewModel(owner);
 	}
 
 	async saveBuilding(viewModel: BuildingSummaryModel) {

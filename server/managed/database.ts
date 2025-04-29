@@ -1559,18 +1559,19 @@ export class PropertyHistoricListingModifier extends Entity<PropertyHistoricList
 }
 			
 export class PropertyOwnerQueryProxy extends QueryProxy {
-	get aquiredValuation(): Partial<StreetQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get aquiredValuation(): Partial<ValuationQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get owner(): Partial<LegalEntityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get property(): Partial<PropertyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get aquired(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get aquiredValuationId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get ownerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get propertyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get share(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get sold(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class PropertyOwner extends Entity<PropertyOwnerQueryProxy> {
-	get aquiredValuation(): Partial<ForeignReference<Street>> { return this.$aquiredValuation; }
+	get aquiredValuation(): Partial<ForeignReference<Valuation>> { return this.$aquiredValuation; }
 	get owner(): Partial<ForeignReference<LegalEntity>> { return this.$owner; }
 	get property(): Partial<ForeignReference<Property>> { return this.$property; }
 	aquired: Date;
@@ -1578,6 +1579,7 @@ export class PropertyOwner extends Entity<PropertyOwnerQueryProxy> {
 	declare id: string;
 	ownerId: string;
 	propertyId: string;
+	share: number;
 	sold: Date;
 	
 	$$meta = {
@@ -1588,6 +1590,7 @@ export class PropertyOwner extends Entity<PropertyOwnerQueryProxy> {
 			id: { type: "uuid", name: "id" },
 			ownerId: { type: "uuid", name: "owner_id" },
 			propertyId: { type: "uuid", name: "property_id" },
+			share: { type: "float4", name: "share" },
 			sold: { type: "timestamp", name: "sold" }
 		},
 		get set(): DbSet<PropertyOwner, PropertyOwnerQueryProxy> { 
@@ -1598,14 +1601,14 @@ export class PropertyOwner extends Entity<PropertyOwnerQueryProxy> {
 	constructor() {
 		super();
 		
-		this.$aquiredValuation = new ForeignReference<Street>(this, "aquiredValuationId", Street);
+		this.$aquiredValuation = new ForeignReference<Valuation>(this, "aquiredValuationId", Valuation);
 	this.$owner = new ForeignReference<LegalEntity>(this, "ownerId", LegalEntity);
 	this.$property = new ForeignReference<Property>(this, "propertyId", Property);
 	}
 	
-	private $aquiredValuation: ForeignReference<Street>;
+	private $aquiredValuation: ForeignReference<Valuation>;
 
-	set aquiredValuation(value: Partial<ForeignReference<Street>>) {
+	set aquiredValuation(value: Partial<ForeignReference<Valuation>>) {
 		if (value) {
 			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
 

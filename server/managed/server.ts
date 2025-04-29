@@ -55,11 +55,14 @@ import { ResidentTickerModel } from "././../areas/life/ticker";
 import { LifeService } from "././../areas/life/service";
 import { Building } from "././database";
 import { Dwelling } from "././database";
+import { PropertyOwner } from "././database";
 import { DwellingViewModel } from "././../areas/life/resident";
 import { PropertyDwellingViewModel } from "././../areas/property.view";
+import { PropertyOwnerViewModel } from "././../areas/property.view";
 import { BuildingSummaryModel } from "././../areas/property/building";
 import { PlotBoundarySummaryModel } from "././../areas/property/plot";
 import { Shape } from "././../../interface/shape";
+import { TradeManager } from "././../areas/trade/manager";
 import { PropertyService } from "././../areas/property/service";
 import { Article } from "././database";
 import { ArticleImage } from "././database";
@@ -76,6 +79,8 @@ import { Street } from "././database";
 import { StreetRoute } from "././database";
 import { PlotBoundaryShapeModel } from "././../areas/property/plot";
 import { StreetService } from "././../areas/street/service";
+import { ValuationViewModel } from "././../areas/trade/valuation.view";
+import { TradeService } from "././../areas/trade/service";
 import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
@@ -96,6 +101,7 @@ import { LawHouseSessionProtocolViewModel } from "./../areas/law-house/session";
 import { TenancyViewModel } from "./../areas/life/resident";
 import { BuildingShapeModel } from "./../areas/property/building";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
+import { ValuationSummaryModel } from "./../areas/trade/valuation.view";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { HonestiumViewModel } from "./../areas/vote/bill";
@@ -118,6 +124,7 @@ import { LegalEntity } from "./../managed/database";
 import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
+import { Valuation } from "./../managed/database";
 import { TrainStationExit } from "./../managed/database";
 import { TrainRoute } from "./../managed/database";
 import { TrainStation } from "./../managed/database";
@@ -173,6 +180,10 @@ Inject.mappings = {
 	},
 	"PropertyService": {
 		objectConstructor: PropertyService,
+		parameters: ["DbContext","TradeManager"]
+	},
+	"TradeManager": {
+		objectConstructor: TradeManager,
 		parameters: ["DbContext"]
 	},
 	"PublicationService": {
@@ -190,6 +201,10 @@ Inject.mappings = {
 	"StreetService": {
 		objectConstructor: StreetService,
 		parameters: ["DbContext"]
+	},
+	"TradeService": {
+		objectConstructor: TradeService,
+		parameters: ["DbContext","TradeManager"]
 	},
 	"TrainService": {
 		objectConstructor: TrainService,
@@ -718,15 +733,15 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"ExMWNsOHJ3YWFnZHNpYXhuZX1kY2Jjaj",
+			"hzbzE0dDd1MmRhZnw1Z3c0dWFwa2Yzcj",
 			{
-			"FiOGdqZm1zM2lkejcwcH81ZXRsZzBvNX": { type: "string", isArray: false, isOptional: false },
-				"ZvNmNyYWM1c2xkemU5bzszZ3F4czczbm": { type: "string", isArray: false, isOptional: false }
+			"xxNnpkOXJiZ2dkNjJjdGBpdzgxcDtrY2": { type: "string", isArray: false, isOptional: false },
+				"ZybDVoNDkydzlyY3p6b2Vydn91MWVpY3": { type: "string", isArray: false, isOptional: false }
 			},
 			inject => inject.construct(PropertyService),
-			(controller, params) => controller.setOwner(
-				params["FiOGdqZm1zM2lkejcwcH81ZXRsZzBvNX"],
-				params["ZvNmNyYWM1c2xkemU5bzszZ3F4czczbm"]
+			(controller, params) => controller.assignSoleOwner(
+				params["xxNnpkOXJiZ2dkNjJjdGBpdzgxcDtrY2"],
+				params["ZybDVoNDkydzlyY3p6b2Vydn91MWVpY3"]
 			)
 		);
 
@@ -1000,6 +1015,17 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(StreetService),
 			(controller, params) => controller.archive(
 				params["5jM250bjp0Z3Y0b2YzZH41aGR6bGtka3"]
+			)
+		);
+
+		this.expose(
+			"loMWA3dmBqbG1hNTE2MjR2ajZvNzUxM2",
+			{
+			"hpOGF4ZDZiY2lhOTo3eGowM2V1dGhvbG": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(TradeService),
+			(controller, params) => controller.getValuation(
+				params["hpOGF4ZDZiY2lhOTo3eGowM2V1dGhvbG"]
 			)
 		);
 
@@ -1963,11 +1989,11 @@ ViewModel.mappings = {
 			return {
 				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.$$model.borough)),
 				historicListingGrade: new HistoricListingGradeViewModel(await BaseServer.unwrap(this.$$model.historicListingGrade)),
-				owner: new PlayerViewModel(await BaseServer.unwrap(this.$$model.owner)),
 				buildings: (await this.$$model.buildings.includeTree(ViewModel.mappings[BuildingSummaryModel.name].items).toArray()).map(item => new BuildingSummaryModel(item)),
 				dwellings: (await this.$$model.dwellings.includeTree(ViewModel.mappings[PropertyDwellingViewModel.name].items).toArray()).map(item => new PropertyDwellingViewModel(item)),
 				historicListingModifiers: (await this.$$model.historicListingModifiers.includeTree(ViewModel.mappings[PropertyHistoricListingModifierViewModel.name].items).toArray()).map(item => new PropertyHistoricListingModifierViewModel(item)),
 				offices: (await this.$$model.offices.includeTree(ViewModel.mappings[OfficeViewModel.name].items).toArray()).map(item => new OfficeViewModel(item)),
+				owners: (await this.$$model.owners.includeTree(ViewModel.mappings[PropertyOwnerViewModel.name].items).toArray()).map(item => new PropertyOwnerViewModel(item)),
 				plotBoundaries: (await this.$$model.plotBoundaries.includeTree(ViewModel.mappings[PlotBoundarySummaryModel.name].items).toArray()).map(item => new PlotBoundarySummaryModel(item)),
 				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.$$model.type)),
 				activePlotBoundaryId: this.$$model.activePlotBoundaryId,
@@ -2017,12 +2043,6 @@ ViewModel.mappings = {
 						[...parents, "historicListingGrade-PropertyViewModel"]
 					);
 				},
-				get owner() {
-					return ViewModel.mappings[PlayerViewModel.name].getPrefetchingProperties(
-						level,
-						[...parents, "owner-PropertyViewModel"]
-					);
-				},
 				get buildings() {
 					return ViewModel.mappings[BuildingSummaryModel.name].getPrefetchingProperties(
 						level,
@@ -2045,6 +2065,12 @@ ViewModel.mappings = {
 					return ViewModel.mappings[OfficeViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "offices-PropertyViewModel"]
+					);
+				},
+				get owners() {
+					return ViewModel.mappings[PropertyOwnerViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "owners-PropertyViewModel"]
 					);
 				},
 				get plotBoundaries() {
@@ -2072,11 +2098,11 @@ ViewModel.mappings = {
 			const item = new PropertyViewModel(null);
 			"borough" in data && (item.borough = data.borough && ViewModel.mappings[BoroughSummaryModel.name].toViewModel(data.borough));
 			"historicListingGrade" in data && (item.historicListingGrade = data.historicListingGrade && ViewModel.mappings[HistoricListingGradeViewModel.name].toViewModel(data.historicListingGrade));
-			"owner" in data && (item.owner = data.owner && ViewModel.mappings[PlayerViewModel.name].toViewModel(data.owner));
 			"buildings" in data && (item.buildings = data.buildings && [...data.buildings].map(i => ViewModel.mappings[BuildingSummaryModel.name].toViewModel(i)));
 			"dwellings" in data && (item.dwellings = data.dwellings && [...data.dwellings].map(i => ViewModel.mappings[PropertyDwellingViewModel.name].toViewModel(i)));
 			"historicListingModifiers" in data && (item.historicListingModifiers = data.historicListingModifiers && [...data.historicListingModifiers].map(i => ViewModel.mappings[PropertyHistoricListingModifierViewModel.name].toViewModel(i)));
 			"offices" in data && (item.offices = data.offices && [...data.offices].map(i => ViewModel.mappings[OfficeViewModel.name].toViewModel(i)));
+			"owners" in data && (item.owners = data.owners && [...data.owners].map(i => ViewModel.mappings[PropertyOwnerViewModel.name].toViewModel(i)));
 			"plotBoundaries" in data && (item.plotBoundaries = data.plotBoundaries && [...data.plotBoundaries].map(i => ViewModel.mappings[PlotBoundarySummaryModel.name].toViewModel(i)));
 			"type" in data && (item.type = data.type && ViewModel.mappings[PropertyTypeViewModel.name].toViewModel(data.type));
 			"activePlotBoundaryId" in data && (item.activePlotBoundaryId = data.activePlotBoundaryId === null ? null : `${data.activePlotBoundaryId}`);
@@ -2100,11 +2126,11 @@ ViewModel.mappings = {
 			
 			"borough" in viewModel && (model.borough.id = viewModel.borough ? viewModel.borough.id : null);
 			"historicListingGrade" in viewModel && (model.historicListingGrade.id = viewModel.historicListingGrade ? viewModel.historicListingGrade.id : null);
-			"owner" in viewModel && (model.owner.id = viewModel.owner ? viewModel.owner.id : null);
 			"buildings" in viewModel && (null);
 			"dwellings" in viewModel && (null);
 			"historicListingModifiers" in viewModel && (null);
 			"offices" in viewModel && (null);
+			"owners" in viewModel && (null);
 			"plotBoundaries" in viewModel && (null);
 			"type" in viewModel && (model.type.id = viewModel.type ? viewModel.type.id : null);
 			"activePlotBoundaryId" in viewModel && (model.activePlotBoundaryId = viewModel.activePlotBoundaryId === null ? null : `${viewModel.activePlotBoundaryId}`);
@@ -2113,6 +2139,94 @@ ViewModel.mappings = {
 			"historicListingRegisteredAt" in viewModel && (model.historicListingRegisteredAt = viewModel.historicListingRegisteredAt === null ? null : new Date(viewModel.historicListingRegisteredAt));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+
+			return model;
+		}
+	},
+	[PropertyOwnerViewModel.name]: class ComposedPropertyOwnerViewModel extends PropertyOwnerViewModel {
+		async map() {
+			return {
+				aquiredValuation: new ValuationSummaryModel(await BaseServer.unwrap(this.$$model.aquiredValuation)),
+				owner: new LegalEntityViewModel(await BaseServer.unwrap(this.$$model.owner)),
+				aquired: this.$$model.aquired,
+				id: this.$$model.id,
+				share: this.$$model.share,
+				sold: this.$$model.sold
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get aquiredValuation() {
+					return ViewModel.mappings[ValuationSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "aquiredValuation-PropertyOwnerViewModel"]
+					);
+				},
+				get owner() {
+					return ViewModel.mappings[LegalEntityViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "owner-PropertyOwnerViewModel"]
+					);
+				},
+				aquired: true,
+				id: true,
+				share: true,
+				sold: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new PropertyOwnerViewModel(null);
+			"aquiredValuation" in data && (item.aquiredValuation = data.aquiredValuation && ViewModel.mappings[ValuationSummaryModel.name].toViewModel(data.aquiredValuation));
+			"owner" in data && (item.owner = data.owner && ViewModel.mappings[LegalEntityViewModel.name].toViewModel(data.owner));
+			"aquired" in data && (item.aquired = data.aquired === null ? null : new Date(data.aquired));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"share" in data && (item.share = data.share === null ? null : +data.share);
+			"sold" in data && (item.sold = data.sold === null ? null : new Date(data.sold));
+
+			return item;
+		}
+
+		static async toModel(viewModel: PropertyOwnerViewModel) {
+			let model: PropertyOwner;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(PropertyOwner).find(viewModel.id)
+			} else {
+				model = new PropertyOwner();
+			}
+			
+			"aquiredValuation" in viewModel && (model.aquiredValuation.id = viewModel.aquiredValuation ? viewModel.aquiredValuation.id : null);
+			"owner" in viewModel && (model.owner.id = viewModel.owner ? viewModel.owner.id : null);
+			"aquired" in viewModel && (model.aquired = viewModel.aquired === null ? null : new Date(viewModel.aquired));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"share" in viewModel && (model.share = viewModel.share === null ? null : +viewModel.share);
+			"sold" in viewModel && (model.sold = viewModel.sold === null ? null : new Date(viewModel.sold));
 
 			return model;
 		}
@@ -4247,6 +4361,68 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[ValuationSummaryModel.name]: class ComposedValuationSummaryModel extends ValuationSummaryModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				price: this.$$model.price
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				price: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ValuationSummaryModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"price" in data && (item.price = data.price === null ? null : +data.price);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ValuationSummaryModel) {
+			let model: Valuation;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Valuation).find(viewModel.id)
+			} else {
+				model = new Valuation();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"price" in viewModel && (model.price = viewModel.price === null ? null : +viewModel.price);
+
+			return model;
+		}
+	},
 	[TrainStationExitViewModel.name]: class ComposedTrainStationExitViewModel extends TrainStationExitViewModel {
 		async map() {
 			return {
@@ -5600,6 +5776,89 @@ ViewModel.mappings = {
 			"incorporation" in viewModel && (model.incorporation = viewModel.incorporation === null ? null : new Date(viewModel.incorporation));
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
+
+			return model;
+		}
+	},
+	[ValuationViewModel.name]: class ComposedValuationViewModel extends ValuationViewModel {
+		async map() {
+			return {
+				issuer: new LegalEntityViewModel(await BaseServer.unwrap(this.$$model.issuer)),
+				description: this.$$model.description,
+				estimated: this.$$model.estimated,
+				id: this.$$model.id,
+				item: this.$$model.item,
+				price: this.$$model.price
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get issuer() {
+					return ViewModel.mappings[LegalEntityViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "issuer-ValuationViewModel"]
+					);
+				},
+				description: true,
+				estimated: true,
+				id: true,
+				item: true,
+				price: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ValuationViewModel(null);
+			"issuer" in data && (item.issuer = data.issuer && ViewModel.mappings[LegalEntityViewModel.name].toViewModel(data.issuer));
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			"estimated" in data && (item.estimated = data.estimated === null ? null : new Date(data.estimated));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"item" in data && (item.item = data.item === null ? null : `${data.item}`);
+			"price" in data && (item.price = data.price === null ? null : +data.price);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ValuationViewModel) {
+			let model: Valuation;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Valuation).find(viewModel.id)
+			} else {
+				model = new Valuation();
+			}
+			
+			"issuer" in viewModel && (model.issuer.id = viewModel.issuer ? viewModel.issuer.id : null);
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+			"estimated" in viewModel && (model.estimated = viewModel.estimated === null ? null : new Date(viewModel.estimated));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"item" in viewModel && (model.item = viewModel.item === null ? null : `${viewModel.item}`);
+			"price" in viewModel && (model.price = viewModel.price === null ? null : +viewModel.price);
 
 			return model;
 		}

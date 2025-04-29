@@ -208,11 +208,11 @@ export class PropertyOverviewModel {
 export class PropertyViewModel {
 	borough: BoroughSummaryModel;
 	historicListingGrade: HistoricListingGradeViewModel;
-	owner: PlayerViewModel;
 	buildings: BuildingSummaryModel[];
 	dwellings: PropertyDwellingViewModel[];
 	historicListingModifiers: PropertyHistoricListingModifierViewModel[];
 	offices: OfficeViewModel[];
+	owners: PropertyOwnerViewModel[];
 	plotBoundaries: PlotBoundarySummaryModel[];
 	type: PropertyTypeViewModel;
 	activePlotBoundaryId: string;
@@ -226,11 +226,11 @@ export class PropertyViewModel {
 		const item = new PropertyViewModel();
 		raw.borough === undefined || (item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null)
 		raw.historicListingGrade === undefined || (item.historicListingGrade = raw.historicListingGrade ? HistoricListingGradeViewModel["$build"](raw.historicListingGrade) : null)
-		raw.owner === undefined || (item.owner = raw.owner ? PlayerViewModel["$build"](raw.owner) : null)
 		raw.buildings === undefined || (item.buildings = raw.buildings ? raw.buildings.map(i => BuildingSummaryModel["$build"](i)) : null)
 		raw.dwellings === undefined || (item.dwellings = raw.dwellings ? raw.dwellings.map(i => PropertyDwellingViewModel["$build"](i)) : null)
 		raw.historicListingModifiers === undefined || (item.historicListingModifiers = raw.historicListingModifiers ? raw.historicListingModifiers.map(i => PropertyHistoricListingModifierViewModel["$build"](i)) : null)
 		raw.offices === undefined || (item.offices = raw.offices ? raw.offices.map(i => OfficeViewModel["$build"](i)) : null)
+		raw.owners === undefined || (item.owners = raw.owners ? raw.owners.map(i => PropertyOwnerViewModel["$build"](i)) : null)
 		raw.plotBoundaries === undefined || (item.plotBoundaries = raw.plotBoundaries ? raw.plotBoundaries.map(i => PlotBoundarySummaryModel["$build"](i)) : null)
 		raw.type === undefined || (item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null)
 		raw.activePlotBoundaryId === undefined || (item.activePlotBoundaryId = raw.activePlotBoundaryId === null ? null : `${raw.activePlotBoundaryId}`)
@@ -239,6 +239,27 @@ export class PropertyViewModel {
 		raw.historicListingRegisteredAt === undefined || (item.historicListingRegisteredAt = raw.historicListingRegisteredAt ? new Date(raw.historicListingRegisteredAt) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		
+		return item;
+	}
+}
+
+export class PropertyOwnerViewModel {
+	aquiredValuation: ValuationSummaryModel;
+	owner: LegalEntityViewModel;
+	aquired: Date;
+	id: string;
+	share: number;
+	sold: Date;
+
+	private static $build(raw) {
+		const item = new PropertyOwnerViewModel();
+		raw.aquiredValuation === undefined || (item.aquiredValuation = raw.aquiredValuation ? ValuationSummaryModel["$build"](raw.aquiredValuation) : null)
+		raw.owner === undefined || (item.owner = raw.owner ? LegalEntityViewModel["$build"](raw.owner) : null)
+		raw.aquired === undefined || (item.aquired = raw.aquired ? new Date(raw.aquired) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.share === undefined || (item.share = raw.share === null ? null : +raw.share)
+		raw.sold === undefined || (item.sold = raw.sold ? new Date(raw.sold) : null)
 		
 		return item;
 	}
@@ -737,6 +758,19 @@ export class ChatInteractionViewModel {
 	}
 }
 
+export class ValuationSummaryModel {
+	id: string;
+	price: number;
+
+	private static $build(raw) {
+		const item = new ValuationSummaryModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
+		
+		return item;
+	}
+}
+
 export class TrainStationExitViewModel {
 	station: TrainStationViewModel;
 	id: string;
@@ -1065,6 +1099,27 @@ export class PublicationViewModel {
 		raw.incorporation === undefined || (item.incorporation = raw.incorporation ? new Date(raw.incorporation) : null)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
+		
+		return item;
+	}
+}
+
+export class ValuationViewModel {
+	issuer: LegalEntityViewModel;
+	description: string;
+	estimated: Date;
+	id: string;
+	item: string;
+	price: number;
+
+	private static $build(raw) {
+		const item = new ValuationViewModel();
+		raw.issuer === undefined || (item.issuer = raw.issuer ? LegalEntityViewModel["$build"](raw.issuer) : null)
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
+		raw.estimated === undefined || (item.estimated = raw.estimated ? new Date(raw.estimated) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.item === undefined || (item.item = raw.item === null ? null : `${raw.item}`)
+		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
 		
 		return item;
 	}
@@ -2130,22 +2185,24 @@ export class PropertyService {
 		});
 	}
 
-	async setOwner(propertyId: string, ownerId: string): Promise<void> {
+	async assignSoleOwner(propertyId: string, entityId: string): Promise<PropertyOwnerViewModel> {
 		const $data = new FormData();
-		$data.append("FiOGdqZm1zM2lkejcwcH81ZXRsZzBvNX", Service.stringify(propertyId))
-		$data.append("ZvNmNyYWM1c2xkemU5bzszZ3F4czczbm", Service.stringify(ownerId))
+		$data.append("xxNnpkOXJiZ2dkNjJjdGBpdzgxcDtrY2", Service.stringify(propertyId))
+		$data.append("ZybDVoNDkydzlyY3p6b2Vydn91MWVpY3", Service.stringify(entityId))
 
-		return await fetch(Service.toURL("ExMWNsOHJ3YWFnZHNpYXhuZX1kY2Jjaj"), {
+		return await fetch(Service.toURL("hzbzE0dDd1MmRhZnw1Z3c0dWFwa2Yzcj"), {
 			method: "post",
 			credentials: "include",
 			body: $data
 		}).then(res => res.json()).then(r => {
-			if ("error" in r) {
-				throw new Error(r.error);
-			}
+			if ("data" in r) {
+				const d = r.data;
 
-			if ("aborted" in r) {
+				return d === null ? null : PropertyOwnerViewModel["$build"](d);
+			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
 			}
 		});
 	}
@@ -2625,6 +2682,29 @@ export class StreetService {
 
 			if ("aborted" in r) {
 				throw new Error("request aborted by server");
+			}
+		});
+	}
+}
+
+export class TradeService {
+	async getValuation(id: string): Promise<ValuationViewModel> {
+		const $data = new FormData();
+		$data.append("hpOGF4ZDZiY2lhOTo3eGowM2V1dGhvbG", Service.stringify(id))
+
+		return await fetch(Service.toURL("loMWA3dmBqbG1hNTE2MjR2ajZvNzUxM2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : ValuationViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
 			}
 		});
 	}

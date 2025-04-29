@@ -1,13 +1,12 @@
 import { Component } from "@acryps/page";
 import { LegalEntityService, LegalEntityViewModel } from "../../../managed/services";
 import { LegalEntityComponent } from "..";
-import { select } from "@acryps/style";
 
 export class LegalEntitySelectorComponent extends Component {
 	static featured: LegalEntityViewModel[];
 	declare rootNode: HTMLElement;
 
-	requestLock: any;
+	requestLock = setTimeout(() => {});
 
 	list = new ListComponent();
 
@@ -15,6 +14,12 @@ export class LegalEntitySelectorComponent extends Component {
 		public selection: LegalEntityViewModel = null
 	) {
 		super();
+	}
+
+	onSelect(handler: (entity: LegalEntityViewModel) => void) {
+		this.list.onSelect = handler;
+
+		return this;
 	}
 
 	onload() {
@@ -30,18 +35,21 @@ export class LegalEntitySelectorComponent extends Component {
 	}
 
 	updateSearchResults(search: string) {
-		const requestLock = Math.random();
-		this.requestLock = requestLock;
+		clearTimeout(this.requestLock);
 
-		if (search.trim()) {
-			new LegalEntityService().find(search).then(results => {
-				if (this.requestLock == requestLock) {
-					this.list.updateList(results, this.selection);
-				}
-			});
-		} else {
-			this.list.updateList(LegalEntitySelectorComponent.featured, this.selection);
-		}
+		const requestDebounce = setTimeout(() => {
+			if (search.trim()) {
+				new LegalEntityService().find(search).then(results => {
+					if (this.requestLock == requestDebounce) {
+						this.list.updateList(results, this.selection);
+					}
+				});
+			} else {
+				this.list.updateList(LegalEntitySelectorComponent.featured, this.selection);
+			}
+		}, 500);
+
+		this.requestLock = requestDebounce;
 	}
 
 	render() {
@@ -53,7 +61,7 @@ export class LegalEntitySelectorComponent extends Component {
 			input.onkeyup = () => this.updateSearchResults(input.value);
 
 			input.onfocus = () => this.rootNode.setAttribute('ui-focus', '');
-			input.onblur = () => requestAnimationFrame(() => this.rootNode.removeAttribute('ui-focus'));
+			input.onblur = () => setTimeout(() => this.rootNode.removeAttribute('ui-focus'), 100);
 		});
 
 		return <ui-legal-entity-selector>
@@ -68,6 +76,8 @@ class ListComponent extends Component {
 	list: LegalEntityViewModel[] = [];
 	selection: LegalEntityViewModel;
 
+	onSelect: (entity: LegalEntityViewModel) => void
+
 	updateList(list: LegalEntityViewModel[], selection: LegalEntityViewModel) {
 		this.list = list;
 		this.selection = selection;
@@ -77,7 +87,7 @@ class ListComponent extends Component {
 
 	renderItem(entity: LegalEntityViewModel) {
 		return <ui-entity>
-			{new LegalEntityComponent(entity)}
+			{new LegalEntityComponent(entity, () => this.onSelect(entity))}
 		</ui-entity>
 	}
 

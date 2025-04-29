@@ -92,11 +92,11 @@ export interface PropertyOverviewModel {
 export interface PropertyViewModel {
     borough: BoroughSummaryModel;
 	historicListingGrade: HistoricListingGradeViewModel;
-	owner: PlayerViewModel;
 	buildings: BuildingSummaryModel[];
 	dwellings: PropertyDwellingViewModel[];
 	historicListingModifiers: PropertyHistoricListingModifierViewModel[];
 	offices: OfficeViewModel[];
+	owners: PropertyOwnerViewModel[];
 	plotBoundaries: PlotBoundarySummaryModel[];
 	type: PropertyTypeViewModel;
 	activePlotBoundaryId: string;
@@ -105,6 +105,15 @@ export interface PropertyViewModel {
 	historicListingRegisteredAt: Date;
 	id: string;
 	name: string;
+}
+
+export interface PropertyOwnerViewModel {
+    aquiredValuation: ValuationSummaryModel;
+	owner: LegalEntityViewModel;
+	aquired: Date;
+	id: string;
+	share: number;
+	sold: Date;
 }
 
 export interface PropertyDwellingViewModel {
@@ -310,6 +319,11 @@ export interface ChatInteractionViewModel {
 	response: string;
 }
 
+export interface ValuationSummaryModel {
+    id: string;
+	price: number;
+}
+
 export interface TrainStationExitViewModel {
     station: TrainStationViewModel;
 	id: string;
@@ -449,4 +463,13 @@ export interface PublicationViewModel {
 	incorporation: Date;
 	name: string;
 	tag: string;
+}
+
+export interface ValuationViewModel {
+    issuer: LegalEntityViewModel;
+	description: string;
+	estimated: Date;
+	id: string;
+	item: string;
+	price: number;
 }

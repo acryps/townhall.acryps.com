@@ -1,8 +1,9 @@
-import { alignItems, aspectRatio, backgroundColor, border, borderBottom, child, color, columnGap, display, flexDirection, flexWrap, fontSize, fontWeight, gap, height, imageRendering, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, Mm, objectFit, objectPosition, opacity, padding, percentage, px, ratio, rem, textAlign, textDecorationLine, vh, width } from "@acryps/style";
+import { alignItems, aspectRatio, backgroundColor, border, borderBottom, child, color, columnGap, display, flexDirection, flexWrap, fontSize, fontWeight, gap, height, imageRendering, justifyContent, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, Mm, objectFit, objectPosition, opacity, padding, percentage, px, ratio, rem, textAlign, textDecorationLine, vh, width } from "@acryps/style";
 import { negativeColor, neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 import { fieldStyle } from "../../shared/field.style";
 import { buttonStyle } from "../../shared/index.style";
 import { buildingStyle } from "./building/index.style";
+import { ownershipStructureStyle } from "./ownership/index.style";
 
 export const propertyStyle = () => child('ui-property',
 	display('block'),
@@ -25,6 +26,7 @@ export const propertyStyle = () => child('ui-property',
 	),
 
 	buildingStyle(),
+	ownershipStructureStyle(),
 
 	child('ui-content',
 		child('ui-map-container',
@@ -51,6 +53,41 @@ export const propertyStyle = () => child('ui-property',
 
 			child('select',
 				fieldStyle()
+			)
+		),
+
+		child('ui-ownership-structure',
+			display('block'),
+			marginBottom(rem(2)),
+
+			border(px(1), 'solid', 'currentColor'),
+
+			child('ui-field').attribute('ui-quick-assign',
+				display('block'),
+				padding(pageGutter),
+
+				borderBottom(px(1), 'dotted', 'currentColor'),
+
+				child('label',
+					display('block'),
+					marginBottom(rem(0.25))
+				)
+			),
+
+			child('ui-owner',
+				display('flex'),
+				justifyContent('space-between'),
+
+				padding(pageGutter),
+				borderBottom(px(1), 'dotted', 'currentColor')
+			),
+
+			child('ui-action',
+				display('flex'),
+				columnGap(pageGutter),
+				alignItems('center'),
+
+				padding(pageGutter)
 			)
 		),
 

@@ -20,7 +20,7 @@ export class LegalEntityService extends Service {
 
 	listFeatured() {
 		return LegalEntityViewModel.from(
-			LegalEntityReferenceCounter.active.ranked
+			LegalEntityReferenceCounter.active.ranked.slice(0, 25)
 		);
 	}
 }

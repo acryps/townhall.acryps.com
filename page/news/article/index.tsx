@@ -1,5 +1,5 @@
 import { Component } from "@acryps/page";
-import { ArticleViewModel, PublicationService } from "../../managed/services";
+import { ArticleImageViewModel, ArticleViewModel, PublicationService } from "../../managed/services";
 import { MetaNewsArticle, MetaOrganization } from "@acryps/metadata";
 import { AnnotatedTextComponent } from "../../shared/annotaded-text";
 import { BannerComponent } from "../../banner";
@@ -42,20 +42,41 @@ export class ArticePage extends Component {
 			</ui-detail>
 
 			{!!this.article.images.length && <ui-slideshow>
-				{this.article.images.map(image => <ui-slide>
-					<ui-image>
-						<img src={`/article/image/${image.id}`} />
-					</ui-image>
-
-					{image.caption && <ui-caption>
-						{image.caption}
-					</ui-caption>}
-				</ui-slide>)}
+				{this.article.images.map(image => this.renderSlide(image))}
 			</ui-slideshow>}
 
 			<ui-body>
 				{this.content}
 			</ui-body>
 		</ui-article>;
+	}
+
+	renderSlide(image: ArticleImageViewModel) {
+		const slide: HTMLElement = <ui-slide>
+			<ui-image>
+				<img src={`/article/image/${image.id}`} ui-click={() => {
+					if (slide.hasAttribute('ui-expanded')) {
+						slide.removeAttribute('ui-expanded');
+
+						return;
+					}
+
+					const bounds = slide.getBoundingClientRect();
+					const center = bounds.x > 0 && bounds.x + bounds.width < innerWidth;
+
+					if (center) {
+						slide.setAttribute('ui-expanded', '');
+					} else {
+						slide.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+					}
+				}} />
+			</ui-image>
+
+			{image.caption && <ui-caption>
+				{image.caption}
+			</ui-caption>}
+		</ui-slide>;
+
+		return slide;
 	}
 }

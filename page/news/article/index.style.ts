@@ -1,4 +1,4 @@
-import { child, display, marginBottom, rem, fontSize, whiteSpace, marginTop, width, percentage, maxHeight, vh, objectFit, imageRendering, scrollSnapType, overflowX, height, backgroundColor, gap, color, marginInline, paddingInline, flexShrink, overflow, flexGrow, scrollSnapAlign, flexDirection, paddingBlock, outline, px, alignSelf, scrollbarWidth, vw, Hex, position, inset } from "@acryps/style";
+import { child, display, marginBottom, rem, fontSize, whiteSpace, marginTop, width, percentage, maxHeight, vh, objectFit, imageRendering, scrollSnapType, overflowX, height, backgroundColor, gap, color, marginInline, paddingInline, flexShrink, overflow, flexGrow, scrollSnapAlign, flexDirection, paddingBlock, outline, px, alignSelf, scrollbarWidth, vw, Hex, position, inset, zIndex, background, padding, hex, cursor } from "@acryps/style";
 import { headline } from "../../assets/font/index.style";
 import { boxed, usedBoxedWidth } from "../../shared/boxed.style";
 import { neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
@@ -69,7 +69,9 @@ export const articleStyle = () => child('ui-article',
 
 					width(percentage(100)),
 					height(percentage(100)),
-					objectFit('contain')
+					objectFit('contain'),
+
+					cursor('pointer')
 				)
 			),
 
@@ -82,6 +84,15 @@ export const articleStyle = () => child('ui-article',
 				fontSize(rem(0.85))
 			)
 		)
+			.attribute('ui-expanded',
+				child('ui-image',
+					position('fixed'),
+					inset(0),
+					zIndex(1000),
+
+					backgroundColor(hex('000'))
+				)
+			)
 	),
 
 	child('ui-body',

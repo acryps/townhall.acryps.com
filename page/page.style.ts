@@ -4,14 +4,13 @@ import { bold, boldItalic, regular, regularItalic } from "./assets/font/index.st
 import { boroughStyle } from "./borough/index.style";
 import { bannerStyle, createBannerStyle } from "./banner/index.style";
 import { iconFont, icons } from "./assets/icons/managed";
-import { articleStyle, newsStyle, publicationStyle } from "./news/index.style";
+import { newsStyle, publicationStyle } from "./news/index.style";
 import { populationStyle } from "./population/index.style";
 import { residentStyle } from "./resident/index.style";
 import { mapStyle as mapPageStyle } from "./map/index.style";
 import { navigationBackgroundColor, navigationBorderColor, pageBackgroundColor, pageGutter, pageTextColor } from "./index.style";
 import { propertyStyle } from "./properties/property/index.style";
 import { mapStyle } from "./shared/map/index.style";
-import { chatStyle } from "./resident/chat/index.style";
 import { voteStyle } from "./vote/index.style";
 import { lawHouseStyle } from "./law-house/index.style";
 import { residentBadgeListStyle } from "./shared/resident-badge-list/index.style";
@@ -23,6 +22,7 @@ import { writeArticleStyle } from "./news/write/index.style";
 import { annotatedTextStyle } from "./shared/annotaded-text/index.style";
 import { streetStyle } from "./street/index.style";
 import { legalEntitySelectorStyle } from "./shared/legal-entity/select/index.style";
+import { articleStyle } from "./news/article/index.style";
 
 export const pageStyle = () => root(
 	bold,

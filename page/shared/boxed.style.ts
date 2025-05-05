@@ -1,7 +1,10 @@
-import { display, marginInline, maxWidth, rem } from "@acryps/style";
+import { display, marginInline, maxWidth, min, rem, vw } from "@acryps/style";
+
+export const boxedMaxContentWidth = rem(60);
+export const usedBoxedWidth = min(boxedMaxContentWidth, vw(100));
 
 export const boxed = () => [
 	display('block'),
-	maxWidth(rem(60)),
+	maxWidth(boxedMaxContentWidth),
 	marginInline('auto'),
 ];

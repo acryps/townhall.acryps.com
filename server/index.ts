@@ -46,7 +46,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new LegalEntityReferenceCounter(database).schedule();
 
 	const life = new Life(database);
-	// await life.load();
+	await life.load();
 
 	const lawHouse = new LawHouse(database, new Language('smart'), life);
 

@@ -295,7 +295,6 @@ export class MapComponent extends Component {
 		if (this.highlightedShape) {
 			// prepare clip area
 			const path = new Path2D();
-			this.context.beginPath();
 
 			for (let pointIndex = 0; pointIndex < this.highlightedShape.shape.length; pointIndex++) {
 				const x = this.highlightedShape[pointIndex].x - offset.x;
@@ -307,6 +306,8 @@ export class MapComponent extends Component {
 					path.moveTo(x, y);
 				}
 			}
+
+			path.closePath();
 
 			// gray out map
 			const imageData = this.context.getImageData(0, 0, this.width, this.height);

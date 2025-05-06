@@ -41,7 +41,7 @@ export class ArticePage extends Component {
 				</ui-date>
 			</ui-detail>
 
-			{!!this.article.images.length && <ui-slideshow>
+			{this.article.images.length > 0 && <ui-slideshow>
 				{this.article.images.map(image => this.renderSlide(image))}
 			</ui-slideshow>}
 

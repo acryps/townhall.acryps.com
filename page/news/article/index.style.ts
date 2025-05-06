@@ -1,9 +1,9 @@
-import { child, display, marginBottom, rem, fontSize, whiteSpace, marginTop, width, percentage, maxHeight, vh, objectFit, imageRendering, scrollSnapType, overflowX, height, backgroundColor, gap, color, marginInline, paddingInline, flexShrink, overflow, flexGrow, scrollSnapAlign, flexDirection, paddingBlock, outline, px, alignSelf, scrollbarWidth, vw, Hex, position, inset, zIndex, background, padding, hex, cursor } from "@acryps/style";
+import { child, display, marginBottom, rem, fontSize, whiteSpace, marginTop, width, percentage, maxHeight, vh, objectFit, imageRendering, scrollSnapType, overflowX, height, backgroundColor, gap, color, marginInline, paddingInline, flexShrink, overflow, flexGrow, scrollSnapAlign, flexDirection, paddingBlock, outline, px, alignSelf, scrollbarWidth, vw, Hex, position, inset, zIndex, background, padding, hex, cursor, min } from "@acryps/style";
 import { headline } from "../../assets/font/index.style";
-import { boxed, usedBoxedWidth } from "../../shared/boxed.style";
+import { boxed, boxedMaxContentWidth } from "../../shared/boxed.style";
 import { neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 
-const slideWidth = usedBoxedWidth;
+const slideWidth = min(boxedMaxContentWidth, vw(100).subtract(pageGutter.multiply(2)))
 
 export const articleStyle = () => child('ui-article',
 	boxed(),

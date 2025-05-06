@@ -59,6 +59,7 @@ export const homeStyle = () => child('ui-home',
 		marginBottom(rem(1)),
 
 		position('relative'),
+		backgroundColor(hex('000')),
 
 		child('img',
 			position('absolute'),

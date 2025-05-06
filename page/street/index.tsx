@@ -80,7 +80,7 @@ export class StreetPage extends Component {
 
 						history.back();
 					}}>
-						{deleteIcon()} Archive Property
+						{deleteIcon()} Archive Street
 					</ui-action>
 				</ui-actions>
 			</ui-content>}

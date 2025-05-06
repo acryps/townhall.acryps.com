@@ -22,7 +22,7 @@ export const homeStyle = () => child('ui-home',
 			position('absolute'),
 			top(0),
 
-			newstickerScrollerAnimation.animate(seconds(15), 'linear'),
+			newstickerScrollerAnimation.animate(seconds(25), 'linear'),
 			animationIterationCount('infinite'),
 
 			display('flex'),

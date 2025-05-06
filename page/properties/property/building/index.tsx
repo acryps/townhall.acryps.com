@@ -41,7 +41,7 @@ export class BuildingPage extends Component {
 
 					history.back();
 				}}>
-					{deleteIcon()} Archive Property
+					{deleteIcon()} Archive Building
 				</ui-action>
 			</ui-actions>
 		</ui-building>

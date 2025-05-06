@@ -43,11 +43,13 @@ export class PropertyTileServer extends ShapeTileServer {
 					}
 
 					for (let building of await property.buildings.toArray()) {
-						shapes.push({
-							fill: '#ff0',
-							stroke: '#666',
-							bounds: building.boundary
-						});
+						if (!building.archived) {
+							shapes.push({
+								fill: '#ff0',
+								stroke: '#666',
+								bounds: building.boundary
+							});
+						}
 					}
 				}
 

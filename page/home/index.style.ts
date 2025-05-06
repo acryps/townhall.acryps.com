@@ -1,18 +1,61 @@
-import { alignContent, alignItems, aspectRatio, backdropFilter, backgroundColor, border, bottom, boxShadow, brightness, child, color, ColorValue, contrast, display, flexDirection, flexWrap, fontSize, fontStyle, fontWeight, gap, grayscale, height, hex, Hex, inset, insetInline, invert, justifyContent, left, lineHeight, margin, marginBlock, marginBottom, marginInline, marginRight, marginTop, maxHeight, Mm, objectFit, padding, percentage, position, px, ratio, rem, style, textAlign, Variable, vh, width, zIndex } from "@acryps/style";
+import { alignContent, alignItems, animationIterationCount, aspectRatio, backdropFilter, background, backgroundColor, border, bottom, boxShadow, brightness, child, color, ColorValue, contrast, cursor, display, flexDirection, flexWrap, fontSize, fontStyle, fontWeight, gap, grayscale, height, hex, Hex, inset, insetInline, invert, justifyContent, Keyframe, Keyframes, left, lineHeight, margin, marginBlock, marginBottom, marginInline, marginRight, marginTop, maxHeight, Mm, objectFit, overflow, padding, paddingBlock, paddingInline, percentage, position, px, ratio, rem, seconds, style, textAlign, top, transform, translateX, Variable, vh, whiteSpace, width, zIndex } from "@acryps/style";
 import { buttonStyle } from "../shared/index.style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { card } from "../shared/card.style";
-import { pageGutter } from "../index.style";
+import { neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../index.style";
+import { headline } from "../assets/font/index.style";
 
 export const homeStyle = () => child('ui-home',
 	display('block'),
+
+	child('ui-newsticker',
+		display('block'),
+		height(rem(1).add(pageGutter)),
+		marginInline(pageGutter.invert()),
+		marginTop(pageGutter.invert()),
+		overflow('hidden'),
+
+		position('relative'),
+		backgroundColor(neutralColor),
+
+		child('ui-scroller',
+			position('absolute'),
+			top(0),
+
+			newstickerScrollerAnimation.animate(seconds(10), 'linear'),
+			animationIterationCount('infinite'),
+
+			display('flex'),
+
+			lineHeight(1),
+			whiteSpace('nowrap'),
+
+			child('ui-article',
+				display('flex'),
+				alignItems('center'),
+				gap(rem(0.75)),
+
+				paddingBlock(pageGutter.divide(2)),
+				paddingInline(pageGutter),
+				cursor('pointer'),
+
+				child('ui-title',
+					headline
+				),
+
+				child('ui-date',
+					fontSize(rem(0.6))
+				)
+			)
+		),
+	),
 
 	child('ui-impression',
 		display('block'),
 		width(percentage(100).add(pageGutter).add(pageGutter)),
 		maxHeight(vh(50)),
 		aspectRatio(ratio(16, 9)),
-		margin(pageGutter.invert()),
+		marginInline(pageGutter.invert()),
 		marginBottom(rem(1)),
 
 		position('relative'),
@@ -198,3 +241,7 @@ export const homeStyle = () => child('ui-home',
 )
 
 export const boroughColor = new Variable<ColorValue>('borough-color');
+
+const newstickerScrollerAnimation = new Keyframes('newsticker-scroller')
+	.addKeyframe('from', transform(translateX(percentage(0))))
+	.addKeyframe('to', transform(translateX(percentage(-50))));

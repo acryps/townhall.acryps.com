@@ -2,6 +2,13 @@ import { ViewModel } from "vlserver";
 import { Article, ArticleImage } from "../../managed/database";
 import { PublicationSummaryModel } from "./publication";
 
+export class ArticleNewstickerModel extends ViewModel<Article> {
+	id;
+
+	title;
+	published;
+}
+
 export class ArticleViewModel extends ViewModel<Article> {
 	id;
 

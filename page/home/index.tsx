@@ -8,6 +8,8 @@ import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, pr
 import { Point } from "../../interface/point";
 import { toSimulatedTime } from "../../interface/time";
 import { ImpressionsComponent } from "./impressions";
+import { ArticleNewstickerModel, ArticleViewModel, PublicationService } from "../managed/services";
+import { NewstickerComponent } from "./newsticker";
 
 export class HomePage extends Component {
 	render() {
@@ -26,6 +28,7 @@ export class HomePage extends Component {
 		});
 
 		return <ui-home>
+			{new NewstickerComponent()}
 			{new ImpressionsComponent()}
 
 			{time}

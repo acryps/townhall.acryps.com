@@ -48,12 +48,10 @@ import { PropertyOwnershipPage } from "./properties/property/ownership";
 export class Application {
 	static router: Router;
 
-	static players: PlayerViewModel[];
 	static boroughs: BoroughSummaryModel[];
+	static bridge = new GameBridge();
 
 	static center = new Point(23, 183);
-
-	static bridge = new GameBridge();
 
 	static async main() {
 		new Rewrite().activate();
@@ -63,7 +61,6 @@ export class Application {
 			location.pathname = '/home';
 		}
 
-		this.players = await new GameService().getPlayers();
 		this.boroughs = await new BoroughService().list();
 
 		this.router = new PathRouter(

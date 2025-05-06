@@ -1,5 +1,5 @@
 import { Component } from "@acryps/page";
-import { ResidentSummaryModel } from "../managed/services";
+import { ResidentSummaryModel } from "../../managed/services";
 
 export class ResidentBadgeListComponent extends Component {
 	constructor(

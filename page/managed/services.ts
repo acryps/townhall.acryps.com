@@ -686,6 +686,21 @@ export class PlotBoundaryShapeModel {
 	}
 }
 
+export class ArticleNewstickerModel {
+	id: string;
+	published: Date;
+	title: string;
+
+	private static $build(raw) {
+		const item = new ArticleNewstickerModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.published === undefined || (item.published = raw.published ? new Date(raw.published) : null)
+		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
+		
+		return item;
+	}
+}
+
 export class ArticleViewModel {
 	images: ArticleImageViewModel[];
 	publication: PublicationSummaryModel;
@@ -2324,6 +2339,27 @@ export class PublicationService {
 				const d = r.data;
 
 				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getNewsticker(): Promise<Array<ArticleNewstickerModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("FsZGx5dTMzY20wcTh3ajh5YmRueHJ6NH"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ArticleNewstickerModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

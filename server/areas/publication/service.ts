@@ -1,6 +1,6 @@
 import { Service } from "vlserver";
 import { Article, ArticleImage, DbContext, Publication } from "../../managed/database";
-import { ArticleImageViewModel, ArticleViewModel } from "./article";
+import { ArticleImageViewModel, ArticleNewstickerModel, ArticleViewModel } from "./article";
 import { PublicationViewModel } from "./publication";
 import { Annotator } from "../../annotate";
 
@@ -25,6 +25,14 @@ export class PublicationService extends Service {
 		const article = await this.database.article.find(id);
 
 		return Annotator.annotate(article.body).pack();
+	}
+
+	async getNewsticker() {
+		return ArticleNewstickerModel.from(this.database.article
+			.where(article => article.published != null)
+			.orderByDescending(article => article.published)
+			.limit(5)
+		);
 	}
 
 	listNewestArticles(page: number, publication: string) {

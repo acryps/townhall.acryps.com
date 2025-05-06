@@ -68,6 +68,7 @@ import { Article } from "././database";
 import { ArticleImage } from "././database";
 import { Publication } from "././database";
 import { ArticleImageViewModel } from "././../areas/publication/article";
+import { ArticleNewstickerModel } from "././../areas/publication/article";
 import { ArticleViewModel } from "././../areas/publication/article";
 import { PublicationViewModel } from "././../areas/publication/publication";
 import { Annotator } from "././../annotate";
@@ -810,6 +811,15 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(PublicationService),
 			(controller, params) => controller.getArticleContent(
 				params["IxdjlzOHlheGNtZmN1cGE0ZnV2YTZsM2"]
+			)
+		);
+
+		this.expose(
+			"FsZGx5dTMzY20wcTh3ajh5YmRueHJ6NH",
+			{},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.getNewsticker(
+				
 			)
 		);
 
@@ -4054,6 +4064,72 @@ ViewModel.mappings = {
 			
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"shape" in viewModel && (model.shape = viewModel.shape === null ? null : `${viewModel.shape}`);
+
+			return model;
+		}
+	},
+	[ArticleNewstickerModel.name]: class ComposedArticleNewstickerModel extends ArticleNewstickerModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				published: this.$$model.published,
+				title: this.$$model.title
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				published: true,
+				title: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ArticleNewstickerModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"published" in data && (item.published = data.published === null ? null : new Date(data.published));
+			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ArticleNewstickerModel) {
+			let model: Article;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Article).find(viewModel.id)
+			} else {
+				model = new Article();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"published" in viewModel && (model.published = viewModel.published === null ? null : new Date(viewModel.published));
+			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
 
 			return model;
 		}

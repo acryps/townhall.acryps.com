@@ -289,6 +289,12 @@ export interface PlotBoundaryShapeModel {
 	shape: string;
 }
 
+export interface ArticleNewstickerModel {
+    id: string;
+	published: Date;
+	title: string;
+}
+
 export interface ArticleViewModel {
     images: ArticleImageViewModel[];
 	publication: PublicationSummaryModel;

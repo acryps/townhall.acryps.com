@@ -37,8 +37,7 @@ export class BuildingPage extends Component {
 			<ui-actions>
 				<ui-action ui-click={async () => {
 					await new PropertyService().archiveBuilding(this.building.id);
-
-					this.building.archived = true;
+					this.building.archived = new Date();
 
 					history.back();
 				}}>

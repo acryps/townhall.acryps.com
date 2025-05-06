@@ -297,7 +297,7 @@ export class MapComponent extends Component {
 			const path = new Path2D();
 			this.context.beginPath();
 
-			for (let pointIndex = 0; pointIndex < this.highlightedShape.length; pointIndex++) {
+			for (let pointIndex = 0; pointIndex < this.highlightedShape.shape.length; pointIndex++) {
 				const x = this.highlightedShape[pointIndex].x - offset.x;
 				const y = this.highlightedShape[pointIndex].y - offset.y;
 

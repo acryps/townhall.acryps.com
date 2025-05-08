@@ -2,6 +2,7 @@ import { aspectRatio, backgroundColor, child, color, display, flexDirection, fle
 import { card } from "../../shared/card.style";
 import { collection, collectionItem } from "../../shared/collection.style";
 import { infoColor, pageBackgroundColor, pageTextColor, positiveColor } from "../../index.style";
+import { headerBannerStyle } from "../../banner/index.style";
 
 export const companyStyle = () => child('ui-company',
 	display('block'),
@@ -13,6 +14,8 @@ export const companyStyle = () => child('ui-company',
 
 		backgroundColor(infoColor)
 	),
+
+	headerBannerStyle(),
 
 	child('ui-name',
 		display('block'),

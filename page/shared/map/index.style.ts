@@ -1,7 +1,7 @@
 import { alignItems, aspectRatio, backgroundColor, backgroundImage, backgroundSize, brightness, child, color, colorStop, contrast, display, dropShadow, fill, filter, fontSize, grayscale, height, hex, hueRotate, imageRendering, inset, justifyContent, left, linearGradient, marginLeft, marginTop, Number, opacity, overflow, padding, paddingBlock, paddingInline, percentage, pointerEvents, position, px, ratio, rem, Rem, select, stroke, strokeWidth, textAlign, top, transform, translate, turn, Variable, vectorEffect, whiteSpace, width, wordBreak, zIndex } from "@acryps/style";
 import { negativeColor, pageBackgroundColor, pageTextColor, positiveColor } from "../../index.style";
 import { PageComponent } from "../../page";
-import { micro } from "../../assets/font/index.style";
+import { microFont } from "../../assets/font/index.style";
 
 export const mapPixelWidth = new Variable<Number>('map-pixel-width');
 export const mapPixelHeight = new Variable<Number>('map-pixel-height');
@@ -87,7 +87,7 @@ export const mapStyle = () => select('ui-map-container',
 
 			transform(translate(percentage(-50))),
 
-			micro,
+			microFont,
 			fontSize(rem(0.5)),
 			opacity(0.95),
 			textAlign('center'),

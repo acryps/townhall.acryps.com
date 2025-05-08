@@ -3,7 +3,8 @@ import { collection, collectionItem } from "../shared/collection.style";
 import { card } from "../shared/card.style";
 import { boxed } from "../shared/boxed.style";
 import { buttonStyle } from "../shared/index.style";
-import { headline } from "../assets/font/index.style";
+import { headlineFont } from "../assets/font/index.style";
+import { headerBannerStyle } from "../banner/index.style";
 
 const bodyLineHeight = 1.3;
 
@@ -47,22 +48,13 @@ export const newsStyle = () => child('ui-news',
 export const publicationStyle = () => child('ui-publication',
 	boxed(),
 
-	child('ui-banner',
-		display('flex'),
-		justifyContent('center'),
-		marginBottom(rem(1)),
-
-		child('img',
-			height(min(vh(20), rem(10))),
-
-			border(px(1), 'solid', hex('000'))
-		)
-	),
+	headerBannerStyle(),
 
 	child('ui-name',
 		display('block'),
 		marginBottom(rem(1)),
 
+		headlineFont,
 		fontSize(rem(2)),
 		textAlign('center')
 	),
@@ -116,7 +108,7 @@ export const articleListStyle = () => child('ui-articles',
 				display('block'),
 				marginBottom(rem(0.5)),
 
-				headline,
+				headlineFont,
 				fontSize(rem(1.75))
 			),
 

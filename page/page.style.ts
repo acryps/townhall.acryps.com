@@ -1,6 +1,6 @@
 import { backdropFilter, backgroundColor, blur, borderBottom, boxShadow, brightness, child, color, ColorValue, contrast, display, dropShadow, em, filter, fontFamily, fontSize, grayscale, hex, margin, outline, padding, position, px, rem, root, top, Variable, zIndex } from "@acryps/style";
 import { homeStyle } from "./home/index.style";
-import { bold, boldItalic, regular, regularItalic } from "./assets/font/index.style";
+import { boldFont, boldItalicFont, regularFont, regularItalicFont } from "./assets/font/index.style";
 import { boroughStyle } from "./borough/index.style";
 import { bannerStyle, createBannerStyle } from "./banner/index.style";
 import { iconFont, icons } from "./assets/icons/managed";
@@ -25,15 +25,15 @@ import { legalEntitySelectorStyle } from "./shared/legal-entity/select/index.sty
 import { articleStyle } from "./news/article/index.style";
 
 export const pageStyle = () => root(
-	bold,
-	boldItalic,
-	regular,
-	regularItalic,
+	boldFont,
+	boldItalicFont,
+	regularFont,
+	regularItalicFont,
 
 	iconFont,
 	icons(),
 
-	fontFamily(regular.name),
+	fontFamily(regularFont.name),
 
 	bannerStyle(),
 	mapStyle(),

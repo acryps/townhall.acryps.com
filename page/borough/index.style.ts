@@ -1,21 +1,12 @@
 import { aspectRatio, border, child, display, fontSize, height, hex, imageRendering, justifyContent, marginBottom, marginInline, maxWidth, min, paddingInline, percentage, px, ratio, rem, textAlign, vh, whiteSpace, width } from "@acryps/style";
 import { boxed } from "../shared/boxed.style";
+import { bannerStyle, headerBannerStyle } from "../banner/index.style";
 
 export const boroughStyle = () => child('ui-borough',
 	boxed(),
 	paddingInline(rem(1)),
 
-	child('ui-banner',
-		display('flex'),
-		justifyContent('center'),
-		marginBottom(rem(1)),
-
-		child('img',
-			height(min(vh(20), rem(10))),
-
-			border(px(1), 'solid', hex('000'))
-		)
-	),
+	headerBannerStyle(),
 
 	child('ui-name',
 		display('block'),

@@ -1,6 +1,7 @@
 import { Component } from "@acryps/page";
 import { CompanyOfficeService, CompanySummaryModel, CompanyType } from "../managed/services";
 import { companyOfficeIcon } from "../assets/icons/managed";
+import { BannerComponent } from "../banner";
 
 export class CompanyOfficePage extends Component {
 	companies: CompanySummaryModel[];
@@ -36,13 +37,17 @@ export class CompanyOfficePage extends Component {
 
 			<ui-companies>
 				{this.companies.map(company => <ui-company ui-href={`company/${company.tag}`}>
-					<ui-name>
-						{company.name}
-					</ui-name>
+					<ui-detail>
+						<ui-name>
+							{company.name}
+						</ui-name>
 
-					{company.purpose && <ui-purpose>
-						{company.purpose}
-					</ui-purpose>}
+						{company.purpose && <ui-purpose>
+							{company.purpose}
+						</ui-purpose>}
+					</ui-detail>
+
+					{company.banner && BannerComponent.unpack(company.banner)}
 				</ui-company>)}
 			</ui-companies>
 		</ui-company-office>

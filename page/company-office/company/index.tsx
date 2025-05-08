@@ -4,6 +4,7 @@ import { toSimulatedAge } from "../../../interface/time";
 import { MapComponent } from "../../shared/map";
 import { Point } from "../../../interface/point";
 import { convertToCompanyTypeName } from "../../../interface/company";
+import { BannerComponent } from "../../banner";
 
 export class CompanyPage extends Component {
 	declare parameters: { tag };
@@ -20,6 +21,8 @@ export class CompanyPage extends Component {
 				Company has not been legally incorporated yet.
 				The next law house session for the main office should do this automatically.
 			</ui-alert>}
+
+			{this.company.banner && BannerComponent.unpack(this.company.banner)}
 
 			<ui-name>
 				{this.company.name}

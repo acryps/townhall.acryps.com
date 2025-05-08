@@ -36,7 +36,7 @@ export class BannerComponent extends Component {
 	layers: { offset: number, color: string }[] = [];
 
 	constructor(
-		public baseColor: string
+		public baseColor = 'white'
 	) {
 		super();
 
@@ -120,6 +120,10 @@ export class BannerComponent extends Component {
 	}
 
 	static unpack(source: string) {
+		if (!source) {
+			return new BannerComponent();
+		}
+
 		const packed = JSON.parse(decodeURIComponent(atob(source)));
 		const banner = new BannerComponent(packed[0]);
 

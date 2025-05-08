@@ -1,5 +1,5 @@
 import { child, display, marginBottom, rem, fontSize, whiteSpace, marginTop, width, percentage, maxHeight, vh, objectFit, imageRendering, scrollSnapType, overflowX, height, backgroundColor, gap, color, marginInline, paddingInline, flexShrink, overflow, flexGrow, scrollSnapAlign, flexDirection, paddingBlock, outline, px, alignSelf, scrollbarWidth, vw, Hex, position, inset, zIndex, background, padding, hex, cursor, min } from "@acryps/style";
-import { headline } from "../../assets/font/index.style";
+import { headlineFont } from "../../assets/font/index.style";
 import { boxed, boxedMaxContentWidth } from "../../shared/boxed.style";
 import { neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 
@@ -12,7 +12,7 @@ export const articleStyle = () => child('ui-article',
 		display('block'),
 		marginBottom(rem(1.5)),
 
-		headline,
+		headlineFont,
 		fontSize(rem(2.5))
 	),
 

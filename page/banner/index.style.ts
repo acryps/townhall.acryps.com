@@ -1,8 +1,20 @@
-import { alignContent, alignItems, border, child, columnGap, display, height, imageRendering, justifyContent, maxWidth, min, padding, px, rem, select, style, vw, width } from "@acryps/style";
+import { alignContent, alignItems, border, child, columnGap, display, height, hex, imageRendering, justifyContent, marginBottom, maxWidth, min, padding, px, rem, select, style, vh, vw, width } from "@acryps/style";
 
 export const bannerStyle = () => select('ui-banner',
 	child('img',
 		imageRendering('pixelated')
+	)
+);
+
+export const headerBannerStyle = () => child('ui-banner',
+	display('flex'),
+	justifyContent('center'),
+	marginBottom(rem(1)),
+
+	child('img',
+		height(min(vh(20), rem(10))),
+
+		border(px(1), 'solid', hex('000'))
 	)
 );
 

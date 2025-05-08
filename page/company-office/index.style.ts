@@ -1,4 +1,4 @@
-import { alignItems, backgroundColor, child, color, columnGap, display, fontSize, fontWeight, margin, marginBottom, padding, rem } from "@acryps/style";
+import { alignItems, backgroundColor, child, color, columnGap, display, fontSize, fontWeight, gap, margin, marginBottom, padding, rem } from "@acryps/style";
 import { boxed } from "../shared/boxed.style";
 import { pageBackgroundColor, pageGutter, pageTextColor } from "../index.style";
 import { registerCompanyStyle } from "./register/index.style";
@@ -39,15 +39,20 @@ export const companyOfficeStyle = () => child('ui-company-office',
 			collectionItem(),
 			card(),
 
-			child('ui-name',
-				display('block'),
-				marginBottom(rem(0.5)),
+			display('flex'),
+			gap(pageGutter),
 
-				fontWeight('bold')
-			),
+			child('ui-detail',
+				child('ui-name',
+					display('block'),
+					marginBottom(rem(0.5)),
 
-			child('ui-purpose',
-				display('block')
+					fontWeight('bold')
+				),
+
+				child('ui-purpose',
+					display('block')
+				)
 			)
 		)
 	)

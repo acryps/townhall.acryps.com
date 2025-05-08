@@ -3,7 +3,7 @@ import { buttonStyle } from "../shared/index.style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { card } from "../shared/card.style";
 import { neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../index.style";
-import { headline } from "../assets/font/index.style";
+import { headlineFont } from "../assets/font/index.style";
 
 export const homeStyle = () => child('ui-home',
 	display('block'),
@@ -40,7 +40,7 @@ export const homeStyle = () => child('ui-home',
 				cursor('pointer'),
 
 				child('ui-title',
-					headline
+					headlineFont
 				),
 
 				child('ui-date',

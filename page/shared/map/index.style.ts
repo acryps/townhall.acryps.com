@@ -1,4 +1,4 @@
-import { alignItems, aspectRatio, backgroundColor, backgroundImage, backgroundSize, child, color, colorStop, display, dropShadow, fill, filter, fontSize, height, hex, imageRendering, inset, justifyContent, left, linearGradient, marginLeft, marginTop, Number, opacity, overflow, padding, paddingBlock, paddingInline, percentage, pointerEvents, position, px, ratio, rem, Rem, select, stroke, strokeWidth, textAlign, top, transform, translate, turn, Variable, vectorEffect, whiteSpace, width, wordBreak, zIndex } from "@acryps/style";
+import { alignItems, aspectRatio, backgroundColor, backgroundImage, backgroundSize, brightness, child, color, colorStop, contrast, display, dropShadow, fill, filter, fontSize, grayscale, height, hex, hueRotate, imageRendering, inset, justifyContent, left, linearGradient, marginLeft, marginTop, Number, opacity, overflow, padding, paddingBlock, paddingInline, percentage, pointerEvents, position, px, ratio, rem, Rem, select, stroke, strokeWidth, textAlign, top, transform, translate, turn, Variable, vectorEffect, whiteSpace, width, wordBreak, zIndex } from "@acryps/style";
 import { pageBackgroundColor, pageTextColor } from "../../index.style";
 import { PageComponent } from "../../page";
 import { micro } from "../../assets/font/index.style";
@@ -33,25 +33,40 @@ export const mapStyle = () => select('ui-map-container',
 		position('absolute'),
 
 		imageRendering('pixelated'),
-		backgroundImage(
-			linearGradient(turn(0.25),
-				colorStop(percentage(0), blankBackground),
-				colorStop(percentage(50), blankBackground),
-				colorStop(percentage(50), 'transparent'),
-				colorStop(percentage(100), 'transparent')
+
+		select(':first-of-type',
+			backgroundImage(
+				linearGradient(turn(0.25),
+					colorStop(percentage(0), blankBackground),
+					colorStop(percentage(50), blankBackground),
+					colorStop(percentage(50), 'transparent'),
+					colorStop(percentage(100), 'transparent')
+				),
+				linearGradient(turn(0),
+					colorStop(percentage(0), blankBackground),
+					colorStop(percentage(50), blankBackground),
+					colorStop(percentage(50), 'transparent'),
+					colorStop(percentage(100), 'transparent')
+				)
 			),
-			linearGradient(turn(0),
-				colorStop(percentage(0), blankBackground),
-				colorStop(percentage(50), blankBackground),
-				colorStop(percentage(50), 'transparent'),
-				colorStop(percentage(100), 'transparent')
+			backgroundSize([
+				percentage(100).divide(mapPixelWidth).multiply(2),
+				percentage(100).divide(mapPixelHeight).multiply(2)
+			])
+		)
+	)
+		.attribute('ui-highlight-shape',
+			filter(
+				dropShadow(0, 0, px(2), 'currentColor')
+			)
+		)
+		.attribute('ui-highlight-base',
+			filter(
+				contrast(0.5),
+				brightness(1.5),
+				grayscale(1)
 			)
 		),
-		backgroundSize([
-			percentage(100).divide(mapPixelWidth).multiply(2),
-			percentage(100).divide(mapPixelHeight).multiply(2)
-		])
-	),
 
 	child('ui-labels',
 		display('block'),
@@ -75,16 +90,6 @@ export const mapStyle = () => select('ui-map-container',
 
 			color(pageTextColor),
 			backgroundColor(pageBackgroundColor)
-		)
-	),
-
-	child('svg',
-		position('absolute'),
-		pointerEvents('none'),
-
-		child('g',
-			child('path', fill('#fff1')),
-			child('rect', fill('#fff1'))
 		)
 	)
 )

@@ -20,7 +20,7 @@ export class MapComponent extends Component {
 	readonly minimumWidth = 10;
 	readonly maximumWidth = 1000;
 
-	canvas: HTMLCanvasElement;
+	canvas = document.createElement('canvas');
 	context: CanvasRenderingContext2D;
 
 	width: number;
@@ -33,10 +33,12 @@ export class MapComponent extends Component {
 	drawingClosePossible = new Observable<boolean>(false);
 
 	highlightMargin = 1.5;
-	highlightOutline: SVGElement;
 	highlightedShape: {
 		shape: Point[],
-		close: boolean
+		close: boolean,
+
+		shapeCanvas: HTMLCanvasElement,
+		shapeContext: CanvasRenderingContext2D
 	};
 
 	subpixel = new Point(0, 0);
@@ -73,31 +75,21 @@ export class MapComponent extends Component {
 
 	// highlight an area
 	highlight(shape: Point[], close = true) {
-		this.highlightedShape = { shape, close };
+		const canvas = document.createElement('canvas');
+		canvas.setAttribute('ui-highlight-shape', '');
+
+		this.highlightedShape = {
+			shape,
+			close,
+
+			shapeCanvas: canvas,
+			shapeContext: canvas.getContext('2d')
+		};
+
 		this.show(Point.center(shape), this.scale);
 
-		const pixels = calculateDanwinstonShapePath(shape, close);
-
-		this.highlightOutline = Application.createSVGElement('svg');
-		this.highlightOutline.innerHTML = `<defs><filter id="so"><feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="orange"/></filter></defs>`;
-
-		const group = Application.createSVGElement('g') as SVGGElement;
-		group.setAttribute('filter', 'url(#so)')
-		this.highlightOutline.appendChild(group);
-
-		const outline = Application.createSVGElement('path') as SVGPathElement;
-		outline.setAttribute('d', pixels.map((point, index) => `${index ? 'L' : 'M'} ${point.x + 0.5},${point.y + 0.5}`).join(' '));
-		group.appendChild(outline);
-
-		for (let pixel of pixels) {
-			const rectangle = Application.createSVGElement('rect') as SVGRectElement;
-			rectangle.setAttribute('x', pixel.x);
-			rectangle.setAttribute('y', pixel.y);
-			rectangle.setAttribute('width', '1');
-			rectangle.setAttribute('height', '1');
-
-			group.appendChild(rectangle);
-		}
+		// mark base canvas as highlight base
+		this.canvas.setAttribute('ui-highlight-base', '');
 
 		return this;
 	}
@@ -169,7 +161,6 @@ export class MapComponent extends Component {
 	}
 
 	render() {
-		this.canvas = document.createElement('canvas');
 		this.context = this.canvas.getContext('2d');
 
 		requestAnimationFrame(() => {
@@ -194,10 +185,9 @@ export class MapComponent extends Component {
 		});
 
 		const container = <ui-map-container>
-			{this.canvas}
+			{this.activeCanvases}
 
 			{this.labelContainer}
-			{this.highlightOutline}
 		</ui-map-container>;
 
 		return container;
@@ -253,20 +243,30 @@ export class MapComponent extends Component {
 		this.height = Math.floor(this.subpixelHeight);
 	}
 
-	private get subpixelOffsetElements() {
+	private get activeCanvases() {
 		return [
 			this.canvas,
+			this.highlightedShape?.shapeCanvas
+		].filter(item => item);
+	}
+
+	private get activeSubpixelOffsetElements() {
+		return [
+			this.canvas,
+			this.highlightedShape?.shapeCanvas,
 			this.labelContainer,
-			this.highlightOutline
 		].filter(item => item);
 	}
 
 	private updateScale() {
 		this.resize();
-		this.canvas.width = this.width;
-		this.canvas.height = this.height;
 
-		for (let element of this.subpixelOffsetElements) {
+		for (let canvas of this.activeCanvases) {
+			canvas.width = this.width;
+			canvas.height = this.height;
+		}
+
+		for (let element of this.activeSubpixelOffsetElements) {
 			element.style.width = `${this.pixelSize * this.width}px`;
 			element.style.height = `${this.pixelSize * this.height}px`;
 		}
@@ -311,7 +311,7 @@ export class MapComponent extends Component {
 		const subpixelX = `${-this.subpixel.x + outboard.x / 2 - mapOverdraw / 2 * this.pixelSize - oddOffset.x * this.pixelSize}px`;
 		const subpixelY = `${-this.subpixel.y + outboard.y / 2 - mapOverdraw / 2 * this.pixelSize - oddOffset.y * this.pixelSize}px`;
 
-		for (let element of this.subpixelOffsetElements) {
+		for (let element of this.activeSubpixelOffsetElements) {
 			element.style.left = subpixelX;
 			element.style.top = subpixelY;
 		}
@@ -334,7 +334,9 @@ export class MapComponent extends Component {
 		this.context.save();
 
 		this.context.clearRect(0, 0, this.width, this.height);
-		this.renderLayerBuffers();
+		this.highlightedShape?.shapeContext.clearRect(0, 0, this.width, this.height);
+
+		this.renderLayerBuffers(this.context);
 
 		// top most pixel offset
 		// point 0,0 in canvas converted to map location
@@ -347,48 +349,37 @@ export class MapComponent extends Component {
 		this.rootNode.style.setProperty(mapPositionX.propertyName, offset.x);
 		this.rootNode.style.setProperty(mapPositionY.propertyName, offset.y);
 
-		if (this.highlightOutline) {
-			this.highlightOutline.setAttribute('viewBox', `${offset.x} ${offset.y} ${this.width} ${this.height}`);
-		}
-
 		if (this.highlightedShape) {
-			// prepare clip area
-			const path = new Path2D();
+			// draw highlighted area in color
+			this.highlightedShape.shapeContext.globalCompositeOperation = 'source-over';
+			this.renderLayerBuffers(this.highlightedShape.shapeContext);
+
+			// turns next draw into a mask
+			this.highlightedShape.shapeContext.globalCompositeOperation = 'destination-in';
+			this.highlightedShape.shapeContext.fillStyle = 'black';
+
+			this.highlightedShape.shapeContext.beginPath();
 
 			for (let pointIndex = 0; pointIndex < this.highlightedShape.shape.length; pointIndex++) {
-				const x = this.highlightedShape.shape[pointIndex].x - offset.x;
-				const y = this.highlightedShape.shape[pointIndex].y - offset.y;
+				const x = this.highlightedShape.shape[pointIndex].x - offset.x + 0.5;
+				const y = this.highlightedShape.shape[pointIndex].y - offset.y + 0.5;
 
 				if (pointIndex) {
-					path.lineTo(x, y);
+					this.highlightedShape.shapeContext.lineTo(x, y);
 				} else {
-					path.moveTo(x, y);
+					this.highlightedShape.shapeContext.moveTo(x, y);
 				}
 			}
 
-			path.closePath();
-
-			// gray out map
-			const imageData = this.context.getImageData(0, 0, this.width, this.height);
-			let index = 0;
-
-			while (index < imageData.data.length) {
-				// make it a big brighter
-				const gray = (imageData.data[index] + imageData.data[index + 1] + imageData.data[index + 2]) / 4 + 0xff / 2;
-
-				imageData.data[index++] = gray;
-				imageData.data[index++] = gray;
-				imageData.data[index++] = gray;
-				index++; // alpha
+			if (this.highlightedShape.close) {
+				this.highlightedShape.shapeContext.closePath();
 			}
 
-			this.context.putImageData(imageData, 0, 0);
+			for (let point of calculateDanwinstonShapePath(this.highlightedShape.shape, this.highlightedShape.close)) {
+				this.highlightedShape.shapeContext.rect(point.x - offset.x, point.y - offset.y, 1, 1);
+			}
 
-			// draw highlighted area in color
-			this.context.save();
-			this.context.clip(path);
-			this.renderLayerBuffers();
-			this.context.restore();
+			this.highlightedShape.shapeContext.fill();
 		}
 
 		if (this.drawing) {
@@ -476,12 +467,12 @@ export class MapComponent extends Component {
 		}
 	}
 
-	private renderLayerBuffers() {
+	private renderLayerBuffers(context: CanvasRenderingContext2D) {
 		// copy layer buffers to main context
 		for (let layer of this.layers) {
 			const image = layer.render(this.cursor, this.width, this.height);
 
-			this.context.drawImage(image, 0, 0);
+			context.drawImage(image, 0, 0);
 		}
 	}
 }

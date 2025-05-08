@@ -31,6 +31,7 @@ export class MapComponent extends Component {
 	drawing?: Point[];
 	drawingClosePossible = new Observable<boolean>(false);
 
+	highlightMargin = 1.5;
 	highlightedShape: {
 		shape: Point[],
 		close: boolean
@@ -146,7 +147,20 @@ export class MapComponent extends Component {
 		this.canvas = document.createElement('canvas');
 		this.context = this.canvas.getContext('2d');
 
-		requestAnimationFrame(() => this.updateScale());
+		requestAnimationFrame(() => {
+			// adjust scale to fit highlighted shape
+			if (this.highlightedShape) {
+				const shape = Point.bounds(this.highlightedShape.shape);
+				const bounds = this.canvas.getBoundingClientRect();
+
+				this.scale = Math.max(
+					(shape.width * this.highlightMargin / bounds.width),
+					(shape.height * this.highlightMargin / bounds.height)
+				);
+			}
+
+			this.updateScale();
+		});
 
 		addEventListener('resize', () => {
 			if (document.contains(this.canvas)) {
@@ -309,15 +323,6 @@ export class MapComponent extends Component {
 
 			path.closePath();
 
-			for (let pointIndex = 0; pointIndex < this.highlightedShape.shape.length; pointIndex++) {
-				const start = this.highlightedShape.shape[pointIndex - 1] ?? this.highlightedShape.shape[0];
-				const end = this.highlightedShape.shape[pointIndex];
-
-				for (let pixel of calcualteDanwinstonLine(start.subtract(offset), end.subtract(offset))) {
-					path.rect(pixel.x, pixel.y, 1, 1);
-				}
-			}
-
 			// gray out map
 			const imageData = this.context.getImageData(0, 0, this.width, this.height);
 			let index = 0;
@@ -334,14 +339,6 @@ export class MapComponent extends Component {
 
 			this.context.putImageData(imageData, 0, 0);
 
-			// draw highlighted area in color
-			this.context.save();
-			this.context.clip(path);
-			this.renderLayerBuffers();
-
-			// draw shape
-			this.context.restore();
-
 			this.context.strokeStyle = this.drawing ? '#00f8' : '#000';
 
 			let length = this.highlightedShape.shape.length;
@@ -349,6 +346,24 @@ export class MapComponent extends Component {
 			if (!this.highlightedShape.close) {
 				length--;
 			}
+
+			for (let pointIndex = 0; pointIndex < length; pointIndex++) {
+				for (let x = -1; x < 1; x++) {
+					for (let y = -1; y < 1; y++) {
+						drawDanwinstonLine(
+							this.context,
+							this.highlightedShape.shape[pointIndex].subtract(offset).copy(x, y),
+							this.highlightedShape.shape[(pointIndex + 1) % this.highlightedShape.shape.length].subtract(offset).copy(x, y)
+						);
+					}
+				}
+			}
+
+			// draw highlighted area in color
+			this.context.save();
+			this.context.clip(path);
+			this.renderLayerBuffers();
+			this.context.restore();
 		}
 
 		if (this.drawing) {

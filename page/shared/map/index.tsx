@@ -3,7 +3,7 @@ import { Point } from "../../../interface/point";
 import { MapLayer } from "./layer";
 import { labelX, labelY, mapOverdraw, mapPixelHeight, mapPixelWidth, mapPositionX, mapPositionY, mapSubpixelHeight, mapSubpixelWidth, subpixelOffsetX, subpixelOffsetY } from "./index.style";
 import { baseLayer } from "./layers";
-import { drawDanwinstonLine } from "../../../interface/line";
+import { calcualteDanwinstonLine, drawDanwinstonLine } from "../../../interface/line";
 import { Observable } from "@acryps/page-observable";
 import { Hex } from "@acryps/style";
 import { Label } from "./layer/label";
@@ -297,8 +297,8 @@ export class MapComponent extends Component {
 			const path = new Path2D();
 
 			for (let pointIndex = 0; pointIndex < this.highlightedShape.shape.length; pointIndex++) {
-				const x = this.highlightedShape[pointIndex].x - offset.x;
-				const y = this.highlightedShape[pointIndex].y - offset.y;
+				const x = this.highlightedShape.shape[pointIndex].x - offset.x;
+				const y = this.highlightedShape.shape[pointIndex].y - offset.y;
 
 				if (pointIndex) {
 					path.lineTo(x, y);
@@ -308,6 +308,15 @@ export class MapComponent extends Component {
 			}
 
 			path.closePath();
+
+			for (let pointIndex = 0; pointIndex < this.highlightedShape.shape.length; pointIndex++) {
+				const start = this.highlightedShape.shape[pointIndex - 1] ?? this.highlightedShape.shape[0];
+				const end = this.highlightedShape.shape[pointIndex];
+
+				for (let pixel of calcualteDanwinstonLine(start.subtract(offset), end.subtract(offset))) {
+					path.rect(pixel.x, pixel.y, 1, 1);
+				}
+			}
 
 			// gray out map
 			const imageData = this.context.getImageData(0, 0, this.width, this.height);
@@ -339,18 +348,6 @@ export class MapComponent extends Component {
 
 			if (!this.highlightedShape.close) {
 				length--;
-			}
-
-			for (let pointIndex = 0; pointIndex < length; pointIndex++) {
-				for (let x = -1; x < 1; x++) {
-					for (let y = -1; y < 1; y++) {
-						drawDanwinstonLine(
-							this.context,
-							this.highlightedShape.shape[pointIndex].subtract(offset),
-							this.highlightedShape.shape[(pointIndex + 1) % this.highlightedShape.shape.length].subtract(offset)
-						);
-					}
-				}
 			}
 		}
 

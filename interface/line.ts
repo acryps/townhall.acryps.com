@@ -1,6 +1,6 @@
 // legally binding line drawing algorithm in pilegron
 
-import { Point } from "./point";
+import { PackedPoint, Point } from "./point";
 
 // signed into law in the Danwingston act
 type Coordinate = {
@@ -19,6 +19,8 @@ export const drawDanwinstonLine = (context: Partial<CanvasRenderingContext2D>, s
 	context.fillStyle = fillStyle;
 }
 
+// get all pixel in the path
+// removes duplicates
 export const calculateDanwinstonShapePath = (shape: Coordinate[], close = true) => {
 	let length = shape.length;
 
@@ -26,16 +28,18 @@ export const calculateDanwinstonShapePath = (shape: Coordinate[], close = true) 
 		length--;
 	}
 
-	const points: Point[] = [];
+	const points = new Map<PackedPoint, Point>();
 
 	for (let pointIndex = 0; pointIndex < length; pointIndex++) {
 		const start = shape[pointIndex];
 		const end = shape[pointIndex + 1] ?? shape[0];
 
-		points.push(...calcualteDanwinstonLine(start, end));
+		for (let pixel of calcualteDanwinstonLine(start, end)) {
+			points.set(pixel.pack(), pixel);
+		}
 	}
 
-	return points;
+	return [...points.values()];
 }
 
 export const calcualteDanwinstonLine = (start: Coordinate, end: Coordinate) => {

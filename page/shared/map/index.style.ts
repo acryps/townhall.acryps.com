@@ -29,44 +29,48 @@ export const mapStyle = () => select('ui-map-container',
 
 	position('relative'),
 
-	child('canvas',
-		position('absolute'),
+	child('ui-container',
+		display('contents'),
 
-		imageRendering('pixelated'),
+		child('canvas',
+			position('absolute'),
 
-		select(':first-of-type',
-			backgroundImage(
-				linearGradient(turn(0.25),
-					colorStop(percentage(0), blankBackground),
-					colorStop(percentage(50), blankBackground),
-					colorStop(percentage(50), 'transparent'),
-					colorStop(percentage(100), 'transparent')
+			imageRendering('pixelated'),
+
+			select(':first-of-type',
+				backgroundImage(
+					linearGradient(turn(0.25),
+						colorStop(percentage(0), blankBackground),
+						colorStop(percentage(50), blankBackground),
+						colorStop(percentage(50), 'transparent'),
+						colorStop(percentage(100), 'transparent')
+					),
+					linearGradient(turn(0),
+						colorStop(percentage(0), blankBackground),
+						colorStop(percentage(50), blankBackground),
+						colorStop(percentage(50), 'transparent'),
+						colorStop(percentage(100), 'transparent')
+					)
 				),
-				linearGradient(turn(0),
-					colorStop(percentage(0), blankBackground),
-					colorStop(percentage(50), blankBackground),
-					colorStop(percentage(50), 'transparent'),
-					colorStop(percentage(100), 'transparent')
+				backgroundSize([
+					percentage(100).divide(mapPixelWidth).multiply(2),
+					percentage(100).divide(mapPixelHeight).multiply(2)
+				])
+			)
+		)
+			.attribute('ui-highlight-shape',
+				filter(
+					dropShadow(0, 0, px(2), 'currentColor')
 				)
-			),
-			backgroundSize([
-				percentage(100).divide(mapPixelWidth).multiply(2),
-				percentage(100).divide(mapPixelHeight).multiply(2)
-			])
-		)
-	)
-		.attribute('ui-highlight-shape',
-			filter(
-				dropShadow(0, 0, px(2), 'currentColor')
 			)
-		)
-		.attribute('ui-highlight-base',
-			filter(
-				contrast(0.5),
-				brightness(1.5),
-				grayscale(1)
+			.attribute('ui-highlight-base',
+				filter(
+					contrast(0.5),
+					brightness(1.5),
+					grayscale(1)
+				)
 			)
-		),
+	),
 
 	child('ui-labels',
 		display('block'),

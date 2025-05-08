@@ -9,6 +9,7 @@ import { addIcon, boroughIcon, captureIcon, chatIcon, dayIcon, drawIcon, movemen
 import { Observable } from "@acryps/page-observable";
 import { CreateFeaturePage } from "./create";
 import { Action } from "../action";
+import { MapToolbarComponent } from "./toolbar";
 
 export type DrawingType = 'closed-shape' | 'path' | 'any';
 
@@ -22,11 +23,7 @@ export class MapPage extends Component {
 	readonly zoomAccuracy = 3;
 
 	map = new MapComponent();
-
-	keycode = new Map<string, MapLayer | [MapLayer, MapLayer]>()
-		.set(' ', [baseLayer, nightLayer])
-		.set('b', boroughLayer)
-		.set('p', propertyLayer);
+	toolbar = new MapToolbarComponent();
 
 	drawing: {
 		type: DrawingType,
@@ -39,6 +36,12 @@ export class MapPage extends Component {
 			return <ui-map-child>
 				{child}
 			</ui-map-child>;
+		}
+
+		if (this.child instanceof Action) {
+			this.toolbar.action = child;
+		} else {
+			this.toolbar.action = null;
 		}
 
 		Application.setTitle(this.drawing?.name, 'Map');
@@ -60,136 +63,23 @@ export class MapPage extends Component {
 
 				console.log(pick);
 			});
-
-			onkeypress = event => {
-				const layer = this.keycode.get(event.key);
-
-				if (layer) {
-					if (Array.isArray(layer)) {
-						this.toggleLayer(layer[0], layer[1]);
-					} else {
-						this.toggleLayer(layer);
-					}
-				}
-			};
 		});
 
 		return <ui-map>
 			{this.map}
 
-			<ui-tools>
-				{this.map.drawing && <ui-actions>
-					<ui-action ui-click={() => this.map.pushDrawingPoint()}>
-						{addIcon()} Add Point
-					</ui-action>
-
-					{this.drawing.type == 'closed-shape' ? (
-						this.map.drawingClosePossible.map(possible => possible ? <ui-action ui-click={() => this.completeDrawing()}>
-							{addIcon()} {this.drawing.name}
-						</ui-action> : <ui-action ui-disabled>
-							{addIcon()} {this.drawing.name}
-						</ui-action>)
-					) : <ui-action ui-click={() => this.completeDrawing()}>
-						{addIcon()} {this.drawing.name}
-					</ui-action>}
-				</ui-actions>}
-
-				<ui-drawer>
-					{child}
-
-					<ui-layer ui-click={() => this.toggleLayer(baseLayer, nightLayer)}>
-						{dayIcon()}
-					</ui-layer>
-
-					<ui-layers>
-						<ui-layer ui-click={() => this.toggleLayer(boroughLayer)}>
-							{boroughIcon()}
-						</ui-layer>
-
-						<ui-layer ui-click={() => this.toggleLayer(propertyLayer)}>
-							{propertyRegisterIcon()}
-						</ui-layer>
-
-						<ui-layer ui-click={() => this.toggleLayer(streetLayer)}>
-							{streetIcon()}
-						</ui-layer>
-					</ui-layers>
-
-					<ui-layers>
-						<ui-layer ui-click={() => this.toggleLayer(movementHeatmapLayer)}>
-							{movementIcon()}
-						</ui-layer>
-
-						<ui-layer ui-click={() => this.toggleLayer(propertyUsageLayer)}>
-							{residentIcon()}
-						</ui-layer>
-					</ui-layers>
-
-					<ui-actions>
-						<ui-action ui-active={!!this.map.drawing} ui-click={async () => {
-							const source = await this.map.capture();
-							const name = `map-${Math.round(this.map.center.x)}-${Math.round(this.map.center.y)}.png`;
-
-							if (navigator.share) {
-								navigator.share({
-									title: `Map ${Math.round(this.map.center.x)} ${Math.round(this.map.center.y)}`,
-									files: [
-										new File([source], name, { type: 'image/png' })
-									],
-									url: location.href
-								});
-							} else {
-								const link = document.createElement('a');
-								link.download = name;
-								link.href = URL.createObjectURL(source);
-
-								link.click();
-							}
-						}}>
-							{captureIcon()}
-						</ui-action>
-
-						<ui-action ui-click={async () => {
-							if (this.map.drawing) {
-								if (this.map.drawing.length) {
-									if (confirm('Do you want to delete the current drawing?')) {
-										this.map.completeDrawing();
-									}
-								}
-							} else {
-								const packed = Point.pack(await this.draw('Add Feature', 'any'));
-
-								this.navigate(`create/${btoa(packed)}`);
-							}
-						}}>
-							{drawIcon()}
-						</ui-action>
-					</ui-actions>
-				</ui-drawer>
-			</ui-tools>
+			{this.toolbar}
 		</ui-map>
 	}
 
 	completeDrawing() {
-		const shape = this.map.completeDrawing();
+		const shape = this.map.drawer.complete();
 
 		// backup if create would were to fail
 		console.log('shape', Point.pack(shape));
 
 		this.drawing.complete(shape);
-	}
-
-	toggleLayer(enable: MapLayer, disable?: MapLayer) {
-		if (this.map.layers.includes(enable)) {
-			this.map.layers.splice(this.map.layers.indexOf(enable), 1, disable);
-		} else if (this.map.layers.includes(disable)) {
-			this.map.layers.splice(this.map.layers.indexOf(disable), 1, enable);
-		} else {
-			this.map.layers.push(enable);
-		}
-
-		this.map.layers = this.map.layers.filter(layer => layer);
-		this.map.updateLayers();
+		this.toolbar.update();
 	}
 
 	draw(action: string, type: DrawingType = 'closed-shape') {
@@ -201,7 +91,7 @@ export class MapPage extends Component {
 			}
 
 			this.map.enableDrawing();
-			this.update();
+			this.toolbar.update();
 		});
 	}
 

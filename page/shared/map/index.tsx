@@ -3,10 +3,11 @@ import { Point } from "../../../interface/point";
 import { MapLayer } from "./layer";
 import { labelX, labelY, mapOverdraw, mapPixelHeight, mapPixelWidth, mapPositionX, mapPositionY, mapSubpixelHeight, mapSubpixelWidth, subpixelOffsetX, subpixelOffsetY } from "./index.style";
 import { baseLayer } from "./layers";
-import { calcualteDanwinstonLine, drawDanwinstonLine } from "../../../interface/line";
+import { calcualteDanwinstonLine, calculateDanwinstonShapePath, drawDanwinstonLine } from "../../../interface/line";
 import { Observable } from "@acryps/page-observable";
 import { Hex } from "@acryps/style";
 import { Label } from "./layer/label";
+import { Application } from "../..";
 
 export class MapComponent extends Component {
 	readonly defaultZoom = 4;
@@ -32,6 +33,7 @@ export class MapComponent extends Component {
 	drawingClosePossible = new Observable<boolean>(false);
 
 	highlightMargin = 1.5;
+	highlightOutline: SVGElement;
 	highlightedShape: {
 		shape: Point[],
 		close: boolean
@@ -73,6 +75,13 @@ export class MapComponent extends Component {
 	highlight(shape: Point[], close = true) {
 		this.highlightedShape = { shape, close };
 		this.show(Point.center(shape), this.scale);
+
+		this.highlightOutline = Application.createSVGElement('svg');
+
+		const outline = Application.createSVGElement('path') as SVGPathElement;
+		outline.setAttribute('d', calculateDanwinstonShapePath(shape, close).map((point, index) => `${index ? 'L' : 'M'} ${point.x},${point.y}`).join(' '));
+
+		this.highlightOutline.appendChild(outline);
 
 		return this;
 	}
@@ -172,6 +181,7 @@ export class MapComponent extends Component {
 			{this.canvas}
 
 			{this.labelContainer}
+			{this.highlightOutline}
 		</ui-map-container>;
 
 		return container;
@@ -227,13 +237,23 @@ export class MapComponent extends Component {
 		this.height = Math.floor(this.subpixelHeight);
 	}
 
+	private get subpixelOffsetElements() {
+		return [
+			this.canvas,
+			this.labelContainer,
+			this.highlightOutline
+		].filter(item => item);
+	}
+
 	private updateScale() {
 		this.resize();
 		this.canvas.width = this.width;
 		this.canvas.height = this.height;
 
-		this.labelContainer.style.width = this.canvas.style.width = `${this.pixelSize * this.width}px`;
-		this.labelContainer.style.height = this.canvas.style.height = `${this.pixelSize * this.height}px`;
+		for (let element of this.subpixelOffsetElements) {
+			element.style.width = `${this.pixelSize * this.width}px`;
+			element.style.height = `${this.pixelSize * this.height}px`;
+		}
 
 		this.rootNode.style.setProperty(mapPixelWidth.propertyName, this.width.toString());
 		this.rootNode.style.setProperty(mapPixelHeight.propertyName, this.height.toString());
@@ -247,7 +267,6 @@ export class MapComponent extends Component {
 
 	// updates map content
 	updateLayers() {
-		const box = this.canvas.getBoundingClientRect();
 		const bounds = this.rootNode.getBoundingClientRect();
 
 		// how much partially visible pixels are on the canvas
@@ -273,8 +292,13 @@ export class MapComponent extends Component {
 		);
 
 		// it does not work in styles as the width/height are relative
-		this.labelContainer.style.left = this.canvas.style.left = `${-this.subpixel.x + outboard.x / 2 - mapOverdraw / 2 * this.pixelSize - oddOffset.x * this.pixelSize}px`;
-		this.labelContainer.style.top = this.canvas.style.top = `${-this.subpixel.y + outboard.y / 2 - mapOverdraw / 2 * this.pixelSize - oddOffset.y * this.pixelSize}px`;
+		const subpixelX = `${-this.subpixel.x + outboard.x / 2 - mapOverdraw / 2 * this.pixelSize - oddOffset.x * this.pixelSize}px`;
+		const subpixelY = `${-this.subpixel.y + outboard.y / 2 - mapOverdraw / 2 * this.pixelSize - oddOffset.y * this.pixelSize}px`;
+
+		for (let element of this.subpixelOffsetElements) {
+			element.style.left = subpixelX;
+			element.style.top = subpixelY;
+		}
 
 		for (let layer of this.layers) {
 			layer.update(this.cursor, this.width, this.height).then(() => {
@@ -303,8 +327,13 @@ export class MapComponent extends Component {
 			this.cursor.y - this.height / 2 - (this.height % 2 ? 0.5 : 0)
 		);
 
+		// label positions
 		this.rootNode.style.setProperty(mapPositionX.propertyName, offset.x);
 		this.rootNode.style.setProperty(mapPositionY.propertyName, offset.y);
+
+		if (this.highlightOutline) {
+			this.highlightOutline.setAttribute('viewBox', `${offset.x} ${offset.y} ${this.width} ${this.height}`);
+		}
 
 		if (this.highlightedShape) {
 			// prepare clip area
@@ -338,26 +367,6 @@ export class MapComponent extends Component {
 			}
 
 			this.context.putImageData(imageData, 0, 0);
-
-			this.context.strokeStyle = this.drawing ? '#00f8' : '#000';
-
-			let length = this.highlightedShape.shape.length;
-
-			if (!this.highlightedShape.close) {
-				length--;
-			}
-
-			for (let pointIndex = 0; pointIndex < length; pointIndex++) {
-				for (let x = -1; x < 1; x++) {
-					for (let y = -1; y < 1; y++) {
-						drawDanwinstonLine(
-							this.context,
-							this.highlightedShape.shape[pointIndex].subtract(offset).copy(x, y),
-							this.highlightedShape.shape[(pointIndex + 1) % this.highlightedShape.shape.length].subtract(offset).copy(x, y)
-						);
-					}
-				}
-			}
 
 			// draw highlighted area in color
 			this.context.save();

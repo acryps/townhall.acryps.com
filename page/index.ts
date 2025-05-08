@@ -54,7 +54,10 @@ export class Application {
 	static center = new Point(23, 183);
 
 	static async main() {
-		new Rewrite().activate();
+		const rewrite = new Rewrite();
+		rewrite.nativeElements.push('svg', 'path');
+		rewrite.activate();
+
 		Service.baseUrl = '/';
 
 		if (location.pathname == '/') {
@@ -145,6 +148,10 @@ export class Application {
 
 	static setTitle(...parts: string[]) {
 		document.title = [...parts, 'Townhall'].filter(item => item).join(' | ');
+	}
+
+	static createSVGElement(tag: string) {
+		return document.createElementNS('http://www.w3.org/2000/svg', tag);
 	}
 }
 

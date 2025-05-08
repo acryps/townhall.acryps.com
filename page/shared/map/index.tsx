@@ -8,6 +8,8 @@ import { BaseMapView } from "./views/base";
 import { MapHighlighterView } from "./views/highlight";
 import { MapDrawView } from "./views/draw";
 import { MapViewContainer } from "./views/container";
+import { MapView } from "./views";
+import { top } from "@acryps/style";
 
 export class MapComponent extends Component {
 	readonly defaultZoom = 4;
@@ -132,8 +134,10 @@ export class MapComponent extends Component {
 		this.viewContainer = new MapViewContainer();
 
 		requestAnimationFrame(() => {
+			const bounds = this.rootNode.getBoundingClientRect();
+
 			for (let view of this.activeViews) {
-				view.prepare();
+				view.prepare(bounds);
 			}
 
 			this.updateScale();
@@ -188,7 +192,7 @@ export class MapComponent extends Component {
 			return this.resize();
 		}
 
-		if (this.subpixelWidth > this.maximumWidth) {
+		if (Math.floor(this.subpixelWidth) > this.maximumWidth) {
 			this.scale = this.maximumWidth / boundingBox.width;
 
 			return this.resize();
@@ -204,7 +208,7 @@ export class MapComponent extends Component {
 		this.height = Math.floor(this.subpixelHeight);
 	}
 
-	get activeViews() {
+	get activeViews(): MapView[] {
 		return [
 			this.base,
 			this.highlighter,

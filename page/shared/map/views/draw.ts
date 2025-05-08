@@ -1,14 +1,27 @@
 import { Observable } from "@acryps/page-observable";
 import { MapView } from ".";
 import { Point } from "../../../../interface/point";
-import { drawDanwinstonLine } from "../../../../interface/line";
+import { calcualteDanwinstonLine, drawDanwinstonLine } from "../../../../interface/line";
+import { negativeColor, positiveColor } from "../../../index.style";
 
 export class MapDrawView extends MapView {
+	readonly targetPixelSize = 5;
+	superscale: number;
+
 	shape: Point[] = [];
 	closeable = new Observable(false);
 
 	push() {
 		this.shape.push(this.map.cursor.copy());
+	}
+
+	resize() {
+		this.canvas.width = this.map.width * this.superscale;
+		this.canvas.height = this.map.height * this.superscale;
+
+		// must be an odd number to keep the pattern clean
+		// especially superscale 2 looks bad
+		this.superscale = Math.floor(this.map.pixelSize / this.targetPixelSize / 2) * 2 + 1;
 	}
 
 	complete() {
@@ -22,7 +35,7 @@ export class MapDrawView extends MapView {
 	}
 
 	render(offset: Point) {
-		this.context.clearRect(0, 0, this.map.width, this.map.height);
+		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 		if (this.shape.length) {
 			const firstPoint = this.shape[0];
@@ -31,16 +44,10 @@ export class MapDrawView extends MapView {
 		}
 
 		// draw existing
-		this.context.strokeStyle = '#000';
+		this.context.fillStyle = '#000';
 
 		for (let pointIndex = 1; pointIndex < this.shape.length; pointIndex++) {
-			const point = this.shape[pointIndex];
-
-			drawDanwinstonLine(
-				this.context,
-				this.shape[pointIndex - 1].subtract(offset),
-				this.shape[pointIndex].subtract(offset)
-			);
+			this.drawCheckeredLine(this.shape[pointIndex - 1], this.shape[pointIndex], offset);
 		}
 
 		// draw current line
@@ -49,27 +56,56 @@ export class MapDrawView extends MapView {
 
 		if (last) {
 			// draw current line
-			this.context.strokeStyle = '#0008';
+			this.context.fillStyle = '#0008';
+			this.drawCheckeredLine(last, cursor, offset);
 
-			drawDanwinstonLine(
-				this.context,
-				last.subtract(offset),
-				cursor.subtract(offset)
-			);
-
-			let cursorColor = '#fff8';
-
-			// draw cursor aligned line indicator
+			// alignment
 			if (last.x == cursor.x || last.y == cursor.y || Math.abs(last.x - cursor.x) == Math.abs(last.y - cursor.y)) {
-				cursorColor = '#0f08';
+				this.context.strokeStyle = positiveColor.toValueString();
+			} else {
+				this.context.strokeStyle = negativeColor.toValueString();
 			}
 
-			this.context.fillStyle = cursorColor;
-			this.context.fillRect(cursor.x - offset.x - 1, cursor.y - offset.y - 1, 3, 3);
+			this.context.strokeRect(
+				(cursor.x - offset.x) * this.superscale - 0.5,
+				(cursor.y - offset.y) * this.superscale - 0.5,
+				this.superscale + 1,
+				this.superscale + 1
+			);
 		}
 
 		// draw cursor
 		this.context.fillStyle = '#000';
-		this.context.fillRect(cursor.x - offset.x, cursor.y - offset.y, 1, 1);
+		this.drawCheckeredPixel(cursor, offset, 0);
+	}
+
+	private drawCheckeredLine(start: Point, end: Point, offset: Point) {
+		for (let pixel of calcualteDanwinstonLine(start, end)) {
+			this.drawCheckeredPixel(pixel, offset);
+		}
+	}
+
+	private drawCheckeredPixel(position: Point, offset: Point) {
+		// prevent odd pixels from not being rendered
+		// & faster
+		if (this.superscale == 1) {
+			this.context.fillRect(position.x - offset.x, position.y - offset.y, 1, 1);
+
+			return;
+		}
+
+		const pattern = (position.x + position.y) % 2;
+
+		for (let x = 0; x < this.superscale; x++) {
+			for (let y = 0; y < this.superscale; y++) {
+				if ((x + y) % 2 == pattern) {
+					this.context.fillRect(
+						(position.x - offset.x) * this.superscale + x,
+						(position.y - offset.y) * this.superscale + y,
+						1, 1
+					);
+				}
+			}
+		}
 	}
 }

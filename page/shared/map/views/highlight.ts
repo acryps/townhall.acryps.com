@@ -23,7 +23,7 @@ export class MapHighlighterView extends MapView {
 			this.mask.rect(point.x, point.y, 1, 1);
 		}
 
-		if (close) {
+		if (this.close) {
 			for (let [key, pixel] of Point.fill(shape)) {
 				this.mask.rect(pixel.x, pixel.y, 1, 1);
 			}
@@ -34,10 +34,9 @@ export class MapHighlighterView extends MapView {
 		}
 	}
 
-	prepare() {
+	prepare(bounds: DOMRect) {
 		// adjust scale to fit highlighted shape
 		const shape = Point.bounds(this.shape);
-		const bounds = this.canvas.getBoundingClientRect();
 
 		this.map.scale = Math.max(
 			(shape.width * this.margin / bounds.width),
@@ -53,7 +52,7 @@ export class MapHighlighterView extends MapView {
 
 		// turns next draw into a mask
 		this.context.globalCompositeOperation = 'destination-in';
-		this.context.fillStyle = 'orange';
+		this.context.fillStyle = 'black';
 
 		this.context.translate(-offset.x, -offset.y);
 		this.context.fill(this.mask);

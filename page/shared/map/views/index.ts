@@ -14,7 +14,7 @@ export abstract class MapView {
 
 	// prepare is only called with views initialy active when loading a map
 	// this can be used to adjust the scale, ...
-	prepare() {}
+	prepare(bounds: DOMRect) {}
 
 	resize() {
 		this.canvas.width = this.map.width;

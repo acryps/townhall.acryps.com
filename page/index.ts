@@ -55,7 +55,7 @@ export class Application {
 
 	static async main() {
 		const rewrite = new Rewrite();
-		rewrite.nativeElements.push('svg', 'path');
+		rewrite.nativeElements.push('svg', 'path', 'rect', 'g');
 		rewrite.activate();
 
 		Service.baseUrl = '/';

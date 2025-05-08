@@ -76,12 +76,28 @@ export class MapComponent extends Component {
 		this.highlightedShape = { shape, close };
 		this.show(Point.center(shape), this.scale);
 
+		const pixels = calculateDanwinstonShapePath(shape, close);
+
 		this.highlightOutline = Application.createSVGElement('svg');
+		this.highlightOutline.innerHTML = `<defs><filter id="so"><feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="orange"/></filter></defs>`;
+
+		const group = Application.createSVGElement('g') as SVGGElement;
+		group.setAttribute('filter', 'url(#so)')
+		this.highlightOutline.appendChild(group);
 
 		const outline = Application.createSVGElement('path') as SVGPathElement;
-		outline.setAttribute('d', calculateDanwinstonShapePath(shape, close).map((point, index) => `${index ? 'L' : 'M'} ${point.x},${point.y}`).join(' '));
+		outline.setAttribute('d', pixels.map((point, index) => `${index ? 'L' : 'M'} ${point.x + 0.5},${point.y + 0.5}`).join(' '));
+		group.appendChild(outline);
 
-		this.highlightOutline.appendChild(outline);
+		for (let pixel of pixels) {
+			const rectangle = Application.createSVGElement('rect') as SVGRectElement;
+			rectangle.setAttribute('x', pixel.x);
+			rectangle.setAttribute('y', pixel.y);
+			rectangle.setAttribute('width', '1');
+			rectangle.setAttribute('height', '1');
+
+			group.appendChild(rectangle);
+		}
 
 		return this;
 	}

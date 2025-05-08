@@ -19,6 +19,25 @@ export const drawDanwinstonLine = (context: Partial<CanvasRenderingContext2D>, s
 	context.fillStyle = fillStyle;
 }
 
+export const calculateDanwinstonShapePath = (shape: Coordinate[], close = true) => {
+	let length = shape.length;
+
+	if (!close) {
+		length--;
+	}
+
+	const points: Point[] = [];
+
+	for (let pointIndex = 0; pointIndex < length; pointIndex++) {
+		const start = shape[pointIndex];
+		const end = shape[pointIndex + 1] ?? shape[0];
+
+		points.push(...calcualteDanwinstonLine(start, end));
+	}
+
+	return points;
+}
+
 export const calcualteDanwinstonLine = (start: Coordinate, end: Coordinate) => {
 	let x1 = start.x;
 	let y1 = start.y;

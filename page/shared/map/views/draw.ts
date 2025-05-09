@@ -11,10 +11,6 @@ export class MapDrawView extends MapView {
 	shape: Point[] = [];
 	closeable = new Observable(false);
 
-	push() {
-		this.shape.push(this.map.cursor.copy());
-	}
-
 	resize() {
 		this.canvas.width = this.map.width * this.superscale;
 		this.canvas.height = this.map.height * this.superscale;

@@ -1,4 +1,4 @@
-import { alignItems, alignSelf, backgroundColor, border, borderTop, bottom, boxShadow, child, color, display, flexDirection, flexGrow, flexWrap, fontSize, gap, height, hex, imageRendering, inset, insetInline, justifyContent, margin, marginInline, marginLeft, marginTop, maxWidth, Number, opacity, overflow, padding, paddingBlock, paddingInline, percentage, pointerEvents, position, px, rem, select, textAlign, Variable, width } from "@acryps/style";
+import { alignItems, alignSelf, backgroundColor, border, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, display, flexDirection, flexGrow, flexWrap, fontSize, gap, height, hex, imageRendering, inset, insetInline, justifyContent, margin, marginInline, marginLeft, marginTop, maxWidth, Number, opacity, overflow, padding, paddingBlock, paddingInline, percentage, pointerEvents, position, px, rem, select, style, textAlign, Variable, width } from "@acryps/style";
 import { pageTextColor, navigationBackgroundColor, navigationBorderColor, pageGutter, pageBackgroundColor, neutralColor } from "../index.style";
 import { buttonStyle } from "../shared/index.style";
 import { PageComponent } from "../page";
@@ -37,9 +37,24 @@ export const mapStyle = () => [
 				display('flex'),
 				flexWrap('wrap'),
 				margin(pageGutter),
-				gap(rem(0.75)),
+				gap(pageGutter.divide(2)),
 
 				justifyContent('center'),
+
+				child('ui-group',
+					display('flex'),
+
+					backgroundColor(pageBackgroundColor),
+					boxShadow(hex('0005'), 0, rem(0.5), pageGutter),
+
+					child('ui-action',
+						buttonStyle(),
+
+						style(':not(:last-of-type)',
+							borderRightStyle('none')
+						)
+					)
+				),
 
 				child('ui-action',
 					buttonStyle(),

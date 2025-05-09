@@ -85,7 +85,17 @@ export class MapComponent extends Component {
 	}
 
 	pushDrawingPoint(point = this.cursor) {
-		this.drawer.push();
+		this.drawer.shape.push(point.copy());
+		this.renderLayers();
+	}
+
+	popDrawingPoint() {
+		this.drawer.shape.pop();
+		this.renderLayers();
+	}
+
+	flipDrawingDirection() {
+		this.drawer.shape.reverse();
 		this.renderLayers();
 	}
 

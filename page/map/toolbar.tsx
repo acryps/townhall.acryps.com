@@ -1,6 +1,6 @@
 import { Component } from "@acryps/page";
 import { MapPage } from ".";
-import { addIcon, boroughIcon, captureIcon, dayIcon, drawIcon, movementIcon, propertyRegisterIcon, residentIcon, streetIcon } from "../assets/icons/managed";
+import { addIcon, boroughIcon, captureIcon, dayIcon, deleteIcon, drawIcon, movementIcon, propertyRegisterIcon, residentIcon, streetIcon } from "../assets/icons/managed";
 import { Point } from "../../interface/point";
 import { MapLayer } from "../shared/map/layer";
 import { baseLayer, nightLayer, boroughLayer, propertyLayer, streetLayer, movementHeatmapLayer, propertyUsageLayer } from "../shared/map/layers";
@@ -30,18 +30,28 @@ export class MapToolbarComponent extends Component {
 
 		return <ui-tools>
 			{this.parent.map.drawer && <ui-actions>
-				<ui-action ui-click={() => this.parent.map.pushDrawingPoint()}>
-					{addIcon()} Add Point
-				</ui-action>
+				<ui-group>
+					<ui-action ui-click={() => this.parent.map.pushDrawingPoint()}>
+						{addIcon()} Add
+					</ui-action>
+
+					<ui-action ui-click={() => this.parent.map.popDrawingPoint()}>
+						{deleteIcon()}
+					</ui-action>
+
+					<ui-action ui-click={() => this.parent.map.flipDrawingDirection()}>
+						{deleteIcon()}
+					</ui-action>
+				</ui-group>
 
 				{this.parent.drawing.type == 'closed-shape' ? (
 					this.parent.map.drawer.closeable.map(possible => possible ? <ui-action ui-click={() => this.parent.completeDrawing()}>
-						{addIcon()} {this.parent.drawing.name}
+						{this.parent.drawing.name} {addIcon()}
 					</ui-action> : <ui-action ui-disabled>
-						{addIcon()} {this.parent.drawing.name}
+						{this.parent.drawing.name} {addIcon()}
 					</ui-action>)
 				) : <ui-action ui-click={() => this.parent.completeDrawing()}>
-					{addIcon()} {this.parent.drawing.name}
+					{this.parent.drawing.name} {addIcon()}
 				</ui-action>}
 			</ui-actions>}
 
@@ -110,7 +120,7 @@ export class MapToolbarComponent extends Component {
 								this.parent.map.drawer.complete();
 							}
 						} else {
-							const packed = Point.pack(await this.parent.draw('Add Feature', 'any'));
+							const packed = Point.pack(await this.parent.draw('Finish', 'any'));
 
 							this.navigate(`create/${btoa(packed)}`);
 						}

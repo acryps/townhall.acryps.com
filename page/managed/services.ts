@@ -2765,6 +2765,26 @@ export class TradeService {
 			}
 		});
 	}
+
+	async overwriteValuation(id: string, price: number): Promise<void> {
+		const $data = new FormData();
+		$data.append("d1ejZldmVzNnV2ejQzYnBnaWlkOW9ubn", Service.stringify(id))
+		$data.append("NneWRjbzNpbnY5azhka382ZDgwdjd0dT", Service.stringify(price))
+
+		return await fetch(Service.toURL("EwbDZndWloZHl2bmIzZGIwcmNpbGRzNn"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
 }
 
 export class TrainService {

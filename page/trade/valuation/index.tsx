@@ -9,6 +9,9 @@ export class ValuationPage extends Component {
 
 	valuation: ValuationViewModel;
 
+	clickCount = 0;
+	priceField: HTMLElement;
+
 	async onload() {
 		this.valuation = await new TradeService().getValuation(this.parameters.id);
 	}
@@ -22,20 +25,37 @@ export class ValuationPage extends Component {
 			{this.valuation.issuer ? <ui-issuer>
 				Issued by {new LegalEntityComponent(this.valuation.issuer)}
 			</ui-issuer> : <ui-issuer ui-generic>
-				Generically issued
+				System issued
 			</ui-issuer>}
 
-			<ui-item>
-				{this.valuation.item}
-			</ui-item>
+			<ui-target>
+				<ui-item>
+					{this.valuation.item}
+				</ui-item>
 
-			<ui-price>
+				<ui-description>
+					{this.valuation.description}
+				</ui-description>
+			</ui-target>
+
+			{this.priceField = <ui-price ui-click={() => {
+				this.clickCount++;
+
+				if (this.clickCount == 3) {
+					this.priceField.contentEditable = 'plaintext-only';
+					this.priceField.textContent = this.valuation.price?.toString() ?? '0';
+
+					this.priceField.focus();
+
+					this.priceField.onblur = async () => {
+						await new TradeService().overwriteValuation(this.valuation.id, +this.priceField.textContent);
+
+						this.reload();
+					}
+				}
+			}}>
 				{convertToCurrency(this.valuation.price)}
-			</ui-price>
-
-			<ui-description>
-				{this.valuation.description}
-			</ui-description>
+			</ui-price>}
 		</ui-valuation>
 	}
 }

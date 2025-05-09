@@ -1056,6 +1056,19 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"EwbDZndWloZHl2bmIzZGIwcmNpbGRzNn",
+			{
+			"d1ejZldmVzNnV2ejQzYnBnaWlkOW9ubn": { type: "string", isArray: false, isOptional: false },
+				"NneWRjbzNpbnY5azhka382ZDgwdjd0dT": { type: "number", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(TradeService),
+			(controller, params) => controller.overwriteValuation(
+				params["d1ejZldmVzNnV2ejQzYnBnaWlkOW9ubn"],
+				params["NneWRjbzNpbnY5azhka382ZDgwdjd0dT"]
+			)
+		);
+
+		this.expose(
 			"hsZXxsa2h0eG50MnVjazg1eHMyY3NiNW",
 			{},
 			inject => inject.construct(TrainService),

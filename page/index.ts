@@ -99,7 +99,7 @@ export class Application {
 					.route('/relations', RelationsPage)
 				)
 
-				.route('/trade/valuation', ValuationPage)
+				.route('/trade/valuation/:id', ValuationPage)
 
 				.route('/population', PopulationPage)
 

@@ -107,9 +107,17 @@ export const propertyStyle = () => child('ui-property',
 
 				borderBottom(px(1), 'dotted', 'currentColor'),
 
-				child('ui-name',
-					display('block'),
-					marginBottom(rem(0.25))
+				child('ui-detail',
+					child('ui-name',
+						display('block'),
+						marginBottom(rem(0.25)),
+
+						fontWeight('bold')
+					),
+
+					child('ui-area',
+						display('block')
+					)
 				),
 
 				child('canvas',
@@ -155,9 +163,17 @@ export const propertyStyle = () => child('ui-property',
 				opacity(0.5),
 				borderBottom(px(1), 'dotted', 'currentColor'),
 
-				child('ui-comment',
-					display('block'),
-					marginBottom(rem(0.25))
+				child('ui-detail',
+					child('ui-comment',
+						display('block'),
+						marginBottom(rem(0.25)),
+
+						fontWeight('bold')
+					),
+
+					child('ui-area',
+						display('block')
+					)
 				),
 
 				child('canvas',

@@ -109,7 +109,7 @@ export class PropertyPage extends Component {
 							{(owner.share * 100).toFixed(0)}%
 						</ui-share>}
 
-						<ui-value>
+						<ui-value ui-href={`/trade/valuation/${owner.aquiredValuation?.id}`}>
 							{convertToCurrency(owner.share * owner.aquiredValuation?.price)}
 						</ui-value>
 					</ui-owner>) : <ui-field ui-quick-assign>
@@ -134,9 +134,15 @@ export class PropertyPage extends Component {
 
 				<ui-buildings>
 					{this.property.buildings.map(building => <ui-building ui-href={`building/${building.id}`} ui-archived={!!building.archived}>
-						<ui-name>
-							{building.name ?? `Building #${building.id.split('-')[0]}`}
-						</ui-name>
+						<ui-detail>
+							<ui-name>
+								{building.name ?? `Building #${building.id.split('-')[0]}`}
+							</ui-name>
+
+							<ui-area>
+								{Point.area(Point.unpack(building.boundary))}b²
+							</ui-area>
+						</ui-detail>
 
 						{new BoundaryComponent(building.boundary)}
 					</ui-building>)}
@@ -152,9 +158,15 @@ export class PropertyPage extends Component {
 
 				<ui-plot-boundaries>
 					{this.property.plotBoundaries.map((boundary, index) => <ui-plot-boundary ui-active={boundary == this.activePlotBoundary}>
-						<ui-comment>
-							{boundary.changeComment ?? `Plot Boundary #${boundary.id.split('-')[0]}`}
-						</ui-comment>
+						<ui-detail>
+							<ui-comment>
+								{boundary.changeComment ?? `Plot Boundary #${boundary.id.split('-')[0]}`}
+							</ui-comment>
+
+							<ui-area>
+								{Point.area(Point.unpack(boundary.shape))}b²
+							</ui-area>
+						</ui-detail>
 
 						{new BoundaryComponent(boundary.shape, this.property.plotBoundaries[index - 1]?.shape)}
 					</ui-plot-boundary>)}

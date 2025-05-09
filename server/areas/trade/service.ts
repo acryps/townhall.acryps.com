@@ -16,4 +16,11 @@ export class TradeService extends Service {
 			await this.database.valuation.find(id)
 		);
 	}
+
+	async overwriteValuation(id: string, price: number) {
+		const valuation = await this.database.valuation.find(id);
+		valuation.price = price;
+
+		await valuation.update();
+	}
 }

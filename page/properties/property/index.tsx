@@ -12,6 +12,7 @@ import { convertToLegalCompanyName } from "../../../interface/company";
 import { BoundaryComponent } from "./boundary";
 import { LegalEntitySelectorComponent } from "../../shared/legal-entity/select";
 import { LegalEntityComponent } from "../../shared/legal-entity";
+import { convertToCurrency } from "../../../interface/currency";
 
 export class PropertyPage extends Component {
 	declare parameters: { id: string };
@@ -107,6 +108,10 @@ export class PropertyPage extends Component {
 						{activeOwners.length != 1 && <ui-share>
 							{(owner.share * 100).toFixed(0)}%
 						</ui-share>}
+
+						<ui-value>
+							{convertToCurrency(owner.share * owner.aquiredValuation?.price)}
+						</ui-value>
 					</ui-owner>) : <ui-field ui-quick-assign>
 						<label>
 							Quick Assign one owner

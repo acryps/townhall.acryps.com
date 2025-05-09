@@ -1,4 +1,4 @@
-import { alignItems, aspectRatio, backgroundColor, border, borderBottom, child, color, columnGap, display, flexDirection, flexWrap, fontSize, fontWeight, gap, height, imageRendering, justifyContent, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, Mm, objectFit, objectPosition, opacity, padding, percentage, px, ratio, rem, textAlign, textDecorationLine, vh, width } from "@acryps/style";
+import { alignItems, aspectRatio, backgroundColor, border, borderBottom, child, color, columnGap, display, flexDirection, flexGrow, flexWrap, fontSize, fontWeight, gap, height, imageRendering, justifyContent, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, Mm, objectFit, objectPosition, opacity, padding, percentage, px, ratio, rem, textAlign, textDecorationLine, vh, width } from "@acryps/style";
 import { negativeColor, neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 import { fieldStyle } from "../../shared/field.style";
 import { buttonStyle } from "../../shared/index.style";
@@ -76,10 +76,14 @@ export const propertyStyle = () => child('ui-property',
 
 			child('ui-owner',
 				display('flex'),
-				justifyContent('space-between'),
+				gap(pageGutter),
 
 				padding(pageGutter),
-				borderBottom(px(1), 'dotted', 'currentColor')
+				borderBottom(px(1), 'dotted', 'currentColor'),
+
+				child('ui-legal-entity',
+					flexGrow(1)
+				)
 			),
 
 			child('ui-action',

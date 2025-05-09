@@ -1,6 +1,6 @@
 import { Component } from "@acryps/page";
 import { MapPage } from ".";
-import { addIcon, boroughIcon, captureIcon, dayIcon, deleteIcon, drawIcon, movementIcon, propertyRegisterIcon, residentIcon, streetIcon } from "../assets/icons/managed";
+import { addIcon, boroughIcon, captureIcon, dayIcon, deleteIcon, drawIcon, flipIcon, goIcon, movementIcon, propertyRegisterIcon, residentIcon, streetIcon, undoIcon } from "../assets/icons/managed";
 import { PackedPoint, Point } from "../../interface/point";
 import { MapLayer } from "../shared/map/layer";
 import { baseLayer, nightLayer, boroughLayer, propertyLayer, streetLayer, movementHeatmapLayer, propertyUsageLayer } from "../shared/map/layers";
@@ -25,6 +25,8 @@ export class MapToolbarComponent extends Component {
 			.set('p', propertyLayer);
 
 	render() {
+		requestAnimationFrame(() => this.updateLocationIndicator());
+
 		onkeypress = event => {
 			const layer = this.keycode.get(event.key);
 
@@ -45,22 +47,22 @@ export class MapToolbarComponent extends Component {
 					</ui-action>
 
 					<ui-action ui-click={() => this.parent.map.popDrawingPoint()}>
-						{deleteIcon()}
+						{undoIcon()}
 					</ui-action>
 
 					<ui-action ui-click={() => this.parent.map.flipDrawingDirection()}>
-						{deleteIcon()}
+						{flipIcon()}
 					</ui-action>
 				</ui-group>
 
 				{this.parent.drawing.type == 'closed-shape' ? (
 					this.parent.map.drawer.closeable.map(possible => possible ? <ui-action ui-click={() => this.parent.completeDrawing()}>
-						{this.parent.drawing.name} {addIcon()}
+						{this.parent.drawing.name} {goIcon()}
 					</ui-action> : <ui-action ui-disabled>
-						{this.parent.drawing.name} {addIcon()}
+						{this.parent.drawing.name} {goIcon()}
 					</ui-action>)
 				) : <ui-action ui-click={() => this.parent.completeDrawing()}>
-					{this.parent.drawing.name} {addIcon()}
+					{this.parent.drawing.name} {goIcon()}
 				</ui-action>}
 			</ui-actions>}
 

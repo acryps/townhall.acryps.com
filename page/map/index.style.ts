@@ -8,7 +8,7 @@ import { boxed } from "../shared/boxed.style";
 const buttonPaddingSize = rem(0.8);
 
 export const activeBoroughColor = new Variable<Hex>('active-borough-color', pageTextColor);
-export const activeBoroughContrast = new Variable<Hex>('active-borough-contrast', pageTextColor);
+export const activeBoroughContrast = new Variable<Hex>('active-borough-contrast', pageBackgroundColor);
 
 export const mapStyle = () => [
 	child('ui-map-child',

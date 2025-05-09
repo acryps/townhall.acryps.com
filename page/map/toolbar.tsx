@@ -1,14 +1,23 @@
 import { Component } from "@acryps/page";
 import { MapPage } from ".";
 import { addIcon, boroughIcon, captureIcon, dayIcon, deleteIcon, drawIcon, movementIcon, propertyRegisterIcon, residentIcon, streetIcon } from "../assets/icons/managed";
-import { Point } from "../../interface/point";
+import { PackedPoint, Point } from "../../interface/point";
 import { MapLayer } from "../shared/map/layer";
 import { baseLayer, nightLayer, boroughLayer, propertyLayer, streetLayer, movementHeatmapLayer, propertyUsageLayer } from "../shared/map/layers";
+import { BoroughSummaryModel } from "../managed/services";
+import { Application } from "..";
+import { activeBoroughColor, activeBoroughContrast } from "./index.style";
+import { hex } from "@acryps/style";
 
 export class MapToolbarComponent extends Component {
 	declare parent: MapPage;
+	declare rootNode: HTMLElement;
 
 	action: Node;
+
+	renderedLocations = new Map<string, BoroughSummaryModel>;
+	coordinateTracker: HTMLElement;
+	boroughTracker: HTMLElement;
 
 	keycode = new Map<string, MapLayer | [MapLayer, MapLayer]>()
 			.set(' ', [baseLayer, nightLayer])
@@ -55,6 +64,11 @@ export class MapToolbarComponent extends Component {
 				</ui-action>}
 			</ui-actions>}
 
+			<ui-location>
+				{this.coordinateTracker = <ui-coordinates></ui-coordinates>}
+				{this.boroughTracker = <ui-borough></ui-borough>}
+			</ui-location>
+
 			<ui-drawer>
 				{this.action}
 
@@ -77,10 +91,6 @@ export class MapToolbarComponent extends Component {
 				</ui-layers>
 
 				<ui-layers>
-					<ui-layer ui-click={() => this.toggleLayer(movementHeatmapLayer)}>
-						{movementIcon()}
-					</ui-layer>
-
 					<ui-layer ui-click={() => this.toggleLayer(propertyUsageLayer)}>
 						{residentIcon()}
 					</ui-layer>
@@ -132,6 +142,32 @@ export class MapToolbarComponent extends Component {
 		</ui-tools>
 	}
 
+	updateLocationIndicator() {
+		const cursor = this.parent.map.cursor;
+		const packed = cursor.pack();
+
+		this.coordinateTracker.textContent = `${cursor.x} ${cursor.y}`;
+
+		let activeBorough: BoroughSummaryModel;
+
+		if (this.renderedLocations.has(packed)) {
+			activeBorough = this.renderedLocations.get(packed);
+		} else {
+			activeBorough = this.getActiveBorough(packed, cursor);
+			this.renderedLocations.set(packed, activeBorough);
+		}
+
+		if (activeBorough) {
+			this.boroughTracker.textContent = activeBorough.name;
+			this.rootNode.style.setProperty(activeBoroughColor.propertyName, activeBorough.color);
+			this.rootNode.style.setProperty(activeBoroughContrast.propertyName, Application.contrastColor(activeBorough.color));
+		} else {
+			this.boroughTracker.textContent = '-';
+			this.rootNode.style.removeProperty(activeBoroughColor.propertyName);
+			this.rootNode.style.removeProperty(activeBoroughContrast.propertyName);
+		}
+	}
+
 	toggleLayer(enable: MapLayer, disable?: MapLayer) {
 		if (this.parent.map.layers.includes(enable)) {
 			this.parent.map.layers.splice(this.parent.map.layers.indexOf(enable), 1, disable);
@@ -143,5 +179,17 @@ export class MapToolbarComponent extends Component {
 
 		this.parent.map.layers = this.parent.map.layers.filter(layer => layer);
 		this.parent.map.updateLayers();
+	}
+
+	getActiveBorough(packed: PackedPoint, cursor: Point) {
+		for (let borough of Application.boroughs) {
+			const bounds = Point.unpack(borough.bounds);
+
+			if (Point.touches(cursor, new Point(1, 1), bounds)) {
+				if (Point.fill(bounds).has(packed)) {
+					return borough;
+				}
+			}
+		}
 	}
 }

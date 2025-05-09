@@ -150,8 +150,15 @@ export class Application {
 		document.title = [...parts, 'Townhall'].filter(item => item).join(' | ');
 	}
 
-	static createSVGElement(tag: string) {
-		return document.createElementNS('http://www.w3.org/2000/svg', tag);
+	// only works with 6-letter hex
+	static contrastColor(source: string) {
+		source = source.replace('#', '').trim();
+
+		const red = parseInt(source.substring(0, 2), 16);
+		const green = parseInt(source.substring(2, 4), 16);
+		const blue = parseInt(source.substring(4, 6), 16);
+
+		return (red * 0.3 + green * 0.5 + blue * 0.2) > 0x8f ? 'black' : 'white';
 	}
 }
 

@@ -1,4 +1,4 @@
-import { alignItems, alignSelf, backgroundColor, border, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, display, flexDirection, flexGrow, flexWrap, fontSize, gap, height, hex, imageRendering, inset, insetInline, justifyContent, margin, marginInline, marginLeft, marginTop, maxWidth, Number, opacity, overflow, padding, paddingBlock, paddingInline, percentage, pointerEvents, position, px, rem, select, style, textAlign, Variable, width } from "@acryps/style";
+import { alignItems, alignSelf, background, backgroundColor, border, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, display, flexDirection, flexGrow, flexWrap, fontSize, gap, height, Hex, hex, imageRendering, inset, insetInline, justifyContent, margin, marginInline, marginLeft, marginTop, maxWidth, Number, opacity, overflow, padding, paddingBlock, paddingInline, percentage, pointerEvents, position, px, rem, select, style, textAlign, Variable, width } from "@acryps/style";
 import { pageTextColor, navigationBackgroundColor, navigationBorderColor, pageGutter, pageBackgroundColor, neutralColor } from "../index.style";
 import { buttonStyle } from "../shared/index.style";
 import { PageComponent } from "../page";
@@ -6,6 +6,9 @@ import { createFeatureStyle } from "./create/index.style";
 import { boxed } from "../shared/boxed.style";
 
 const buttonPaddingSize = rem(0.8);
+
+export const activeBoroughColor = new Variable<Hex>('active-borough-color', pageTextColor);
+export const activeBoroughContrast = new Variable<Hex>('active-borough-contrast', pageTextColor);
 
 export const mapStyle = () => [
 	child('ui-map-child',
@@ -17,6 +20,9 @@ export const mapStyle = () => [
 	child('ui-map',
 		position('fixed'),
 		inset(0),
+
+		activeBoroughColor,
+		activeBoroughContrast,
 
 		child('ui-map-container',
 			position('fixed'),
@@ -71,6 +77,18 @@ export const mapStyle = () => [
 					)
 			),
 
+			child('ui-location',
+				display('flex'),
+				justifyContent('space-between'),
+
+				paddingInline(pageGutter),
+				paddingBlock(rem(0.25)),
+
+				fontSize(rem(0.75)),
+				color(activeBoroughContrast),
+				backgroundColor(activeBoroughColor),
+			),
+
 			child('ui-drawer',
 				display('flex'),
 				flexWrap('wrap'),
@@ -79,7 +97,6 @@ export const mapStyle = () => [
 
 				color(pageTextColor),
 				backgroundColor(navigationBackgroundColor),
-				borderTop(px(1), 'solid', navigationBorderColor),
 
 				child('ui-create-building',
 					width(percentage(100).subtract(buttonPaddingSize.multiply(2))),

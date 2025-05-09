@@ -49,20 +49,29 @@ export class MapPage extends Component {
 		this.map.show(new Point(+this.parameters.x, +this.parameters.y), 1 / ((+this.parameters.zoom / this.zoomAccuracy) ** 2));
 
 		requestAnimationFrame(() => {
-			registerInteration(this.map, () => {
-				this.updateParameters({
-					x: this.map.cursor.x,
-					y: this.map.cursor.y
-				});
-			}, scale => {
-				this.updateParameters({
-					zoom: (Math.sqrt(1 / scale) * this.zoomAccuracy).toFixed(0)
-				});
-			}, pick => {
-				this.map.pick(pick);
+			this.toolbar.updateLocationIndicator();
 
-				console.log(pick);
-			});
+			registerInteration(this.map,
+				() => this.toolbar.updateLocationIndicator(),
+				() => {
+					this.updateParameters({
+						x: this.map.cursor.x,
+						y: this.map.cursor.y
+					});
+
+					this.toolbar.updateLocationIndicator();
+				}, scale => {
+					this.updateParameters({
+						zoom: (Math.sqrt(1 / scale) * this.zoomAccuracy).toFixed(0)
+					});
+
+					this.toolbar.updateLocationIndicator();
+				}, pick => {
+					this.map.pick(pick);
+
+					console.log(pick);
+				}
+			);
 		});
 
 		return <ui-map>

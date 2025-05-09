@@ -3,6 +3,8 @@ import { Point } from "../../../interface/point";
 
 export const registerInteration = (
 	map: MapComponent,
+
+	onMove: (destination: Point) => void,
 	onMoveEnd: (destination: Point) => void,
 	onScaleEnd: (scale: number) => void,
 	onPick: (point: Point) => void
@@ -144,7 +146,9 @@ export const registerInteration = (
 		}
 
 		const delta = Point.average(movement.pointers).subtract(Point.average(pointers)).scale(map.scale);
-		map.move(new Point(movement.map.x + delta.x, movement.map.y + delta.y));
+		const target = new Point(movement.map.x + delta.x, movement.map.y + delta.y);
+		map.move(target);
+		onMove(target);
 	};
 
 	element.onmouseup = element.ontouchend = (event: TouchEvent | MouseEvent) => {

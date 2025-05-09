@@ -76,7 +76,7 @@ export class MapDrawView extends MapView {
 
 		// draw cursor
 		this.context.fillStyle = '#000';
-		this.drawCheckeredPixel(cursor, offset, 0);
+		this.drawCheckeredPixel(cursor, offset);
 	}
 
 	private drawCheckeredLine(start: Point, end: Point, offset: Point) {

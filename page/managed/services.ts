@@ -2200,6 +2200,27 @@ export class PropertyService {
 		});
 	}
 
+	async findTouchingBoroughs(propertyId: string): Promise<Array<BoroughSummaryModel>> {
+		const $data = new FormData();
+		$data.append("x4Zml2emh6bmZ4dzVyMD85a3VybDNhZT", Service.stringify(propertyId))
+
+		return await fetch(Service.toURL("I1Y2VpcmdnOGUwcWFuOTc2bWQ1NHhud3"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : BoroughSummaryModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async assignSoleOwner(propertyId: string, entityId: string): Promise<PropertyOwnerViewModel> {
 		const $data = new FormData();
 		$data.append("xxNnpkOXJiZ2dkNjJjdGBpdzgxcDtrY2", Service.stringify(propertyId))

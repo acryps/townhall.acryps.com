@@ -11,10 +11,12 @@ import { SquareViewModel } from "./squre.view";
 import { StreetViewModel } from "./street.view";
 import { WaterBodyViewModel } from "./water-body.view";
 import { Point } from "../../interface/point";
+import { PropertyManager } from "./property/manager";
 
 export class MapService extends Service {
 	constructor(
-		private database: DbContext
+		private database: DbContext,
+		private propertyManager: PropertyManager
 	) {
 		super();
 	}
@@ -91,6 +93,12 @@ export class MapService extends Service {
 	async createProperty(shape: string) {
 		const property = new Property();
 		property.created = new Date();
+
+		const touching = await this.propertyManager.findTouchingBoroughs(Point.unpack(shape));
+
+		if (touching.length == 1) {
+			property.borough = touching[0];
+		}
 
 		await property.create();
 

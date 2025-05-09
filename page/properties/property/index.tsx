@@ -1,5 +1,5 @@
 import { Application } from "../../index";
-import { BoroughViewModel, BuildingSummaryModel, HistoricListingGradeViewModel, HistoricListingModifierViewModel, HistoricListingService, MapService, PlotBoundarySummaryModel, PropertyService, PropertyTypeViewModel, PropertyViewModel } from "../../managed/services";
+import { BoroughSummaryModel, BoroughViewModel, BuildingSummaryModel, HistoricListingGradeViewModel, HistoricListingModifierViewModel, HistoricListingService, MapService, PlotBoundarySummaryModel, PropertyService, PropertyTypeViewModel, PropertyViewModel } from "../../managed/services";
 import { Component } from "@acryps/page";
 import { MapComponent } from "../../shared/map";
 import { PackedPoint, PackedPointArray, Point } from "../../../interface/point";
@@ -19,18 +19,22 @@ export class PropertyPage extends Component {
 	property: PropertyViewModel;
 
 	types: PropertyTypeViewModel[];
-	boroughs: BoroughViewModel[];
 	grades: HistoricListingGradeViewModel[];
 	modifiers: HistoricListingModifierViewModel[];
 
 	activePlotBoundary: PlotBoundarySummaryModel;
+
+	touchingBoroughs: BoroughSummaryModel[];
+	boroughs: BoroughSummaryModel[];
 
 	async onload() {
 		this.property = await new MapService().getProperty(this.parameters.id);
 		this.activePlotBoundary = this.property.plotBoundaries.find(boundary => boundary.id == this.property.activePlotBoundaryId);
 
 		this.types = await new MapService().getPropertyTypes();
-		this.boroughs = await new MapService().getBoroughs();
+
+		this.boroughs = Application.boroughs;
+		this.touchingBoroughs = await new PropertyService().findTouchingBoroughs(this.property.id);
 
 		this.grades = await new HistoricListingService().getGrades();
 		this.modifiers = await new HistoricListingService().getModifiers();
@@ -83,8 +87,14 @@ export class PropertyPage extends Component {
 
 					<select $ui-value={this.property.borough} ui-change={() => new MapService().saveProperty(this.property)}>
 						<option ui-value={null}>No borough assigned</option>
+						<option disabled></option>
 
-						{this.boroughs.map(borough => <option ui-value={borough}>
+						{this.touchingBoroughs.map(borough => <option ui-value={borough}>
+							{borough.name}
+						</option>)}
+						{this.touchingBoroughs.length != 0 && <option disabled></option>}
+
+						{this.boroughs.filter(borough => !this.touchingBoroughs.find(touching => touching.id == borough.id)).map(borough => <option ui-value={borough}>
 							{borough.name}
 						</option>)}
 					</select>

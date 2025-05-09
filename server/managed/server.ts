@@ -16,6 +16,7 @@ import { SquareViewModel } from "././../areas/squre.view";
 import { StreetViewModel } from "././../areas/street.view";
 import { WaterBodyViewModel } from "././../areas/water-body.view";
 import { Point } from "././../../interface/point";
+import { PropertyManager } from "././../areas/property/manager";
 import { MapService } from "././../areas/map.service";
 import { BoroughSummaryModel } from "././../areas/borough.summary";
 import { DistrictViewModel } from "././../areas/vote/district";
@@ -137,11 +138,15 @@ import { Vote } from "./../managed/database";
 Inject.mappings = {
 	"MapService": {
 		objectConstructor: MapService,
-		parameters: ["DbContext"]
+		parameters: ["DbContext","PropertyManager"]
 	},
 	"DbContext": {
 		objectConstructor: DbContext,
 		parameters: ["RunContext"]
+	},
+	"PropertyManager": {
+		objectConstructor: PropertyManager,
+		parameters: ["DbContext"]
 	},
 	"BoroughService": {
 		objectConstructor: BoroughService,
@@ -181,7 +186,7 @@ Inject.mappings = {
 	},
 	"PropertyService": {
 		objectConstructor: PropertyService,
-		parameters: ["DbContext","TradeManager"]
+		parameters: ["DbContext","PropertyManager","TradeManager"]
 	},
 	"TradeManager": {
 		objectConstructor: TradeManager,
@@ -730,6 +735,17 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.createBuilding(
 				params["YyZXJidGMzOGBieWEwMTJweDVnaGc1bD"],
 				params["NxNDIwaWU4aXRya3V0aXJxdXVkbGkzNW"]
+			)
+		);
+
+		this.expose(
+			"I1Y2VpcmdnOGUwcWFuOTc2bWQ1NHhud3",
+			{
+			"x4Zml2emh6bmZ4dzVyMD85a3VybDNhZT": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PropertyService),
+			(controller, params) => controller.findTouchingBoroughs(
+				params["x4Zml2emh6bmZ4dzVyMD85a3VybDNhZT"]
 			)
 		);
 

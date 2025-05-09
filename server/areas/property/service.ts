@@ -7,10 +7,13 @@ import { PlotBoundarySummaryModel } from "./plot";
 import { Point } from "../../../interface/point";
 import { Shape } from "../../../interface/shape";
 import { TradeManager } from "../trade/manager";
+import { PropertyManager } from "./manager";
+import { BoroughSummaryModel } from "../borough.summary";
 
 export class PropertyService extends Service {
 	constructor(
 		private database: DbContext,
+		private manager: PropertyManager,
 		private tradeManager: TradeManager
 	) {
 		super();
@@ -38,6 +41,13 @@ export class PropertyService extends Service {
 		await building.create();
 
 		return new BuildingSummaryModel(building);
+	}
+
+	async findTouchingBoroughs(propertyId: string) {
+		const property = await this.database.property.find(propertyId);
+		const plot = await property.activePlotBoundary.fetch();
+
+		return BoroughSummaryModel.from(await this.manager.findTouchingBoroughs(Point.unpack(plot.shape)));
 	}
 
 	async assignSoleOwner(propertyId: string, entityId: string) {

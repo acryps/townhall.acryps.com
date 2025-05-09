@@ -109,9 +109,9 @@ export class PropertyPage extends Component {
 							{(owner.share * 100).toFixed(0)}%
 						</ui-share>}
 
-						<ui-value ui-href={`/trade/valuation/${owner.aquiredValuation?.id}`}>
-							{convertToCurrency(owner.share * owner.aquiredValuation?.price)}
-						</ui-value>
+						{owner.aquiredValuation && <ui-value ui-href={`/trade/valuation/${owner.aquiredValuation.id}`}>
+							{convertToCurrency(owner.share * owner.aquiredValuation.price)}
+						</ui-value>}
 					</ui-owner>) : <ui-field ui-quick-assign>
 						<label>
 							Quick Assign one owner

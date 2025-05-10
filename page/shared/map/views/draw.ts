@@ -6,18 +6,16 @@ import { negativeColor, positiveColor } from "../../../index.style";
 
 export class MapDrawView extends MapView {
 	readonly targetPixelSize = 5;
-	superscale: number;
 
 	shape: Point[] = [];
 	closeable = new Observable(false);
 
 	resize() {
-		this.canvas.width = this.map.width * this.superscale;
-		this.canvas.height = this.map.height * this.superscale;
-
 		// must be an odd number to keep the pattern clean
 		// especially superscale 2 looks bad
 		this.superscale = Math.floor(this.map.pixelSize / this.targetPixelSize / 2) * 2 + 1;
+
+		super.resize();
 	}
 
 	complete() {

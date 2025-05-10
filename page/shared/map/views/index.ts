@@ -2,6 +2,8 @@ import { MapComponent } from "..";
 import { Point } from "../../../../interface/point";
 
 export abstract class MapView {
+	superscale = 1;
+
 	canvas: HTMLCanvasElement;
 	context: CanvasRenderingContext2D;
 
@@ -17,8 +19,8 @@ export abstract class MapView {
 	prepare(bounds: DOMRect) {}
 
 	resize() {
-		this.canvas.width = this.map.width;
-		this.canvas.height = this.map.height;
+		this.canvas.width = this.map.width * this.superscale;
+		this.canvas.height = this.map.height * this.superscale;
 	}
 
 	abstract render(offset: Point);
@@ -26,7 +28,7 @@ export abstract class MapView {
 	protected renderLayerBuffers() {
 		// copy layer buffers to main context
 		for (let layer of this.map.layers) {
-			const image = layer.render(this.map.cursor, this.map.width, this.map.height);
+			const image = layer.render(this.map.cursor, this.map.width, this.map.height, this.superscale);
 
 			this.context.drawImage(image, 0, 0);
 		}

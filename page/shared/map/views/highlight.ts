@@ -6,7 +6,11 @@ import { Point } from "../../../../interface/point";
 export class MapHighlighterView extends MapView {
 	readonly margin = 1.5;
 
+	superscale = 3;
+	outline = 1 / this.superscale;
+
 	private mask = new Path2D();
+	private outlineMask = new Path2D();
 
 	constructor(
 		map: MapComponent,
@@ -20,6 +24,13 @@ export class MapHighlighterView extends MapView {
 		map.base.canvas.setAttribute('ui-highlight-base', '');
 
 		for (let point of calculateDanwinstonShapePath(shape, close)) {
+			this.outlineMask.rect(
+				point.x - this.outline,
+				point.y - this.outline,
+				1 + this.outline * 2,
+				1 + this.outline * 2
+			);
+
 			this.mask.rect(point.x, point.y, 1, 1);
 		}
 
@@ -54,7 +65,14 @@ export class MapHighlighterView extends MapView {
 		this.context.globalCompositeOperation = 'destination-in';
 		this.context.fillStyle = 'black';
 
+		this.context.scale(this.superscale, this.superscale);
 		this.context.translate(-offset.x, -offset.y);
 		this.context.fill(this.mask);
+
+		// add outline
+		this.context.globalCompositeOperation = 'destination-over';
+		this.context.fillStyle = '#000a';
+
+		this.context.fill(this.outlineMask);
 	}
 }

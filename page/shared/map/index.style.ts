@@ -58,11 +58,6 @@ export const mapStyle = () => select('ui-map-container',
 				])
 			)
 		)
-			.attribute('ui-highlight-shape',
-				filter(
-					dropShadow(0, 0, px(2), 'currentColor')
-				)
-			)
 			.attribute('ui-highlight-base',
 				filter(
 					contrast(0.5),

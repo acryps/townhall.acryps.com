@@ -41,7 +41,7 @@ export class MapLayer {
 				this.tiles.set(tileHash, loader);
 
 				// load the tile, then save it
-				loader.then(image => this.tiles.set(tileHash, image))
+				loader.then(image => this.tiles.set(tileHash, image));
 			}
 		}
 
@@ -67,12 +67,14 @@ export class MapLayer {
 		return tiles;
 	}
 
-	render(center: Point, width: number, height: number) {
+	render(center: Point, width: number, height: number, superscale: number) {
 		const left = Math.floor(center.x - width / 2);
 		const top = Math.floor(center.y - height / 2);
 
-		this.canvas.width = width;
-		this.canvas.height = height;
+		this.canvas.width = width * superscale;
+		this.canvas.height = height * superscale;
+
+		this.context.imageSmoothingEnabled = false;
 
 		for (let tile of this.getTiles(center, width, height)) {
 			const image = this.tiles.get(tile.pack());
@@ -81,7 +83,12 @@ export class MapLayer {
 				const x = tile.x * this.size;
 				const y = tile.y * this.size;
 
-				this.context.drawImage(image, x - left, y - top, this.size, this.size);
+				this.context.drawImage(image,
+					(x - left) * superscale,
+					(y - top) * superscale,
+					this.size * superscale,
+					this.size * superscale
+				);
 			}
 		}
 

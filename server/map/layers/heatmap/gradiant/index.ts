@@ -38,7 +38,7 @@ export class GradiantHeatmapTileServer {
 						y * interpolationFieldSize + offset.y - interpolationFieldSize
 					));
 
-					context.fillStyle = `hsla(${value / maxValue * 120}deg, 100%, 50%, 80%)`;
+					context.fillStyle = `hsl(${value / maxValue * 120}deg, 100%, 50%)`;
 					context.fillRect(x, y, 1, 1);
 				}
 			}

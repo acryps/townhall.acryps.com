@@ -3,11 +3,6 @@ import { MapComponent } from "../shared/map";
 import { Application } from "..";
 import { registerInteration } from "../shared/map/interaction";
 import { Point } from "../../interface/point";
-import { baseLayer, boroughLayer, movementHeatmapLayer, nightLayer, propertyLayer, propertyUsageLayer, streetLayer } from "../shared/map/layers";
-import { MapLayer } from "../shared/map/layer";
-import { addIcon, boroughIcon, captureIcon, chatIcon, dayIcon, drawIcon, movementIcon, propertyRegisterIcon, residentIcon, streetIcon } from "../assets/icons/managed";
-import { Observable } from "@acryps/page-observable";
-import { CreateFeaturePage } from "./create";
 import { Action } from "../action";
 import { MapToolbarComponent } from "./toolbar";
 

@@ -30,6 +30,7 @@ export abstract class MapView {
 		for (let layer of this.map.layers) {
 			const image = layer.render(this.map.cursor, this.map.width, this.map.height, this.superscale);
 
+			this.context.globalCompositeOperation = layer.blendMode;
 			this.context.drawImage(image, 0, 0);
 		}
 	}

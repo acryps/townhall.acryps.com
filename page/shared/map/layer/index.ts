@@ -14,6 +14,7 @@ export class MapLayer {
 	constructor(
 		protected source: (x: number, y: number) => Promise<CanvasImageSource>,
 		protected size: number,
+		public blendMode: GlobalCompositeOperation,
 		public pick: (x: number, y: number) => Promise<string>
 	) {
 		this.canvas = new OffscreenCanvas(1, 1);
@@ -95,7 +96,7 @@ export class MapLayer {
 		return this.canvas;
 	}
 
-	static fromShapeSource(source: (x: number, y: number) => string, size: number, pick?: (x: number, y: number) => string, itemLink?: (item: string) => string) {
+	static fromShapeSource(source: (x: number, y: number) => string, size: number, blendMode: GlobalCompositeOperation, pick?: (x: number, y: number) => string, itemLink?: (item: string) => string) {
 		const canvas = new OffscreenCanvas(size, size);
 		const context = canvas.getContext('2d');
 
@@ -121,6 +122,7 @@ export class MapLayer {
 				return canvas.transferToImageBitmap();
 			},
 			size,
+			blendMode,
 			async (x, y) => {
 				if (!pick) {
 					return;
@@ -139,7 +141,7 @@ export class MapLayer {
 		return layer;
 	}
 
-	static fromTileSource(source: (x: number, y: number) => string, size: number, pick?: (x: number, y: number) => string, itemLink?: (item: string) => string) {
+	static fromTileSource(source: (x: number, y: number) => string, size: number, blendMode: GlobalCompositeOperation, pick?: (x: number, y: number) => string, itemLink?: (item: string) => string) {
 		return new MapLayer(
 			async (x, y) => {
 				const image = new Image();
@@ -150,6 +152,7 @@ export class MapLayer {
 				return image;
 			},
 			size,
+			blendMode,
 			async (x, y) => {
 				if (!pick) {
 					return;

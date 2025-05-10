@@ -33,12 +33,18 @@ export class GradiantHeatmapTileServer {
 
 			for (let x = 0; x < sampleSize; x++) {
 				for (let y = 0; y < sampleSize; y++) {
-					const value = sample(new Point(
-						x * interpolationFieldSize + offset.x - interpolationFieldSize,
-						y * interpolationFieldSize + offset.y - interpolationFieldSize
-					));
+					const value = Math.min(
+						maxValue,
 
-					context.fillStyle = `hsl(${value / maxValue * 120}deg, 100%, 50%)`;
+						sample(
+							new Point(
+								x * interpolationFieldSize + offset.x - interpolationFieldSize,
+								y * interpolationFieldSize + offset.y - interpolationFieldSize
+							)
+						)
+					);
+
+					context.fillStyle = `hsl(${value / maxValue * 300}deg, 100%, 50%)`;
 					context.fillRect(x, y, 1, 1);
 				}
 			}
@@ -49,7 +55,7 @@ export class GradiantHeatmapTileServer {
 			canvas.width = tileSize;
 			canvas.height = tileSize;
 
-			context.drawImage(await loadImage(image), -interpolationFieldSize, -interpolationFieldSize, tileSize + interpolationFieldSize, tileSize + interpolationFieldSize);
+			context.drawImage(await loadImage(image), -interpolationFieldSize, -interpolationFieldSize, tileSize + interpolationFieldSize * 2, tileSize + interpolationFieldSize * 2);
 
 			response.contentType('image/png');
 			canvas.toBuffer('png').then(buffer => response.end(buffer));

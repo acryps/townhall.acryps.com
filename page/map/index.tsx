@@ -33,12 +33,6 @@ export class MapPage extends Component {
 			</ui-map-child>;
 		}
 
-		if (this.child instanceof Action) {
-			this.toolbar.action = child;
-		} else {
-			this.toolbar.action = null;
-		}
-
 		Application.setTitle(this.drawing?.name, 'Map');
 
 		this.map.show(new Point(+this.parameters.x, +this.parameters.y), 1 / ((+this.parameters.zoom / this.zoomAccuracy) ** 2));
@@ -71,6 +65,7 @@ export class MapPage extends Component {
 
 		return <ui-map>
 			{this.map}
+			{child}
 
 			{this.toolbar}
 		</ui-map>

@@ -26,6 +26,7 @@ import { PlotterInterface } from "./plot/interface";
 import { StreetFiller } from "./map/fill/street";
 import { LegalEntityReferenceCounter } from "./areas/legal-entity/reference-counter";
 import { PropertyValueTileServer } from "./map/layers/heatmap/gradiant/property-value";
+import { PropertyOwnershipTileServer } from "./map/layers/shape/propety-ownership";
 
 const runLife = process.env.RUN_LIFE == 'YES';
 
@@ -81,6 +82,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new BoroughTileServer(app, database);
 	new PropertyUsageTileServer(app, database);
 	new PropertyValueTileServer(app, database);
+	new PropertyOwnershipTileServer(app, database);
 	// new MovementTileServer(app, database);
 
 	// life.tick();

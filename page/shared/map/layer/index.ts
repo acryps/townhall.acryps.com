@@ -15,10 +15,14 @@ export class MapLayer {
 		protected source: (x: number, y: number) => Promise<CanvasImageSource>,
 		protected size: number,
 		public blendMode: GlobalCompositeOperation,
-		public pick: (x: number, y: number) => Promise<string>
+		public pick: (x: number, y: number) => Promise<boolean>
 	) {
 		this.canvas = new OffscreenCanvas(1, 1);
 		this.context = this.canvas.getContext('2d');
+	}
+
+	reset() {
+		this.tiles.clear();
 	}
 
 	async update(center: Point, width: number, height: number) {
@@ -96,9 +100,18 @@ export class MapLayer {
 		return this.canvas;
 	}
 
-	static fromShapeSource(source: (x: number, y: number) => string, size: number, blendMode: GlobalCompositeOperation, pick?: (x: number, y: number) => string, itemLink?: (item: string) => string) {
+	static fromShapeSource(
+		source: (x: number, y: number) => string,
+		size: number,
+		blendMode: GlobalCompositeOperation,
+
+		pick = false,
+		pickAction = (shape: Shape) => { location.href = `/go/${shape.id}` }
+	) {
 		const canvas = new OffscreenCanvas(size, size);
 		const context = canvas.getContext('2d');
+
+		const pickableShapes: Shape[] = [];
 
 		const layer = new MapLayer(
 			async (x, y) => {
@@ -117,6 +130,10 @@ export class MapLayer {
 							layer.labels.push(new Label(center, shape.name));
 						}
 					}
+
+					if (shape.id) {
+						pickableShapes.push(shape);
+					}
 				}
 
 				return canvas.transferToImageBitmap();
@@ -128,20 +145,31 @@ export class MapLayer {
 					return;
 				}
 
-				const id = await fetch(pick(x, y)).then(response => response.json());
+				const target = new Point(x, y);
 
-				if (!id) {
-					return;
+				for (let shape of pickableShapes) {
+					const boundary = Point.unpack(shape.bounds);
+
+					if (Point.contains(boundary, target)) {
+						pickAction(shape);
+
+						return true;
+					}
 				}
-
-				return itemLink(id);
 			}
 		);
 
 		return layer;
 	}
 
-	static fromTileSource(source: (x: number, y: number) => string, size: number, blendMode: GlobalCompositeOperation, pick?: (x: number, y: number) => string, itemLink?: (item: string) => string) {
+	static fromTileSource(
+		source: (x: number, y: number) => string,
+		size: number,
+		blendMode: GlobalCompositeOperation,
+
+		pick?: (x: number, y: number) => string,
+		pickAction = (id: string) => { location.href = `/go/${id}` }
+	) {
 		return new MapLayer(
 			async (x, y) => {
 				const image = new Image();
@@ -164,7 +192,9 @@ export class MapLayer {
 					return;
 				}
 
-				return itemLink(id);
+				pickAction(id);
+
+				return true;
 			}
 		)
 	}

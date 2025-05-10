@@ -19,7 +19,7 @@ export class EditPlotAction extends Action {
 		this.navigate(`/property/${this.parameters.id}`);
 	}
 
-	render() {
+	renderPanel() {
 		return <ui-edit-plot>
 			Edit Plot #{this.parameters.id}
 		</ui-edit-plot>

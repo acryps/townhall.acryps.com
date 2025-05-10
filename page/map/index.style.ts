@@ -1,9 +1,10 @@
-import { alignItems, alignSelf, background, backgroundColor, border, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, display, flexDirection, flexGrow, flexWrap, fontSize, gap, height, Hex, hex, imageRendering, inset, insetInline, justifyContent, margin, marginInline, marginLeft, marginTop, maxWidth, Number, opacity, overflow, padding, paddingBlock, paddingInline, percentage, pointerEvents, position, px, rem, select, style, textAlign, Variable, width } from "@acryps/style";
+import { alignItems, alignSelf, background, backgroundColor, border, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, display, flexDirection, flexGrow, flexWrap, fontSize, gap, height, Hex, hex, imageRendering, inset, insetInline, justifyContent, margin, marginInline, marginLeft, marginTop, maxWidth, Number, opacity, overflow, padding, paddingBlock, paddingInline, paddingTop, percentage, pointerEvents, position, px, rem, select, style, textAlign, Variable, width } from "@acryps/style";
 import { pageTextColor, navigationBackgroundColor, navigationBorderColor, pageGutter, pageBackgroundColor, neutralColor } from "../index.style";
 import { buttonStyle } from "../shared/index.style";
 import { PageComponent } from "../page";
 import { createFeatureStyle } from "./create/index.style";
 import { boxed } from "../shared/boxed.style";
+import { fieldStyle } from "../shared/field.style";
 
 const buttonPaddingSize = rem(0.8);
 
@@ -89,6 +90,35 @@ export const mapStyle = () => [
 				backgroundColor(activeBoroughColor),
 			),
 
+			child('ui-create-building',
+				paddingTop(pageGutter.divide(2)),
+				paddingInline(pageGutter),
+
+				backgroundColor(navigationBackgroundColor)
+			),
+
+			child('ui-edit-plot',
+				paddingTop(pageGutter.divide(2)),
+				paddingInline(pageGutter),
+
+				backgroundColor(navigationBackgroundColor)
+			),
+
+			child('ui-quick-valueation',
+				display('flex'),
+				gap(pageGutter),
+
+				paddingTop(pageGutter.divide(2)),
+				paddingInline(pageGutter),
+
+				backgroundColor(navigationBackgroundColor),
+
+				child('input',
+					fieldStyle(),
+					flexGrow(1)
+				)
+			),
+
 			child('ui-drawer',
 				display('flex'),
 				flexWrap('wrap'),
@@ -97,21 +127,6 @@ export const mapStyle = () => [
 
 				color(pageTextColor),
 				backgroundColor(navigationBackgroundColor),
-
-				child('ui-create-building',
-					width(percentage(100).subtract(buttonPaddingSize.multiply(2))),
-					paddingInline(buttonPaddingSize),
-					paddingBlock(buttonPaddingSize.divide(2)),
-
-					fontSize(rem(0.75)),
-					textAlign('center'),
-
-					backgroundColor(neutralColor)
-				),
-
-				child('ui-edit-plot',
-					padding(buttonPaddingSize)
-				),
 
 				select('ui-layer',
 					padding(buttonPaddingSize),

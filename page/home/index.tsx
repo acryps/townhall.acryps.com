@@ -4,7 +4,7 @@ import { OnlinePlayerComponent } from "./online";
 import { boroughColor } from "./index.style";
 import { hex } from "@acryps/style";
 import { BannerComponent } from "../banner";
-import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, propertyRegisterIcon, publicationIcon, residentIcon } from "../assets/icons/managed";
+import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, priceIcon, propertyRegisterIcon, publicationIcon, residentIcon } from "../assets/icons/managed";
 import { Point } from "../../interface/point";
 import { toSimulatedTime } from "../../interface/time";
 import { ImpressionsComponent } from "./impressions";
@@ -120,6 +120,18 @@ export class HomePage extends Component {
 
 					<ui-description>
 						Come here if you mean business!
+					</ui-description>
+				</ui-topic>
+
+				<ui-topic ui-href={`/map/${Application.center.x}/${Application.center.y}/5/quick-valueation`}>
+					{priceIcon()}
+
+					<ui-name>
+						Valuation
+					</ui-name>
+
+					<ui-description>
+						Value properties
 					</ui-description>
 				</ui-topic>
 			</ui-topics>

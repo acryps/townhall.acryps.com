@@ -24,7 +24,7 @@ export class CreateBuildingAction extends Action {
 		this.navigate(`/property/${this.parameters.id}`);
 	}
 
-	render() {
+	renderPanel() {
 		return <ui-create-building>
 			Create Building on #{this.parameters.id}
 		</ui-create-building>

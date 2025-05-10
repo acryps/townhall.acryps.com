@@ -102,12 +102,7 @@ export class MapComponent extends Component {
 	// pick
 	async pick(point: Point) {
 		for (let layer of this.layers) {
-			const link = await layer.pick(point.x, point.y);
-
-			if (link) {
-				// most picks resolve into /go/ links, which can only be followed using this
-				location.href = link;
-
+			if (await layer.pick(point.x, point.y)) {
 				return;
 			}
 		}

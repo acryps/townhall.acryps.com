@@ -19,7 +19,7 @@ export class EditRouteAction extends Action {
 		this.navigate(`/street/${this.parameters.id}`);
 	}
 
-	render() {
+	renderPanel() {
 		return <ui-edit-street>
 			Edit Street #{this.parameters.id}
 		</ui-edit-street>

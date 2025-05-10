@@ -1,4 +1,5 @@
 import { calcualteDanwinstonLine } from "./line";
+import { Shape } from "./shape";
 
 export type PackedPoint = string;
 export type PackedPointArray = string;
@@ -100,6 +101,20 @@ export class Point {
 			width: maxX - minX,
 			height: maxY - minY
 		};
+	}
+
+	static contains(boundary: Point[], target: Point) {
+		const bounds = this.bounds(boundary);
+
+		if (bounds.x.min > target.x || bounds.x.max < target.x) {
+			return false;
+		}
+
+		if (bounds.y.min > target.y || bounds.y.max < target.y) {
+			return false;
+		}
+
+		return Point.fill(boundary).has(target.pack());
 	}
 
 	static size(points: Point[]) {

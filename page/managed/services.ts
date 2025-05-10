@@ -2243,6 +2243,27 @@ export class PropertyService {
 		});
 	}
 
+	async assignValuation(propertyId: string, plotAreaPrice: number, buildingAreaPrice: number): Promise<void> {
+		const $data = new FormData();
+		$data.append("EwMmpvdnhlZ35xd3BpczhydWFsc2JzeD", Service.stringify(propertyId))
+		$data.append("QycjQ2N3M1MX54bW1iYmFoaG53aTQ5bn", Service.stringify(plotAreaPrice))
+		$data.append("p5NWZtNHJqMTd2OGIybWllZX9xeD8wem", Service.stringify(buildingAreaPrice))
+
+		return await fetch(Service.toURL("k5NWY1dmQ4cGVvb2UyOWRrOGpvNDFvdj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
 	async saveBuilding(viewModel: BuildingSummaryModel): Promise<void> {
 		const $data = new FormData();
 		$data.append("Q0amZyeDdwbzlqZ3I5ZmtmbnVxZGM1dG", Service.stringify(viewModel))

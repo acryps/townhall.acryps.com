@@ -14,7 +14,7 @@ type Datapoint = {
 export class PropertyValueTileServer extends GradiantHeatmapTileServer {
 	values: Datapoint[] = [];
 
-	depth = 5;
+	depth = 10;
 
 	plotAreaWeight = 0.3;
 	buildingAreaWeight = 0.7;
@@ -27,13 +27,25 @@ export class PropertyValueTileServer extends GradiantHeatmapTileServer {
 			app,
 			'property-value',
 
-			250,
+			200,
 			10,
 
-			1_000 * 2,
+			1000 * 2,
 			target => {
-				const closest = this.values
-					.map(value => ({ value, distance: target.distance(value.center) }))
+				// fast filter first
+				let closest = this.values
+					.map(value => ({
+						value,
+						distance: Math.abs(value.center.x - target.x) * Math.abs(value.center.y - target.y)
+					}))
+					.sort((a, b) => a.distance - b.distance)
+					.slice(0, this.depth * 2);
+
+				for (let item of closest) {
+					item.distance = item.value.center.distance(target);
+				}
+
+				closest = closest
 					.sort((a, b) => a.distance - b.distance)
 					.slice(0, this.depth);
 
@@ -83,7 +95,7 @@ export class PropertyValueTileServer extends GradiantHeatmapTileServer {
 				// make multiple datapoints to represent big buildings properly
 				const outline = calculateDanwinstonShapePath(plotShape, true);
 
-				for (let pointIndex = 0; pointIndex < outline.length; pointIndex += 5) {
+				for (let pointIndex = 0; pointIndex < outline.length; pointIndex += 50) {
 					values.push({
 						center: outline[pointIndex],
 						area: plotArea * this.plotAreaWeight + buildingArea * this.buildingAreaWeight,
@@ -95,6 +107,8 @@ export class PropertyValueTileServer extends GradiantHeatmapTileServer {
 
 		this.values = values;
 
-		setTimeout(() => this.update(), 1000 * 60 * 60);
+		console.log(`indexed ${values.length} valuation points`);
+
+		setTimeout(() => this.update(), 1000 * 60);
 	}
 }

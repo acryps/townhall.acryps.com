@@ -44,6 +44,7 @@ import { StreetPlotsPage } from "./street/plots";
 import { BuildingPage } from "./properties/property/building";
 import { ValuationPage } from "./trade/valuation";
 import { PropertyOwnershipPage } from "./properties/property/ownership";
+import { QuickValueationAction } from "./map/quick-valueation";
 
 export class Application {
 	static router: Router;
@@ -72,6 +73,7 @@ export class Application {
 					.route('/create-building/:id', CreateBuildingAction)
 					.route('/edit-plot/:id', EditPlotAction)
 					.route('/edit-route/:id', EditRouteAction)
+					.route('/quick-valueation', QuickValueationAction)
 
 					.route('/create/:shape', CreateFeaturePage)
 				)

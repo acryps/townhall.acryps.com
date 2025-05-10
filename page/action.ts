@@ -1,4 +1,4 @@
-import { Component } from "@acryps/page";
+import { Component, ComponentContent } from "@acryps/page";
 import { Point } from "../interface/point";
 
 export abstract class Action extends Component {
@@ -9,5 +9,8 @@ export abstract class Action extends Component {
 	}
 
 	abstract activate();
-	abstract complete(shape: Point[]);
+
+	renderPanel(): ComponentContent {
+		return [];
+	};
 }

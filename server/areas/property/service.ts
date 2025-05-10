@@ -1,5 +1,5 @@
 import { Service } from "vlserver";
-import { Building, DbContext, Dwelling, PlotBoundary, PropertyOwner } from "../../managed/database";
+import { Building, DbContext, Dwelling, PlotBoundary, PropertyOwner, Valuation } from "../../managed/database";
 import { DwellingViewModel } from "../life/resident";
 import { PropertyDwellingViewModel, PropertyOwnerViewModel } from "../property.view";
 import { BuildingSummaryModel } from "./building";
@@ -70,6 +70,41 @@ export class PropertyService extends Service {
 		});
 
 		return new PropertyOwnerViewModel(owner);
+	}
+
+	async assignValuation(propertyId: string, plotAreaPrice: number, buildingAreaPrice: number) {
+		const property = await this.database.property.find(propertyId);
+		const plot = await property.activePlotBoundary.fetch();
+		const plotPrice = Point.area(Point.unpack(plot.shape)) * plotAreaPrice * (Math.random() * 0.2 + 0.9);
+
+		const buildings = await property.buildings.where(building => building.archived == null).toArray();
+		const buildingArea = buildings.map(building => Point.area(Point.unpack(building.boundary))).reduce((sum, area) => sum + area, 0);
+		const buildingPrice = buildingArea * buildingAreaPrice * (Math.random() * 0.2 + 0.9);;
+
+		const valuation = new Valuation();
+		valuation.estimated = new Date();
+		valuation.item = `Property ${property.name ?? property.id}`;
+		valuation.price = buildingPrice + plotPrice;
+
+		await valuation.create();
+
+		const currentOwners = await property.owners.where(owner => owner.sold == null).toArray();
+
+		if (currentOwners.length) {
+			for (let owner of currentOwners) {
+				owner.aquiredValuation = valuation;
+
+				await owner.update();
+			}
+		} else {
+			const owner = new PropertyOwner();
+			owner.property = property;
+			owner.aquired = new Date();
+			owner.share = 1;
+			owner.aquiredValuation = valuation;
+
+			await owner.create();
+		}
 	}
 
 	async saveBuilding(viewModel: BuildingSummaryModel) {

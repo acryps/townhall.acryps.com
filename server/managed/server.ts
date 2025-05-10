@@ -57,6 +57,7 @@ import { LifeService } from "././../areas/life/service";
 import { Building } from "././database";
 import { Dwelling } from "././database";
 import { PropertyOwner } from "././database";
+import { Valuation } from "././database";
 import { DwellingViewModel } from "././../areas/life/resident";
 import { PropertyDwellingViewModel } from "././../areas/property.view";
 import { PropertyOwnerViewModel } from "././../areas/property.view";
@@ -126,7 +127,6 @@ import { LegalEntity } from "./../managed/database";
 import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
-import { Valuation } from "./../managed/database";
 import { TrainStationExit } from "./../managed/database";
 import { TrainRoute } from "./../managed/database";
 import { TrainStation } from "./../managed/database";
@@ -759,6 +759,21 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.assignSoleOwner(
 				params["xxNnpkOXJiZ2dkNjJjdGBpdzgxcDtrY2"],
 				params["ZybDVoNDkydzlyY3p6b2Vydn91MWVpY3"]
+			)
+		);
+
+		this.expose(
+			"k5NWY1dmQ4cGVvb2UyOWRrOGpvNDFvdj",
+			{
+			"EwMmpvdnhlZ35xd3BpczhydWFsc2JzeD": { type: "string", isArray: false, isOptional: false },
+				"QycjQ2N3M1MX54bW1iYmFoaG53aTQ5bn": { type: "number", isArray: false, isOptional: false },
+				"p5NWZtNHJqMTd2OGIybWllZX9xeD8wem": { type: "number", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PropertyService),
+			(controller, params) => controller.assignValuation(
+				params["EwMmpvdnhlZ35xd3BpczhydWFsc2JzeD"],
+				params["QycjQ2N3M1MX54bW1iYmFoaG53aTQ5bn"],
+				params["p5NWZtNHJqMTd2OGIybWllZX9xeD8wem"]
 			)
 		);
 

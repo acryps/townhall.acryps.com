@@ -8,6 +8,7 @@ import { BoroughSummaryModel } from "../managed/services";
 import { Application } from "..";
 import { activeBoroughColor, activeBoroughContrast } from "./index.style";
 import { hex } from "@acryps/style";
+import { Action } from "../action";
 
 export class MapToolbarComponent extends Component {
 	declare parent: MapPage;
@@ -70,6 +71,8 @@ export class MapToolbarComponent extends Component {
 				{this.coordinateTracker = <ui-coordinates></ui-coordinates>}
 				{this.boroughTracker = <ui-borough></ui-borough>}
 			</ui-location>
+
+			{(this.parent.child instanceof Action) && this.parent.child.renderPanel()}
 
 			<ui-drawer>
 				{this.action}

@@ -88,7 +88,7 @@ export class MapDrawView extends MapView {
 			return;
 		}
 
-		const pattern = (position.x + position.y) % 2;
+		const pattern = Math.abs(position.x + position.y) % 2;
 
 		for (let x = 0; x < this.superscale; x++) {
 			for (let y = 0; y < this.superscale; y++) {

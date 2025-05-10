@@ -1,8 +1,8 @@
 import { Canvas, ImageData } from "skia-canvas";
-import { Point } from "../../../../interface/point";
-import { ManagedServer } from "../../../managed/server";
+import { Point } from "../../../../../interface/point";
+import { ManagedServer } from "../../../../managed/server";
 
-export class HeatmapTileServer {
+export class DensityHeatmapTileServer {
 	baseTransparency = 0xaf;
 
 	constructor(

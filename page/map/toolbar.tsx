@@ -1,9 +1,9 @@
 import { Component } from "@acryps/page";
 import { MapPage } from ".";
-import { addIcon, boroughIcon, captureIcon, dayIcon, deleteIcon, drawIcon, flipIcon, goIcon, movementIcon, propertyRegisterIcon, residentIcon, streetIcon, undoIcon } from "../assets/icons/managed";
+import { addIcon, boroughIcon, captureIcon, dayIcon, deleteIcon, drawIcon, flipIcon, goIcon, movementIcon, priceIcon, propertyRegisterIcon, residentIcon, streetIcon, undoIcon } from "../assets/icons/managed";
 import { PackedPoint, Point } from "../../interface/point";
 import { MapLayer } from "../shared/map/layer";
-import { baseLayer, nightLayer, boroughLayer, propertyLayer, streetLayer, movementHeatmapLayer, propertyUsageLayer } from "../shared/map/layers";
+import { baseLayer, nightLayer, boroughLayer, propertyLayer, streetLayer, movementHeatmapLayer, propertyUsageLayer, propertyValueHeatmapLayer } from "../shared/map/layers";
 import { BoroughSummaryModel } from "../managed/services";
 import { Application } from "..";
 import { activeBoroughColor, activeBoroughContrast } from "./index.style";
@@ -95,6 +95,10 @@ export class MapToolbarComponent extends Component {
 				<ui-layers>
 					<ui-layer ui-click={() => this.toggleLayer(propertyUsageLayer)}>
 						{residentIcon()}
+					</ui-layer>
+
+					<ui-layer ui-click={() => this.toggleLayer(propertyValueHeatmapLayer)}>
+						{priceIcon()}
 					</ui-layer>
 				</ui-layers>
 

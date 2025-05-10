@@ -1,8 +1,8 @@
-import { HeatmapTileServer } from ".";
-import { DbContext, Movement } from "../../../managed/database";
-import { ManagedServer } from "../../../managed/server";
+import { DensityHeatmapTileServer } from ".";
+import { DbContext, Movement } from "../../../../managed/database";
+import { ManagedServer } from "../../../../managed/server";
 
-export class MovementTileServer extends HeatmapTileServer {
+export class MovementTileServer extends DensityHeatmapTileServer {
 	lastUpdate;
 	movements: Movement[] = [];
 

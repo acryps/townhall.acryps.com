@@ -16,7 +16,7 @@ import { Language } from "./life/language";
 import { GoInterface } from "./go";
 import { PropertyTileServer } from "./map/layers/shape/property";
 import { BoroughTileServer } from "./map/layers/shape/borough";
-import { MovementTileServer } from "./map/layers/heatmap/movement";
+import { MovementTileServer } from "./map/layers/heatmap/density/movement";
 import { PropertyUsageTileServer } from "./map/layers/shape/usage";
 import { ImpressionImageInterface } from "./areas/impressions/interface";
 import { StreetTileServer } from "./map/layers/shape/street";
@@ -25,6 +25,7 @@ import { Annotator } from "./annotate";
 import { PlotterInterface } from "./plot/interface";
 import { StreetFiller } from "./map/fill/street";
 import { LegalEntityReferenceCounter } from "./areas/legal-entity/reference-counter";
+import { PropertyValueTileServer } from "./map/layers/heatmap/gradiant/property-value";
 
 const runLife = process.env.RUN_LIFE == 'YES';
 
@@ -79,6 +80,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new StreetTileServer(app, database); // temporarely only!
 	new BoroughTileServer(app, database);
 	new PropertyUsageTileServer(app, database);
+	new PropertyValueTileServer(app, database);
 	// new MovementTileServer(app, database);
 
 	// life.tick();

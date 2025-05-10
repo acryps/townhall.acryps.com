@@ -2,11 +2,11 @@ import { select, style, content, Font, fontFamily, fontWeight, fontStyle } from 
 
 
 export const iconFont = new Font('icons', fontWeight('normal'), fontStyle('normal'))
-	.addSource('/assets/icons/managed/font/index.eot?fac5c4a2f231', 'embedded-opentype')
-	.addSource('/assets/icons/managed/font/index.svg?68ad2213a6c5', 'svg')
-	.addSource('/assets/icons/managed/font/index.ttf?80586a054c33', 'truetype')
-	.addSource('/assets/icons/managed/font/index.woff?198bac575f50', 'woff')
-	.addSource('/assets/icons/managed/font/index.woff2?895f35de0064', 'woff2');
+	.addSource('/assets/icons/managed/font/index.eot?d7c194f9afe0', 'embedded-opentype')
+	.addSource('/assets/icons/managed/font/index.svg?fd3a8cb76037', 'svg')
+	.addSource('/assets/icons/managed/font/index.ttf?b351b3d6d90a', 'truetype')
+	.addSource('/assets/icons/managed/font/index.woff?ed231240152f', 'woff')
+	.addSource('/assets/icons/managed/font/index.woff2?5fa5550d1ad3', 'woff2');
 
 export const icons = () => select('ui-icon',
 	fontFamily(iconFont.name),
@@ -30,15 +30,16 @@ export const icons = () => select('ui-icon',
 	style('[ui-law]').before('\f10e'),
 	style('[ui-map]').before('\f10f'),
 	style('[ui-movement]').before('\f110'),
-	style('[ui-property-register]').before('\f111'),
-	style('[ui-publication]').before('\f112'),
-	style('[ui-relation-graph]').before('\f113'),
-	style('[ui-relation]').before('\f114'),
-	style('[ui-resident]').before('\f115'),
-	style('[ui-speak]').before('\f116'),
-	style('[ui-state]').before('\f117'),
-	style('[ui-street]').before('\f118'),
-	style('[ui-undo]').before('\f119'),
+	style('[ui-price]').before('\f111'),
+	style('[ui-property-register]').before('\f112'),
+	style('[ui-publication]').before('\f113'),
+	style('[ui-relation-graph]').before('\f114'),
+	style('[ui-relation]').before('\f115'),
+	style('[ui-resident]').before('\f116'),
+	style('[ui-speak]').before('\f117'),
+	style('[ui-state]').before('\f118'),
+	style('[ui-street]').before('\f119'),
+	style('[ui-undo]').before('\f11a'),
 );
 
 const createIconElement = (name: string) => {
@@ -64,6 +65,7 @@ export const homeIcon = () => createIconElement('home');
 export const lawIcon = () => createIconElement('law');
 export const mapIcon = () => createIconElement('map');
 export const movementIcon = () => createIconElement('movement');
+export const priceIcon = () => createIconElement('price');
 export const propertyRegisterIcon = () => createIconElement('property-register');
 export const publicationIcon = () => createIconElement('publication');
 export const relationGraphIcon = () => createIconElement('relation-graph');

@@ -9,3 +9,4 @@ export const propertyUsageLayer = MapLayer.fromShapeSource((x, y) => `/tile/usag
 export const streetLayer = MapLayer.fromShapeSource((x, y) => `/tile/street/${x}/${y}`, 500, (x, y) => `/pick/street/${x}/${y}`, id => `/street/${id}`);
 
 export const movementHeatmapLayer = MapLayer.fromTileSource((x, y) => `/tile/movement/${x}/${y}`, 250);
+export const propertyValueHeatmapLayer = MapLayer.fromTileSource((x, y) => `/tile/property-value/${x}/${y}`, 250);

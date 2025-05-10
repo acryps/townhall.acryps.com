@@ -30,7 +30,8 @@ export class PropertyValueTileServer extends GradiantHeatmapTileServer {
 			200,
 			10,
 
-			1000 * 2,
+			1500 * 2,
+
 			target => {
 				// fast filter first
 				let closest = this.values

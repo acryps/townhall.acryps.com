@@ -1,6 +1,8 @@
 import { Component } from "@acryps/page";
 import { PackedPointArray, Point } from "../../../interface/point";
 import { Shape } from "../../../interface/shape";
+import { ColorValue, Hex } from "@acryps/style";
+import { negativeColor, neutralColor, pageTextColor, positiveColor } from "../../index.style";
 
 export class BoundaryComponent extends Component {
 	points: Point[];
@@ -27,18 +29,43 @@ export class BoundaryComponent extends Component {
 
 		const context = canvas.getContext('2d');
 
-		Shape.render({
-			bounds: this.previousShape,
-			stroke: '#ccf',
-			fill: '#ccf'
-		}, topLeft, context);
+		requestAnimationFrame(async () => {
+			if (this.previousShape) {
+				const base = await this.renderShape(context, this.shape, topLeft, neutralColor);
+				const added = await this.renderShape(context, this.shape, topLeft, positiveColor);
+				const removed = await this.renderShape(context, this.previousShape, topLeft, negativeColor);
 
-		Shape.render({
-			bounds: this.shape,
-			stroke: '#000',
-			fill: '#ff0'
-		}, topLeft, context);
+				context.drawImage(removed, 0, 0);
+
+				context.globalCompositeOperation = 'source-atop';
+				context.drawImage(base, 0, 0);
+
+				context.globalCompositeOperation = 'destination-over';
+				// context.drawImage(removed, 0, 0);
+				context.drawImage(added, 0, 0);
+			} else {
+				await this.renderShape(context, this.shape, topLeft, positiveColor);
+			}
+		});
 
 		return canvas;
+	}
+
+	private renderShape(context: CanvasRenderingContext2D, shape: string, topLeft: Point, color: Hex) {
+		context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+		Shape.render({
+			bounds: shape,
+			stroke: color.toValueString(),
+			fill: color.toValueString()
+		}, topLeft, context);
+
+		const image = new Image();
+
+		return new Promise<HTMLImageElement>(async done => {
+			image.onload = () => done(image);
+
+			image.src = context.canvas.toDataURL();
+		});
 	}
 }

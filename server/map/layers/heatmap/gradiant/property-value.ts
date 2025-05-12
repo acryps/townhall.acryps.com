@@ -30,10 +30,16 @@ export class PropertyValueTileServer extends GradiantHeatmapTileServer {
 			200,
 			10,
 
-			1500 * 2,
+			600 * 2,
 
-			(target, range) => {
-				const closest = this.values
+			(topLeft: Point, size: number) => {
+				return this.values
+					.filter(value => value.center.x > topLeft.x && value.center.x < topLeft.x + size)
+					.filter(value => value.center.y > topLeft.y && value.center.y < topLeft.y + size);
+			},
+
+			(target, values, range) => {
+				const closest = values
 					.filter(value => value.center.distance(target) < range * 1)
 					.map(value => ({
 						value,
@@ -88,13 +94,16 @@ export class PropertyValueTileServer extends GradiantHeatmapTileServer {
 					.reduce((sum, area) => area + sum, 0);
 
 				// make multiple datapoints to represent big buildings properly
-				const outline = [...Point.fill(plotShape).values()];
+				const outline = [...Point.fill(plotShape).values()]
+					.sort((a, b) => a.x % a.y - b.x % b.y); // semi random ranking
+
+				const valuation = await owner.aquiredValuation.fetch();
 
 				for (let pointIndex = 0; pointIndex < outline.length; pointIndex += 5) {
 					values.push({
 						center: outline[pointIndex],
 						area: plotArea * this.plotAreaWeight + buildingArea * this.buildingAreaWeight,
-						valuation: await owner.aquiredValuation.fetch()
+						valuation: valuation
 					});
 				}
 			}

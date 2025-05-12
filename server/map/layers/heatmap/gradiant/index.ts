@@ -2,7 +2,7 @@ import { Canvas, ImageData, loadImage } from "skia-canvas";
 import { Point } from "../../../../../interface/point";
 import { ManagedServer } from "../../../../managed/server";
 
-export class GradiantHeatmapTileServer {
+export class GradiantHeatmapTileServer<SourceType> {
 	baseTransparency = 0xaf;
 
 	constructor(
@@ -13,7 +13,9 @@ export class GradiantHeatmapTileServer {
 		interpolationFieldSize: number,
 
 		maxValue: number,
-		sample: (position: Point, range: number) => number
+
+		load: (topLeft: Point, size: number) => SourceType[],
+		sample: (position: Point, area: SourceType[], range: number) => number
 	) {
 		if (tileSize % interpolationFieldSize) {
 			throw 'Interpolation field must be even fraction of tile size';
@@ -31,13 +33,17 @@ export class GradiantHeatmapTileServer {
 			const canvas = new Canvas(sampleSize, sampleSize);
 			const context = canvas.getContext('2d');
 
+			const data = load(offset.subtract(new Point(interpolationFieldSize, interpolationFieldSize)), tileSize + interpolationFieldSize * 2);
+
 			for (let x = 0; x < sampleSize; x++) {
 				for (let y = 0; y < sampleSize; y++) {
 					const sampeledValue = sample(
 						new Point(
-							x * interpolationFieldSize + offset.x - interpolationFieldSize,
-							y * interpolationFieldSize + offset.y - interpolationFieldSize
+							x * interpolationFieldSize + offset.x - interpolationFieldSize / 2,
+							y * interpolationFieldSize + offset.y - interpolationFieldSize / 2
 						),
+
+						data,
 
 						interpolationFieldSize / 2
 					);

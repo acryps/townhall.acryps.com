@@ -54,20 +54,26 @@ export class PropertyService extends Service {
 		const property = await this.database.property.find(propertyId);
 		const entity = await this.database.legalEntity.find(entityId);
 
-		const owner = new PropertyOwner();
-		owner.property = property;
+		let owner = await property.owners.first();
+
+		if (!owner) {
+			owner = new PropertyOwner();
+			owner.property = property;
+
+			owner.aquired = new Date();
+			owner.share = 1;
+
+			await owner.create();
+
+			this.tradeManager.valueateProperty(property).then(async valuation => {
+				owner.aquiredValuation = valuation;
+
+				await owner.update();
+			});
+		}
+
 		owner.owner = entity;
-
-		owner.aquired = new Date();
-		owner.share = 1;
-
-		await owner.create();
-
-		this.tradeManager.valueateProperty(property).then(async valuation => {
-			owner.aquiredValuation = valuation;
-
-			await owner.update();
-		});
+		await owner.update();
 
 		return new PropertyOwnerViewModel(owner);
 	}

@@ -102,7 +102,7 @@ export class PropertyPage extends Component {
 				</ui-field>
 
 				<ui-ownership-structure>
-					{activeOwners.length ? activeOwners.map(owner => <ui-owner>
+					{activeOwners.find(owner => owner.owner) ? activeOwners.map(owner => <ui-owner>
 						{new LegalEntityComponent(owner.owner)}
 
 						{activeOwners.length != 1 && <ui-share>
@@ -114,7 +114,7 @@ export class PropertyPage extends Component {
 						</ui-value>}
 					</ui-owner>) : <ui-field ui-quick-assign>
 						<label>
-							Quick Assign one owner
+							Assign single owner
 						</label>
 
 						{new LegalEntitySelectorComponent()

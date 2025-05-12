@@ -13,7 +13,7 @@ export class GradiantHeatmapTileServer {
 		interpolationFieldSize: number,
 
 		maxValue: number,
-		sample: (position: Point) => number
+		sample: (position: Point, range: number) => number
 	) {
 		if (tileSize % interpolationFieldSize) {
 			throw 'Interpolation field must be even fraction of tile size';
@@ -33,19 +33,27 @@ export class GradiantHeatmapTileServer {
 
 			for (let x = 0; x < sampleSize; x++) {
 				for (let y = 0; y < sampleSize; y++) {
-					const value = Math.min(
-						maxValue,
+					const sampeledValue = sample(
+						new Point(
+							x * interpolationFieldSize + offset.x - interpolationFieldSize,
+							y * interpolationFieldSize + offset.y - interpolationFieldSize
+						),
 
-						sample(
-							new Point(
-								x * interpolationFieldSize + offset.x - interpolationFieldSize,
-								y * interpolationFieldSize + offset.y - interpolationFieldSize
-							)
-						)
+						interpolationFieldSize / 2
 					);
 
-					context.fillStyle = `hsl(${value / maxValue * 300}deg, 100%, 50%)`;
-					context.fillRect(x, y, 1, 1);
+					if (sampeledValue === null) {
+						context.fillStyle = 'white';
+						context.fillRect(x, y, 1, 1);
+					} else {
+						const value = Math.min(
+							maxValue,
+							sampeledValue
+						);
+
+						context.fillStyle = `hsl(${value / maxValue * 300}deg, 100%, 50%)`;
+						context.fillRect(x, y, 1, 1);
+					}
 				}
 			}
 
@@ -55,7 +63,13 @@ export class GradiantHeatmapTileServer {
 			canvas.width = tileSize;
 			canvas.height = tileSize;
 
-			context.drawImage(await loadImage(image), -interpolationFieldSize, -interpolationFieldSize, tileSize + interpolationFieldSize * 2, tileSize + interpolationFieldSize * 2);
+			context.drawImage(
+				await loadImage(image),
+				-interpolationFieldSize,
+				-interpolationFieldSize,
+				tileSize + interpolationFieldSize * 2,
+				tileSize + interpolationFieldSize * 2
+			);
 
 			response.contentType('image/png');
 			canvas.toBuffer('png').then(buffer => response.end(buffer));

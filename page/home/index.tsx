@@ -39,7 +39,7 @@ export class HomePage extends Component {
 			</ui-description>
 
 			<ui-topics>
-				<ui-topic ui-href={`/map/${Application.center.x}/${Application.center.y}/5`}>
+				<ui-topic ui-href={`/map`}>
 					{mapIcon()}
 
 					<ui-name>

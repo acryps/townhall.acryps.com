@@ -403,6 +403,27 @@ export class WorkContractViewModel {
 	}
 }
 
+export class CityViewModel {
+	centerX: number;
+	centerY: number;
+	id: string;
+	incorporated: Date;
+	mainImpressionId: string;
+	name: string;
+
+	private static $build(raw) {
+		const item = new CityViewModel();
+		raw.centerX === undefined || (item.centerX = raw.centerX === null ? null : +raw.centerX)
+		raw.centerY === undefined || (item.centerY = raw.centerY === null ? null : +raw.centerY)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.incorporated === undefined || (item.incorporated = raw.incorporated ? new Date(raw.incorporated) : null)
+		raw.mainImpressionId === undefined || (item.mainImpressionId = raw.mainImpressionId === null ? null : `${raw.mainImpressionId}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		
+		return item;
+	}
+}
+
 export class HistoricListingGradeViewModel {
 	description: string;
 	grade: number;
@@ -1624,6 +1645,29 @@ export class BoroughService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : DistrictViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class CityService {
+	async getCities(): Promise<Array<CityViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("JtamdiOHlyZH9lNmlhcz8zZXpiMmd3Ym"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : CityViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

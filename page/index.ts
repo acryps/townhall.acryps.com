@@ -45,6 +45,7 @@ import { BuildingPage } from "./properties/property/building";
 import { ValuationPage } from "./trade/valuation";
 import { PropertyOwnershipPage } from "./properties/property/ownership";
 import { QuickValueationAction } from "./map/quick-valueation";
+import { MapStartPage } from "./map/start";
 
 export class Application {
 	static router: Router;
@@ -77,6 +78,7 @@ export class Application {
 
 					.route('/create/:shape', CreateFeaturePage)
 				)
+				.route('/map', MapStartPage)
 
 				.route('/properties', PropertiesComponent)
 				.route('/property/:id', PropertyPage

@@ -24,6 +24,7 @@ import { streetStyle } from "./street/index.style";
 import { legalEntitySelectorStyle } from "./shared/legal-entity/select/index.style";
 import { articleStyle } from "./news/article/index.style";
 import { valuationStyle } from "./trade/valuation/index.style";
+import { mapStartStyle } from "./map/start/index.style";
 
 export const pageStyle = () => root(
 	boldFont,
@@ -78,6 +79,7 @@ export const pageStyle = () => root(
 				homeStyle(),
 
 				mapPageStyle(),
+				mapStartStyle(),
 
 				boroughStyle(),
 				registerBoroughStyle(),

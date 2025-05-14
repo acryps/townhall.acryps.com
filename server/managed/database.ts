@@ -532,6 +532,63 @@ export class ChatInteraction extends Entity<ChatInteractionQueryProxy> {
 	
 }
 			
+export class CityQueryProxy extends QueryProxy {
+	get mainImpression(): Partial<ImpressionQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get centerX(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get centerY(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get incorporated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get mainImpressionId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get orderIndex(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class City extends Entity<CityQueryProxy> {
+	get mainImpression(): Partial<ForeignReference<Impression>> { return this.$mainImpression; }
+	centerX: number;
+	centerY: number;
+	declare id: string;
+	incorporated: Date;
+	mainImpressionId: string;
+	name: string;
+	orderIndex: number;
+	
+	$$meta = {
+		source: "city",
+		columns: {
+			centerX: { type: "float4", name: "center_x" },
+			centerY: { type: "float4", name: "center_y" },
+			id: { type: "uuid", name: "id" },
+			incorporated: { type: "timestamp", name: "incorporated" },
+			mainImpressionId: { type: "uuid", name: "main_impression_id" },
+			name: { type: "text", name: "name" },
+			orderIndex: { type: "int4", name: "order_index" }
+		},
+		get set(): DbSet<City, CityQueryProxy> { 
+			return new DbSet<City, CityQueryProxy>(City, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$mainImpression = new ForeignReference<Impression>(this, "mainImpressionId", Impression);
+	}
+	
+	private $mainImpression: ForeignReference<Impression>;
+
+	set mainImpression(value: Partial<ForeignReference<Impression>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.mainImpressionId = value.id as string;
+		} else {
+			this.mainImpressionId = null;
+		}
+	}
+
+	
+}
+			
 export class CompanyQueryProxy extends QueryProxy {
 	get banner(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -2678,6 +2735,7 @@ export class DbContext {
 	building: DbSet<Building, BuildingQueryProxy>;
 	chat: DbSet<Chat, ChatQueryProxy>;
 	chatInteraction: DbSet<ChatInteraction, ChatInteractionQueryProxy>;
+	city: DbSet<City, CityQueryProxy>;
 	company: DbSet<Company, CompanyQueryProxy>;
 	district: DbSet<District, DistrictQueryProxy>;
 	dwelling: DbSet<Dwelling, DwellingQueryProxy>;
@@ -2726,6 +2784,7 @@ export class DbContext {
 		this.building = new DbSet<Building, BuildingQueryProxy>(Building, this.runContext);
 		this.chat = new DbSet<Chat, ChatQueryProxy>(Chat, this.runContext);
 		this.chatInteraction = new DbSet<ChatInteraction, ChatInteractionQueryProxy>(ChatInteraction, this.runContext);
+		this.city = new DbSet<City, CityQueryProxy>(City, this.runContext);
 		this.company = new DbSet<Company, CompanyQueryProxy>(Company, this.runContext);
 		this.district = new DbSet<District, DistrictQueryProxy>(District, this.runContext);
 		this.dwelling = new DbSet<Dwelling, DwellingQueryProxy>(Dwelling, this.runContext);

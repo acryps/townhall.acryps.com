@@ -173,6 +173,15 @@ export interface WorkContractViewModel {
 	signed: Date;
 }
 
+export interface CityViewModel {
+    centerX: number;
+	centerY: number;
+	id: string;
+	incorporated: Date;
+	mainImpressionId: string;
+	name: string;
+}
+
 export interface HistoricListingGradeViewModel {
     description: string;
 	grade: number;

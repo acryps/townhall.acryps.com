@@ -21,6 +21,8 @@ import { MapService } from "././../areas/map.service";
 import { BoroughSummaryModel } from "././../areas/borough.summary";
 import { DistrictViewModel } from "././../areas/vote/district";
 import { BoroughService } from "././../areas/borough/service";
+import { CityViewModel } from "././../areas/city/city";
+import { CityService } from "././../areas/city/service";
 import { Company } from "././database";
 import { CompanyType } from "././database";
 import { Office } from "././database";
@@ -117,6 +119,7 @@ import { Square } from "./../managed/database";
 import { WaterBody } from "./../managed/database";
 import { WorkOffer } from "./../managed/database";
 import { WorkContract } from "./../managed/database";
+import { City } from "./../managed/database";
 import { HistoricListingGrade } from "./../managed/database";
 import { HistoricListingModifier } from "./../managed/database";
 import { Impression } from "./../managed/database";
@@ -150,6 +153,10 @@ Inject.mappings = {
 	},
 	"BoroughService": {
 		objectConstructor: BoroughService,
+		parameters: ["DbContext"]
+	},
+	"CityService": {
+		objectConstructor: CityService,
 		parameters: ["DbContext"]
 	},
 	"CompanyOfficeService": {
@@ -446,6 +453,15 @@ export class ManagedServer extends BaseServer {
 			{},
 			inject => inject.construct(BoroughService),
 			(controller, params) => controller.listDistricts(
+				
+			)
+		);
+
+		this.expose(
+			"JtamdiOHlyZH9lNmlhcz8zZXpiMmd3Ym",
+			{},
+			inject => inject.construct(CityService),
+			(controller, params) => controller.getCities(
 				
 			)
 		);
@@ -2870,6 +2886,84 @@ ViewModel.mappings = {
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"match" in viewModel && (model.match = viewModel.match === null ? null : `${viewModel.match}`);
 			"signed" in viewModel && (model.signed = viewModel.signed === null ? null : new Date(viewModel.signed));
+
+			return model;
+		}
+	},
+	[CityViewModel.name]: class ComposedCityViewModel extends CityViewModel {
+		async map() {
+			return {
+				centerX: this.$$model.centerX,
+				centerY: this.$$model.centerY,
+				id: this.$$model.id,
+				incorporated: this.$$model.incorporated,
+				mainImpressionId: this.$$model.mainImpressionId,
+				name: this.$$model.name
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				centerX: true,
+				centerY: true,
+				id: true,
+				incorporated: true,
+				mainImpressionId: true,
+				name: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new CityViewModel(null);
+			"centerX" in data && (item.centerX = data.centerX === null ? null : +data.centerX);
+			"centerY" in data && (item.centerY = data.centerY === null ? null : +data.centerY);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"incorporated" in data && (item.incorporated = data.incorporated === null ? null : new Date(data.incorporated));
+			"mainImpressionId" in data && (item.mainImpressionId = data.mainImpressionId === null ? null : `${data.mainImpressionId}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: CityViewModel) {
+			let model: City;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(City).find(viewModel.id)
+			} else {
+				model = new City();
+			}
+			
+			"centerX" in viewModel && (model.centerX = viewModel.centerX === null ? null : +viewModel.centerX);
+			"centerY" in viewModel && (model.centerY = viewModel.centerY === null ? null : +viewModel.centerY);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"incorporated" in viewModel && (model.incorporated = viewModel.incorporated === null ? null : new Date(viewModel.incorporated));
+			"mainImpressionId" in viewModel && (model.mainImpressionId = viewModel.mainImpressionId === null ? null : `${viewModel.mainImpressionId}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 
 			return model;
 		}

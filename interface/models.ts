@@ -334,6 +334,12 @@ export interface ChatInteractionViewModel {
 	response: string;
 }
 
+export interface AssetViewModel {
+    id: string;
+	name: string;
+	value: number;
+}
+
 export interface ValuationSummaryModel {
     id: string;
 	price: number;

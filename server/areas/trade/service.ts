@@ -2,6 +2,8 @@ import { Service } from "vlserver";
 import { DbContext } from "../../managed/database";
 import { TradeManager } from "./manager";
 import { ValuationViewModel } from "./valuation.view";
+import { PropertyOwnerViewModel } from "../property.view";
+import { AssetViewModel } from "./asset";
 
 export class TradeService extends Service {
 	constructor(
@@ -22,5 +24,9 @@ export class TradeService extends Service {
 		valuation.price = price;
 
 		await valuation.update();
+	}
+
+	async compileAssets(id: string) {
+		return AssetViewModel.from(await this.manager.compileAssets(id));
 	}
 }

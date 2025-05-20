@@ -86,6 +86,7 @@ import { StreetRoute } from "././database";
 import { PlotBoundaryShapeModel } from "././../areas/property/plot";
 import { StreetService } from "././../areas/street/service";
 import { ValuationViewModel } from "././../areas/trade/valuation.view";
+import { AssetViewModel } from "././../areas/trade/asset";
 import { TradeService } from "././../areas/trade/service";
 import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
@@ -131,6 +132,7 @@ import { LegalEntity } from "./../managed/database";
 import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
+import { Asset } from "./../areas/trade/asset";
 import { TrainStationExit } from "./../managed/database";
 import { TrainRoute } from "./../managed/database";
 import { TrainStation } from "./../managed/database";
@@ -659,6 +661,17 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"Q3dTc1ODxpNGRreWlxemV2Mj5qcHZ4Mm",
+			{
+			"Z2enBhaH54eDQ5NHxrZGM2ZWpkMWozcD": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LegalEntityService),
+			(controller, params) => controller.findById(
+				params["Z2enBhaH54eDQ5NHxrZGM2ZWpkMWozcD"]
+			)
+		);
+
+		this.expose(
 			"lvYjBpYWJzd2Joajozd3VkazdhZjBobz",
 			{},
 			inject => inject.construct(LegalEntityService),
@@ -1097,6 +1110,17 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.overwriteValuation(
 				params["d1ejZldmVzNnV2ejQzYnBnaWlkOW9ubn"],
 				params["NneWRjbzNpbnY5azhka382ZDgwdjd0dT"]
+			)
+		);
+
+		this.expose(
+			"k0bXJoZmdpOHdpYTc4ZWUwZTozMTNhcW",
+			{
+			"l6NWV2Y2FrNzo0bmI2bTduNmBic3E3aX": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(TradeService),
+			(controller, params) => controller.compileAssets(
+				params["l6NWV2Y2FrNzo0bmI2bTduNmBic3E3aX"]
 			)
 		);
 
@@ -4572,6 +4596,72 @@ ViewModel.mappings = {
 			"question" in viewModel && (model.question = viewModel.question === null ? null : `${viewModel.question}`);
 			"responded" in viewModel && (model.responded = viewModel.responded === null ? null : new Date(viewModel.responded));
 			"response" in viewModel && (model.response = viewModel.response === null ? null : `${viewModel.response}`);
+
+			return model;
+		}
+	},
+	[AssetViewModel.name]: class ComposedAssetViewModel extends AssetViewModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				name: this.$$model.name,
+				value: this.$$model.value
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				name: true,
+				value: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new AssetViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"value" in data && (item.value = data.value === null ? null : +data.value);
+
+			return item;
+		}
+
+		static async toModel(viewModel: AssetViewModel) {
+			let model: Asset;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Asset).find(viewModel.id)
+			} else {
+				model = new Asset();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"value" in viewModel && (model.value = viewModel.value === null ? null : +viewModel.value);
 
 			return model;
 		}

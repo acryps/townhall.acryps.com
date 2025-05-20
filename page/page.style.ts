@@ -25,6 +25,7 @@ import { legalEntitySelectorStyle } from "./shared/legal-entity/select/index.sty
 import { articleStyle } from "./news/article/index.style";
 import { valuationStyle } from "./trade/valuation/index.style";
 import { mapStartStyle } from "./map/start/index.style";
+import { assetsStyle } from "./trade/assets/index.style";
 
 export const pageStyle = () => root(
 	boldFont,
@@ -100,6 +101,7 @@ export const pageStyle = () => root(
 				voteStyle(),
 
 				valuationStyle(),
+				assetsStyle(),
 
 				lawHouseStyle(),
 

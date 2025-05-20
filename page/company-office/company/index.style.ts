@@ -1,8 +1,9 @@
-import { aspectRatio, backgroundColor, child, color, display, flexDirection, flexGrow, fontSize, fontWeight, justifyContent, margin, marginBottom, marginInline, overflow, padding, percentage, ratio, rem, textAlign, whiteSpace, width } from "@acryps/style";
+import { alignItems, alignSelf, aspectRatio, backgroundColor, child, color, display, flexDirection, flexGrow, flexWrap, fontSize, fontWeight, justifyContent, margin, marginBottom, marginInline, overflow, padding, percentage, ratio, rem, textAlign, whiteSpace, width } from "@acryps/style";
 import { card } from "../../shared/card.style";
 import { collection, collectionItem } from "../../shared/collection.style";
-import { infoColor, pageBackgroundColor, pageTextColor, positiveColor } from "../../index.style";
+import { infoColor, pageBackgroundColor, pageGutter, pageTextColor, positiveColor } from "../../index.style";
 import { headerBannerStyle } from "../../banner/index.style";
+import { buttonStyle } from "../../shared/index.style";
 
 export const companyStyle = () => child('ui-company',
 	display('block'),
@@ -52,6 +53,17 @@ export const companyStyle = () => child('ui-company',
 		marginBottom(rem(1)),
 
 		whiteSpace('pre-wrap')
+	),
+
+	child('ui-actions',
+		display('flex'),
+		flexWrap('wrap'),
+		justifyContent('center'),
+		marginBottom(pageGutter),
+
+		child('ui-action',
+			buttonStyle()
+		)
 	),
 
 	child('ui-offices',

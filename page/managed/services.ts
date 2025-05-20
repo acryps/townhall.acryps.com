@@ -794,6 +794,21 @@ export class ChatInteractionViewModel {
 	}
 }
 
+export class AssetViewModel {
+	id: string;
+	name: string;
+	value: number;
+
+	private static $build(raw) {
+		const item = new AssetViewModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.value === undefined || (item.value = raw.value === null ? null : +raw.value)
+		
+		return item;
+	}
+}
+
 export class ValuationSummaryModel {
 	id: string;
 	price: number;
@@ -2050,6 +2065,27 @@ export class LegalEntityService {
 		});
 	}
 
+	async findById(id: string): Promise<LegalEntityViewModel> {
+		const $data = new FormData();
+		$data.append("Z2enBhaH54eDQ5NHxrZGM2ZWpkMWozcD", Service.stringify(id))
+
+		return await fetch(Service.toURL("Q3dTc1ODxpNGRreWlxemV2Mj5qcHZ4Mm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : LegalEntityViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async listFeatured(): Promise<Array<LegalEntityViewModel>> {
 		const $data = new FormData();
 		
@@ -2847,6 +2883,27 @@ export class TradeService {
 
 			if ("aborted" in r) {
 				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async compileAssets(id: string): Promise<Array<AssetViewModel>> {
+		const $data = new FormData();
+		$data.append("l6NWV2Y2FrNzo0bmI2bTduNmBic3E3aX", Service.stringify(id))
+
+		return await fetch(Service.toURL("k0bXJoZmdpOHdpYTc4ZWUwZTozMTNhcW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : AssetViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
 			}
 		});
 	}

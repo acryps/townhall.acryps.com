@@ -44,6 +44,12 @@ export class CompanyPage extends Component {
 				{this.company.description}
 			</ui-description>
 
+			<ui-actions>
+				<ui-action ui-href={`/trade/assets/${this.company.id}`}>
+					View Assets
+				</ui-action>
+			</ui-actions>
+
 			<ui-offices>
 				{this.company.offices.map(office => <ui-office ui-href={`../../office/${office.id}`}>
 					{new MapComponent().highlight(Point.unpack(office.property.activePlotBoundary.shape))}

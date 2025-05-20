@@ -18,6 +18,12 @@ export class LegalEntityService extends Service {
 		);
 	}
 
+	async findById(id: string) {
+		return new LegalEntityViewModel(
+			await this.manager.findBySourceId(id)
+		);
+	}
+
 	listFeatured() {
 		return LegalEntityViewModel.from(
 			LegalEntityReferenceCounter.active.ranked.slice(0, 25)

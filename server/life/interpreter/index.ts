@@ -1,3 +1,4 @@
+import { writeFileSync } from "fs";
 import { Ollama } from "ollama";
 
 export type Tool = {
@@ -20,8 +21,14 @@ export class Interpreter {
 	tools: Tool[] = [];
 	history: InterpreterMessage[] = [];
 
-	readonly toolStartToken = '<ACTION>';
-	readonly toolEndToken = '</ACTION>';
+	static readonly toolStartToken = '<ACTION>';
+	static readonly toolEndToken = '</ACTION>';
+
+	static simulateToolReponse(tool: string, parameters: any) {
+		return new AssistantMessage(`${this.toolStartToken}${tool}({ ${
+			Object.keys(parameters).map(name => `${name}: ${typeof parameters[name] == 'string' ? JSON.stringify(parameters[name]) : parameters[name]}`)
+		} })${this.toolEndToken}`);
+	}
 
 	constructor(
 		public mode: 'smart' | 'fast' = 'smart'
@@ -42,7 +49,7 @@ export class Interpreter {
 			'Wrap parameters in objects, following this example',
 			'',
 			'Function: test(name: string, value: number)',
-			`${this.toolStartToken}test({ name: "string parameter", value: 5.111 })${this.toolEndToken}`,
+			`${Interpreter.toolStartToken}test({ name: "string parameter", value: 5.111 })${Interpreter.toolEndToken}`,
 			'',
 			'If you want to omit a optional parameter, supply null.',
 			'The following actions are available to you.'
@@ -54,7 +61,7 @@ export class Interpreter {
 
 		message.push(
 			'When calling actions, make sure to use the correct data types, encapsulated in JSON.',
-			`Encapsulate each call in ${this.toolStartToken} ... ${this.toolEndToken}.`
+			`Encapsulate each call in ${Interpreter.toolStartToken} ... ${Interpreter.toolEndToken}.`
 		);
 
 		return message.join('\n');
@@ -65,18 +72,22 @@ export class Interpreter {
 	}
 
 	async execute(...messages: InterpreterMessage[]) {
+		const x = [
+			new SystemMessage(this.metaInitiator),
+			...this.history,
+			...messages
+		].map(message => message.toOllamaMessage());
+
+		writeFileSync('MESSAGE_HISTORY.json', JSON.stringify(x, null, '\t'));
+
 		const response = await ollama.chat({
 			model: this.modelName,
-			messages: [
-				new SystemMessage(this.metaInitiator),
-				...this.history,
-				...messages
-			].map(message => message.toOllamaMessage())
+			messages:x
 		});
 
 		const message = response.message.content;
 
-		if (!message.includes(this.toolStartToken)) {
+		if (!message.includes(Interpreter.toolStartToken)) {
 			console.warn(`[interpreter] no tools called.`);
 
 			return await this.execute(...messages);
@@ -84,8 +95,8 @@ export class Interpreter {
 
 		const calls: { tool: Tool, values: any[] }[] = [];
 
-		for (let call of message.split(this.toolStartToken).slice(1)) {
-			const content = call.split(this.toolEndToken)[0].trim();
+		for (let call of message.split(Interpreter.toolStartToken).slice(1)) {
+			const content = call.split(Interpreter.toolEndToken)[0].trim();
 
 			const toolName = content.split('(')[0];
 			const tool = this.tools.find(tool => tool.name == toolName);

@@ -1,7 +1,7 @@
 import { DbClient, RunContext } from "vlquery";
 import { Inject, StaticFileRoute, ViewModel } from "vlserver";
 import { ManagedServer } from "./managed/server";
-import { Article, ArticleImage, Bridge, DbContext, MapType, Movement, Resident, ResidentFigure, ResidentRelationship, Tenancy, TenancyQueryProxy } from "./managed/database";
+import { Article, ArticleImage, Bridge, DbContext, MapType, Movement, PropertyOwner, Resident, ResidentFigure, ResidentRelationship, Tenancy, TenancyQueryProxy } from "./managed/database";
 import ws from 'express-ws';
 import { join } from "path";
 import { GameBridge } from "./bridge";
@@ -27,6 +27,8 @@ import { StreetFiller } from "./map/fill/street";
 import { LegalEntityReferenceCounter } from "./areas/legal-entity/reference-counter";
 import { PropertyValueTileServer } from "./map/layers/heatmap/gradiant/property-value";
 import { PropertyOwnershipTileServer } from "./map/layers/shape/propety-ownership";
+import { PropertyValueator } from "./areas/trade/valuation/property";
+import { LegalEntityManager } from "./areas/legal-entity/manager";
 
 const runLife = process.env.RUN_LIFE == 'YES';
 
@@ -40,6 +42,46 @@ DbClient.connectedClient.connect().then(async () => {
 	ws(app.app);
 
 	const database = new DbContext(new RunContext());
+	const legalEntityManager = new LegalEntityManager(database);
+
+	for (let property of await database.property
+		.where(property => property.deactivated == null)
+		.where(property => property.reviewValue == null)
+		.where(property => property.type != null).toArray()
+	) {
+		const owner = await property.owners.first();
+
+		if (owner && owner.aquiredValuationId) {
+			const valuation = await owner.aquiredValuation.fetch();
+			valuation.description += '\n\nInitial manual valuation';
+			await valuation.update();
+
+			const revalued = new PropertyOwner();
+			revalued.aquired = new Date();
+
+			if (owner.ownerId) {
+				revalued.owner = owner.owner;
+			}
+
+			revalued.property = property;
+			revalued.share = 1;
+
+			revalued.aquiredValuation = await new PropertyValueator(await legalEntityManager.findBorough(property.boroughId)).valueate(property);
+
+			await revalued.create();
+
+			owner.sold = new Date();
+			await owner.update();
+		}
+
+		property.reviewValue = true;
+		await property.update();
+	}
+
+	console.log('done');
+
+	return;
+
 	new MapImporter(database);
 
 	const annotator = new Annotator(database);

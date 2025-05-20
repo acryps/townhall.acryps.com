@@ -9,12 +9,15 @@ import { Shape } from "../../../interface/shape";
 import { TradeManager } from "../trade/manager";
 import { PropertyManager } from "./manager";
 import { BoroughSummaryModel } from "../borough.summary";
+import { PropertyValueator } from "../trade/valuation/property";
+import { LegalEntityManager } from "../legal-entity/manager";
 
 export class PropertyService extends Service {
 	constructor(
 		private database: DbContext,
 		private manager: PropertyManager,
-		private tradeManager: TradeManager
+		private tradeManager: TradeManager,
+		private legalEntityManager: LegalEntityManager
 	) {
 		super();
 	}
@@ -52,9 +55,12 @@ export class PropertyService extends Service {
 
 	async assignSoleOwner(propertyId: string, entityId: string) {
 		const property = await this.database.property.find(propertyId);
+		const borough = await this.legalEntityManager.findBorough(property.boroughId);
 		const entity = await this.database.legalEntity.find(entityId);
 
-		let owner = await property.owners.first();
+		let owner = await property.owners
+			.orderByDescending(owner => owner.aquired)
+			.first();
 
 		if (!owner) {
 			owner = new PropertyOwner();
@@ -65,7 +71,7 @@ export class PropertyService extends Service {
 
 			await owner.create();
 
-			this.tradeManager.valueateProperty(property).then(async valuation => {
+			new PropertyValueator(borough).valueate(property).then(async valuation => {
 				owner.aquiredValuation = valuation;
 
 				await owner.update();

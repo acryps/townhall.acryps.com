@@ -67,6 +67,7 @@ import { BuildingSummaryModel } from "././../areas/property/building";
 import { PlotBoundarySummaryModel } from "././../areas/property/plot";
 import { Shape } from "././../../interface/shape";
 import { TradeManager } from "././../areas/trade/manager";
+import { PropertyValueator } from "././../areas/trade/valuation/property";
 import { PropertyService } from "././../areas/property/service";
 import { Article } from "././database";
 import { ArticleImage } from "././database";
@@ -193,7 +194,7 @@ Inject.mappings = {
 	},
 	"PropertyService": {
 		objectConstructor: PropertyService,
-		parameters: ["DbContext","PropertyManager","TradeManager"]
+		parameters: ["DbContext","PropertyManager","TradeManager","LegalEntityManager"]
 	},
 	"TradeManager": {
 		objectConstructor: TradeManager,

@@ -11,6 +11,21 @@ export class LegalEntityManager extends Manager {
 		super();
 	}
 
+	async findBorough(id: string) {
+		let entity = await this.database.legalEntity.first(entity => entity.boroughId == id);
+
+		if (entity) {
+			return;
+		}
+
+		entity = new LegalEntity();
+		entity.boroughId = id;
+
+		await entity.create();
+
+		return entity;
+	}
+
 	async find(search: string) {
 		search = search.trim().toLowerCase();
 

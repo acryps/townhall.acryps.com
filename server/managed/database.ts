@@ -1443,6 +1443,7 @@ export class PropertyQueryProxy extends QueryProxy {
 	get playerOwnerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get reviewCompany(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get reviewPlot(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get reviewValue(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get typeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
@@ -1471,6 +1472,7 @@ export class Property extends Entity<PropertyQueryProxy> {
 	playerOwnerId: string;
 	reviewCompany: boolean;
 	reviewPlot: boolean;
+	reviewValue: boolean;
 	typeId: string;
 	
 	$$meta = {
@@ -1489,6 +1491,7 @@ export class Property extends Entity<PropertyQueryProxy> {
 			playerOwnerId: { type: "uuid", name: "player_owner_id" },
 			reviewCompany: { type: "bool", name: "review_company" },
 			reviewPlot: { type: "bool", name: "review_plot" },
+			reviewValue: { type: "bool", name: "review_value" },
 			typeId: { type: "uuid", name: "type_id" }
 		},
 		get set(): DbSet<Property, PropertyQueryProxy> { 

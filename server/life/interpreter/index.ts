@@ -72,17 +72,13 @@ export class Interpreter {
 	}
 
 	async execute(...messages: InterpreterMessage[]) {
-		const x = [
-			new SystemMessage(this.metaInitiator),
-			...this.history,
-			...messages
-		].map(message => message.toOllamaMessage());
-
-		writeFileSync('MESSAGE_HISTORY.json', JSON.stringify(x, null, '\t'));
-
 		const response = await ollama.chat({
 			model: this.modelName,
-			messages:x
+			messages: [
+				new SystemMessage(this.metaInitiator),
+				...this.history,
+				...messages
+			].map(message => message.toOllamaMessage())
 		});
 
 		const message = response.message.content;

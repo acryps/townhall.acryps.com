@@ -42,45 +42,6 @@ DbClient.connectedClient.connect().then(async () => {
 	ws(app.app);
 
 	const database = new DbContext(new RunContext());
-	const legalEntityManager = new LegalEntityManager(database);
-
-	for (let property of await database.property
-		.where(property => property.deactivated == null)
-		.where(property => property.reviewValue == null)
-		.where(property => property.type != null).toArray()
-	) {
-		const owner = await property.owners.first();
-
-		if (owner && owner.aquiredValuationId) {
-			const valuation = await owner.aquiredValuation.fetch();
-			valuation.description += '\n\nInitial manual valuation';
-			await valuation.update();
-
-			const revalued = new PropertyOwner();
-			revalued.aquired = new Date();
-
-			if (owner.ownerId) {
-				revalued.owner = owner.owner;
-			}
-
-			revalued.property = property;
-			revalued.share = 1;
-
-			revalued.aquiredValuation = await new PropertyValueator(await legalEntityManager.findBorough(property.boroughId)).valueate(property);
-
-			await revalued.create();
-
-			owner.sold = new Date();
-			await owner.update();
-		}
-
-		property.reviewValue = true;
-		await property.update();
-	}
-
-	console.log('done');
-
-	return;
 
 	new MapImporter(database);
 

@@ -47,7 +47,7 @@ export class LegalEntitySelectorComponent extends Component {
 			} else {
 				this.list.updateList(LegalEntitySelectorComponent.featured, this.selection);
 			}
-		}, 500);
+		}, 100);
 
 		this.requestLock = requestDebounce;
 	}
@@ -61,7 +61,7 @@ export class LegalEntitySelectorComponent extends Component {
 			input.onkeyup = () => this.updateSearchResults(input.value);
 
 			input.onfocus = () => this.rootNode.setAttribute('ui-focus', '');
-			input.onblur = () => setTimeout(() => this.rootNode.removeAttribute('ui-focus'), 100);
+			input.onblur = () => setTimeout(() => this.rootNode.removeAttribute('ui-focus'), 250);
 		});
 
 		return <ui-legal-entity-selector>

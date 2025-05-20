@@ -32,21 +32,21 @@ export class LegalEntityManager extends Manager {
 		const results = await Promise.all([
 			this.referenceItem(
 				this.database.borough, search,
-				(query, term) => query.where(borough => borough.name.lowercase().startsWith(term)),
+				(query, term) => query.where(borough => borough.name.lowercase().includes(term)),
 				id => this.database.legalEntity.first(entity => entity.boroughId == id),
 				'borough'
 			),
 
 			this.referenceItem(
 				this.database.company, search,
-				(query, term) => query.where(company => company.name.lowercase().startsWith(term)),
+				(query, term) => query.where(company => company.name.lowercase().includes(term)),
 				id => this.database.legalEntity.first(entity => entity.companyId == id),
 				'company'
 			),
 
 			this.referenceItem(
 				this.database.resident, search,
-				(query, term) => query.where(resident => resident.givenName.lowercase().startsWith(term) || resident.familyName.lowercase().startsWith(term)),
+				(query, term) => query.where(resident => resident.givenName.lowercase().includes(term) || resident.familyName.lowercase().includes(term)),
 				id => this.database.legalEntity.first(entity => entity.residentId == id),
 				'resident'
 			),
@@ -71,7 +71,7 @@ export class LegalEntityManager extends Manager {
 		resolve: (id: string) => Promise<LegalEntity>,
 		assign: keyof LegalEntity
 	) {
-		let query = set.limit(5);
+		let query = set.limit(15);
 
 		for (let term of search.split(/\s+/)) {
 			query = filter(query, term);

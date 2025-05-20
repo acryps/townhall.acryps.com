@@ -19,25 +19,25 @@ export class LegalEntityComponent extends Component {
 		}
 
 		if (this.entity.state) {
-			return <ui-legal-entity ui-type='state'>
+			return <ui-legal-entity ui-type='state' ui-click={() => this.onClick && this.onClick()}>
 				{stateIcon()} State
 			</ui-legal-entity>;
 		}
 
 		if (this.entity.borough) {
-			return <ui-legal-entity ui-type='borough' ui-click={() => this.onClick() ?? this.navigate(`/borough/${this.entity.borough.tag}`)}>
+			return <ui-legal-entity ui-type='borough' ui-click={() => this.onClick ? this.onClick() : this.navigate(`/borough/${this.entity.borough.tag}`)}>
 				{boroughIcon()} {this.entity.borough.name}
 			</ui-legal-entity>;
 		}
 
 		if (this.entity.company) {
-			return <ui-legal-entity ui-type='company' ui-click={() => this.onClick() ?? this.navigate(`/company-office/company/${this.entity.company.tag}`)}>
+			return <ui-legal-entity ui-type='company' ui-click={() => this.onClick ? this.onClick() : this.navigate(`/company-office/company/${this.entity.company.tag}`)}>
 				{companyOfficeIcon()} {convertToLegalCompanyName(this.entity.company)}
 			</ui-legal-entity>;
 		}
 
 		if (this.entity.resident) {
-			return <ui-legal-entity ui-type='resident' ui-click={() => this.onClick() ?? this.navigate(`/resident/${this.entity.resident.tag}`)}>
+			return <ui-legal-entity ui-type='resident' ui-click={() => this.onClick ? this.onClick() : this.navigate(`/resident/${this.entity.resident.tag}`)}>
 				{residentIcon()} {this.entity.resident.givenName} {this.entity.resident.familyName}
 			</ui-legal-entity>;
 		}

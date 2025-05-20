@@ -46,6 +46,7 @@ import { ValuationPage } from "./trade/valuation";
 import { PropertyOwnershipPage } from "./properties/property/ownership";
 import { QuickValueationAction } from "./map/quick-valueation";
 import { MapStartPage } from "./map/start";
+import { RevaluePropertyPage } from "./properties/property/ownership/revalue";
 
 export class Application {
 	static router: Router;
@@ -83,7 +84,9 @@ export class Application {
 				.route('/properties', PropertiesComponent)
 				.route('/property/:id', PropertyPage
 					.route('/building/:id', BuildingPage)
-					.route('/ownership', PropertyOwnershipPage)
+					.route('/ownership', PropertyOwnershipPage
+						.route('/revalue/:ownerId', RevaluePropertyPage)
+					)
 				)
 
 				.route('/borough/register/:bounds', RegisterBoroughPage)

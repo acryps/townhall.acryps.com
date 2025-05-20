@@ -1,9 +1,12 @@
 import { border, child, display, flexWrap, fontWeight, gap, justifyContent, marginBottom, marginTop, opacity, padding, px, rem } from "@acryps/style";
 import { pageGutter } from "../../../index.style";
 import { buttonStyle } from "../../../shared/index.style";
+import { revalueStyle } from "./revalue/index.style";
 
 export const ownershipStructureStyle = () => child('ui-ownership-structure',
 	display('block'),
+
+	revalueStyle(),
 
 	child('ui-owner',
 		display('block'),

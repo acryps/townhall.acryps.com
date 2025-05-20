@@ -16,6 +16,7 @@ export class TradeManager extends Manager {
 			.where(owner => owner.ownerId == id)
 			.where(owner => owner.sold == null)
 			.where(owner => owner.property.deactivated == null)
+			.where(owner => owner.aquiredValuationId != null)
 			.include(owner => owner.property)
 			.include(owner => owner.aquiredValuation)
 			.toArray();

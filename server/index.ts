@@ -29,6 +29,7 @@ import { PropertyValueTileServer } from "./map/layers/heatmap/gradiant/property-
 import { PropertyOwnershipTileServer } from "./map/layers/shape/propety-ownership";
 import { PropertyValueator } from "./areas/trade/valuation/property";
 import { LegalEntityManager } from "./areas/legal-entity/manager";
+import { FillLife } from "./life/fill/fill";
 
 const runLife = process.env.RUN_LIFE == 'YES';
 
@@ -89,7 +90,7 @@ DbClient.connectedClient.connect().then(async () => {
 	// new MovementTileServer(app, database);
 
 	// life.tick();
-	/// new FillLife(life, db).fillEmptyDwellings();
+	new FillLife(life, database).fillEmptyDwellings();
 
 	ViewModel.globalFetchingContext = database;
 

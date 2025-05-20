@@ -1,6 +1,6 @@
 
-import { Bill, Borough, DbContext, District, Resident, ResidentRelationship, Vote } from "../managed/database";
-import { writeFileSync } from "fs";
+import { Bill, Borough, DbContext, District, Dwelling, Resident, ResidentRelationship, Vote } from "../managed/database";
+import { createWriteStream, writeFileSync } from "fs";
 import { toSimulatedTime } from "../../interface/time";
 import { TickFactor } from "./factor";
 import { Gender, genders } from "./gender";
@@ -18,8 +18,8 @@ export class Life {
 	residents: Resident[];
 
 	// name generators
+	familyNameGenerator: NameGenerator;
 	givenNameGenerators: NameGenerator[];
-	familyNameGenerators: NameGenerator[];
 
 	constructor(
 		private database: DbContext
@@ -28,8 +28,8 @@ export class Life {
 	async load() {
 		this.residents = await this.database.resident.toArray();
 
-		this.givenNameGenerators = genders.map(gender => new NameGenerator('given', gender, this.residents.map(resident => resident.givenName)));
-		this.familyNameGenerators = genders.map(gender => new NameGenerator('family', gender, this.residents.map(resident => resident.familyName)));
+		this.familyNameGenerator = new NameGenerator('family', this.residents.map(resident => resident.familyName));
+		this.givenNameGenerators = genders.map(gender => new NameGenerator('given', this.residents.map(resident => resident.givenName), gender));
 
 		console.log(`[life] now: ${toSimulatedTime(new Date()).toISOString()}`);
 	}
@@ -203,34 +203,6 @@ export class Life {
 			.toArray();
 	}
 
-	// create someone new
-	async spawn(
-		place: Borough,
-		standing: number,
-		birthday: Date,
-		gender: Gender = [...genders].sort(() => Math.random() - 0.5)[0]
-	): Promise<Resident> {
-		const resident = new Resident();
-		resident.birthday = birthday;
-
-		resident.givenName = await this.givenNameGenerators.find(generator => generator.gender == gender).next();
-		resident.familyName = await this.familyNameGenerators.find(generator => generator.gender == gender).next();
-		resident.tag = await this.createNameTag(resident.givenName, resident.familyName);
-
-		const prompt = this.language.createSpawnedBiography(resident.givenName, resident.familyName, birthday, gender, place, standing);
-		resident.biography = await this.language.respondText(prompt, place.description);
-
-		await resident.create();
-		this.residents.push(resident);
-
-		await this.assignFigure(resident);
-		await this.assignPoliticalTags(resident);
-
-		console.log(`+ spawn ${resident.tag} ${resident.givenName} ${resident.familyName}`);
-
-		return resident as Resident;
-	}
-
 	async merge(
 		parentA: Resident,
 		parentB: Resident,
@@ -270,7 +242,7 @@ export class Life {
 		return resident;
 	}
 
-	private async createNameTag(givenName: string, familyName: string, iteration = 0) {
+	async createNameTag(givenName: string, familyName: string, iteration = 0) {
 		const name = `${givenName.toLowerCase()}-${familyName.toLowerCase()}${iteration ? `-${iteration}` : ''}`;
 
 		if (await this.database.resident.where(resident => resident.tag.valueOf() == name).count()) {

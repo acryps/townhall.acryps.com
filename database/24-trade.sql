@@ -61,3 +61,5 @@ WHERE property.player_owner_id IS NOT NULL;
 -- verify ownership
 -- valuations must be created in code
 ALTER TABLE property DROP player_owner_id;
+
+ALTER TABLE property ADD review_value BOOLEAN;

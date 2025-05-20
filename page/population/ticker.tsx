@@ -8,7 +8,7 @@ export class PopulationTickerComponent extends Component {
 		this.events = await new LifeService().ticker();
 
 		setTimeout(() => {
-			if (this.loaded) {
+			if (document.contains(this.rootNode)) {
 				this.reload();
 			}
 		}, 1000);

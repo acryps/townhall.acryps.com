@@ -1,6 +1,7 @@
 import { ViewModel } from "vlserver";
 import { Dwelling, Resident, ResidentEventView, ResidentRelationship, Tenancy } from "../../managed/database";
 import { PropertySummaryModel } from "../property.summary";
+import { WorkContractEmploymentModel, WorkContractViewModel } from "../work";
 
 export class ResidentSummaryModel extends ViewModel<Resident> {
 	id;
@@ -22,6 +23,7 @@ export class ResidentViewModel extends ViewModel<Resident> {
 	biography;
 
 	mainTenancy: TenancyViewModel;
+	workContracts: WorkContractEmploymentModel[];
 }
 
 export class ResidentRelationViewModel extends ViewModel<ResidentRelationship> {

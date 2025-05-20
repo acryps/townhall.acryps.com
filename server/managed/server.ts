@@ -102,7 +102,7 @@ import { OfficeCapacityViewModel } from "./../areas/company.view";
 import { TenantViewModel } from "./../areas/property.view";
 import { StreetRouteSummaryModel } from "./../areas/street.view";
 import { WorkOfferSummaryModel } from "./../areas/work";
-import { WorkContractViewModel } from "./../areas/work";
+import { WorkContractSummaryModel } from "./../areas/work";
 import { LawHouseSessionaryViewModel } from "./../areas/law-house/session";
 import { LawHouseSessionProtocolViewModel } from "./../areas/law-house/session";
 import { TenancyViewModel } from "./../areas/life/resident";
@@ -112,6 +112,10 @@ import { ValuationSummaryModel } from "./../areas/trade/valuation.view";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { HonestiumViewModel } from "./../areas/vote/bill";
+import { OfficeEmployeeModel } from "./../areas/company.view";
+import { WorkOfferEmplymentModel } from "./../areas/work";
+import { WorkContractViewModel } from "./../areas/work";
+import { WorkContractEmploymentModel } from "./../areas/work";
 import { Bridge } from "./../managed/database";
 import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
@@ -2836,13 +2840,11 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	[WorkContractViewModel.name]: class ComposedWorkContractViewModel extends WorkContractViewModel {
+	[WorkContractSummaryModel.name]: class ComposedWorkContractSummaryModel extends WorkContractSummaryModel {
 		async map() {
 			return {
-				worker: new ResidentSummaryModel(await BaseServer.unwrap(this.$$model.worker)),
 				canceled: this.$$model.canceled,
 				id: this.$$model.id,
-				match: this.$$model.match,
 				signed: this.$$model.signed
 			}
 		};
@@ -2873,31 +2875,22 @@ ViewModel.mappings = {
 			}
 
 			return {
-				get worker() {
-					return ViewModel.mappings[ResidentSummaryModel.name].getPrefetchingProperties(
-						level,
-						[...parents, "worker-WorkContractViewModel"]
-					);
-				},
 				canceled: true,
 				id: true,
-				match: true,
 				signed: true
 			};
 		};
 
 		static toViewModel(data) {
-			const item = new WorkContractViewModel(null);
-			"worker" in data && (item.worker = data.worker && ViewModel.mappings[ResidentSummaryModel.name].toViewModel(data.worker));
+			const item = new WorkContractSummaryModel(null);
 			"canceled" in data && (item.canceled = data.canceled === null ? null : new Date(data.canceled));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
-			"match" in data && (item.match = data.match === null ? null : `${data.match}`);
 			"signed" in data && (item.signed = data.signed === null ? null : new Date(data.signed));
 
 			return item;
 		}
 
-		static async toModel(viewModel: WorkContractViewModel) {
+		static async toModel(viewModel: WorkContractSummaryModel) {
 			let model: WorkContract;
 			
 			if (viewModel.id) {
@@ -2906,10 +2899,8 @@ ViewModel.mappings = {
 				model = new WorkContract();
 			}
 			
-			"worker" in viewModel && (model.worker.id = viewModel.worker ? viewModel.worker.id : null);
 			"canceled" in viewModel && (model.canceled = viewModel.canceled === null ? null : new Date(viewModel.canceled));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
-			"match" in viewModel && (model.match = viewModel.match === null ? null : `${viewModel.match}`);
 			"signed" in viewModel && (model.signed = viewModel.signed === null ? null : new Date(viewModel.signed));
 
 			return model;
@@ -3646,6 +3637,7 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				mainTenancy: new TenancyViewModel(await BaseServer.unwrap(this.$$model.mainTenancy)),
+				workContracts: (await this.$$model.workContracts.includeTree(ViewModel.mappings[WorkContractEmploymentModel.name].items).toArray()).map(item => new WorkContractEmploymentModel(item)),
 				biography: this.$$model.biography,
 				birthday: this.$$model.birthday,
 				familyName: this.$$model.familyName,
@@ -3687,6 +3679,12 @@ ViewModel.mappings = {
 						[...parents, "mainTenancy-ResidentViewModel"]
 					);
 				},
+				get workContracts() {
+					return ViewModel.mappings[WorkContractEmploymentModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "workContracts-ResidentViewModel"]
+					);
+				},
 				biography: true,
 				birthday: true,
 				familyName: true,
@@ -3699,6 +3697,7 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new ResidentViewModel(null);
 			"mainTenancy" in data && (item.mainTenancy = data.mainTenancy && ViewModel.mappings[TenancyViewModel.name].toViewModel(data.mainTenancy));
+			"workContracts" in data && (item.workContracts = data.workContracts && [...data.workContracts].map(i => ViewModel.mappings[WorkContractEmploymentModel.name].toViewModel(i)));
 			"biography" in data && (item.biography = data.biography === null ? null : `${data.biography}`);
 			"birthday" in data && (item.birthday = data.birthday === null ? null : new Date(data.birthday));
 			"familyName" in data && (item.familyName = data.familyName === null ? null : `${data.familyName}`);
@@ -3719,6 +3718,7 @@ ViewModel.mappings = {
 			}
 			
 			"mainTenancy" in viewModel && (model.mainTenancy.id = viewModel.mainTenancy ? viewModel.mainTenancy.id : null);
+			"workContracts" in viewModel && (null);
 			"biography" in viewModel && (model.biography = viewModel.biography === null ? null : `${viewModel.biography}`);
 			"birthday" in viewModel && (model.birthday = viewModel.birthday === null ? null : new Date(viewModel.birthday));
 			"familyName" in viewModel && (model.familyName = viewModel.familyName === null ? null : `${viewModel.familyName}`);
@@ -4042,8 +4042,8 @@ ViewModel.mappings = {
 			return {
 				id: this.$$model.id,
 				timestamp: this.$$model.timestamp,
-				primaryResidentId: this.$$model.primaryResidentId,
-				action: this.$$model.action
+				action: this.$$model.action,
+				primaryResidentId: this.$$model.primaryResidentId
 			}
 		};
 
@@ -4075,8 +4075,8 @@ ViewModel.mappings = {
 			return {
 				id: true,
 				timestamp: true,
-				primaryResidentId: true,
-				action: true
+				action: true,
+				primaryResidentId: true
 			};
 		};
 
@@ -4084,8 +4084,8 @@ ViewModel.mappings = {
 			const item = new ResidentTickerModel(null);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"timestamp" in data && (item.timestamp = data.timestamp === null ? null : new Date(data.timestamp));
-			"primaryResidentId" in data && (item.primaryResidentId = data.primaryResidentId === null ? null : `${data.primaryResidentId}`);
 			"action" in data && (item.action = data.action === null ? null : `${data.action}`);
+			"primaryResidentId" in data && (item.primaryResidentId = data.primaryResidentId === null ? null : `${data.primaryResidentId}`);
 
 			return item;
 		}
@@ -4101,8 +4101,8 @@ ViewModel.mappings = {
 			
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"timestamp" in viewModel && (model.timestamp = viewModel.timestamp === null ? null : new Date(viewModel.timestamp));
-			"primaryResidentId" in viewModel && (model.primaryResidentId = viewModel.primaryResidentId === null ? null : `${viewModel.primaryResidentId}`);
 			"action" in viewModel && (model.action = viewModel.action === null ? null : `${viewModel.action}`);
+			"primaryResidentId" in viewModel && (model.primaryResidentId = viewModel.primaryResidentId === null ? null : `${viewModel.primaryResidentId}`);
 
 			return model;
 		}
@@ -5660,6 +5660,165 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[OfficeEmployeeModel.name]: class ComposedOfficeEmployeeModel extends OfficeEmployeeModel {
+		async map() {
+			return {
+				company: new CompanySummaryModel(await BaseServer.unwrap(this.$$model.company)),
+				property: new PropertySummaryModel(await BaseServer.unwrap(this.$$model.property)),
+				id: this.$$model.id,
+				name: this.$$model.name
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get company() {
+					return ViewModel.mappings[CompanySummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "company-OfficeEmployeeModel"]
+					);
+				},
+				get property() {
+					return ViewModel.mappings[PropertySummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "property-OfficeEmployeeModel"]
+					);
+				},
+				id: true,
+				name: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new OfficeEmployeeModel(null);
+			"company" in data && (item.company = data.company && ViewModel.mappings[CompanySummaryModel.name].toViewModel(data.company));
+			"property" in data && (item.property = data.property && ViewModel.mappings[PropertySummaryModel.name].toViewModel(data.property));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: OfficeEmployeeModel) {
+			let model: Office;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Office).find(viewModel.id)
+			} else {
+				model = new Office();
+			}
+			
+			"company" in viewModel && (model.company.id = viewModel.company ? viewModel.company.id : null);
+			"property" in viewModel && (model.property.id = viewModel.property ? viewModel.property.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+
+			return model;
+		}
+	},
+	[WorkOfferEmplymentModel.name]: class ComposedWorkOfferEmplymentModel extends WorkOfferEmplymentModel {
+		async map() {
+			return {
+				office: new OfficeEmployeeModel(await BaseServer.unwrap(this.$$model.office)),
+				closed: this.$$model.closed,
+				count: this.$$model.count,
+				id: this.$$model.id,
+				title: this.$$model.title
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get office() {
+					return ViewModel.mappings[OfficeEmployeeModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "office-WorkOfferEmplymentModel"]
+					);
+				},
+				closed: true,
+				count: true,
+				id: true,
+				title: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new WorkOfferEmplymentModel(null);
+			"office" in data && (item.office = data.office && ViewModel.mappings[OfficeEmployeeModel.name].toViewModel(data.office));
+			"closed" in data && (item.closed = data.closed === null ? null : new Date(data.closed));
+			"count" in data && (item.count = data.count === null ? null : +data.count);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: WorkOfferEmplymentModel) {
+			let model: WorkOffer;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(WorkOffer).find(viewModel.id)
+			} else {
+				model = new WorkOffer();
+			}
+			
+			"office" in viewModel && (model.office.id = viewModel.office ? viewModel.office.id : null);
+			"closed" in viewModel && (model.closed = viewModel.closed === null ? null : new Date(viewModel.closed));
+			"count" in viewModel && (model.count = viewModel.count === null ? null : +viewModel.count);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
+
+			return model;
+		}
+	},
 	[WorkOfferViewModel.name]: class ComposedWorkOfferViewModel extends WorkOfferViewModel {
 		async map() {
 			return {
@@ -5752,6 +5911,160 @@ ViewModel.mappings = {
 			"offered" in viewModel && (model.offered = viewModel.offered === null ? null : new Date(viewModel.offered));
 			"task" in viewModel && (model.task = viewModel.task === null ? null : `${viewModel.task}`);
 			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
+
+			return model;
+		}
+	},
+	[WorkContractViewModel.name]: class ComposedWorkContractViewModel extends WorkContractViewModel {
+		async map() {
+			return {
+				worker: new ResidentSummaryModel(await BaseServer.unwrap(this.$$model.worker)),
+				canceled: this.$$model.canceled,
+				id: this.$$model.id,
+				match: this.$$model.match,
+				signed: this.$$model.signed
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get worker() {
+					return ViewModel.mappings[ResidentSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "worker-WorkContractViewModel"]
+					);
+				},
+				canceled: true,
+				id: true,
+				match: true,
+				signed: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new WorkContractViewModel(null);
+			"worker" in data && (item.worker = data.worker && ViewModel.mappings[ResidentSummaryModel.name].toViewModel(data.worker));
+			"canceled" in data && (item.canceled = data.canceled === null ? null : new Date(data.canceled));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"match" in data && (item.match = data.match === null ? null : `${data.match}`);
+			"signed" in data && (item.signed = data.signed === null ? null : new Date(data.signed));
+
+			return item;
+		}
+
+		static async toModel(viewModel: WorkContractViewModel) {
+			let model: WorkContract;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(WorkContract).find(viewModel.id)
+			} else {
+				model = new WorkContract();
+			}
+			
+			"worker" in viewModel && (model.worker.id = viewModel.worker ? viewModel.worker.id : null);
+			"canceled" in viewModel && (model.canceled = viewModel.canceled === null ? null : new Date(viewModel.canceled));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"match" in viewModel && (model.match = viewModel.match === null ? null : `${viewModel.match}`);
+			"signed" in viewModel && (model.signed = viewModel.signed === null ? null : new Date(viewModel.signed));
+
+			return model;
+		}
+	},
+	[WorkContractEmploymentModel.name]: class ComposedWorkContractEmploymentModel extends WorkContractEmploymentModel {
+		async map() {
+			return {
+				offer: new WorkOfferEmplymentModel(await BaseServer.unwrap(this.$$model.offer)),
+				canceled: this.$$model.canceled,
+				id: this.$$model.id,
+				signed: this.$$model.signed
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get offer() {
+					return ViewModel.mappings[WorkOfferEmplymentModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "offer-WorkContractEmploymentModel"]
+					);
+				},
+				canceled: true,
+				id: true,
+				signed: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new WorkContractEmploymentModel(null);
+			"offer" in data && (item.offer = data.offer && ViewModel.mappings[WorkOfferEmplymentModel.name].toViewModel(data.offer));
+			"canceled" in data && (item.canceled = data.canceled === null ? null : new Date(data.canceled));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"signed" in data && (item.signed = data.signed === null ? null : new Date(data.signed));
+
+			return item;
+		}
+
+		static async toModel(viewModel: WorkContractEmploymentModel) {
+			let model: WorkContract;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(WorkContract).find(viewModel.id)
+			} else {
+				model = new WorkContract();
+			}
+			
+			"offer" in viewModel && (model.offer.id = viewModel.offer ? viewModel.offer.id : null);
+			"canceled" in viewModel && (model.canceled = viewModel.canceled === null ? null : new Date(viewModel.canceled));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"signed" in viewModel && (model.signed = viewModel.signed === null ? null : new Date(viewModel.signed));
 
 			return model;
 		}

@@ -5,7 +5,7 @@ CREATE TABLE city (
 	name TEXT,
 	incorporated TIMESTAMP,
 
-	main_impression_id UUID CONSTRAINT main_impression__ REFERENCES impression (id)
+	main_impression_id UUID CONSTRAINT main_impression__ REFERENCES impression (id),
 
 	center_x REAL,
 	center_y REAL

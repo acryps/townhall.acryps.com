@@ -26,7 +26,7 @@ export class Language {
 	`;
 
 	readonly createNames = (size: number, type: NameType, gender: Gender, used: string[], characterSeed: string[]) => `
-		Create a list of ${size} ${gender.name} ${type} names.
+		Create a list of ${size} ${gender?.name ?? ''} ${type} names.
 		Avoid compound names.
 		Do not create full names, only ${type} names!
 		The names will be used to create fictional characters.

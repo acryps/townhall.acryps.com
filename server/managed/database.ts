@@ -1,16 +1,16 @@
 import { Entity, DbSet, RunContext, QueryUUID, QueryProxy, QueryString, QueryJSON, QueryTimeStamp, QueryNumber, QueryTime, QueryDate, QueryBoolean, QueryBuffer, QueryEnum, ForeignReference, PrimaryReference, View, ViewSet } from 'vlquery';
 
-export class MapType extends QueryEnum {
-	static readonly night = "night";
-	static readonly overworld = "overworld";
-}
-
 export class CompanyType extends QueryEnum {
 	static readonly company = "company";
 	static readonly department = "department";
 	static readonly governmentCompany = "government_company";
 	static readonly guild = "guild";
 	static readonly nonProfit = "non_profit";
+}
+
+export class MapType extends QueryEnum {
+	static readonly night = "night";
+	static readonly overworld = "overworld";
 }
 
 export class ArticleQueryProxy extends QueryProxy {
@@ -1819,8 +1819,10 @@ export class ResidentQueryProxy extends QueryProxy {
 	get mainTenancy(): Partial<TenancyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get biography(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get birthday(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get coreValues(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get familyName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get figureId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get generated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get givenName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get mainTenancyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get politicalSetting(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -1837,8 +1839,10 @@ export class Resident extends Entity<ResidentQueryProxy> {
 		workContracts: PrimaryReference<WorkContract, WorkContractQueryProxy>;
 		biography: string;
 	birthday: Date;
+	coreValues: string;
 	familyName: string;
 	figureId: string;
+	generated: Date;
 	givenName: string;
 	declare id: string;
 	mainTenancyId: string;
@@ -1850,8 +1854,10 @@ export class Resident extends Entity<ResidentQueryProxy> {
 		columns: {
 			biography: { type: "text", name: "biography" },
 			birthday: { type: "timestamp", name: "birthday" },
+			coreValues: { type: "text", name: "core_values" },
 			familyName: { type: "text", name: "family_name" },
 			figureId: { type: "uuid", name: "figure_id" },
+			generated: { type: "timestamp", name: "generated" },
 			givenName: { type: "text", name: "given_name" },
 			id: { type: "uuid", name: "id" },
 			mainTenancyId: { type: "uuid", name: "main_tenancy_id" },
@@ -2696,10 +2702,10 @@ export class WorkOffer extends Entity<WorkOfferQueryProxy> {
 			
 class ResidentEventViewProxy extends QueryProxy {
 	get timestamp(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get primaryResidentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get secondaryResidentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get action(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get detail(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get primaryResidentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get secondaryResidentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class ResidentEventView extends View<ResidentEventViewProxy> {
@@ -2712,19 +2718,19 @@ export class ResidentEventView extends View<ResidentEventViewProxy> {
 		columns: {
 			id: { type: "uuid", name: "id" },
 			timestamp: { type: "timestamp", name: "timestamp" },
-			primaryResidentId: { type: "uuid", name: "primary_resident_id" },
-			secondaryResidentId: { type: "uuid", name: "secondary_resident_id" },
 			action: { type: "text", name: "action" },
-			detail: { type: "text", name: "detail" }
+			detail: { type: "text", name: "detail" },
+			primaryResidentId: { type: "uuid", name: "primary_resident_id" },
+			secondaryResidentId: { type: "uuid", name: "secondary_resident_id" }
 		}
 	};
 
 	id: string;
 	timestamp: Date;
-	primaryResidentId: string;
-	secondaryResidentId: string;
 	action: string;
 	detail: string;
+	primaryResidentId: string;
+	secondaryResidentId: string;
 }
 			
 

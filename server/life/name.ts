@@ -4,18 +4,29 @@ import { Language } from "./language";
 export type NameType = 'given' | 'family';
 
 export class NameGenerator {
-	private language = new Language();
+	private language = new Language('fast');
 
-	readonly stockSize = 50;
+	readonly stockSize = 100;
 	readonly minimumStockSize = 20;
+	readonly selectionSize = 10;
 
 	private stock = [];
 
 	constructor(
 		public type: NameType,
-		public gender: Gender,
-		private used: string[]
+		private used: string[],
+		public gender?: Gender
 	) { }
+
+	async selection() {
+		const names = [];
+
+		for (let index = 0; index < this.selectionSize; index++) {
+			names.push(await this.next());
+		}
+
+		return names;
+	}
 
 	async next() {
 		while (this.stock.length < this.minimumStockSize) {

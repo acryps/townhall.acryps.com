@@ -122,18 +122,6 @@ export class HomePage extends Component {
 						Come here if you mean business!
 					</ui-description>
 				</ui-topic>
-
-				<ui-topic ui-href={`/map/${Application.center.x}/${Application.center.y}/5/quick-valueation`}>
-					{priceIcon()}
-
-					<ui-name>
-						Valuation
-					</ui-name>
-
-					<ui-description>
-						Value properties
-					</ui-description>
-				</ui-topic>
 			</ui-topics>
 
 			<ui-connection>

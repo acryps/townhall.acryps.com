@@ -1,4 +1,4 @@
-import { alignItems, borderBottom, borderLeft, ch, child, columnGap, display, Dvi, fontSize, fontWeight, height, justifyContent, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, maxHeight, objectFit, objectPosition, paddingLeft, percentage, px, Px, rem, textAlign, vh, whiteSpace, width } from "@acryps/style";
+import { alignItems, borderBottom, borderLeft, ch, child, columnGap, display, Dvi, fontSize, fontWeight, height, justifyContent, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, maxHeight, objectFit, objectPosition, paddingLeft, percentage, px, Px, rem, textAlign, vh, whiteSpace, width } from "@acryps/style";
 import { boxed } from "../shared/boxed.style";
 import { buttonStyle } from "../shared/index.style";
 import { ChatPage } from "./chat";
@@ -43,13 +43,21 @@ export const residentStyle = () => child('ui-resident',
 		display('block'),
 		textAlign('center'),
 
-		marginBottom(rem(2))
+		marginBottom(rem(0.25))
+	),
+
+	child('ui-work',
+		display('block'),
+		textAlign('center'),
+
+		marginBottom(rem(0.25))
 	),
 
 	child('ui-actions',
 		display('flex'),
 		justifyContent('center'),
 		columnGap(rem(1)),
+		marginTop(rem(1.75)),
 		marginBottom(rem(2)),
 
 		child('ui-action', buttonStyle())

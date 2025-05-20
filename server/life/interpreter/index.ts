@@ -131,6 +131,8 @@ export class Interpreter {
 			...messages,
 			new AssistantMessage(message)
 		);
+
+		return message;
 	}
 
 	addTool(name: string, parameters: ToolParameter[], action: Function) {

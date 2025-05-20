@@ -3,6 +3,7 @@ import { ChatService, LifeService, ResidentEventViewModel, ResidentViewModel } f
 import { toSimulatedAge } from "../../interface/time";
 import { chatIcon, electionIcon, homeIcon, relationGraphIcon } from "../assets/icons/managed";
 import { MetaPerson } from "@acryps/metadata";
+import { convertToLegalCompanyName } from "../../interface/company";
 
 export class ResidentPage extends Component {
 	declare parameters: { tag };
@@ -29,6 +30,8 @@ export class ResidentPage extends Component {
 			</ui-resident>;
 		}
 
+		const activeWorkContract = this.resident.workContracts.find(contract => !contract.canceled);
+
 		return <ui-resident>
 			<img src={`/resident/image/${this.resident.tag}`} />
 
@@ -51,6 +54,12 @@ export class ResidentPage extends Component {
 			</ui-home> : <ui-home>
 				No permanent home
 			</ui-home>}
+
+			{activeWorkContract ? <ui-work ui-href={`/company-office/company/${activeWorkContract.offer.office.company.tag}`}>
+				Working as {activeWorkContract.offer.title} for {convertToLegalCompanyName(activeWorkContract.offer.office.company)} in {activeWorkContract.offer.office.property.borough.name}
+			</ui-work> : <ui-work>
+				Not employeed at the time
+			</ui-work>}
 
 			<ui-actions>
 				<ui-action ui-click={async () => this.navigate(`chat/${await new ChatService().start(this.resident.tag)}`)}>

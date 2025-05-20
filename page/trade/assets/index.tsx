@@ -12,6 +12,12 @@ export class EntityAssetsPage extends Component {
 	async onload() {
 		this.entity = await new LegalEntityService().findById(this.parameters.id);
 
+		if (!this.entity) {
+			this.assets = [];
+
+			return;
+		}
+
 		new TradeService().compileAssets(this.entity.id).then(assets => {
 			this.assets = assets;
 

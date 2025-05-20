@@ -165,11 +165,9 @@ export interface WorkOfferSummaryModel {
 	title: string;
 }
 
-export interface WorkContractViewModel {
-    worker: ResidentSummaryModel;
-	canceled: Date;
+export interface WorkContractSummaryModel {
+    canceled: Date;
 	id: string;
-	match: string;
 	signed: Date;
 }
 
@@ -243,6 +241,7 @@ export interface ResidentSummaryModel {
 
 export interface ResidentViewModel {
     mainTenancy: TenancyViewModel;
+	workContracts: WorkContractEmploymentModel[];
 	biography: string;
 	birthday: Date;
 	familyName: string;
@@ -284,8 +283,8 @@ export interface ResidentEventViewModel {
 export interface ResidentTickerModel {
     id: string;
 	timestamp: Date;
-	primaryResidentId: string;
 	action: string;
+	primaryResidentId: string;
 }
 
 export interface BuildingShapeModel {
@@ -441,6 +440,21 @@ export interface OfficeViewModel {
 	name: string;
 }
 
+export interface OfficeEmployeeModel {
+    company: CompanySummaryModel;
+	property: PropertySummaryModel;
+	id: string;
+	name: string;
+}
+
+export interface WorkOfferEmplymentModel {
+    office: OfficeEmployeeModel;
+	closed: Date;
+	count: number;
+	id: string;
+	title: string;
+}
+
 export interface WorkOfferViewModel {
     workContracts: WorkContractViewModel[];
 	office: OfficeViewModel;
@@ -450,6 +464,21 @@ export interface WorkOfferViewModel {
 	offered: Date;
 	task: string;
 	title: string;
+}
+
+export interface WorkContractViewModel {
+    worker: ResidentSummaryModel;
+	canceled: Date;
+	id: string;
+	match: string;
+	signed: Date;
+}
+
+export interface WorkContractEmploymentModel {
+    offer: WorkOfferEmplymentModel;
+	canceled: Date;
+	id: string;
+	signed: Date;
 }
 
 export interface LawHouseSessionViewModel {

@@ -384,19 +384,15 @@ export class WorkOfferSummaryModel {
 	}
 }
 
-export class WorkContractViewModel {
-	worker: ResidentSummaryModel;
+export class WorkContractSummaryModel {
 	canceled: Date;
 	id: string;
-	match: string;
 	signed: Date;
 
 	private static $build(raw) {
-		const item = new WorkContractViewModel();
-		raw.worker === undefined || (item.worker = raw.worker ? ResidentSummaryModel["$build"](raw.worker) : null)
+		const item = new WorkContractSummaryModel();
 		raw.canceled === undefined || (item.canceled = raw.canceled ? new Date(raw.canceled) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
-		raw.match === undefined || (item.match = raw.match === null ? null : `${raw.match}`)
 		raw.signed === undefined || (item.signed = raw.signed ? new Date(raw.signed) : null)
 		
 		return item;
@@ -571,6 +567,7 @@ export class ResidentSummaryModel {
 
 export class ResidentViewModel {
 	mainTenancy: TenancyViewModel;
+	workContracts: WorkContractEmploymentModel[];
 	biography: string;
 	birthday: Date;
 	familyName: string;
@@ -581,6 +578,7 @@ export class ResidentViewModel {
 	private static $build(raw) {
 		const item = new ResidentViewModel();
 		raw.mainTenancy === undefined || (item.mainTenancy = raw.mainTenancy ? TenancyViewModel["$build"](raw.mainTenancy) : null)
+		raw.workContracts === undefined || (item.workContracts = raw.workContracts ? raw.workContracts.map(i => WorkContractEmploymentModel["$build"](i)) : null)
 		raw.biography === undefined || (item.biography = raw.biography === null ? null : `${raw.biography}`)
 		raw.birthday === undefined || (item.birthday = raw.birthday ? new Date(raw.birthday) : null)
 		raw.familyName === undefined || (item.familyName = raw.familyName === null ? null : `${raw.familyName}`)
@@ -667,15 +665,15 @@ export class ResidentEventViewModel {
 export class ResidentTickerModel {
 	id: string;
 	timestamp: Date;
-	primaryResidentId: string;
 	action: string;
+	primaryResidentId: string;
 
 	private static $build(raw) {
 		const item = new ResidentTickerModel();
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.timestamp === undefined || (item.timestamp = raw.timestamp ? new Date(raw.timestamp) : null)
-		raw.primaryResidentId === undefined || (item.primaryResidentId = raw.primaryResidentId === null ? null : `${raw.primaryResidentId}`)
 		raw.action === undefined || (item.action = raw.action === null ? null : `${raw.action}`)
+		raw.primaryResidentId === undefined || (item.primaryResidentId = raw.primaryResidentId === null ? null : `${raw.primaryResidentId}`)
 		
 		return item;
 	}
@@ -1050,6 +1048,42 @@ export class OfficeViewModel {
 	}
 }
 
+export class OfficeEmployeeModel {
+	company: CompanySummaryModel;
+	property: PropertySummaryModel;
+	id: string;
+	name: string;
+
+	private static $build(raw) {
+		const item = new OfficeEmployeeModel();
+		raw.company === undefined || (item.company = raw.company ? CompanySummaryModel["$build"](raw.company) : null)
+		raw.property === undefined || (item.property = raw.property ? PropertySummaryModel["$build"](raw.property) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		
+		return item;
+	}
+}
+
+export class WorkOfferEmplymentModel {
+	office: OfficeEmployeeModel;
+	closed: Date;
+	count: number;
+	id: string;
+	title: string;
+
+	private static $build(raw) {
+		const item = new WorkOfferEmplymentModel();
+		raw.office === undefined || (item.office = raw.office ? OfficeEmployeeModel["$build"](raw.office) : null)
+		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
+		raw.count === undefined || (item.count = raw.count === null ? null : +raw.count)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
+		
+		return item;
+	}
+}
+
 export class WorkOfferViewModel {
 	workContracts: WorkContractViewModel[];
 	office: OfficeViewModel;
@@ -1070,6 +1104,42 @@ export class WorkOfferViewModel {
 		raw.offered === undefined || (item.offered = raw.offered ? new Date(raw.offered) : null)
 		raw.task === undefined || (item.task = raw.task === null ? null : `${raw.task}`)
 		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
+		
+		return item;
+	}
+}
+
+export class WorkContractViewModel {
+	worker: ResidentSummaryModel;
+	canceled: Date;
+	id: string;
+	match: string;
+	signed: Date;
+
+	private static $build(raw) {
+		const item = new WorkContractViewModel();
+		raw.worker === undefined || (item.worker = raw.worker ? ResidentSummaryModel["$build"](raw.worker) : null)
+		raw.canceled === undefined || (item.canceled = raw.canceled ? new Date(raw.canceled) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.match === undefined || (item.match = raw.match === null ? null : `${raw.match}`)
+		raw.signed === undefined || (item.signed = raw.signed ? new Date(raw.signed) : null)
+		
+		return item;
+	}
+}
+
+export class WorkContractEmploymentModel {
+	offer: WorkOfferEmplymentModel;
+	canceled: Date;
+	id: string;
+	signed: Date;
+
+	private static $build(raw) {
+		const item = new WorkContractEmploymentModel();
+		raw.offer === undefined || (item.offer = raw.offer ? WorkOfferEmplymentModel["$build"](raw.offer) : null)
+		raw.canceled === undefined || (item.canceled = raw.canceled ? new Date(raw.canceled) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.signed === undefined || (item.signed = raw.signed ? new Date(raw.signed) : null)
 		
 		return item;
 	}

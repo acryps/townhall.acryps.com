@@ -1,12 +1,16 @@
 
-import { Bill, Borough, DbContext, District, Dwelling, Resident, ResidentRelationship, Vote } from "../managed/database";
+import { Bill, Borough, DbContext, District, Dwelling, PlotBoundary, Resident, ResidentRelationship, Vote } from "../managed/database";
 import { createWriteStream, writeFileSync } from "fs";
-import { toSimulatedTime } from "../../interface/time";
+import { toSimulatedAge, toSimulatedTime } from "../../interface/time";
 import { TickFactor } from "./factor";
 import { Gender, genders } from "./gender";
 import { NameGenerator } from "./name";
 import { Language } from "./language";
 import { resolve } from "dns/promises";
+import { Interpreter, SystemMessage, UserMessage } from "./interpreter";
+import { Interface } from "readline/promises";
+import { config } from "process";
+import { Point } from "../../interface/point";
 
 export class Life {
 	// weights, of how many people do what on a tick
@@ -17,6 +21,9 @@ export class Life {
 
 	residents: Resident[];
 
+	// contains points that a resident frequents
+	residentAnchors = new Map<Resident, Point[]>();
+
 	// name generators
 	familyNameGenerator: NameGenerator;
 	givenNameGenerators: NameGenerator[];
@@ -26,7 +33,11 @@ export class Life {
 	) {}
 
 	async load() {
-		this.residents = await this.database.resident.toArray();
+		this.residents = await this.database.resident
+			.include(resident => resident.tenancies)
+			.toArray();
+
+		await this.updateResidentAnchors();
 
 		this.familyNameGenerator = new NameGenerator('family', this.residents.map(resident => resident.familyName));
 		this.givenNameGenerators = genders.map(gender => new NameGenerator('given', this.residents.map(resident => resident.givenName), gender));
@@ -34,8 +45,89 @@ export class Life {
 		console.log(`[life] now: ${toSimulatedTime(new Date()).toISOString()}`);
 	}
 
+	async updateResidentAnchors() {
+		const workContracts = await this.database.workContract
+			.where(contract => contract.canceled == null)
+			.include(contract => contract.offer)
+			.toArray();
+
+		const offices = await this.database.office.toArray();
+		const plots = await this.database.plotBoundary
+			.where(boundary => boundary.property.activePlotBoundaryId == boundary.id)
+			.toArray();
+
+		const dwellings = await this.database.dwelling.toArray();
+
+		for (let resident of this.residents) {
+			const boundaries: PlotBoundary[] = [];
+
+			const contracts = workContracts.filter(contract => contract.workerId == resident.id);
+
+			for (let contract of contracts) {
+				const offer = await contract.offer.fetch();
+				const office = offices.find(office => office.id == offer.officeId);
+
+				boundaries.push(plots.find(plot => plot.propertyId == office.propertyId));
+			}
+
+			for (let tenancy of await resident.tenancies.toArray()) {
+				if (!tenancy.end) {
+					const dwelling = dwellings.find(dwelling => dwelling.id == tenancy.dwellingId);
+
+					boundaries.push(plots.find(plot => plot.propertyId == dwelling.propertyId));
+				}
+			}
+
+			this.residentAnchors.set(resident, boundaries.map(boundary => Point.center(Point.unpack(boundary.shape))));
+		}
+	}
+
 	async tick() {
-		await this.bondingFactor.tick(async (initiator: Resident, peer: Resident) => await this.bond(initiator, peer));
+		await this.bondNext();
+	}
+
+	async bondNext() {
+		const initiator = [...this.residents].sort(() => Math.random() - 0.5)[0];
+		const meetingAnchor = [...this.residentAnchors.get(initiator)].sort(() => Math.random() - 0.5)[0];
+
+		if (!meetingAnchor) {
+			return await this.bondNext();
+		}
+
+		const pool = [];
+
+		for (let [peer, anchors] of this.residentAnchors) {
+			for (let anchor of anchors) {
+				const distance = anchor.distance(meetingAnchor);
+
+				pool.push({
+					peer,
+					distance
+				});
+			}
+		}
+
+		pool.sort((a, b) => a.distance - b.distance);
+
+		const weights = pool.map((_, index) => 1 / Math.sqrt(index + 1));
+		const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+		const pick = Math.random() * totalWeight;
+
+		console.log('pick', totalWeight, pick);
+
+		let cumulative = 0;
+		for (let index = 0; index < pool.length; index++) {
+			cumulative += weights[index];
+
+			if (pick < cumulative) {
+				const peer = pool[index].peer;
+				console.log(peer);
+
+				await this.bond(initiator, peer);
+
+				return;
+			}
+		}
 	}
 
 	async vote() {
@@ -131,46 +223,92 @@ export class Life {
 	}
 
 	async bond(initiator: Resident, peer: Resident) {
-		/*const initiatorRelationships = await this.findActiveRelations(initiator);
+		if (initiator.id == peer.id) {
+			return;
+		}
+
+		const initiatorRelationships = await this.findActiveRelations(initiator);
+		const peerRelationships = await this.findActiveRelations(peer);
 
 		// if they already have a relationship, break it!
 		// new relationships form frequently, as finding existing relationsships is rarer
 		const existingRelationship = initiatorRelationships.find(relationship => relationship.initiatorId == peer.id || relationship.peerId == peer.id);
 
-		if (existingRelationship) {
-			existingRelationship.conflict = await this.respond(`
+		if (existingRelationship && !existingRelationship.unbreakable) {
+			console.log(`-separate: ${initiator.tag} ${peer.tag}`);
 
-			`, existingRelationship.connection, initiator.biography, peer.biography);
+			const interpreter = new Interpreter();
+
+			interpreter.addTool('separate', [{ type: String, name: 'conflict' }], conflict => {
+				existingRelationship.conflict = conflict;
+			});
+
+			await interpreter.execute(
+				new SystemMessage(`
+					${initiator.givenName} and ${peer.givenName} have meet ${toSimulatedAge(existingRelationship.bonded)} years ago.
+					They had their fun times, but sadly they cannot continue their connection.
+					Come up with a fictional story, why they are no longer friends, ...
+
+					I will provide you with their bonding story and some detail about the people.
+					When you found a separaration story, call the 'separate' function.
+				`),
+
+				new UserMessage(existingRelationship.connection),
+
+				new UserMessage(await this.compilePersonDescription(initiator, initiatorRelationships)),
+				new UserMessage(await this.compilePersonDescription(peer, peerRelationships))
+			);
 
 			existingRelationship.ended = new Date();
+
+			await existingRelationship.update();
+
+			return;
 		}
 
-		const peerRelationships = await this.findActiveRelations(peer);
+		console.log(`+bond: ${initiator.tag} ${peer.tag}`);
 
 		const relationship = new ResidentRelationship();
 		relationship.bonded = new Date();
 		relationship.initiator = initiator;
 		relationship.peer = peer;
 
-		relationship.connection = await this.respond(`
-			${initiator.givenName} and ${peer.givenName} just meet.
-			given thier biographies and friends, write an imaginary a story why they bonded.
-			they might have meet outside randomly, meet in a pub, at work, thru friends or any other way!
-			they may become friends, partners or might even start a business together - any type of relationship may emerge from this connection.
-			do not tell me that you are writing a story, or any meta text.
+		const interpreter = new Interpreter('smart');
 
-			their current relations are:
-			${initiator.givenName}: ${(await this.compileFriendList(initiator, initiatorRelationships)).join(', ')}
-			${peer.givenName}: ${(await this.compileFriendList(peer, peerRelationships)).join(', ')}
-		`, initiator.biography, peer.biography);
+		interpreter.addTool('bond', [{ type: String, name: 'story' }, { type: String, name: 'summary' }, { type: String, name: 'type' }], (connection, summary, type) => {
+			relationship.connection = connection;
+			relationship.summary = summary;
+			relationship.purpose = type;
+		});
 
-		relationship.summary = await this.summarize(relationship.connection);
+		await interpreter.execute(
+			new SystemMessage(`
+				${initiator.givenName} and ${peer.givenName} just meet.
+				Given thier biographies and friends, write an imaginary a story why they bonded.
+				They might have meet outside randomly, meet in a pub, at work, thru friends or any other way!
+				They may become friends, partners or might even start a business together - any type of relationship may emerge from this connection.
+				I will provide you with a biography of the people and a list of all their friends and relations.
 
-		relationship.purpose = await this.respond(`
+				Call the 'bond' function when you found their story, a short summary of the story and a type ("Romantic", "Work", "Friendship", ...).
+			`),
 
-		`);
+			new UserMessage(await this.compilePersonDescription(initiator, initiatorRelationships)),
+			new UserMessage(await this.compilePersonDescription(peer, peerRelationships))
+		);
 
-		await relationship.create();*/
+		await relationship.create();
+	}
+
+	async compilePersonDescription(resident: Resident, relationships: ResidentRelationship[]) {
+		return `
+			${resident.givenName} ${resident.familyName}
+			age ${toSimulatedAge(resident.birthday)}
+
+			${resident.biography}
+
+			friendships and relations:
+			${(await this.compileFriendList(resident, relationships)).join('\n')}
+		`;
 	}
 
 	async compileFriendList(resident: Resident, relationships: ResidentRelationship[]) {
@@ -179,7 +317,7 @@ export class Life {
 		for (let relationship of relationships) {
 			const peer = relationship.initiatorId == resident.id ? await relationship.peer.fetch() : await relationship.initiator.fetch();
 
-			relations.push(`- ${relationship} with ${peer.givenName} ${peer.familyName}: ${relationship.summary}`);
+			relations.push(`- ${relationship} with ${peer.givenName} ${peer.familyName} (since ${toSimulatedAge(relationship.bonded)} years): ${relationship.summary}`);
 		}
 
 		return relations;

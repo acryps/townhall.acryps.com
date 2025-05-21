@@ -665,15 +665,15 @@ export class ResidentEventViewModel {
 export class ResidentTickerModel {
 	id: string;
 	timestamp: Date;
-	action: string;
 	primaryResidentId: string;
+	action: string;
 
 	private static $build(raw) {
 		const item = new ResidentTickerModel();
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.timestamp === undefined || (item.timestamp = raw.timestamp ? new Date(raw.timestamp) : null)
-		raw.action === undefined || (item.action = raw.action === null ? null : `${raw.action}`)
 		raw.primaryResidentId === undefined || (item.primaryResidentId = raw.primaryResidentId === null ? null : `${raw.primaryResidentId}`)
+		raw.action === undefined || (item.action = raw.action === null ? null : `${raw.action}`)
 		
 		return item;
 	}

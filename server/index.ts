@@ -30,6 +30,7 @@ import { PropertyOwnershipTileServer } from "./map/layers/shape/propety-ownershi
 import { PropertyValueator } from "./areas/trade/valuation/property";
 import { LegalEntityManager } from "./areas/legal-entity/manager";
 import { FillLife } from "./life/fill/fill";
+import { createWriteStream } from "fs";
 
 const runLife = process.env.RUN_LIFE == 'YES';
 
@@ -53,6 +54,7 @@ DbClient.connectedClient.connect().then(async () => {
 
 	const life = new Life(database);
 	await life.load();
+	await life.tick();
 
 	const lawHouse = new LawHouse(database, new Language('smart'), life);
 
@@ -89,7 +91,6 @@ DbClient.connectedClient.connect().then(async () => {
 	new PropertyOwnershipTileServer(app, database);
 	// new MovementTileServer(app, database);
 
-	// life.tick();
 	new FillLife(life, database).fillEmptyDwellings();
 
 	ViewModel.globalFetchingContext = database;

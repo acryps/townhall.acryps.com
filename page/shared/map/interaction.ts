@@ -1,8 +1,18 @@
 import { MapComponent } from ".";
 import { Point } from "../../../interface/point";
 
-export const registerInteration = (
-	map: MapComponent,
+export type InteractivePlane = {
+	rootNode: HTMLElement;
+	center: Point;
+	scale: number;
+
+	zoom(scale: number): void;
+	move(target: Point): void;
+	translate(target: Point): Point;
+};
+
+export const registerInteraction = (
+	map: InteractivePlane,
 
 	onMove: (destination: Point) => void,
 	onMoveEnd: (destination: Point) => void,

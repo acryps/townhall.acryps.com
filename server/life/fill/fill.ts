@@ -20,7 +20,7 @@ export class FillLife {
 			.where(property => property.deactivated == null)
 			.include(property => property.borough)
 			.include(property => property.dwellings)
-			.toArray()
+			.toArray();
 
 		for (let property of properties) {
 			const dwellings = await property.dwellings.toArray();
@@ -35,6 +35,8 @@ export class FillLife {
 	}
 
 	async fillDwelling(borough: Borough, dwelling: Dwelling) {
+		console.log(`filling dwelling`, dwelling.id, borough.name);
+
 		await this.createFamily(dwelling, borough);
 	}
 
@@ -107,6 +109,10 @@ export class FillLife {
 			members.push(resident);
 		});
 
+		console.log('GEN');
+
+		let iterations = 0;
+
 		do {
 			const job = await this.findJobOffering(homeLocation);
 			jobs.push(job);
@@ -120,13 +126,23 @@ export class FillLife {
 			const count = members.length;
 
 			while (count == members.length) {
+				console.log('TRYING GEN...');
+
 				await interpreter.execute(new UserMessage(`
 					${role}
 					${members.length == 0 ? `age: ${firstAge}` : ''}
 					${job?.task}
 				`));
+
+				iterations++;
+
+				if (iterations > 100) {
+					return await this.createFamily(dwelling, borough);
+				}
 			}
 		} while (Math.random() > 0.3);
+
+		console.log('GEN DONE');
 
 		// create residents and assign jobs
 		for (let memberIndex = 0; memberIndex < members.length; memberIndex++) {
@@ -138,6 +154,7 @@ export class FillLife {
 			await member.create();
 
 			await this.updateBiography(member, job, members);
+			await this.life.assignFigure(member);
 
 			if (job && toSimulatedAge(member.birthday) > 18) {
 				const contract = new WorkContract();
@@ -146,6 +163,8 @@ export class FillLife {
 				contract.signed = new Date();
 
 				await contract.create();
+
+				FillLife.contracts.push(contract);
 			}
 		}
 
@@ -174,6 +193,7 @@ export class FillLife {
 				relationship.purpose = 'Parent';
 				relationship.connection = `${familyName} Family`;
 				relationship.bonded = child.birthday;
+				relationship.unbreakable = true;
 
 				await relationship.create();
 			}
@@ -195,28 +215,40 @@ export class FillLife {
 		}
 	}
 
+	static offers: WorkOffer[];
+	static contracts: WorkContract[];
+	static properties: Property[];
+
 	async findJobOffering(location: Point) {
 		if (Math.random() < 0.2) {
 			return;
 		}
 
-		const offers = await this.database.workOffer
-			.where(offer => offer.closed == null)
-			.include(offer => offer.office)
-			.toArray();
+		let offers = FillLife.offers;
+
+		if (!offers) {
+			offers = FillLife.offers = await this.database.workOffer
+				.where(offer => offer.closed == null)
+				.include(offer => offer.office)
+				.toArray();
+
+			FillLife.contracts = await this.database.workContract.toArray();
+			FillLife.properties = await this.database.property.include(property => property.activePlotBoundary).toArray();
+		}
 
 		const pool: { offer: WorkOffer, distance: number }[] = [];
 
 		for (let offer of offers) {
 			const office = await offer.office.fetch();
-			const property = await office.property.fetch();
+			const property = FillLife.properties.find(property => property.id == office.propertyId);
 			const boundary = await property.activePlotBoundary.fetch();
 
 			const center = Point.center(Point.unpack(boundary.shape));
 
-			const contracts = await offer.workContracts
-				.where(contract => contract.canceled == null)
-				.count();
+			const contracts = FillLife.contracts
+				.filter(contract => contract.offerId == offer.id)
+				.filter(contract => !contract.canceled)
+				.length;
 
 			if (contracts < offer.count) {
 				pool.push({

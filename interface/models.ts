@@ -283,8 +283,8 @@ export interface ResidentEventViewModel {
 export interface ResidentTickerModel {
     id: string;
 	timestamp: Date;
-	action: string;
 	primaryResidentId: string;
+	action: string;
 }
 
 export interface BuildingShapeModel {

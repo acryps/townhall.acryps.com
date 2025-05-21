@@ -4042,8 +4042,8 @@ ViewModel.mappings = {
 			return {
 				id: this.$$model.id,
 				timestamp: this.$$model.timestamp,
-				action: this.$$model.action,
-				primaryResidentId: this.$$model.primaryResidentId
+				primaryResidentId: this.$$model.primaryResidentId,
+				action: this.$$model.action
 			}
 		};
 
@@ -4075,8 +4075,8 @@ ViewModel.mappings = {
 			return {
 				id: true,
 				timestamp: true,
-				action: true,
-				primaryResidentId: true
+				primaryResidentId: true,
+				action: true
 			};
 		};
 
@@ -4084,8 +4084,8 @@ ViewModel.mappings = {
 			const item = new ResidentTickerModel(null);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"timestamp" in data && (item.timestamp = data.timestamp === null ? null : new Date(data.timestamp));
-			"action" in data && (item.action = data.action === null ? null : `${data.action}`);
 			"primaryResidentId" in data && (item.primaryResidentId = data.primaryResidentId === null ? null : `${data.primaryResidentId}`);
+			"action" in data && (item.action = data.action === null ? null : `${data.action}`);
 
 			return item;
 		}
@@ -4101,8 +4101,8 @@ ViewModel.mappings = {
 			
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"timestamp" in viewModel && (model.timestamp = viewModel.timestamp === null ? null : new Date(viewModel.timestamp));
-			"action" in viewModel && (model.action = viewModel.action === null ? null : `${viewModel.action}`);
 			"primaryResidentId" in viewModel && (model.primaryResidentId = viewModel.primaryResidentId === null ? null : `${viewModel.primaryResidentId}`);
+			"action" in viewModel && (model.action = viewModel.action === null ? null : `${viewModel.action}`);
 
 			return model;
 		}

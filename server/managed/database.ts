@@ -1,16 +1,16 @@
 import { Entity, DbSet, RunContext, QueryUUID, QueryProxy, QueryString, QueryJSON, QueryTimeStamp, QueryNumber, QueryTime, QueryDate, QueryBoolean, QueryBuffer, QueryEnum, ForeignReference, PrimaryReference, View, ViewSet } from 'vlquery';
 
+export class MapType extends QueryEnum {
+	static readonly night = "night";
+	static readonly overworld = "overworld";
+}
+
 export class CompanyType extends QueryEnum {
 	static readonly company = "company";
 	static readonly department = "department";
 	static readonly governmentCompany = "government_company";
 	static readonly guild = "guild";
 	static readonly nonProfit = "non_profit";
-}
-
-export class MapType extends QueryEnum {
-	static readonly night = "night";
-	static readonly overworld = "overworld";
 }
 
 export class ArticleQueryProxy extends QueryProxy {
@@ -1948,6 +1948,7 @@ export class ResidentRelationshipQueryProxy extends QueryProxy {
 	get peerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get purpose(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get summary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get unbreakable(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class ResidentRelationship extends Entity<ResidentRelationshipQueryProxy> {
@@ -1962,6 +1963,7 @@ export class ResidentRelationship extends Entity<ResidentRelationshipQueryProxy>
 	peerId: string;
 	purpose: string;
 	summary: string;
+	unbreakable: boolean;
 	
 	$$meta = {
 		source: "resident_relationship",
@@ -1974,7 +1976,8 @@ export class ResidentRelationship extends Entity<ResidentRelationshipQueryProxy>
 			initiatorId: { type: "uuid", name: "initiator_id" },
 			peerId: { type: "uuid", name: "peer_id" },
 			purpose: { type: "text", name: "purpose" },
-			summary: { type: "text", name: "summary" }
+			summary: { type: "text", name: "summary" },
+			unbreakable: { type: "bool", name: "unbreakable" }
 		},
 		get set(): DbSet<ResidentRelationship, ResidentRelationshipQueryProxy> { 
 			return new DbSet<ResidentRelationship, ResidentRelationshipQueryProxy>(ResidentRelationship, null);
@@ -2702,10 +2705,10 @@ export class WorkOffer extends Entity<WorkOfferQueryProxy> {
 			
 class ResidentEventViewProxy extends QueryProxy {
 	get timestamp(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get action(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get detail(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get primaryResidentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get secondaryResidentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get action(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get detail(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class ResidentEventView extends View<ResidentEventViewProxy> {
@@ -2718,19 +2721,19 @@ export class ResidentEventView extends View<ResidentEventViewProxy> {
 		columns: {
 			id: { type: "uuid", name: "id" },
 			timestamp: { type: "timestamp", name: "timestamp" },
-			action: { type: "text", name: "action" },
-			detail: { type: "text", name: "detail" },
 			primaryResidentId: { type: "uuid", name: "primary_resident_id" },
-			secondaryResidentId: { type: "uuid", name: "secondary_resident_id" }
+			secondaryResidentId: { type: "uuid", name: "secondary_resident_id" },
+			action: { type: "text", name: "action" },
+			detail: { type: "text", name: "detail" }
 		}
 	};
 
 	id: string;
 	timestamp: Date;
-	action: string;
-	detail: string;
 	primaryResidentId: string;
 	secondaryResidentId: string;
+	action: string;
+	detail: string;
 }
 			
 

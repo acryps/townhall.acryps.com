@@ -7,13 +7,13 @@ export class TickFactor {
 		private name: string,
 		private baseFactor: number,
 		private size = 1
-	) { }
+	) {}
 
 	async tick(call: (...residens: Resident[]) => Promise<void>) {
 		const factor = Math.ceil(Math.random() * this.baseFactor * this.simulator.residents.length);
 		console.group(`${this.name}: ${factor}`);
 
-		const people = [...this.simulator.residents];
+		const people = this.simulator.residents;
 		people.sort(() => Math.random() - 0.5);
 
 		for (let iteration = 0; iteration < factor; iteration++) {

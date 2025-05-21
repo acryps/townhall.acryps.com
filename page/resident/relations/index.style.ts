@@ -1,86 +1,54 @@
-import { alignItems, aspectRatio, borderBottom, child, color, columnGap, display, flexBasis, flexGrow, flexShrink, fontSize, fontWeight, height, marginBottom, marginInline, marginTop, objectFit, objectPosition, overflow, padding, paddingBlock, percentage, px, ratio, rem, style, textAlign, textDecorationLine, textTransform, width } from "@acryps/style";
-import { negativeColor, pageGutter, positiveColor } from "../../index.style";
+import { alignItems, aspectRatio, background, backgroundColor, border, borderBottom, child, color, columnGap, cursor, display, Dvi, flexBasis, flexGrow, flexShrink, fontSize, fontWeight, height, imageRendering, inset, marginBottom, marginInline, marginTop, objectFit, objectPosition, opacity, overflow, padding, paddingBlock, paddingInline, percentage, position, px, ratio, rem, style, textAlign, textDecorationLine, textTransform, transform, translate, whiteSpace, width } from "@acryps/style";
+import { negativeColor, pageBackgroundColor, pageGutter, pageTextColor, positiveColor } from "../../index.style";
 import { boxed } from "../../shared/boxed.style";
 
-export const relationsStyle = () => child('ui-relations',
-	boxed(),
+export const relationsStyle = () => child('ui-relation-graph',
+	position('fixed'),
+	inset(0),
 
-	child('ui-hint',
-		display('block'),
-		marginBottom(rem(2))
+	child('canvas',
+		width(percentage(100)),
+		height(percentage(100)),
+
+		imageRendering('pixelated')
 	),
 
-	child('ui-relation',
+	child('ui-resident',
+		position('fixed'),
+		paddingBlock(rem(0.25)),
+		paddingInline(rem(0.5)),
+
 		display('block'),
-		paddingBlock(pageGutter),
+		transform(translate(percentage(-50), percentage(-50))),
 
-		style(':not(:last-of-type)',
-			borderBottom(px(1), 'solid', 'currentColor')
-		),
+		color(pageTextColor),
+		backgroundColor(pageBackgroundColor),
+		border(px(1), 'solid', pageTextColor),
+		whiteSpace('nowrap'),
+		cursor('pointer'),
 
-		child('ui-link',
-			display('flex'),
-			columnGap(pageGutter),
-			alignItems('center'),
-			marginBottom(rem(0.5)),
-
-			child('ui-resident',
-				flexGrow(1),
-				flexBasis(0),
-
-				textAlign('center'),
-
-				child('img',
-					height(rem(3)),
-					aspectRatio(ratio(1, 1.25)),
-
-					objectFit('cover'),
-					objectPosition('top')
-				),
-
-				child('ui-name',
-					display('block'),
-
-					fontWeight('bold')
-				)
-			)
-				.attribute('ui-self',
-					child('ui-name',
-						textDecorationLine('underline')
-					)
-				),
-
-			child('ui-icon',
-				flexShrink(0)
-			)
-		),
-
-		child('ui-purpose',
+		child('ui-given-name',
 			display('block'),
-			marginBottom(rem(2)),
+
+			fontWeight('bold'),
+			textAlign('center')
+		),
+
+		child('ui-family-name',
+			display('block'),
+
+			textAlign('center')
+		),
+
+		child('ui-age',
+			display('block'),
 
 			textAlign('center'),
-			textTransform('uppercase')
-		),
-
-		child('ui-time',
-			display('block'),
-
-			fontSize(rem(0.75))
-		),
-
-		child('ui-connection',
-			display('block'),
-			marginTop(rem(1)),
-
-			color(positiveColor)
-		),
-
-		child('ui-conflict',
-			display('block'),
-			marginTop(rem(1)),
-
-			color(negativeColor)
+			fontSize(rem(0.8))
 		)
 	)
+		.attribute('ui-expanded',
+			color(pageBackgroundColor),
+			backgroundColor(pageTextColor)
+		)
 );

@@ -1,7 +1,7 @@
 import { Component } from "@acryps/page";
 import { MapComponent } from "../shared/map";
 import { Application } from "..";
-import { registerInteration } from "../shared/map/interaction";
+import { registerInteraction } from "../shared/map/interaction";
 import { Point } from "../../interface/point";
 import { Action } from "../action";
 import { MapToolbarComponent } from "./toolbar";
@@ -40,7 +40,7 @@ export class MapPage extends Component {
 		requestAnimationFrame(() => {
 			this.toolbar.updateLocationIndicator();
 
-			registerInteration(this.map,
+			registerInteraction(this.map,
 				() => this.toolbar.updateLocationIndicator(),
 				() => {
 					this.updateParameters({

@@ -54,7 +54,7 @@ DbClient.connectedClient.connect().then(async () => {
 
 	const life = new Life(database);
 	await life.load();
-	await life.tick();
+	// await life.tick();
 
 	const lawHouse = new LawHouse(database, new Language('smart'), life);
 
@@ -91,7 +91,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new PropertyOwnershipTileServer(app, database);
 	// new MovementTileServer(app, database);
 
-	new FillLife(life, database).fillEmptyDwellings();
+	// new FillLife(life, database).fillEmptyDwellings();
 
 	ViewModel.globalFetchingContext = database;
 

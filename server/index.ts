@@ -31,6 +31,15 @@ import { PropertyValueator } from "./areas/trade/valuation/property";
 import { LegalEntityManager } from "./areas/legal-entity/manager";
 import { FillLife } from "./life/fill/fill";
 import { createWriteStream } from "fs";
+import { MetricTracker } from "./areas/metrics/tracker";
+import { PopulationSizeMetric } from "./areas/metrics/tracker/population-size";
+import { PropertyCountMetric } from "./areas/metrics/tracker/property-count";
+import { AllocatedAreaMetric } from "./areas/metrics/tracker/allocated-area";
+import { PopulationAgeAverageMetric } from "./areas/metrics/tracker/average-age";
+import { WorkUnemploymentMetric } from "./areas/metrics/tracker/unemployment";
+import { TotalPropertyValueMetric } from "./areas/metrics/tracker/total-property-value";
+import { DwellingCountMetric } from "./areas/metrics/tracker/dwelling-count";
+import { PlayerTraveledBlocksMetric } from "./areas/metrics/tracker/player-traveled-blocks";
 
 const runLife = process.env.RUN_LIFE == 'YES';
 
@@ -90,6 +99,19 @@ DbClient.connectedClient.connect().then(async () => {
 	new PropertyValueTileServer(app, database);
 	new PropertyOwnershipTileServer(app, database);
 	// new MovementTileServer(app, database);
+
+	// order will be keept in client
+	MetricTracker.track(new PopulationSizeMetric(database));
+	MetricTracker.track(new PopulationAgeAverageMetric(database));
+
+	MetricTracker.track(new PlayerTraveledBlocksMetric(database));
+
+	MetricTracker.track(new PropertyCountMetric(database));
+	MetricTracker.track(new DwellingCountMetric(database));
+	MetricTracker.track(new AllocatedAreaMetric(database));
+	MetricTracker.track(new TotalPropertyValueMetric(database));
+
+	MetricTracker.track(new WorkUnemploymentMetric(database));
 
 	// new FillLife(life, database).fillEmptyDwellings();
 

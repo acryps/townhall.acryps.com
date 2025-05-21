@@ -48,6 +48,7 @@ import { QuickValueationAction } from "./map/quick-valueation";
 import { MapStartPage } from "./map/start";
 import { RevaluePropertyPage } from "./properties/property/ownership/revalue";
 import { EntityAssetsPage } from "./trade/assets";
+import { MetricsPage } from "./metrics";
 
 export class Application {
 	static router: Router;
@@ -101,6 +102,8 @@ export class Application {
 				.route('/news/article/:id', ArticePage)
 				.route('/news/publication/:tag', PublicationPage)
 				.route('/news', NewsPage)
+
+				.route('/metrics', MetricsPage)
 
 				.route('/resident/:tag', ResidentPage
 					.route('/chat/:chat', ChatPage)

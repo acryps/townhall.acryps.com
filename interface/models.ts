@@ -287,6 +287,20 @@ export interface ResidentTickerModel {
 	action: string;
 }
 
+export interface MetricViewModel {
+    description: string;
+	id: string;
+	name: string;
+}
+
+export interface MetricValueViewModel {
+    elapsed: number;
+	formatted: string;
+	id: string;
+	updated: Date;
+	value: number;
+}
+
 export interface BuildingShapeModel {
     boundary: string;
 	id: string;

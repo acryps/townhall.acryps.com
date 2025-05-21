@@ -26,6 +26,7 @@ import { articleStyle } from "./news/article/index.style";
 import { valuationStyle } from "./trade/valuation/index.style";
 import { mapStartStyle } from "./map/start/index.style";
 import { assetsStyle } from "./trade/assets/index.style";
+import { metricsStyle } from "./metrics/index.style";
 
 export const pageStyle = () => root(
 	boldFont,
@@ -92,6 +93,8 @@ export const pageStyle = () => root(
 				publicationStyle(),
 				articleStyle(),
 				writeArticleStyle(),
+
+				metricsStyle(),
 
 				populationStyle(),
 				residentStyle(),

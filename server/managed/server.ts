@@ -56,6 +56,10 @@ import { ResidentViewModel } from "././../areas/life/resident";
 import { ResidentEventView } from "././database";
 import { ResidentTickerModel } from "././../areas/life/ticker";
 import { LifeService } from "././../areas/life/service";
+import { MetricTracker } from "././../areas/metrics/tracker";
+import { MetricValueViewModel } from "././../areas/metrics/view";
+import { MetricViewModel } from "././../areas/metrics/view";
+import { MetricService } from "././../areas/metrics/service";
 import { Building } from "././database";
 import { Dwelling } from "././database";
 import { PropertyOwner } from "././database";
@@ -135,6 +139,8 @@ import { LawHouseSessionProtocol } from "./../managed/database";
 import { LegalEntity } from "./../managed/database";
 import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
+import { Metric } from "./../managed/database";
+import { MetricValue } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
 import { Asset } from "./../areas/trade/asset";
 import { TrainStationExit } from "./../managed/database";
@@ -196,6 +202,10 @@ Inject.mappings = {
 	},
 	"LifeService": {
 		objectConstructor: LifeService,
+		parameters: ["DbContext"]
+	},
+	"MetricService": {
+		objectConstructor: MetricService,
 		parameters: ["DbContext"]
 	},
 	"PropertyService": {
@@ -745,6 +755,26 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(LifeService),
 			(controller, params) => controller.search(
 				params["c2cWYybjR0ZjdramJraXF2d2N0MnZmNX"]
+			)
+		);
+
+		this.expose(
+			"JobTc2MmQwODI1YWFhbndodHVlZ2VtMX",
+			{},
+			inject => inject.construct(MetricService),
+			(controller, params) => controller.list(
+				
+			)
+		);
+
+		this.expose(
+			"F1dWc1eGgzZW83cWk4OD4yNjQ5am1pYn",
+			{
+			"VvZnh3MHc5OHcyOGF5d3VmOHtiZ2V6bj": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(MetricService),
+			(controller, params) => controller.plot(
+				params["VvZnh3MHc5OHcyOGF5d3VmOHtiZ2V6bj"]
 			)
 		);
 
@@ -4103,6 +4133,146 @@ ViewModel.mappings = {
 			"timestamp" in viewModel && (model.timestamp = viewModel.timestamp === null ? null : new Date(viewModel.timestamp));
 			"primaryResidentId" in viewModel && (model.primaryResidentId = viewModel.primaryResidentId === null ? null : `${viewModel.primaryResidentId}`);
 			"action" in viewModel && (model.action = viewModel.action === null ? null : `${viewModel.action}`);
+
+			return model;
+		}
+	},
+	[MetricViewModel.name]: class ComposedMetricViewModel extends MetricViewModel {
+		async map() {
+			return {
+				description: this.$$model.description,
+				id: this.$$model.id,
+				name: this.$$model.name
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				description: true,
+				id: true,
+				name: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new MetricViewModel(null);
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: MetricViewModel) {
+			let model: Metric;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Metric).find(viewModel.id)
+			} else {
+				model = new Metric();
+			}
+			
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+
+			return model;
+		}
+	},
+	[MetricValueViewModel.name]: class ComposedMetricValueViewModel extends MetricValueViewModel {
+		async map() {
+			return {
+				elapsed: this.$$model.elapsed,
+				formatted: this.$$model.formatted,
+				id: this.$$model.id,
+				updated: this.$$model.updated,
+				value: this.$$model.value
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				elapsed: true,
+				formatted: true,
+				id: true,
+				updated: true,
+				value: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new MetricValueViewModel(null);
+			"elapsed" in data && (item.elapsed = data.elapsed === null ? null : +data.elapsed);
+			"formatted" in data && (item.formatted = data.formatted === null ? null : `${data.formatted}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"updated" in data && (item.updated = data.updated === null ? null : new Date(data.updated));
+			"value" in data && (item.value = data.value === null ? null : +data.value);
+
+			return item;
+		}
+
+		static async toModel(viewModel: MetricValueViewModel) {
+			let model: MetricValue;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(MetricValue).find(viewModel.id)
+			} else {
+				model = new MetricValue();
+			}
+			
+			"elapsed" in viewModel && (model.elapsed = viewModel.elapsed === null ? null : +viewModel.elapsed);
+			"formatted" in viewModel && (model.formatted = viewModel.formatted === null ? null : `${viewModel.formatted}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"updated" in viewModel && (model.updated = viewModel.updated === null ? null : new Date(viewModel.updated));
+			"value" in viewModel && (model.value = viewModel.value === null ? null : +viewModel.value);
 
 			return model;
 		}

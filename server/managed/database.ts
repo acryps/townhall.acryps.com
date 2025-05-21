@@ -1138,6 +1138,96 @@ export class MapTile extends Entity<MapTileQueryProxy> {
 	};
 }
 			
+export class MetricQueryProxy extends QueryProxy {
+	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Metric extends Entity<MetricQueryProxy> {
+	values: PrimaryReference<MetricValue, MetricValueQueryProxy>;
+		description: string;
+	declare id: string;
+	name: string;
+	tag: string;
+	
+	$$meta = {
+		source: "metric",
+		columns: {
+			description: { type: "text", name: "description" },
+			id: { type: "uuid", name: "id" },
+			name: { type: "text", name: "name" },
+			tag: { type: "text", name: "tag" }
+		},
+		get set(): DbSet<Metric, MetricQueryProxy> { 
+			return new DbSet<Metric, MetricQueryProxy>(Metric, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.values = new PrimaryReference<MetricValue, MetricValueQueryProxy>(this, "metricId", MetricValue);
+	}
+}
+			
+export class MetricValueQueryProxy extends QueryProxy {
+	get metric(): Partial<MetricQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get elapsed(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get formatted(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get host(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get metricId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get updated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get value(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class MetricValue extends Entity<MetricValueQueryProxy> {
+	get metric(): Partial<ForeignReference<Metric>> { return this.$metric; }
+	elapsed: number;
+	formatted: string;
+	host: string;
+	declare id: string;
+	metricId: string;
+	updated: Date;
+	value: number;
+	
+	$$meta = {
+		source: "metric_value",
+		columns: {
+			elapsed: { type: "int4", name: "elapsed" },
+			formatted: { type: "text", name: "formatted" },
+			host: { type: "text", name: "host" },
+			id: { type: "uuid", name: "id" },
+			metricId: { type: "uuid", name: "metric_id" },
+			updated: { type: "timestamp", name: "updated" },
+			value: { type: "float4", name: "value" }
+		},
+		get set(): DbSet<MetricValue, MetricValueQueryProxy> { 
+			return new DbSet<MetricValue, MetricValueQueryProxy>(MetricValue, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$metric = new ForeignReference<Metric>(this, "metricId", Metric);
+	}
+	
+	private $metric: ForeignReference<Metric>;
+
+	set metric(value: Partial<ForeignReference<Metric>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.metricId = value.id as string;
+		} else {
+			this.metricId = null;
+		}
+	}
+
+	
+}
+			
 export class MovementQueryProxy extends QueryProxy {
 	get player(): Partial<PlayerQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get driving(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -2759,6 +2849,8 @@ export class DbContext {
 	lawHouseSessionary: DbSet<LawHouseSessionary, LawHouseSessionaryQueryProxy>;
 	legalEntity: DbSet<LegalEntity, LegalEntityQueryProxy>;
 	mapTile: DbSet<MapTile, MapTileQueryProxy>;
+	metric: DbSet<Metric, MetricQueryProxy>;
+	metricValue: DbSet<MetricValue, MetricValueQueryProxy>;
 	movement: DbSet<Movement, MovementQueryProxy>;
 	office: DbSet<Office, OfficeQueryProxy>;
 	officeCapacity: DbSet<OfficeCapacity, OfficeCapacityQueryProxy>;
@@ -2808,6 +2900,8 @@ export class DbContext {
 		this.lawHouseSessionary = new DbSet<LawHouseSessionary, LawHouseSessionaryQueryProxy>(LawHouseSessionary, this.runContext);
 		this.legalEntity = new DbSet<LegalEntity, LegalEntityQueryProxy>(LegalEntity, this.runContext);
 		this.mapTile = new DbSet<MapTile, MapTileQueryProxy>(MapTile, this.runContext);
+		this.metric = new DbSet<Metric, MetricQueryProxy>(Metric, this.runContext);
+		this.metricValue = new DbSet<MetricValue, MetricValueQueryProxy>(MetricValue, this.runContext);
 		this.movement = new DbSet<Movement, MovementQueryProxy>(Movement, this.runContext);
 		this.office = new DbSet<Office, OfficeQueryProxy>(Office, this.runContext);
 		this.officeCapacity = new DbSet<OfficeCapacity, OfficeCapacityQueryProxy>(OfficeCapacity, this.runContext);

@@ -679,6 +679,40 @@ export class ResidentTickerModel {
 	}
 }
 
+export class MetricViewModel {
+	description: string;
+	id: string;
+	name: string;
+
+	private static $build(raw) {
+		const item = new MetricViewModel();
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		
+		return item;
+	}
+}
+
+export class MetricValueViewModel {
+	elapsed: number;
+	formatted: string;
+	id: string;
+	updated: Date;
+	value: number;
+
+	private static $build(raw) {
+		const item = new MetricValueViewModel();
+		raw.elapsed === undefined || (item.elapsed = raw.elapsed === null ? null : +raw.elapsed)
+		raw.formatted === undefined || (item.formatted = raw.formatted === null ? null : `${raw.formatted}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.updated === undefined || (item.updated = raw.updated ? new Date(raw.updated) : null)
+		raw.value === undefined || (item.value = raw.value === null ? null : +raw.value)
+		
+		return item;
+	}
+}
+
 export class BuildingShapeModel {
 	boundary: string;
 	id: string;
@@ -2297,6 +2331,50 @@ export class LifeService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : ResidentViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class MetricService {
+	async list(): Promise<Array<MetricViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("JobTc2MmQwODI1YWFhbndodHVlZ2VtMX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : MetricViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async plot(id: string): Promise<Array<MetricValueViewModel>> {
+		const $data = new FormData();
+		$data.append("VvZnh3MHc5OHcyOGF5d3VmOHtiZ2V6bj", Service.stringify(id))
+
+		return await fetch(Service.toURL("F1dWc1eGgzZW83cWk4OD4yNjQ5am1pYn"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : MetricValueViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

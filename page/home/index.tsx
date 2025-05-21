@@ -4,7 +4,7 @@ import { OnlinePlayerComponent } from "./online";
 import { boroughColor } from "./index.style";
 import { hex } from "@acryps/style";
 import { BannerComponent } from "../banner";
-import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, priceIcon, propertyRegisterIcon, publicationIcon, residentIcon } from "../assets/icons/managed";
+import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, metricIcon, priceIcon, propertyRegisterIcon, publicationIcon, residentIcon } from "../assets/icons/managed";
 import { Point } from "../../interface/point";
 import { toSimulatedTime } from "../../interface/time";
 import { ImpressionsComponent } from "./impressions";
@@ -72,6 +72,18 @@ export class HomePage extends Component {
 
 					<ui-description>
 						Register, view or aquire plots of land
+					</ui-description>
+				</ui-topic>
+
+				<ui-topic ui-href='/metrics'>
+					{metricIcon()}
+
+					<ui-name>
+						Metrics
+					</ui-name>
+
+					<ui-description>
+						See key values and trends
 					</ui-description>
 				</ui-topic>
 

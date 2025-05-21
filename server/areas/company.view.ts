@@ -36,10 +36,6 @@ export class OfficeViewModel extends OfficeSummaryModel {
 }
 
 export class OfficeEmployeeModel extends OfficeSummaryModel {
-	id;
-
-	name;
-	property: PropertySummaryModel;
 	company: CompanySummaryModel;
 }
 

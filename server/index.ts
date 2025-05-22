@@ -40,8 +40,10 @@ import { WorkUnemploymentMetric } from "./areas/metrics/tracker/unemployment";
 import { TotalPropertyValueMetric } from "./areas/metrics/tracker/total-property-value";
 import { DwellingCountMetric } from "./areas/metrics/tracker/dwelling-count";
 import { PlayerTraveledBlocksMetric } from "./areas/metrics/tracker/player-traveled-blocks";
+import { RelationDistanceMetric } from "./areas/metrics/tracker/relation-distance";
 
 const runLife = process.env.RUN_LIFE == 'YES';
+const updateMetrics = process.env.UPDATE_METRICS == 'YES';
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
@@ -101,19 +103,22 @@ DbClient.connectedClient.connect().then(async () => {
 	// new MovementTileServer(app, database);
 
 	// order will be keept in client
-	MetricTracker.track(new PopulationSizeMetric(database));
-	MetricTracker.track(new PopulationAgeAverageMetric(database));
+	if (updateMetrics) {
+		MetricTracker.track(new PopulationSizeMetric(database));
+		MetricTracker.track(new PopulationAgeAverageMetric(database));
+		MetricTracker.track(new RelationDistanceMetric(database));
 
-	MetricTracker.track(new PlayerTraveledBlocksMetric(database));
+		MetricTracker.track(new PlayerTraveledBlocksMetric(database));
 
-	MetricTracker.track(new PropertyCountMetric(database));
-	MetricTracker.track(new DwellingCountMetric(database));
-	MetricTracker.track(new AllocatedAreaMetric(database));
-	MetricTracker.track(new TotalPropertyValueMetric(database));
+		MetricTracker.track(new PropertyCountMetric(database));
+		MetricTracker.track(new DwellingCountMetric(database));
+		MetricTracker.track(new AllocatedAreaMetric(database));
+		MetricTracker.track(new TotalPropertyValueMetric(database));
 
-	MetricTracker.track(new WorkUnemploymentMetric(database));
+		MetricTracker.track(new WorkUnemploymentMetric(database));
+	}
 
-	// new FillLife(life, database).fillEmptyDwellings();
+	new FillLife(life, database).fillEmptyDwellings();
 
 	ViewModel.globalFetchingContext = database;
 

@@ -14,6 +14,7 @@
 		"townhallServerAddress": "Minecraft File Server Location",
 
 		"runLife?": "Run Life (YES to enable)",
+		"updateMetrics": "Update Metrics (YES to enable)",
 
 		"languageModel": {
 			"model": {

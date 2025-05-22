@@ -19,7 +19,7 @@ export class MetricService extends Service {
 			this.database.metricValue
 				.where(value => value.metric == id)
 				.orderByDescending(value => value.updated)
-				.limit(20)
+				.limit(200)
 		);
 	}
 }

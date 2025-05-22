@@ -63,7 +63,7 @@ export abstract class MetricTracker {
 
 		this.last = value;
 
-		setTimeout(() => this.update(), value.elapsed * 100 + 1000 * 60);
+		setTimeout(() => this.update(), value.elapsed * 100 + 1000 * 60 * 5);
 	}
 
 	abstract fetch(): Promise<number>;

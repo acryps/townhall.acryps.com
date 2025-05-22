@@ -1,4 +1,5 @@
 import { MetricTracker } from ".";
+import { convertToCurrency } from "../../../../interface/currency";
 import { toSimulatedAge } from "../../../../interface/time";
 import { LegalEntityManager } from "../../legal-entity/manager";
 import { TradeManager } from "../../trade/manager";
@@ -24,5 +25,9 @@ export class CompanyAssetTotalMetric extends MetricTracker {
 		}
 
 		return total;
+	}
+
+	format(value: number) {
+		return convertToCurrency(value);
 	}
 }

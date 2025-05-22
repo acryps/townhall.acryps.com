@@ -13,10 +13,10 @@ export const convertToLegalCompanyName = (company: Company) => ({
 	[CompanyType.department]: company.name
 })[company.type];
 
-export const convertToCompanyTypeName = (company: Company) => ({
+export const convertToCompanyTypeName = (company: Company | CompanyType) => ({
 	[CompanyType.company]: 'Company',
 	[CompanyType.nonProfit]: 'Non Profit',
 	[CompanyType.guild]: 'Guild',
 	[CompanyType.governmentCompany]: 'Govcom',
 	[CompanyType.department]: 'Department'
-})[company.type];
+})[typeof company == 'object' ? company.type : company];

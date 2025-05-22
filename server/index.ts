@@ -130,7 +130,7 @@ DbClient.connectedClient.connect().then(async () => {
 
 		for (let type in CompanyType) {
 			if (typeof CompanyType[type] == 'string') {
-				MetricTracker.track(new CompanyCountMetric(database, type));
+				MetricTracker.track(new CompanyCountMetric(database, CompanyType[type]));
 			}
 		}
 

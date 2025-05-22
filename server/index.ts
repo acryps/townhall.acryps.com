@@ -125,8 +125,8 @@ DbClient.connectedClient.connect().then(async () => {
 		MetricTracker.track(new TotalPropertyValueMetric(database));
 
 		MetricTracker.track(new WorkUnemploymentMetric(database));
-		MetricTracker.track(new OpenWorkOfferMetric(database));
 		MetricTracker.track(new WorkOfferTotalMetric(database));
+		MetricTracker.track(new OpenWorkOfferMetric(database));
 
 		for (let type in CompanyType) {
 			if (typeof CompanyType[type] == 'string') {

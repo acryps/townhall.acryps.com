@@ -2,11 +2,11 @@ import { select, style, content, Font, fontFamily, fontWeight, fontStyle } from 
 
 
 export const iconFont = new Font('icons', fontWeight('normal'), fontStyle('normal'))
-	.addSource('/assets/icons/managed/font/index.eot?beda2de0af5e', 'embedded-opentype')
+	.addSource('/assets/icons/managed/font/index.eot?f39b3700c951', 'embedded-opentype')
 	.addSource('/assets/icons/managed/font/index.svg?8dc6d49097ab', 'svg')
-	.addSource('/assets/icons/managed/font/index.ttf?f65096147ed6', 'truetype')
-	.addSource('/assets/icons/managed/font/index.woff?7d02867866c4', 'woff')
-	.addSource('/assets/icons/managed/font/index.woff2?fcf02c9dabdd', 'woff2');
+	.addSource('/assets/icons/managed/font/index.ttf?469885aa31c0', 'truetype')
+	.addSource('/assets/icons/managed/font/index.woff?69459caa137f', 'woff')
+	.addSource('/assets/icons/managed/font/index.woff2?8dc03bfaa1fd', 'woff2');
 
 export const icons = () => select('ui-icon',
 	fontFamily(iconFont.name),

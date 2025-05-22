@@ -18,7 +18,8 @@ export class MetricComponent extends Component {
 	}
 
 	render() {
-		const max = Math.max(...this.data.map(item => item.value));
+		const high = Math.max(...this.data.map(item => item.value));
+		const low = Math.min(...this.data.map(item => item.value));
 
 		return <ui-metric>
 			<ui-header>
@@ -38,12 +39,12 @@ export class MetricComponent extends Component {
 					</ui-current>
 
 					<ui-peak>
-						Peak {this.data.find(item => item.value == max)?.formatted ?? '-'}
+						High {this.data.find(item => item.value == high)?.formatted ?? '-'} / Low {this.data.find(item => item.value == low)?.formatted ?? '-'}
 					</ui-peak>
 				</ui-value>
 			</ui-header>
 
-			<ui-chart style={chartMaxValue.provide(max)}>
+			<ui-chart style={chartMaxValue.provide(high)}>
 				<ui-data>
 					{this.data.map((value, index) => <ui-value style={[
 						chartValue.provide(value.value),

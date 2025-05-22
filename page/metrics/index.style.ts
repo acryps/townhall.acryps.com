@@ -1,4 +1,4 @@
-import { backgroundColor, borderBottom, child, display, flexDirection, flexGrow, flexShrink, fontSize, fontWeight, height, hex, insetBlock, marginBottom, marginLeft, marginTop, minWidth, Number, overflow, paddingBottom, percentage, position, px, rem, right, textAlign, Variable, width } from "@acryps/style";
+import { alignItems, backgroundColor, borderBottom, child, display, flexDirection, flexGrow, flexShrink, fontSize, fontWeight, height, hex, insetBlock, marginBottom, marginLeft, marginTop, minWidth, Number, overflow, paddingBottom, percentage, position, px, rem, right, textAlign, Variable, width } from "@acryps/style";
 import { boxed } from "../shared/boxed.style";
 import { pageGutter } from "../index.style";
 
@@ -50,7 +50,9 @@ export const metricsStyle = () => child('ui-metrics',
 				),
 
 				child('ui-peak',
-					display('block')
+					display('block'),
+
+					fontSize(rem(0.8))
 				)
 			)
 		),
@@ -71,6 +73,7 @@ export const metricsStyle = () => child('ui-metrics',
 
 				display('flex'),
 				flexDirection('row-reverse'),
+				alignItems('flex-end'),
 
 				child('ui-value',
 					height(percentage(100).divide(chartMaxValue).multiply(chartValue)),

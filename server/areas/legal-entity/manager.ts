@@ -23,7 +23,7 @@ export class LegalEntityManager extends Manager {
 		let entity = await this.database.legalEntity.first(entity => entity.boroughId == id);
 
 		if (entity) {
-			return;
+			return entity;
 		}
 
 		entity = new LegalEntity();
@@ -38,7 +38,7 @@ export class LegalEntityManager extends Manager {
 		let entity = await this.database.legalEntity.first(entity => entity.companyId == id);
 
 		if (entity) {
-			return;
+			return entity;
 		}
 
 		entity = new LegalEntity();

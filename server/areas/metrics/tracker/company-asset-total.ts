@@ -23,6 +23,6 @@ export class CompanyAssetTotalMetric extends MetricTracker {
 			}
 		}
 
-		return value;
+		return total;
 	}
 }

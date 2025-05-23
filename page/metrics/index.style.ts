@@ -72,9 +72,14 @@ export const metricsStyle = () => child('ui-metrics',
 		),
 
 		child('ui-chart',
-			display('flex'),
+			display('block'),
 			height(rem(10)),
-			marginBottom(pageGutter)
+			marginBottom(pageGutter),
+
+			child('canvas',
+				width(percentage(100)),
+				height(percentage(100))
+			)
 		),
 
 		child('ui-time',

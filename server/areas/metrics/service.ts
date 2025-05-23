@@ -14,12 +14,14 @@ export class MetricService extends Service {
 		return MetricViewModel.from(MetricTracker.tracked.map(metric => metric.metric));
 	}
 
-	plot(id: string) {
+	async plot(id: string, start: Date) {
+		const metric = await this.database.metric.find(id);
+		const afterCount = await metric.values.where(value => value.updated.isAfter(start)).count();
+
 		return MetricValueViewModel.from(
-			this.database.metricValue
-				.where(value => value.metric == id)
+			metric.values
 				.orderByDescending(value => value.updated)
-				.limit(500)
+				.limit(afterCount + 2)
 		);
 	}
 }

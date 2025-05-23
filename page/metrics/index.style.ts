@@ -1,16 +1,29 @@
-import { alignItems, backgroundColor, borderBottom, child, display, flexDirection, flexGrow, flexShrink, fontSize, fontWeight, height, hex, insetBlock, marginBottom, marginLeft, marginTop, minWidth, Number, overflow, paddingBottom, percentage, position, px, rem, right, textAlign, Variable, width } from "@acryps/style";
+import { alignItems, backgroundColor, borderBottom, child, display, flexDirection, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, height, hex, insetBlock, marginBottom, marginLeft, marginTop, minWidth, Number, overflow, paddingBottom, percentage, position, px, rem, right, textAlign, Variable, width } from "@acryps/style";
 import { boxed } from "../shared/boxed.style";
 import { pageGutter } from "../index.style";
+import { fieldStyle } from "../shared/field.style";
 
-export const chartMaxValue = new Variable<Number>('max-value');
-export const chartValue = new Variable<Number>('value');
-export const chartDuration = new Variable<Number>('duration');
+export const chartLineColor = hex('000');
+export const chartLineWidth = 2;
+
+export const chartFillColor = hex('00f4');
 
 // duartion of one pixel
 const timescale = 1000 * 60;
 
 export const metricsStyle = () => child('ui-metrics',
 	boxed(),
+
+	child('ui-view-options',
+		display('flex'),
+		flexWrap('wrap'),
+		gap(pageGutter),
+		marginBottom(pageGutter.multiply(2)),
+
+		child('select',
+			fieldStyle()
+		)
+	),
 
 	child('ui-metric',
 		display('block'),
@@ -21,6 +34,7 @@ export const metricsStyle = () => child('ui-metrics',
 
 		child('ui-header',
 			display('flex'),
+			gap(pageGutter),
 			marginBottom(pageGutter),
 
 			child('ui-detail',
@@ -60,29 +74,7 @@ export const metricsStyle = () => child('ui-metrics',
 		child('ui-chart',
 			display('flex'),
 			height(rem(10)),
-			marginBottom(pageGutter),
-
-			overflow('hidden'),
-			position('relative'),
-
-			child('ui-data',
-				position('absolute'),
-				insetBlock(0),
-				right(0),
-				minWidth(percentage(100)),
-
-				display('flex'),
-				flexDirection('row-reverse'),
-				alignItems('flex-end'),
-
-				child('ui-value',
-					height(percentage(100).divide(chartMaxValue).multiply(chartValue)),
-					width(px(1).multiply(chartDuration).divide(timescale).add(px(1))),
-					marginLeft(px(-1)),
-
-					backgroundColor(hex('2031b2'))
-				)
-			)
+			marginBottom(pageGutter)
 		),
 
 		child('ui-time',

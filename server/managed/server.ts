@@ -768,13 +768,15 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"F1dWc1eGgzZW83cWk4OD4yNjQ5am1pYn",
+			"V4d2kxM3N6aHtqNHc3YTkydGlmaGBtaj",
 			{
-			"VvZnh3MHc5OHcyOGF5d3VmOHtiZ2V6bj": { type: "string", isArray: false, isOptional: false }
+			"NvNjYzd3V0MDV4ZWlxaHQ5YndjZHl2cG": { type: "string", isArray: false, isOptional: false },
+				"ZoNHI0aD8zbTl2bmAyY3c2ZTU5aWBibj": { type: "date", isArray: false, isOptional: false }
 			},
 			inject => inject.construct(MetricService),
 			(controller, params) => controller.plot(
-				params["VvZnh3MHc5OHcyOGF5d3VmOHtiZ2V6bj"]
+				params["NvNjYzd3V0MDV4ZWlxaHQ5YndjZHl2cG"],
+				params["ZoNHI0aD8zbTl2bmAyY3c2ZTU5aWBibj"]
 			)
 		);
 

@@ -1,6 +1,7 @@
 import { ViewModel } from "vlserver";
 import { DbContext, Metric, MetricValue } from "../../../managed/database";
 import { hostname } from "os";
+import { updateMetrics } from "../../..";
 
 export abstract class MetricTracker {
 	static tracked: MetricTracker[] = [];
@@ -30,7 +31,9 @@ export abstract class MetricTracker {
 			.orderByDescending(value => value.updated)
 			.first();
 
-		tracker.update();
+		if (updateMetrics) {
+			tracker.update();
+		}
 	}
 
 	tag: string[];
@@ -48,22 +51,30 @@ export abstract class MetricTracker {
 	// updates the metric, automatically adjusting the update frequency based on effort
 	async update() {
 		const start = +new Date();
+		const fetched = await this.fetch();
+		const elapsed = +new Date() - start;
 
-		const value = new MetricValue();
-		value.value = await this.fetch();
-		value.formatted = this.format(value.value);
-		value.elapsed = +new Date() - start;
-		value.updated = new Date();
-		value.metric = this.metric;
-		value.host = hostname();
+		if (!this.last || this.last.value != fetched) {
+			const value = new MetricValue();
+			value.value = fetched
+			value.formatted = this.format(fetched);
+			value.elapsed = elapsed;
+			value.updated = new Date();
+			value.metric = this.metric;
+			value.host = hostname();
 
-		if (!this.last || this.last.value != value.value) {
 			await value.create();
+
+			this.last = value;
+		} else {
+			this.last.updated = new Date();
+			this.last.elapsed = elapsed;
+			this.last.host = hostname();
+
+			await this.last.update();
 		}
 
-		this.last = value;
-
-		setTimeout(() => this.update(), value.elapsed * 100 + 1000 * 60 * 5);
+		setTimeout(() => this.update(), this.last.elapsed * 100 + 1000 * 60 * 5);
 	}
 
 	abstract fetch(): Promise<number>;

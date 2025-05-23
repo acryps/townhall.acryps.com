@@ -2362,11 +2362,12 @@ export class MetricService {
 		});
 	}
 
-	async plot(id: string): Promise<Array<MetricValueViewModel>> {
+	async plot(id: string, start: Date): Promise<Array<MetricValueViewModel>> {
 		const $data = new FormData();
-		$data.append("VvZnh3MHc5OHcyOGF5d3VmOHtiZ2V6bj", Service.stringify(id))
+		$data.append("NvNjYzd3V0MDV4ZWlxaHQ5YndjZHl2cG", Service.stringify(id))
+		$data.append("ZoNHI0aD8zbTl2bmAyY3c2ZTU5aWBibj", Service.stringify(start))
 
-		return await fetch(Service.toURL("F1dWc1eGgzZW83cWk4OD4yNjQ5am1pYn"), {
+		return await fetch(Service.toURL("V4d2kxM3N6aHtqNHc3YTkydGlmaGBtaj"), {
 			method: "post",
 			credentials: "include",
 			body: $data

@@ -46,8 +46,8 @@ import { WorkOfferTotalMetric } from "./areas/metrics/tracker/work-offers";
 import { CompanyCountMetric } from "./areas/metrics/tracker/company-count";
 import { CompanyAssetTotalMetric } from "./areas/metrics/tracker/company-asset-total";
 
-const runLife = process.env.RUN_LIFE == 'YES';
-const updateMetrics = process.env.UPDATE_METRICS == 'YES';
+export const runLife = process.env.RUN_LIFE == 'YES';
+export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
 
 console.log("connecting to database...");
 DbClient.connectedClient = new DbClient({ max: 2 });
@@ -112,30 +112,28 @@ DbClient.connectedClient.connect().then(async () => {
 	// new MovementTileServer(app, database);
 
 	// order will be keept in client
-	if (updateMetrics) {
-		MetricTracker.track(new PopulationSizeMetric(database));
-		MetricTracker.track(new PopulationAgeAverageMetric(database));
-		MetricTracker.track(new RelationDistanceMetric(database));
+	MetricTracker.track(new PopulationSizeMetric(database));
+	MetricTracker.track(new PopulationAgeAverageMetric(database));
+	MetricTracker.track(new RelationDistanceMetric(database));
 
-		MetricTracker.track(new PlayerTraveledBlocksMetric(database));
+	MetricTracker.track(new PlayerTraveledBlocksMetric(database));
 
-		MetricTracker.track(new PropertyCountMetric(database));
-		MetricTracker.track(new DwellingCountMetric(database));
-		MetricTracker.track(new AllocatedAreaMetric(database));
-		MetricTracker.track(new TotalPropertyValueMetric(database));
+	MetricTracker.track(new PropertyCountMetric(database));
+	MetricTracker.track(new DwellingCountMetric(database));
+	MetricTracker.track(new AllocatedAreaMetric(database));
+	MetricTracker.track(new TotalPropertyValueMetric(database));
 
-		MetricTracker.track(new WorkUnemploymentMetric(database));
-		MetricTracker.track(new WorkOfferTotalMetric(database));
-		MetricTracker.track(new OpenWorkOfferMetric(database));
+	MetricTracker.track(new WorkUnemploymentMetric(database));
+	MetricTracker.track(new WorkOfferTotalMetric(database));
+	MetricTracker.track(new OpenWorkOfferMetric(database));
 
-		for (let type in CompanyType) {
-			if (typeof CompanyType[type] == 'string') {
-				MetricTracker.track(new CompanyCountMetric(database, CompanyType[type]));
-			}
+	for (let type in CompanyType) {
+		if (typeof CompanyType[type] == 'string') {
+			MetricTracker.track(new CompanyCountMetric(database, CompanyType[type]));
 		}
-
-		MetricTracker.track(new CompanyAssetTotalMetric(database));
 	}
+
+	MetricTracker.track(new CompanyAssetTotalMetric(database));
 
 	ViewModel.globalFetchingContext = database;
 

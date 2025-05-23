@@ -3,7 +3,9 @@ import { MetricService, MetricValueViewModel, MetricViewModel } from "../managed
 import { chartFillColor, chartLineColor, chartLineWidth } from "./index.style";
 
 export class MetricComponent extends Component {
-	datapoints: MetricValueViewModel[] = [];
+	datapoints: MetricValueViewModel[];
+
+	end: Date;
 
 	constructor(
 		private metric: MetricViewModel,
@@ -14,24 +16,30 @@ export class MetricComponent extends Component {
 
 		new MetricService().plot(this.metric.id, start).then(data => {
 			this.datapoints = data;
-
-			// will not render if relative
-			if (this.datapoints.length == 1) {
-				this.type = 'absolute';
-			}
+			this.end = new Date();
 
 			this.update();
 		});
 	}
 
 	render() {
-		const high = Math.max(...this.datapoints.map(item => item.value));
-		const low = Math.min(...this.datapoints.map(item => item.value));
+		const current = this.datapoints?.at(0);
+		const high = Math.max(...this.datapoints?.map(item => item.value) ?? []);
+		const low = Math.min(...this.datapoints?.map(item => item.value) ?? []);
 
 		const canvas = document.createElement('canvas');
 
 		requestAnimationFrame(() => {
+			if (!this.datapoints) {
+				return;
+			}
+
 			const container = canvas.parentElement;
+
+			if (this.datapoints.length <= 1) {
+				container.remove();
+			}
+
 			const bounds = container.getBoundingClientRect();
 
 			canvas.width = bounds.width * devicePixelRatio;
@@ -41,31 +49,33 @@ export class MetricComponent extends Component {
 			context.scale(devicePixelRatio, devicePixelRatio);
 			context.translate(0, chartLineWidth / 2);
 
-			let x = bounds.width;
-			const height = bounds.height - chartLineWidth;
-
-			const timeRange = +new Date() - +this.start;
-			const valueRange = this.type == 'absolute' ? high : (high - low);
-			const valueBase = this.type == 'absolute' ? 0 : low;
-
-			context.beginPath();
-			context.moveTo(bounds.width, height - height / valueRange * (this.datapoints[0].value - valueBase));
-
-			for (let datapoint of this.datapoints) {
-				x -= bounds.width / timeRange * (+new Date() - +datapoint.updated);
-
-				context.lineTo(x, height - height / valueRange * (datapoint.value - valueBase));
-			}
-
 			context.strokeStyle = chartLineColor.toValueString();
 			context.lineWidth = chartLineWidth;
+			context.fillStyle = chartFillColor.toValueString();
+
+			const height = bounds.height - chartLineWidth;
+
+			const timeRange = +this.end - +this.start;
+			const translateTimeToX = (time: Date) => bounds.width - bounds.width / timeRange * (+this.end - +time);
+
+			const valueRange = this.type == 'absolute' ? high : (high - low);
+			const baseValue = this.type == 'absolute' ? 0 : low;
+
+			const translateValueToY = (value: number) => height - height / valueRange * (value - baseValue);
+
+			context.beginPath();
+			context.lineTo(bounds.width, translateValueToY(this.datapoints[0].value));
+
+			for (let datapoint of this.datapoints) {
+				context.lineTo(translateTimeToX(datapoint.updated), translateValueToY(datapoint.value));
+			}
+
 			context.stroke();
 
-			context.lineTo(x, bounds.height);
+			context.lineTo(translateTimeToX(this.datapoints[this.datapoints.length - 1].updated), bounds.height);
 			context.lineTo(bounds.width, bounds.height);
 			context.closePath();
 
-			context.fillStyle = chartFillColor.toValueString();
 			context.fill();
 		});
 
@@ -83,11 +93,11 @@ export class MetricComponent extends Component {
 
 				<ui-value>
 					<ui-current>
-						{this.datapoints[0]?.formatted ?? '-'}
+						{current?.formatted ?? '-'}
 					</ui-current>
 
 					<ui-peak>
-						High {this.datapoints.find(item => item.value == high)?.formatted ?? '-'} / Low {this.datapoints.find(item => item.value == low)?.formatted ?? '-'}
+						High {this.datapoints?.find(item => item.value == high)?.formatted ?? '-'} / Low {this.datapoints?.find(item => item.value == low)?.formatted ?? '-'}
 					</ui-peak>
 				</ui-value>
 			</ui-header>
@@ -96,9 +106,11 @@ export class MetricComponent extends Component {
 				{canvas}
 			</ui-chart>
 
-			<ui-time>
-				Updated at {this.datapoints[0]?.updated.toLocaleString()} in {this.datapoints[0]?.elapsed}ms. {this.datapoints.length} datapoints rendered.
-			</ui-time>
+			{current ? <ui-time>
+				Updated at {current.updated.toLocaleString()} in {current.elapsed}ms. {this.datapoints.length} datapoints rendered.
+			</ui-time> : <ui-time>
+				Loading datapoints...
+			</ui-time>}
 		</ui-metric>
 	}
 }

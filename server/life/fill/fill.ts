@@ -220,7 +220,7 @@ export class FillLife {
 	static properties: Property[];
 
 	async findJobOffering(location: Point) {
-		if (Math.random() < 0.2) {
+		if (Math.random() < 0.1) {
 			return;
 		}
 

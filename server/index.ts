@@ -78,7 +78,7 @@ DbClient.connectedClient.connect().then(async () => {
 
 		setInterval(() => {
 			life.tick();
-		}, 1000 * 60);
+		}, 1000 * 30);
 
 		new FillLife(life, database).fillEmptyDwellings();
 

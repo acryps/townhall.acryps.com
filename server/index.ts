@@ -45,6 +45,7 @@ import { OpenWorkOfferMetric } from "./areas/metrics/tracker/open-work-offer";
 import { WorkOfferTotalMetric } from "./areas/metrics/tracker/work-offers";
 import { CompanyCountMetric } from "./areas/metrics/tracker/company-count";
 import { CompanyAssetTotalMetric } from "./areas/metrics/tracker/company-asset-total";
+import { EmptyDwellingCountMetric } from "./areas/metrics/tracker/empty-dwellings";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -81,6 +82,22 @@ DbClient.connectedClient.connect().then(async () => {
 		}, 1000 * 30);
 
 		new FillLife(life, database).fillEmptyDwellings();
+
+		(async () => {
+			for (let property of await database.property.toArray()) {
+				const owner = await property.owners.orderByDescending(owner => owner.aquired).first();
+
+				if (owner && !owner.aquiredValuationId) {
+					const borough = await new LegalEntityManager(database).findBorough(property.boroughId);
+
+					console.log(`valueing property ${property.id}`);
+					const valueation = await new PropertyValueator(borough).valueate(property);
+
+					owner.aquiredValuation = valueation;
+					await owner.update();
+				}
+			}
+		})();
 
 		(async () => {
 			for (let company of await database.company.toArray()) {
@@ -120,6 +137,7 @@ DbClient.connectedClient.connect().then(async () => {
 
 	MetricTracker.track(new PropertyCountMetric(database));
 	MetricTracker.track(new DwellingCountMetric(database));
+	MetricTracker.track(new EmptyDwellingCountMetric(database));
 	MetricTracker.track(new AllocatedAreaMetric(database));
 	MetricTracker.track(new TotalPropertyValueMetric(database));
 

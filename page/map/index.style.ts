@@ -136,7 +136,8 @@ export const mapStyle = () => [
 				backgroundColor(navigationBackgroundColor),
 
 				select('ui-layer',
-					padding(buttonPaddingSize),
+					paddingInline(buttonPaddingSize.divide(2)),
+					paddingBlock(buttonPaddingSize),
 
 					fontSize(rem(1.5))
 				),

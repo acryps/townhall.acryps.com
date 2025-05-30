@@ -391,8 +391,10 @@ export interface TrainStationViewModel {
 }
 
 export interface TrainStopViewModel {
-    id: string;
+    closed: Date;
+	id: string;
 	name: string;
+	opened: Date;
 	stationId: string;
 	trackPosition: string;
 }

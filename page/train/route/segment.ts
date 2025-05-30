@@ -50,7 +50,7 @@ export class TrainRouteSegment {
 
 		// insert missing stops in between
 		for (let stop of route.stops) {
-			if (!segments.find(segment => segment.stop == stop)) {
+			if (!stop.closed && !segments.find(segment => segment.stop == stop)) {
 				const station = stations.find(station => station.id == stop.stationId);
 				const center = Point.center(Point.unpack(station.property.activePlotBoundary.shape));
 
@@ -90,11 +90,13 @@ export class TrainRouteSegment {
 
 	static findStop(pixel: Point, route: TrainRouteViewModel, stations: TrainStationViewModel[]) {
 		for (let stop of route.stops) {
-			const station = stations.find(station => station.id == stop.stationId);
-			const bounds = Point.unpack(station.property.activePlotBoundary.shape);
+			if (!stop.closed) {
+				const station = stations.find(station => station.id == stop.stationId);
+				const bounds = Point.unpack(station.property.activePlotBoundary.shape);
 
-			if (Point.contains(bounds, pixel)) {
-				return stop;
+				if (Point.contains(bounds, pixel)) {
+					return stop;
+				}
 			}
 		}
 	}

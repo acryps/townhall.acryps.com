@@ -2580,8 +2580,10 @@ export class TrainStationExit extends Entity<TrainStationExitQueryProxy> {
 export class TrainStopQueryProxy extends QueryProxy {
 	get route(): Partial<TrainRouteQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get station(): Partial<TrainStationQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get closed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get downPlatform(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get opened(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get routeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get stationId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get trackPosition(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -2591,9 +2593,11 @@ export class TrainStopQueryProxy extends QueryProxy {
 export class TrainStop extends Entity<TrainStopQueryProxy> {
 	get route(): Partial<ForeignReference<TrainRoute>> { return this.$route; }
 	get station(): Partial<ForeignReference<TrainStation>> { return this.$station; }
+	closed: Date;
 	downPlatform: string;
 	declare id: string;
 	name: string;
+	opened: Date;
 	routeId: string;
 	stationId: string;
 	trackPosition: string;
@@ -2602,9 +2606,11 @@ export class TrainStop extends Entity<TrainStopQueryProxy> {
 	$$meta = {
 		source: "train_stop",
 		columns: {
+			closed: { type: "timestamp", name: "closed" },
 			downPlatform: { type: "text", name: "down_platform" },
 			id: { type: "uuid", name: "id" },
 			name: { type: "text", name: "name" },
+			opened: { type: "timestamp", name: "opened" },
 			routeId: { type: "uuid", name: "route_id" },
 			stationId: { type: "uuid", name: "station_id" },
 			trackPosition: { type: "text", name: "track_position" },

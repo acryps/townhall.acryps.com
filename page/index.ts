@@ -52,6 +52,7 @@ import { MetricsPage } from "./metrics";
 import { TrainsPage } from "./train";
 import { TrainRoutePage } from "./train/route";
 import { RegisterTrainRoutePage } from "./train/register";
+import { InsertTrainRouteStopAction } from "./map/train-route/insert-stop";
 
 export class Application {
 	static router: Router;
@@ -81,6 +82,7 @@ export class Application {
 					.route('/edit-plot/:id', EditPlotAction)
 					.route('/edit-route/:id', EditRouteAction)
 					.route('/quick-valueation', QuickValueationAction)
+					.route('/train-route/insert-stop/:code/:segmentIndex', InsertTrainRouteStopAction)
 
 					.route('/create/:shape', CreateFeaturePage)
 				)

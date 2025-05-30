@@ -1,5 +1,5 @@
 import { Service } from "vlserver";
-import { DbContext, TrainRoute, TrainRoutePath } from "../../managed/database";
+import { DbContext, TrainRoute, TrainRoutePath, TrainStation, TrainStop } from "../../managed/database";
 import { TrainRouteViewModel } from "./route.view";
 import { TrainStationViewModel } from "./station.view";
 import { Point } from "../../../interface/point";
@@ -56,6 +56,31 @@ export class TrainService extends Service {
 
 		route.activePath = activePath;
 		await route.update();
+	}
+
+	async registerStation(id: string) {
+		const station = new TrainStation();
+		station.propertyId = id;
+
+		await station.create();
+
+		return new TrainStationViewModel(station);
+	}
+
+	async addStop(routeId: string, stationId: string) {
+		const stop = new TrainStop();
+		stop.stationId = stationId;
+		stop.routeId = routeId;
+		stop.opened = new Date();
+
+		await stop.create();
+	}
+
+	async removeStop(stopId: string) {
+		const stop = await this.database.trainStop.find(stopId);
+		stop.closed = new Date();
+
+		await stop.update();
 	}
 
 	getStations() {

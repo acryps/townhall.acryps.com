@@ -6,6 +6,9 @@ export class TrainStopViewModel extends ViewModel<TrainStop> {
 	id;
 	name;
 
+	opened;
+	closed;
+
 	trackPosition;
 
 	stationId;

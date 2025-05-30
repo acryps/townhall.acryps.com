@@ -104,6 +104,13 @@ export const mapStyle = () => [
 				backgroundColor(navigationBackgroundColor)
 			),
 
+			child('ui-insert-train-stop',
+				paddingTop(pageGutter.divide(2)),
+				paddingInline(pageGutter),
+
+				backgroundColor(navigationBackgroundColor)
+			),
+
 			child('ui-quick-valueation',
 				display('flex'),
 				gap(pageGutter),

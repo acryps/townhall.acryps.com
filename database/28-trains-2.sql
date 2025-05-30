@@ -31,6 +31,11 @@ ALTER TABLE train_station ADD property_id UUID CONSTRAINT property__train_statio
 ALTER TABLE train_stop ADD up_platform TEXT;
 ALTER TABLE train_stop ADD down_platform TEXT;
 
+ALTER TABLE train_stop ADD opened TIMESTAMP;
+UPDATE train_stop SET opened = NOW();
+
+ALTER TABLE train_stop ADD closed TIMESTAMP;
+
 ALTER TABLE train_route DROP path;
 DROP TABLE trian_station_exit;
 ALTER TABLE train_stop DROP track_position;

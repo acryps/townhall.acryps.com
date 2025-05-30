@@ -931,15 +931,19 @@ export class TrainStationViewModel {
 }
 
 export class TrainStopViewModel {
+	closed: Date;
 	id: string;
 	name: string;
+	opened: Date;
 	stationId: string;
 	trackPosition: string;
 
 	private static $build(raw) {
 		const item = new TrainStopViewModel();
+		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
 		raw.stationId === undefined || (item.stationId = raw.stationId === null ? null : `${raw.stationId}`)
 		raw.trackPosition === undefined || (item.trackPosition = raw.trackPosition === null ? null : `${raw.trackPosition}`)
 		
@@ -3174,6 +3178,66 @@ export class TrainService {
 		$data.append("J5c2Fob3Z0eGRxZGZmc3M4aWQ4ZGJmc2", Service.stringify(name))
 
 		return await fetch(Service.toURL("l3Y2JsdHpocTpya3xpaDVkdDN4ZnczbT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async registerStation(id: string): Promise<TrainStationViewModel> {
+		const $data = new FormData();
+		$data.append("91eXg3MnBkejd1Z3Y3aDFveDNmdWgwaj", Service.stringify(id))
+
+		return await fetch(Service.toURL("RlMmhtd3Q2cndiYzJ2M3c2c2N6bnV6c2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : TrainStationViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async addStop(routeId: string, stationId: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("A4MXx3Z3podXVycjRqdmhuZWF1cDhpem", Service.stringify(routeId))
+		$data.append("QzOTEzaGlsdTMyZ2JnZDIydnR5NjU5Y3", Service.stringify(stationId))
+
+		return await fetch(Service.toURL("Q4ejpmY2hkeXA1bnlodHNjaTd2eX03a2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async removeStop(stopId: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("VvMmZ4N3F6Y253dmRuMTJxMWA2cGV0cn", Service.stringify(stopId))
+
+		return await fetch(Service.toURL("BicGs0M39ub2JqNDFndTN0cWl6ZmRxZ2"), {
 			method: "post",
 			credentials: "include",
 			body: $data

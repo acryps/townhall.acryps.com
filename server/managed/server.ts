@@ -94,6 +94,8 @@ import { AssetViewModel } from "././../areas/trade/asset";
 import { TradeService } from "././../areas/trade/service";
 import { TrainRoute } from "././database";
 import { TrainRoutePath } from "././database";
+import { TrainStation } from "././database";
+import { TrainStop } from "././database";
 import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
@@ -147,8 +149,6 @@ import { MetricValue } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
 import { Asset } from "./../areas/trade/asset";
 import { TrainStationExit } from "./../managed/database";
-import { TrainStation } from "./../managed/database";
-import { TrainStop } from "./../managed/database";
 import { BillHonestium } from "./../managed/database";
 import { District } from "./../managed/database";
 import { Vote } from "./../managed/database";
@@ -1222,6 +1222,41 @@ export class ManagedServer extends BaseServer {
 				params["54ZWt0OTE1a2lmaW1ya3VsMWBmbTY1eW"],
 				params["ZvZnNiaWdpZmNtejpsODg0dmkwa3VkdT"],
 				params["J5c2Fob3Z0eGRxZGZmc3M4aWQ4ZGJmc2"]
+			)
+		);
+
+		this.expose(
+			"RlMmhtd3Q2cndiYzJ2M3c2c2N6bnV6c2",
+			{
+			"91eXg3MnBkejd1Z3Y3aDFveDNmdWgwaj": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(TrainService),
+			(controller, params) => controller.registerStation(
+				params["91eXg3MnBkejd1Z3Y3aDFveDNmdWgwaj"]
+			)
+		);
+
+		this.expose(
+			"Q4ejpmY2hkeXA1bnlodHNjaTd2eX03a2",
+			{
+			"A4MXx3Z3podXVycjRqdmhuZWF1cDhpem": { type: "string", isArray: false, isOptional: false },
+				"QzOTEzaGlsdTMyZ2JnZDIydnR5NjU5Y3": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(TrainService),
+			(controller, params) => controller.addStop(
+				params["A4MXx3Z3podXVycjRqdmhuZWF1cDhpem"],
+				params["QzOTEzaGlsdTMyZ2JnZDIydnR5NjU5Y3"]
+			)
+		);
+
+		this.expose(
+			"BicGs0M39ub2JqNDFndTN0cWl6ZmRxZ2",
+			{
+			"VvMmZ4N3F6Y253dmRuMTJxMWA2cGV0cn": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(TrainService),
+			(controller, params) => controller.removeStop(
+				params["VvMmZ4N3F6Y253dmRuMTJxMWA2cGV0cn"]
 			)
 		);
 
@@ -5280,8 +5315,10 @@ ViewModel.mappings = {
 	[TrainStopViewModel.name]: class ComposedTrainStopViewModel extends TrainStopViewModel {
 		async map() {
 			return {
+				closed: this.$$model.closed,
 				id: this.$$model.id,
 				name: this.$$model.name,
+				opened: this.$$model.opened,
 				stationId: this.$$model.stationId,
 				trackPosition: this.$$model.trackPosition
 			}
@@ -5313,8 +5350,10 @@ ViewModel.mappings = {
 			}
 
 			return {
+				closed: true,
 				id: true,
 				name: true,
+				opened: true,
 				stationId: true,
 				trackPosition: true
 			};
@@ -5322,8 +5361,10 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new TrainStopViewModel(null);
+			"closed" in data && (item.closed = data.closed === null ? null : new Date(data.closed));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"opened" in data && (item.opened = data.opened === null ? null : new Date(data.opened));
 			"stationId" in data && (item.stationId = data.stationId === null ? null : `${data.stationId}`);
 			"trackPosition" in data && (item.trackPosition = data.trackPosition === null ? null : `${data.trackPosition}`);
 
@@ -5339,8 +5380,10 @@ ViewModel.mappings = {
 				model = new TrainStop();
 			}
 			
+			"closed" in viewModel && (model.closed = viewModel.closed === null ? null : new Date(viewModel.closed));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"opened" in viewModel && (model.opened = viewModel.opened === null ? null : new Date(viewModel.opened));
 			"stationId" in viewModel && (model.stationId = viewModel.stationId === null ? null : `${viewModel.stationId}`);
 			"trackPosition" in viewModel && (model.trackPosition = viewModel.trackPosition === null ? null : `${viewModel.trackPosition}`);
 

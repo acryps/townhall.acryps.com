@@ -135,7 +135,7 @@ export class TrainRoutePage extends Component {
 
 			<ui-route>
 				<ui-segments>
-					{this.segments.map(segment => {
+					{this.segments.map((segment, segmentIndex) => {
 						let element: HTMLElement;
 
 						if (segment instanceof TrainRouteStopSegment) {
@@ -157,7 +157,11 @@ export class TrainRoutePage extends Component {
 										Edit Route
 									</ui-action>
 
-									<ui-action>
+									<ui-action ui-click={async () => {
+										await new TrainService().removeStop(segment.stop.id);
+
+										this.reload();
+									}}>
 										Remove Stop
 									</ui-action>
 								</ui-actions>}
@@ -173,7 +177,7 @@ export class TrainRoutePage extends Component {
 										Edit Route
 									</ui-action>
 
-									<ui-action>
+									<ui-action ui-href={`/map/${segment.center.x}/${segment.center.y}/5/train-route/insert-stop/${this.trainRoute.code}/${segmentIndex}`}>
 										Insert Stop
 									</ui-action>
 								</ui-actions>}

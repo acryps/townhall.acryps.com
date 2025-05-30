@@ -9,19 +9,26 @@ export class TrainRoutesTileServer extends ShapeTileServer {
 	) {
 		super(
 			app,
-			'train-route/:code',
+			'train-routes',
 
-			async (parameters) => {
-				const route = await database.trainRoute.first(route => route.code.valueOf() == parameters.code);
+			async () => {
+				const shapes = [];
 
-				const shapes = [
-					{
+				const routes = await database.trainRoute
+					.include(route => route.activePath)
+					.where(route => route.closed == null)
+					.toArray()
+
+				for (let route of routes) {
+					const path = await route.activePath.fetch();
+
+					shapes.push({
 						id: route.id,
 						stroke: route.color,
-						bounds: route.path,
+						bounds: path.path,
 						open: true
-					}
-				];
+					});
+				}
 
 				return shapes;
 			}

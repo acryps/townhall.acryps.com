@@ -173,7 +173,7 @@ export class FillLife {
 		const parents = [members[0], members[1]];
 		const children = members.slice(2);
 
-		if (parents.length > 1) {
+		if (members.length > 1) {
 			const relationship = new ResidentRelationship();
 			relationship.initiator = members[0];
 			relationship.peer = members[1];

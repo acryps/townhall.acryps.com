@@ -5,14 +5,16 @@ export type RenderableShape = {
 	fill?: string;
 	stroke?: string;
 	bounds: PackedPointArray;
+	open?: boolean;
 }
 
 export class Shape {
 	id: string;
 	fill?: string;
-	stroke: string;
+	stroke?: string;
 	bounds: PackedPointArray;
-	name: string;
+	name?: string;
+	open?: boolean;
 
 	static render(shape: RenderableShape, offset: Point, context: CanvasRenderingContext2D) {
 		if (!shape) {
@@ -49,7 +51,7 @@ export class Shape {
 		if (shape.stroke) {
 			context.strokeStyle = shape.stroke;
 
-			for (let index = 0; index < bounds.length; index++) {
+			for (let index = 0; index < bounds.length - (shape.open ? 1 : 0); index++) {
 				const start = bounds[index].subtract(offset);
 				const end = bounds[(index + 1) % bounds.length].subtract(offset);
 

@@ -1161,6 +1161,17 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"ZjcnJibH5xZzpjMD5tYWFxbjJzdWk5Zj",
+			{
+			"1vbXJxM3FsajRzOHE4Y3h3azc3dXM0Ym": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(TrainService),
+			(controller, params) => controller.getRoute(
+				params["1vbXJxM3FsajRzOHE4Y3h3azc3dXM0Ym"]
+			)
+		);
+
+		this.expose(
 			"hsZXxsa2h0eG50MnVjazg1eHMyY3NiNW",
 			{},
 			inject => inject.construct(TrainService),
@@ -4978,11 +4989,17 @@ ViewModel.mappings = {
 	[TrainRouteViewModel.name]: class ComposedTrainRouteViewModel extends TrainRouteViewModel {
 		async map() {
 			return {
+				operator: new CompanyViewModel(await BaseServer.unwrap(this.$$model.operator)),
 				stops: (await this.$$model.stops.includeTree(ViewModel.mappings[TrainStopViewModel.name].items).toArray()).map(item => new TrainStopViewModel(item)),
+				closed: this.$$model.closed,
+				code: this.$$model.code,
 				color: this.$$model.color,
+				description: this.$$model.description,
 				id: this.$$model.id,
 				name: this.$$model.name,
-				path: this.$$model.path
+				opened: this.$$model.opened,
+				path: this.$$model.path,
+				textColor: this.$$model.textColor
 			}
 		};
 
@@ -5012,26 +5029,43 @@ ViewModel.mappings = {
 			}
 
 			return {
+				get operator() {
+					return ViewModel.mappings[CompanyViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "operator-TrainRouteViewModel"]
+					);
+				},
 				get stops() {
 					return ViewModel.mappings[TrainStopViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "stops-TrainRouteViewModel"]
 					);
 				},
+				closed: true,
+				code: true,
 				color: true,
+				description: true,
 				id: true,
 				name: true,
-				path: true
+				opened: true,
+				path: true,
+				textColor: true
 			};
 		};
 
 		static toViewModel(data) {
 			const item = new TrainRouteViewModel(null);
+			"operator" in data && (item.operator = data.operator && ViewModel.mappings[CompanyViewModel.name].toViewModel(data.operator));
 			"stops" in data && (item.stops = data.stops && [...data.stops].map(i => ViewModel.mappings[TrainStopViewModel.name].toViewModel(i)));
+			"closed" in data && (item.closed = data.closed === null ? null : new Date(data.closed));
+			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
 			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"opened" in data && (item.opened = data.opened === null ? null : new Date(data.opened));
 			"path" in data && (item.path = data.path === null ? null : `${data.path}`);
+			"textColor" in data && (item.textColor = data.textColor === null ? null : `${data.textColor}`);
 
 			return item;
 		}
@@ -5045,11 +5079,17 @@ ViewModel.mappings = {
 				model = new TrainRoute();
 			}
 			
+			"operator" in viewModel && (model.operator.id = viewModel.operator ? viewModel.operator.id : null);
 			"stops" in viewModel && (null);
+			"closed" in viewModel && (model.closed = viewModel.closed === null ? null : new Date(viewModel.closed));
+			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
 			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"opened" in viewModel && (model.opened = viewModel.opened === null ? null : new Date(viewModel.opened));
 			"path" in viewModel && (model.path = viewModel.path === null ? null : `${viewModel.path}`);
+			"textColor" in viewModel && (model.textColor = viewModel.textColor === null ? null : `${viewModel.textColor}`);
 
 			return model;
 		}

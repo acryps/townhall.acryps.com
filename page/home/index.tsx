@@ -4,7 +4,7 @@ import { OnlinePlayerComponent } from "./online";
 import { boroughColor } from "./index.style";
 import { hex } from "@acryps/style";
 import { BannerComponent } from "../banner";
-import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, metricIcon, priceIcon, propertyRegisterIcon, publicationIcon, residentIcon } from "../assets/icons/managed";
+import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, metricIcon, priceIcon, propertyRegisterIcon, publicationIcon, residentIcon, trainIcon } from "../assets/icons/managed";
 import { Point } from "../../interface/point";
 import { toSimulatedTime } from "../../interface/time";
 import { ImpressionsComponent } from "./impressions";
@@ -108,6 +108,18 @@ export class HomePage extends Component {
 
 					<ui-description>
 						View bills and watch residents vote live
+					</ui-description>
+				</ui-topic>
+
+				<ui-topic ui-href='/trains'>
+					{trainIcon()}
+
+					<ui-name>
+						Train Routes
+					</ui-name>
+
+					<ui-description>
+						View routes in the railnetwork of Pilegron.
 					</ui-description>
 				</ui-topic>
 

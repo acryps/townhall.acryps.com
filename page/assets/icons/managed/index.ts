@@ -2,11 +2,11 @@ import { select, style, content, Font, fontFamily, fontWeight, fontStyle } from 
 
 
 export const iconFont = new Font('icons', fontWeight('normal'), fontStyle('normal'))
-	.addSource('/assets/icons/managed/font/index.eot?44b903ea4cb8', 'embedded-opentype')
-	.addSource('/assets/icons/managed/font/index.svg?8dc6d49097ab', 'svg')
-	.addSource('/assets/icons/managed/font/index.ttf?5192aa4868d6', 'truetype')
-	.addSource('/assets/icons/managed/font/index.woff?81f1fd237eec', 'woff')
-	.addSource('/assets/icons/managed/font/index.woff2?810b58880681', 'woff2');
+	.addSource('/assets/icons/managed/font/index.eot?4beda87678f5', 'embedded-opentype')
+	.addSource('/assets/icons/managed/font/index.svg?468d48c8341c', 'svg')
+	.addSource('/assets/icons/managed/font/index.ttf?140bee713d22', 'truetype')
+	.addSource('/assets/icons/managed/font/index.woff?d89e113120be', 'woff')
+	.addSource('/assets/icons/managed/font/index.woff2?99c093e9660d', 'woff2');
 
 export const icons = () => select('ui-icon',
 	fontFamily(iconFont.name),
@@ -37,10 +37,12 @@ export const icons = () => select('ui-icon',
 	style('[ui-relation-graph]').before('\f115'),
 	style('[ui-relation]').before('\f116'),
 	style('[ui-resident]').before('\f117'),
-	style('[ui-speak]').before('\f118'),
-	style('[ui-state]').before('\f119'),
-	style('[ui-street]').before('\f11a'),
-	style('[ui-undo]').before('\f11b'),
+	style('[ui-route-interchange]').before('\f118'),
+	style('[ui-speak]').before('\f119'),
+	style('[ui-state]').before('\f11a'),
+	style('[ui-street]').before('\f11b'),
+	style('[ui-train]').before('\f11c'),
+	style('[ui-undo]').before('\f11d'),
 );
 
 const createIconElement = (name: string) => {
@@ -73,7 +75,9 @@ export const publicationIcon = () => createIconElement('publication');
 export const relationGraphIcon = () => createIconElement('relation-graph');
 export const relationIcon = () => createIconElement('relation');
 export const residentIcon = () => createIconElement('resident');
+export const routeInterchangeIcon = () => createIconElement('route-interchange');
 export const speakIcon = () => createIconElement('speak');
 export const stateIcon = () => createIconElement('state');
 export const streetIcon = () => createIconElement('street');
+export const trainIcon = () => createIconElement('train');
 export const undoIcon = () => createIconElement('undo');

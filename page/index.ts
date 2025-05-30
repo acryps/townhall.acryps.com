@@ -49,6 +49,8 @@ import { MapStartPage } from "./map/start";
 import { RevaluePropertyPage } from "./properties/property/ownership/revalue";
 import { EntityAssetsPage } from "./trade/assets";
 import { MetricsPage } from "./metrics";
+import { TrainsPage } from "./train";
+import { TrainRoutePage } from "./train/route";
 
 export class Application {
 	static router: Router;
@@ -96,6 +98,10 @@ export class Application {
 
 				.route('/street/:id', StreetPage
 					.route('/plots', StreetPlotsPage)
+				)
+
+				.route('/trains', TrainsPage
+					.route('/route/:code', TrainRoutePage)
 				)
 
 				.route('/news/write/:id', WriteArticlePage)

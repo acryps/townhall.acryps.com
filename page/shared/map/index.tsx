@@ -37,6 +37,10 @@ export class MapComponent extends Component {
 	subpixel = new Point(0, 0);
 	pixelSize = 0;
 
+	// triggered when the first render is complete
+	initialRenderComplete = false;
+	onInitialRenderComplete = () => {};
+
 	layers: MapLayer[] = [
 		baseLayer
 	];
@@ -323,6 +327,11 @@ export class MapComponent extends Component {
 		}
 
 		this.renderLabels();
+
+		if (!this.initialRenderComplete) {
+			this.initialRenderComplete = true;
+			this.onInitialRenderComplete();
+		}
 	}
 
 	private renderLabels() {

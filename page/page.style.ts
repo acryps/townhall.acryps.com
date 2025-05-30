@@ -27,6 +27,8 @@ import { valuationStyle } from "./trade/valuation/index.style";
 import { mapStartStyle } from "./map/start/index.style";
 import { assetsStyle } from "./trade/assets/index.style";
 import { metricsStyle } from "./metrics/index.style";
+import { trainStyle } from "./train/index.style";
+import { trainRouteIconStyle } from "./shared/train-route/index.style";
 
 export const pageStyle = () => root(
 	boldFont,
@@ -45,6 +47,7 @@ export const pageStyle = () => root(
 	locationMarkerStyle(),
 	annotatedTextStyle(),
 	legalEntitySelectorStyle(),
+	trainRouteIconStyle(),
 
 	child('body',
 		padding(0),
@@ -100,6 +103,8 @@ export const pageStyle = () => root(
 				residentStyle(),
 
 				streetStyle(),
+
+				trainStyle(),
 
 				voteStyle(),
 

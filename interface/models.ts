@@ -366,11 +366,17 @@ export interface TrainStationExitViewModel {
 }
 
 export interface TrainRouteViewModel {
-    stops: TrainStopViewModel[];
+    operator: CompanyViewModel;
+	stops: TrainStopViewModel[];
+	closed: Date;
+	code: string;
 	color: string;
+	description: string;
 	id: string;
 	name: string;
+	opened: Date;
 	path: string;
+	textColor: string;
 }
 
 export interface TrainStationViewModel {

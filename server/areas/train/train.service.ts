@@ -10,11 +10,24 @@ export class TrainService extends Service {
 		super();
 	}
 
+	async getRoute(code: string) {
+		return new TrainRouteViewModel(
+			await this.db.trainRoute
+				.first(route => route.code.valueOf() == code)
+		);
+	}
+
 	getRoutes() {
-		return TrainRouteViewModel.from(this.db.trainRoute);
+		return TrainRouteViewModel.from(
+			this.db.trainRoute
+				.orderByAscending(route => route.code)
+		);
 	}
 
 	getStations() {
-		return TrainStationViewModel.from(this.db.trainStation);
+		return TrainStationViewModel.from(
+			this.db.trainStation
+				.orderByAscending(station => station.name)
+		);
 	}
 }

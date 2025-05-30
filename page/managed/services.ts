@@ -872,19 +872,31 @@ export class TrainStationExitViewModel {
 }
 
 export class TrainRouteViewModel {
+	operator: CompanyViewModel;
 	stops: TrainStopViewModel[];
+	closed: Date;
+	code: string;
 	color: string;
+	description: string;
 	id: string;
 	name: string;
+	opened: Date;
 	path: string;
+	textColor: string;
 
 	private static $build(raw) {
 		const item = new TrainRouteViewModel();
+		raw.operator === undefined || (item.operator = raw.operator ? CompanyViewModel["$build"](raw.operator) : null)
 		raw.stops === undefined || (item.stops = raw.stops ? raw.stops.map(i => TrainStopViewModel["$build"](i)) : null)
+		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
+		raw.code === undefined || (item.code = raw.code === null ? null : `${raw.code}`)
 		raw.color === undefined || (item.color = raw.color === null ? null : `${raw.color}`)
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
 		raw.path === undefined || (item.path = raw.path === null ? null : `${raw.path}`)
+		raw.textColor === undefined || (item.textColor = raw.textColor === null ? null : `${raw.textColor}`)
 		
 		return item;
 	}
@@ -3059,6 +3071,27 @@ export class TradeService {
 }
 
 export class TrainService {
+	async getRoute(code: string): Promise<TrainRouteViewModel> {
+		const $data = new FormData();
+		$data.append("1vbXJxM3FsajRzOHE4Y3h3azc3dXM0Ym", Service.stringify(code))
+
+		return await fetch(Service.toURL("ZjcnJibH5xZzpjMD5tYWFxbjJzdWk5Zj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : TrainRouteViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async getRoutes(): Promise<Array<TrainRouteViewModel>> {
 		const $data = new FormData();
 		

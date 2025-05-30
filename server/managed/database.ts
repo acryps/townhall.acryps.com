@@ -602,6 +602,7 @@ export class CompanyQueryProxy extends QueryProxy {
 
 export class Company extends Entity<CompanyQueryProxy> {
 	offices: PrimaryReference<Office, OfficeQueryProxy>;
+		operatedTrainRoutes: PrimaryReference<TrainRoute, TrainRouteQueryProxy>;
 		banner: string;
 	created: Date;
 	description: string;
@@ -634,6 +635,7 @@ export class Company extends Entity<CompanyQueryProxy> {
 		super();
 		
 		this.offices = new PrimaryReference<Office, OfficeQueryProxy>(this, "companyId", Office);
+		this.operatedTrainRoutes = new PrimaryReference<TrainRoute, TrainRouteQueryProxy>(this, "operatorId", TrainRoute);
 	}
 }
 			
@@ -2338,25 +2340,45 @@ export class Tenancy extends Entity<TenancyQueryProxy> {
 }
 			
 export class TrainRouteQueryProxy extends QueryProxy {
+	get operator(): Partial<CompanyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get closed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get code(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get color(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get opened(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get operatorId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get path(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get textColor(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class TrainRoute extends Entity<TrainRouteQueryProxy> {
+	get operator(): Partial<ForeignReference<Company>> { return this.$operator; }
 	stops: PrimaryReference<TrainStop, TrainStopQueryProxy>;
-		color: string;
+		closed: Date;
+	code: string;
+	color: string;
+	description: string;
 	declare id: string;
 	name: string;
+	opened: Date;
+	operatorId: string;
 	path: string;
+	textColor: string;
 	
 	$$meta = {
 		source: "train_route",
 		columns: {
+			closed: { type: "timestamp", name: "closed" },
+			code: { type: "text", name: "code" },
 			color: { type: "text", name: "color" },
+			description: { type: "text", name: "description" },
 			id: { type: "uuid", name: "id" },
 			name: { type: "text", name: "name" },
-			path: { type: "text", name: "path" }
+			opened: { type: "timestamp", name: "opened" },
+			operatorId: { type: "uuid", name: "operator_id" },
+			path: { type: "text", name: "path" },
+			textColor: { type: "text", name: "text_color" }
 		},
 		get set(): DbSet<TrainRoute, TrainRouteQueryProxy> { 
 			return new DbSet<TrainRoute, TrainRouteQueryProxy>(TrainRoute, null);
@@ -2366,8 +2388,23 @@ export class TrainRoute extends Entity<TrainRouteQueryProxy> {
 	constructor() {
 		super();
 		
-		this.stops = new PrimaryReference<TrainStop, TrainStopQueryProxy>(this, "routeId", TrainStop);
+		this.$operator = new ForeignReference<Company>(this, "operatorId", Company);
+	this.stops = new PrimaryReference<TrainStop, TrainStopQueryProxy>(this, "routeId", TrainStop);
 	}
+	
+	private $operator: ForeignReference<Company>;
+
+	set operator(value: Partial<ForeignReference<Company>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.operatorId = value.id as string;
+		} else {
+			this.operatorId = null;
+		}
+	}
+
+	
 }
 			
 export class TrainStationQueryProxy extends QueryProxy {

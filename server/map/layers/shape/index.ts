@@ -8,7 +8,7 @@ export class ShapeTileServer {
 		app: ManagedServer,
 		route: string,
 
-		fetch: () => Promise<Shape[]>,
+		fetch: (parameters: Record<string, string>) => Promise<Shape[]>,
 	) {
 		const size = 500;
 
@@ -18,7 +18,7 @@ export class ShapeTileServer {
 
 			const offset = new Point(regionX * size, regionY * size);
 
-			const shapes = await fetch();
+			const shapes = await fetch(request.params);
 
 			response.json(shapes
 				.filter(shape => Point.touches(offset, size, Point.unpack(shape.bounds)))
@@ -29,7 +29,7 @@ export class ShapeTileServer {
 			const x = +request.params.x;
 			const y = +request.params.y;
 
-			const shapes = await fetch();
+			const shapes = await fetch(request.params);
 
 			const canvas = new Canvas(1, 1);
 			const context = canvas.getContext('2d');

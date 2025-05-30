@@ -46,6 +46,8 @@ import { WorkOfferTotalMetric } from "./areas/metrics/tracker/work-offers";
 import { CompanyCountMetric } from "./areas/metrics/tracker/company-count";
 import { CompanyAssetTotalMetric } from "./areas/metrics/tracker/company-asset-total";
 import { EmptyDwellingCountMetric } from "./areas/metrics/tracker/empty-dwellings";
+import { TrainRouteTileServer } from "./map/layers/shape/train/route";
+import { TrainRoutesTileServer } from "./map/layers/shape/train/routes";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -126,6 +128,8 @@ DbClient.connectedClient.connect().then(async () => {
 	new PropertyUsageTileServer(app, database);
 	new PropertyValueTileServer(app, database);
 	new PropertyOwnershipTileServer(app, database);
+	new TrainRouteTileServer(app, database);
+	new TrainRoutesTileServer(app, database);
 	// new MovementTileServer(app, database);
 
 	// order will be keept in client

@@ -111,7 +111,7 @@ export class HomePage extends Component {
 					</ui-description>
 				</ui-topic>
 
-				<ui-topic ui-href='/trains'>
+				<ui-topic ui-href='/train'>
 					{trainIcon()}
 
 					<ui-name>

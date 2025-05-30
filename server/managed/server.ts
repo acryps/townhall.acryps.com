@@ -92,6 +92,8 @@ import { StreetService } from "././../areas/street/service";
 import { ValuationViewModel } from "././../areas/trade/valuation.view";
 import { AssetViewModel } from "././../areas/trade/asset";
 import { TradeService } from "././../areas/trade/service";
+import { TrainRoute } from "././database";
+import { TrainRoutePath } from "././database";
 import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
@@ -114,6 +116,7 @@ import { BuildingShapeModel } from "./../areas/property/building";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
 import { ValuationSummaryModel } from "./../areas/trade/valuation.view";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
+import { TrainRoutePathViewModel } from "./../areas/train/route.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { HonestiumViewModel } from "./../areas/vote/bill";
 import { OfficeEmployeeModel } from "./../areas/company.view";
@@ -144,7 +147,6 @@ import { MetricValue } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
 import { Asset } from "./../areas/trade/asset";
 import { TrainStationExit } from "./../managed/database";
-import { TrainRoute } from "./../managed/database";
 import { TrainStation } from "./../managed/database";
 import { TrainStop } from "./../managed/database";
 import { BillHonestium } from "./../managed/database";
@@ -1177,6 +1179,49 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(TrainService),
 			(controller, params) => controller.getRoutes(
 				
+			)
+		);
+
+		this.expose(
+			"U2anMzaDB2dndnNjM0Zjg1cX84c2tjYn",
+			{
+			"k4dXhnbnd3aGRhNnRsZmlwZGlvMTU5cm": { type: TrainRouteViewModel, isArray: false, isOptional: false }
+			},
+			inject => inject.construct(TrainService),
+			(controller, params) => controller.saveRoute(
+				params["k4dXhnbnd3aGRhNnRsZmlwZGlvMTU5cm"]
+			)
+		);
+
+		this.expose(
+			"lmNThhdDtzaHxwb3FnM3poMWJkMXRlbW",
+			{
+			"IxZHhlem0yOWYwOWV2MnZrYm85YmRhcX": { type: "string", isArray: false, isOptional: false },
+				"E0cWN0cHRhczh1YXVycmc1MjJycXRtb2": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(TrainService),
+			(controller, params) => controller.setOperator(
+				params["IxZHhlem0yOWYwOWV2MnZrYm85YmRhcX"],
+				params["E0cWN0cHRhczh1YXVycmc1MjJycXRtb2"]
+			)
+		);
+
+		this.expose(
+			"l3Y2JsdHpocTpya3xpaDVkdDN4ZnczbT",
+			{
+			"EwanloangzanlyZWg1YTNwdzJjcWg3eT": { type: "string", isArray: false, isOptional: false },
+				"hnMXdzZWg0NXJqdjlkaDY0cnl3d3R2NH": { type: "string", isArray: false, isOptional: false },
+				"54ZWt0OTE1a2lmaW1ya3VsMWBmbTY1eW": { type: "string", isArray: false, isOptional: false },
+				"ZvZnNiaWdpZmNtejpsODg0dmkwa3VkdT": { type: "string", isArray: false, isOptional: false },
+				"J5c2Fob3Z0eGRxZGZmc3M4aWQ4ZGJmc2": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(TrainService),
+			(controller, params) => controller.register(
+				params["EwanloangzanlyZWg1YTNwdzJjcWg3eT"],
+				params["hnMXdzZWg0NXJqdjlkaDY0cnl3d3R2NH"],
+				params["54ZWt0OTE1a2lmaW1ya3VsMWBmbTY1eW"],
+				params["ZvZnNiaWdpZmNtejpsODg0dmkwa3VkdT"],
+				params["J5c2Fob3Z0eGRxZGZmc3M4aWQ4ZGJmc2"]
 			)
 		);
 
@@ -4989,7 +5034,8 @@ ViewModel.mappings = {
 	[TrainRouteViewModel.name]: class ComposedTrainRouteViewModel extends TrainRouteViewModel {
 		async map() {
 			return {
-				operator: new CompanyViewModel(await BaseServer.unwrap(this.$$model.operator)),
+				activePath: new TrainRoutePathViewModel(await BaseServer.unwrap(this.$$model.activePath)),
+				operator: new LegalEntityViewModel(await BaseServer.unwrap(this.$$model.operator)),
 				stops: (await this.$$model.stops.includeTree(ViewModel.mappings[TrainStopViewModel.name].items).toArray()).map(item => new TrainStopViewModel(item)),
 				closed: this.$$model.closed,
 				code: this.$$model.code,
@@ -4998,7 +5044,6 @@ ViewModel.mappings = {
 				id: this.$$model.id,
 				name: this.$$model.name,
 				opened: this.$$model.opened,
-				path: this.$$model.path,
 				textColor: this.$$model.textColor
 			}
 		};
@@ -5029,8 +5074,14 @@ ViewModel.mappings = {
 			}
 
 			return {
+				get activePath() {
+					return ViewModel.mappings[TrainRoutePathViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "activePath-TrainRouteViewModel"]
+					);
+				},
 				get operator() {
-					return ViewModel.mappings[CompanyViewModel.name].getPrefetchingProperties(
+					return ViewModel.mappings[LegalEntityViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "operator-TrainRouteViewModel"]
 					);
@@ -5048,14 +5099,14 @@ ViewModel.mappings = {
 				id: true,
 				name: true,
 				opened: true,
-				path: true,
 				textColor: true
 			};
 		};
 
 		static toViewModel(data) {
 			const item = new TrainRouteViewModel(null);
-			"operator" in data && (item.operator = data.operator && ViewModel.mappings[CompanyViewModel.name].toViewModel(data.operator));
+			"activePath" in data && (item.activePath = data.activePath && ViewModel.mappings[TrainRoutePathViewModel.name].toViewModel(data.activePath));
+			"operator" in data && (item.operator = data.operator && ViewModel.mappings[LegalEntityViewModel.name].toViewModel(data.operator));
 			"stops" in data && (item.stops = data.stops && [...data.stops].map(i => ViewModel.mappings[TrainStopViewModel.name].toViewModel(i)));
 			"closed" in data && (item.closed = data.closed === null ? null : new Date(data.closed));
 			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
@@ -5064,7 +5115,6 @@ ViewModel.mappings = {
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"opened" in data && (item.opened = data.opened === null ? null : new Date(data.opened));
-			"path" in data && (item.path = data.path === null ? null : `${data.path}`);
 			"textColor" in data && (item.textColor = data.textColor === null ? null : `${data.textColor}`);
 
 			return item;
@@ -5079,6 +5129,7 @@ ViewModel.mappings = {
 				model = new TrainRoute();
 			}
 			
+			"activePath" in viewModel && (model.activePath.id = viewModel.activePath ? viewModel.activePath.id : null);
 			"operator" in viewModel && (model.operator.id = viewModel.operator ? viewModel.operator.id : null);
 			"stops" in viewModel && (null);
 			"closed" in viewModel && (model.closed = viewModel.closed === null ? null : new Date(viewModel.closed));
@@ -5088,18 +5139,16 @@ ViewModel.mappings = {
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"opened" in viewModel && (model.opened = viewModel.opened === null ? null : new Date(viewModel.opened));
-			"path" in viewModel && (model.path = viewModel.path === null ? null : `${viewModel.path}`);
 			"textColor" in viewModel && (model.textColor = viewModel.textColor === null ? null : `${viewModel.textColor}`);
 
 			return model;
 		}
 	},
-	[TrainStationViewModel.name]: class ComposedTrainStationViewModel extends TrainStationViewModel {
+	[TrainRoutePathViewModel.name]: class ComposedTrainRoutePathViewModel extends TrainRoutePathViewModel {
 		async map() {
 			return {
 				id: this.$$model.id,
-				name: this.$$model.name,
-				position: this.$$model.position
+				path: this.$$model.path
 			}
 		};
 
@@ -5130,16 +5179,84 @@ ViewModel.mappings = {
 
 			return {
 				id: true,
-				name: true,
-				position: true
+				path: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new TrainRoutePathViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"path" in data && (item.path = data.path === null ? null : `${data.path}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: TrainRoutePathViewModel) {
+			let model: TrainRoutePath;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(TrainRoutePath).find(viewModel.id)
+			} else {
+				model = new TrainRoutePath();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"path" in viewModel && (model.path = viewModel.path === null ? null : `${viewModel.path}`);
+
+			return model;
+		}
+	},
+	[TrainStationViewModel.name]: class ComposedTrainStationViewModel extends TrainStationViewModel {
+		async map() {
+			return {
+				property: new PropertySummaryModel(await BaseServer.unwrap(this.$$model.property)),
+				id: this.$$model.id,
+				name: this.$$model.name
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get property() {
+					return ViewModel.mappings[PropertySummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "property-TrainStationViewModel"]
+					);
+				},
+				id: true,
+				name: true
 			};
 		};
 
 		static toViewModel(data) {
 			const item = new TrainStationViewModel(null);
+			"property" in data && (item.property = data.property && ViewModel.mappings[PropertySummaryModel.name].toViewModel(data.property));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"position" in data && (item.position = data.position === null ? null : `${data.position}`);
 
 			return item;
 		}
@@ -5153,9 +5270,9 @@ ViewModel.mappings = {
 				model = new TrainStation();
 			}
 			
+			"property" in viewModel && (model.property.id = viewModel.property ? viewModel.property.id : null);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"position" in viewModel && (model.position = viewModel.position === null ? null : `${viewModel.position}`);
 
 			return model;
 		}

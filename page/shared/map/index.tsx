@@ -17,8 +17,9 @@ export class MapComponent extends Component {
 	declare rootNode: HTMLElement;
 
 	center: Point;
-	scale = 0.8;
+	cursorColor?: string;
 
+	scale = 0.8;
 	readonly minimumWidth = 10;
 	readonly maximumWidth = 1000;
 
@@ -314,19 +315,31 @@ export class MapComponent extends Component {
 		// top most pixel offset
 		// point 0,0 in canvas converted to map location
 		const offset = new Point(
-			this.cursor.x - this.width / 2 - (this.width % 2 ? 0.5 : 0),
-			this.cursor.y - this.height / 2 - (this.height % 2 ? 0.5 : 0)
+			this.width / 2 + (this.width % 2 ? 0.5 : 0),
+			this.height / 2 + (this.height % 2 ? 0.5 : 0)
 		);
 
-		// label positions
-		this.rootNode.style.setProperty(mapPositionX.propertyName, offset.x);
-		this.rootNode.style.setProperty(mapPositionY.propertyName, offset.y);
+		const topLeft = this.cursor.subtract(offset);
 
-		for (let view of this.activeViews) {
-			view.render(offset);
+		// label positions
+		this.rootNode.style.setProperty(mapPositionX.propertyName, topLeft.x);
+		this.rootNode.style.setProperty(mapPositionY.propertyName, topLeft.y);
+
+		const activeViews = this.activeViews;
+
+		for (let view of activeViews) {
+			view.render(topLeft);
 		}
 
 		this.renderLabels();
+
+		if (this.cursorColor) {
+			const topView = activeViews[activeViews.length - 1];
+
+			topView.context.globalCompositeOperation = 'source-over';
+			topView.context.fillStyle = this.cursorColor;
+			topView.context.fillRect(topLeft.x + offset.x, topLeft.y + offset.y, 1, 1);
+		}
 
 		if (!this.initialRenderComplete) {
 			this.initialRenderComplete = true;

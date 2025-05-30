@@ -366,7 +366,8 @@ export interface TrainStationExitViewModel {
 }
 
 export interface TrainRouteViewModel {
-    operator: CompanyViewModel;
+    activePath: TrainRoutePathViewModel;
+	operator: LegalEntityViewModel;
 	stops: TrainStopViewModel[];
 	closed: Date;
 	code: string;
@@ -375,14 +376,18 @@ export interface TrainRouteViewModel {
 	id: string;
 	name: string;
 	opened: Date;
-	path: string;
 	textColor: string;
 }
 
-export interface TrainStationViewModel {
+export interface TrainRoutePathViewModel {
     id: string;
+	path: string;
+}
+
+export interface TrainStationViewModel {
+    property: PropertySummaryModel;
+	id: string;
 	name: string;
-	position: string;
 }
 
 export interface TrainStopViewModel {

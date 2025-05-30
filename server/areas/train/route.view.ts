@@ -1,7 +1,8 @@
 import { ViewModel } from "vlserver";
-import { TrainRoute } from "../../managed/database";
+import { TrainRoute, TrainRoutePath } from "../../managed/database";
 import { TrainStopViewModel } from "./stop.view";
 import { CompanyViewModel } from "../company.view";
+import { LegalEntityViewModel } from "../legal-entity";
 
 export class TrainRouteViewModel extends ViewModel<TrainRoute> {
 	id;
@@ -9,7 +10,7 @@ export class TrainRouteViewModel extends ViewModel<TrainRoute> {
 
 	name;
 	description;
-	operator: CompanyViewModel;
+	operator: LegalEntityViewModel;
 
 	color;
 	textColor;
@@ -17,6 +18,12 @@ export class TrainRouteViewModel extends ViewModel<TrainRoute> {
 	opened;
 	closed;
 
-	path;
+	activePath: TrainRoutePathViewModel;
 	stops: TrainStopViewModel[];
+}
+
+export class TrainRoutePathViewModel extends ViewModel<TrainRoutePath> {
+	id;
+
+	path;
 }

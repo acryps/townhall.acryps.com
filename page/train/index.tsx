@@ -5,6 +5,7 @@ import { hex } from "@acryps/style";
 import { TrainRouteIconComponent } from "../shared/train-route";
 import { routeInterchangeIcon } from "../assets/icons/managed";
 import { convertToLegalCompanyName } from "../../interface/company";
+import { LegalEntityComponent } from "../shared/legal-entity";
 
 export class TrainsPage extends Component {
 	routes: TrainRouteViewModel[];
@@ -36,32 +37,37 @@ export class TrainsPage extends Component {
 					{route.description}
 				</ui-description>
 
-				{route.operator && <ui-operator ui-href={`/company-office/company/${route.operator.tag}`}>
-					Operated by {convertToLegalCompanyName(route.operator)}
+				{route.operator && <ui-operator>
+					Operated by {new LegalEntityComponent(route.operator)}
 				</ui-operator>}
 
 				<ui-stops>
 					{route.stops.map(stop => {
 						const station = this.stations.find(station => station.id == stop.stationId);
-						const interchangePeers = this.findInterchangePeers(route, station);
 
 						return <ui-stop>
 							<ui-name>
-								{station.name}
+								{station.name ?? station.property.name}
 							</ui-name>
 
-							{interchangePeers.length != 0 && <ui-interchange>
-								{routeInterchangeIcon()}
-
-								<ui-routes>
-									{interchangePeers.map(peer => new TrainRouteIconComponent(peer))}
-								</ui-routes>
-							</ui-interchange>}
+							{this.renderInterchange(route, station)}
 						</ui-stop>
 					})}
 				</ui-stops>
 			</ui-train-route>)}
 		</ui-trains>;
+	}
+
+	renderInterchange(base: TrainRouteViewModel, station: TrainStationViewModel) {
+		const interchangePeers = this.findInterchangePeers(base, station);
+
+		return interchangePeers.length != 0 && <ui-interchange>
+			{routeInterchangeIcon()}
+
+			<ui-routes>
+				{interchangePeers.map(peer => new TrainRouteIconComponent(peer))}
+			</ui-routes>
+		</ui-interchange>;
 	}
 
 	findInterchangePeers(base: TrainRouteViewModel, station: TrainStationViewModel) {

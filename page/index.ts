@@ -51,6 +51,7 @@ import { EntityAssetsPage } from "./trade/assets";
 import { MetricsPage } from "./metrics";
 import { TrainsPage } from "./train";
 import { TrainRoutePage } from "./train/route";
+import { RegisterTrainRoutePage } from "./train/register";
 
 export class Application {
 	static router: Router;
@@ -100,7 +101,8 @@ export class Application {
 					.route('/plots', StreetPlotsPage)
 				)
 
-				.route('/trains', TrainsPage
+				.route('/train', TrainsPage
+					.route('/register/:path', RegisterTrainRoutePage)
 					.route('/route/:code', TrainRoutePage)
 				)
 

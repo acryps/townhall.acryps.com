@@ -11,7 +11,7 @@ export class TrainRouteIconComponent extends Component {
 	}
 
 	render() {
-		return <ui-train-route-icon ui-href={`/trains/route/${this.trainRoute.code}`} style={[
+		return <ui-train-route-icon ui-href={`/train/route/${this.trainRoute.code}`} style={[
 			trainRouteColor.provide(hex(this.trainRoute.color)),
 			trainRouteTextColor.provide(hex(this.trainRoute.textColor))
 		].join(';')}>

@@ -872,7 +872,8 @@ export class TrainStationExitViewModel {
 }
 
 export class TrainRouteViewModel {
-	operator: CompanyViewModel;
+	activePath: TrainRoutePathViewModel;
+	operator: LegalEntityViewModel;
 	stops: TrainStopViewModel[];
 	closed: Date;
 	code: string;
@@ -881,12 +882,12 @@ export class TrainRouteViewModel {
 	id: string;
 	name: string;
 	opened: Date;
-	path: string;
 	textColor: string;
 
 	private static $build(raw) {
 		const item = new TrainRouteViewModel();
-		raw.operator === undefined || (item.operator = raw.operator ? CompanyViewModel["$build"](raw.operator) : null)
+		raw.activePath === undefined || (item.activePath = raw.activePath ? TrainRoutePathViewModel["$build"](raw.activePath) : null)
+		raw.operator === undefined || (item.operator = raw.operator ? LegalEntityViewModel["$build"](raw.operator) : null)
 		raw.stops === undefined || (item.stops = raw.stops ? raw.stops.map(i => TrainStopViewModel["$build"](i)) : null)
 		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
 		raw.code === undefined || (item.code = raw.code === null ? null : `${raw.code}`)
@@ -895,23 +896,35 @@ export class TrainRouteViewModel {
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
-		raw.path === undefined || (item.path = raw.path === null ? null : `${raw.path}`)
 		raw.textColor === undefined || (item.textColor = raw.textColor === null ? null : `${raw.textColor}`)
 		
 		return item;
 	}
 }
 
+export class TrainRoutePathViewModel {
+	id: string;
+	path: string;
+
+	private static $build(raw) {
+		const item = new TrainRoutePathViewModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.path === undefined || (item.path = raw.path === null ? null : `${raw.path}`)
+		
+		return item;
+	}
+}
+
 export class TrainStationViewModel {
+	property: PropertySummaryModel;
 	id: string;
 	name: string;
-	position: string;
 
 	private static $build(raw) {
 		const item = new TrainStationViewModel();
+		raw.property === undefined || (item.property = raw.property ? PropertySummaryModel["$build"](raw.property) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
-		raw.position === undefined || (item.position = raw.position === null ? null : `${raw.position}`)
 		
 		return item;
 	}
@@ -3109,6 +3122,68 @@ export class TrainService {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
 				throw new Error(r.error);
+			}
+		});
+	}
+
+	async saveRoute(route: TrainRouteViewModel): Promise<void> {
+		const $data = new FormData();
+		$data.append("k4dXhnbnd3aGRhNnRsZmlwZGlvMTU5cm", Service.stringify(route))
+
+		return await fetch(Service.toURL("U2anMzaDB2dndnNjM0Zjg1cX84c2tjYn"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async setOperator(routeId: string, operatorId: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("IxZHhlem0yOWYwOWV2MnZrYm85YmRhcX", Service.stringify(routeId))
+		$data.append("E0cWN0cHRhczh1YXVycmc1MjJycXRtb2", Service.stringify(operatorId))
+
+		return await fetch(Service.toURL("lmNThhdDtzaHxwb3FnM3poMWJkMXRlbW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async register(path: string, code: string, color: string, textColor: string, name: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("EwanloangzanlyZWg1YTNwdzJjcWg3eT", Service.stringify(path))
+		$data.append("hnMXdzZWg0NXJqdjlkaDY0cnl3d3R2NH", Service.stringify(code))
+		$data.append("54ZWt0OTE1a2lmaW1ya3VsMWBmbTY1eW", Service.stringify(color))
+		$data.append("ZvZnNiaWdpZmNtejpsODg0dmkwa3VkdT", Service.stringify(textColor))
+		$data.append("J5c2Fob3Z0eGRxZGZmc3M4aWQ4ZGJmc2", Service.stringify(name))
+
+		return await fetch(Service.toURL("l3Y2JsdHpocTpya3xpaDVkdDN4ZnczbT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
 			}
 		});
 	}

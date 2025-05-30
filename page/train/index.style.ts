@@ -2,16 +2,18 @@ import { alignItems, backgroundColor, border, borderTop, child, ColorValue, disp
 import { boxed } from "../shared/boxed.style";
 import { pageBackgroundColor, pageGutter } from "../index.style";
 import { trainRouteStyle } from "./route/index.style";
+import { registerTrainRouteStyle } from "./register/index.style";
 
 export const routeColor = new Variable<ColorValue>('route-color');
 
-const bulletSize = rem(0.75);
-const lineSize = px(2);
+export const bulletSize = rem(0.75);
+export const lineSize = px(2);
 
 export const trainStyle = () => child('ui-trains',
 	boxed(),
 
 	trainRouteStyle(),
+	registerTrainRouteStyle(),
 
 	child('ui-train-route',
 		display('block'),

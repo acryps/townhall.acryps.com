@@ -602,7 +602,6 @@ export class CompanyQueryProxy extends QueryProxy {
 
 export class Company extends Entity<CompanyQueryProxy> {
 	offices: PrimaryReference<Office, OfficeQueryProxy>;
-		operatedTrainRoutes: PrimaryReference<TrainRoute, TrainRouteQueryProxy>;
 		banner: string;
 	created: Date;
 	description: string;
@@ -635,7 +634,6 @@ export class Company extends Entity<CompanyQueryProxy> {
 		super();
 		
 		this.offices = new PrimaryReference<Office, OfficeQueryProxy>(this, "companyId", Office);
-		this.operatedTrainRoutes = new PrimaryReference<TrainRoute, TrainRouteQueryProxy>(this, "operatorId", TrainRoute);
 	}
 }
 			
@@ -1034,7 +1032,8 @@ export class LegalEntityQueryProxy extends QueryProxy {
 export class LegalEntity extends Entity<LegalEntityQueryProxy> {
 	get borough(): Partial<ForeignReference<Borough>> { return this.$borough; }
 	get company(): Partial<ForeignReference<Company>> { return this.$company; }
-	get resident(): Partial<ForeignReference<Resident>> { return this.$resident; }
+	operatedTrainRoutes: PrimaryReference<TrainRoute, TrainRouteQueryProxy>;
+		get resident(): Partial<ForeignReference<Resident>> { return this.$resident; }
 	boroughId: string;
 	companyId: string;
 	declare id: string;
@@ -1060,7 +1059,8 @@ export class LegalEntity extends Entity<LegalEntityQueryProxy> {
 		
 		this.$borough = new ForeignReference<Borough>(this, "boroughId", Borough);
 	this.$company = new ForeignReference<Company>(this, "companyId", Company);
-	this.$resident = new ForeignReference<Resident>(this, "residentId", Resident);
+	this.operatedTrainRoutes = new PrimaryReference<TrainRoute, TrainRouteQueryProxy>(this, "operatorId", TrainRoute);
+		this.$resident = new ForeignReference<Resident>(this, "residentId", Resident);
 	}
 	
 	private $borough: ForeignReference<Borough>;
@@ -1550,6 +1550,7 @@ export class Property extends Entity<PropertyQueryProxy> {
 		offices: PrimaryReference<Office, OfficeQueryProxy>;
 		owners: PrimaryReference<PropertyOwner, PropertyOwnerQueryProxy>;
 		plotBoundaries: PrimaryReference<PlotBoundary, PlotBoundaryQueryProxy>;
+		trainStations: PrimaryReference<TrainStation, TrainStationQueryProxy>;
 		get type(): Partial<ForeignReference<PropertyType>> { return this.$type; }
 	activePlotBoundaryId: string;
 	boroughId: string;
@@ -1604,6 +1605,7 @@ export class Property extends Entity<PropertyQueryProxy> {
 		this.offices = new PrimaryReference<Office, OfficeQueryProxy>(this, "propertyId", Office);
 		this.owners = new PrimaryReference<PropertyOwner, PropertyOwnerQueryProxy>(this, "propertyId", PropertyOwner);
 		this.plotBoundaries = new PrimaryReference<PlotBoundary, PlotBoundaryQueryProxy>(this, "propertyId", PlotBoundary);
+		this.trainStations = new PrimaryReference<TrainStation, TrainStationQueryProxy>(this, "propertyId", TrainStation);
 		this.$type = new ForeignReference<PropertyType>(this, "typeId", PropertyType);
 	}
 	
@@ -2340,7 +2342,9 @@ export class Tenancy extends Entity<TenancyQueryProxy> {
 }
 			
 export class TrainRouteQueryProxy extends QueryProxy {
-	get operator(): Partial<CompanyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get activePath(): Partial<TrainRoutePathQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get operator(): Partial<LegalEntityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get activePathId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get closed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get code(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get color(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -2353,9 +2357,12 @@ export class TrainRouteQueryProxy extends QueryProxy {
 }
 
 export class TrainRoute extends Entity<TrainRouteQueryProxy> {
-	get operator(): Partial<ForeignReference<Company>> { return this.$operator; }
+	get activePath(): Partial<ForeignReference<TrainRoutePath>> { return this.$activePath; }
+	get operator(): Partial<ForeignReference<LegalEntity>> { return this.$operator; }
 	stops: PrimaryReference<TrainStop, TrainStopQueryProxy>;
-		closed: Date;
+		paths: PrimaryReference<TrainRoutePath, TrainRoutePathQueryProxy>;
+		activePathId: string;
+	closed: Date;
 	code: string;
 	color: string;
 	description: string;
@@ -2369,6 +2376,7 @@ export class TrainRoute extends Entity<TrainRouteQueryProxy> {
 	$$meta = {
 		source: "train_route",
 		columns: {
+			activePathId: { type: "uuid", name: "active_path_id" },
 			closed: { type: "timestamp", name: "closed" },
 			code: { type: "text", name: "code" },
 			color: { type: "text", name: "color" },
@@ -2388,13 +2396,27 @@ export class TrainRoute extends Entity<TrainRouteQueryProxy> {
 	constructor() {
 		super();
 		
-		this.$operator = new ForeignReference<Company>(this, "operatorId", Company);
+		this.$activePath = new ForeignReference<TrainRoutePath>(this, "activePathId", TrainRoutePath);
+	this.$operator = new ForeignReference<LegalEntity>(this, "operatorId", LegalEntity);
 	this.stops = new PrimaryReference<TrainStop, TrainStopQueryProxy>(this, "routeId", TrainStop);
+		this.paths = new PrimaryReference<TrainRoutePath, TrainRoutePathQueryProxy>(this, "trainRouteId", TrainRoutePath);
 	}
 	
-	private $operator: ForeignReference<Company>;
+	private $activePath: ForeignReference<TrainRoutePath>;
 
-	set operator(value: Partial<ForeignReference<Company>>) {
+	set activePath(value: Partial<ForeignReference<TrainRoutePath>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.activePathId = value.id as string;
+		} else {
+			this.activePathId = null;
+		}
+	}
+
+	private $operator: ForeignReference<LegalEntity>;
+
+	set operator(value: Partial<ForeignReference<LegalEntity>>) {
 		if (value) {
 			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
 
@@ -2407,24 +2429,77 @@ export class TrainRoute extends Entity<TrainRouteQueryProxy> {
 	
 }
 			
+export class TrainRoutePathQueryProxy extends QueryProxy {
+	get trainRoute(): Partial<TrainRouteQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get path(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get trainRouteId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class TrainRoutePath extends Entity<TrainRoutePathQueryProxy> {
+	get trainRoute(): Partial<ForeignReference<TrainRoute>> { return this.$trainRoute; }
+	created: Date;
+	declare id: string;
+	path: string;
+	trainRouteId: string;
+	
+	$$meta = {
+		source: "train_route_path",
+		columns: {
+			created: { type: "timestamp", name: "created" },
+			id: { type: "uuid", name: "id" },
+			path: { type: "text", name: "path" },
+			trainRouteId: { type: "uuid", name: "train_route_id" }
+		},
+		get set(): DbSet<TrainRoutePath, TrainRoutePathQueryProxy> { 
+			return new DbSet<TrainRoutePath, TrainRoutePathQueryProxy>(TrainRoutePath, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$trainRoute = new ForeignReference<TrainRoute>(this, "trainRouteId", TrainRoute);
+	}
+	
+	private $trainRoute: ForeignReference<TrainRoute>;
+
+	set trainRoute(value: Partial<ForeignReference<TrainRoute>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.trainRouteId = value.id as string;
+		} else {
+			this.trainRouteId = null;
+		}
+	}
+
+	
+}
+			
 export class TrainStationQueryProxy extends QueryProxy {
+	get property(): Partial<PropertyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get position(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get propertyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class TrainStation extends Entity<TrainStationQueryProxy> {
+	get property(): Partial<ForeignReference<Property>> { return this.$property; }
 	exits: PrimaryReference<TrainStationExit, TrainStationExitQueryProxy>;
 		stops: PrimaryReference<TrainStop, TrainStopQueryProxy>;
 		declare id: string;
 	name: string;
 	position: string;
+	propertyId: string;
 	
 	$$meta = {
 		source: "train_station",
 		columns: {
 			id: { type: "uuid", name: "id" },
 			name: { type: "text", name: "name" },
-			position: { type: "text", name: "position" }
+			position: { type: "text", name: "position" },
+			propertyId: { type: "uuid", name: "property_id" }
 		},
 		get set(): DbSet<TrainStation, TrainStationQueryProxy> { 
 			return new DbSet<TrainStation, TrainStationQueryProxy>(TrainStation, null);
@@ -2434,9 +2509,24 @@ export class TrainStation extends Entity<TrainStationQueryProxy> {
 	constructor() {
 		super();
 		
-		this.exits = new PrimaryReference<TrainStationExit, TrainStationExitQueryProxy>(this, "stationId", TrainStationExit);
+		this.$property = new ForeignReference<Property>(this, "propertyId", Property);
+	this.exits = new PrimaryReference<TrainStationExit, TrainStationExitQueryProxy>(this, "stationId", TrainStationExit);
 		this.stops = new PrimaryReference<TrainStop, TrainStopQueryProxy>(this, "stationId", TrainStop);
 	}
+	
+	private $property: ForeignReference<Property>;
+
+	set property(value: Partial<ForeignReference<Property>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.propertyId = value.id as string;
+		} else {
+			this.propertyId = null;
+		}
+	}
+
+	
 }
 			
 export class TrainStationExitQueryProxy extends QueryProxy {
@@ -2490,29 +2580,35 @@ export class TrainStationExit extends Entity<TrainStationExitQueryProxy> {
 export class TrainStopQueryProxy extends QueryProxy {
 	get route(): Partial<TrainRouteQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get station(): Partial<TrainStationQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get downPlatform(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get routeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get stationId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get trackPosition(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get upPlatform(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class TrainStop extends Entity<TrainStopQueryProxy> {
 	get route(): Partial<ForeignReference<TrainRoute>> { return this.$route; }
 	get station(): Partial<ForeignReference<TrainStation>> { return this.$station; }
+	downPlatform: string;
 	declare id: string;
 	name: string;
 	routeId: string;
 	stationId: string;
 	trackPosition: string;
+	upPlatform: string;
 	
 	$$meta = {
 		source: "train_stop",
 		columns: {
+			downPlatform: { type: "text", name: "down_platform" },
 			id: { type: "uuid", name: "id" },
 			name: { type: "text", name: "name" },
 			routeId: { type: "uuid", name: "route_id" },
 			stationId: { type: "uuid", name: "station_id" },
-			trackPosition: { type: "text", name: "track_position" }
+			trackPosition: { type: "text", name: "track_position" },
+			upPlatform: { type: "text", name: "up_platform" }
 		},
 		get set(): DbSet<TrainStop, TrainStopQueryProxy> { 
 			return new DbSet<TrainStop, TrainStopQueryProxy>(TrainStop, null);
@@ -2906,6 +3002,7 @@ export class DbContext {
 	streetRoute: DbSet<StreetRoute, StreetRouteQueryProxy>;
 	tenancy: DbSet<Tenancy, TenancyQueryProxy>;
 	trainRoute: DbSet<TrainRoute, TrainRouteQueryProxy>;
+	trainRoutePath: DbSet<TrainRoutePath, TrainRoutePathQueryProxy>;
 	trainStation: DbSet<TrainStation, TrainStationQueryProxy>;
 	trainStationExit: DbSet<TrainStationExit, TrainStationExitQueryProxy>;
 	trainStop: DbSet<TrainStop, TrainStopQueryProxy>;
@@ -2957,6 +3054,7 @@ export class DbContext {
 		this.streetRoute = new DbSet<StreetRoute, StreetRouteQueryProxy>(StreetRoute, this.runContext);
 		this.tenancy = new DbSet<Tenancy, TenancyQueryProxy>(Tenancy, this.runContext);
 		this.trainRoute = new DbSet<TrainRoute, TrainRouteQueryProxy>(TrainRoute, this.runContext);
+		this.trainRoutePath = new DbSet<TrainRoutePath, TrainRoutePathQueryProxy>(TrainRoutePath, this.runContext);
 		this.trainStation = new DbSet<TrainStation, TrainStationQueryProxy>(TrainStation, this.runContext);
 		this.trainStationExit = new DbSet<TrainStationExit, TrainStationExitQueryProxy>(TrainStationExit, this.runContext);
 		this.trainStop = new DbSet<TrainStop, TrainStopQueryProxy>(TrainStop, this.runContext);

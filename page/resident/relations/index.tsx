@@ -3,18 +3,18 @@ import { ResidentPage } from "..";
 import { LifeService, ResidentRelationViewModel, ResidentSummaryModel } from "../../managed/services";
 import { toSimulatedAge, toSimulatedTime } from "../../../interface/time";
 import { relationIcon } from "../../assets/icons/managed";
-import { RelationGraphNode } from "./graph";
 import { Point } from "../../../interface/point";
 import { drawDanwinstonLine } from "../../../interface/line";
 import { registerInteraction } from "../../shared/map/interaction";
 import { px } from "@acryps/style";
+import { NetworkGraphNode } from "../../shared/network-graph/graph";
 
 export class RelationsPage extends Component {
 	declare parent: ResidentPage;
 	declare rootNode: HTMLElement;
 
 	relations: ResidentRelationViewModel[] = [];
-	nodes = new Map<string, RelationGraphNode>();
+	nodes = new Map<string, NetworkGraphNode>();
 
 	canvas = document.createElement('canvas');
 	context = this.canvas.getContext('2d');
@@ -36,7 +36,7 @@ export class RelationsPage extends Component {
 				if (!this.nodes.has(member.id)) {
 					let expanded = id == member.id;
 
-					const node: RelationGraphNode = {
+					const node: NetworkGraphNode = {
 						element: <ui-resident ui-expanded={expanded} ui-click={async () => {
 							if (expanded) {
 								open(`/resident/${member.tag}`);
@@ -75,60 +75,15 @@ export class RelationsPage extends Component {
 	}
 
 	next() {
-		const repulsion = 100;
-		const springLength = 1;
-		const springStrength = 0.01;
+		NetworkGraphNode.simulate(
+			[...this.nodes.values()],
+			this.relations.map(relation => [
+				this.nodes.get(relation.initiator.id),
+				this.nodes.get(relation.peer.id)
+			])
+		);
 
-		// repulsion
-		const nodes = [...this.nodes.values()];
-
-		for (let i = 0; i < nodes.length; i++) {
-			for (let j = i + 1; j < nodes.length; j++) {
-				let a = nodes[i];
-				let b = nodes[j];
-
-				let dx = a.position.x - b.position.x;
-				let dy = a.position.y - b.position.y;
-				let distSq = dx * dx + dy * dy + 0.1;
-				let force = repulsion / distSq;
-				let angle = Math.atan2(dy, dx);
-				let fx = Math.cos(angle) * force;
-				let fy = Math.sin(angle) * force;
-
-				a.velocity.x += fx;
-				a.velocity.y += fy;
-
-				b.velocity.x -= fx;
-				b.velocity.y -= fy;
-			}
-		}
-
-		// attract
-		for (let relation of this.relations) {
-			let from = this.nodes.get(relation.initiator.id);
-			let to = this.nodes.get(relation.peer.id);
-
-			let dx = to.position.x - from.position.x;
-			let dy = to.position.y - from.position.y;
-			let dist = Math.sqrt(dx * dx + dy * dy);
-			let force = (dist - springLength) * springStrength;
-			let angle = Math.atan2(dy, dx);
-			let fx = Math.cos(angle) * force;
-			let fy = Math.sin(angle) * force;
-			from.velocity.x += fx;
-			from.velocity.y += fy;
-			to.velocity.x -= fx;
-			to.velocity.y -= fy;
-		}
-
-		// apply
-		for (let node of nodes) {
-			node.position.x += node.velocity.x;
-			node.position.y += node.velocity.y;
-
-			node.velocity.x *= 0.9;
-			node.velocity.y *= 0.9;
-
+		for (let node of this.nodes.values()) {
 			const center = node.position.subtract(this.center).scale(1 / this.scale);
 
 			node.element.style.left = px(center.x).toValueString();

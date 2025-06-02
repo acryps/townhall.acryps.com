@@ -13,11 +13,17 @@ export class Tabs extends Component {
 	active: Tab;
 	tabs: Tab[] = [];
 
-	addTab(header: ComponentContent, content: ComponentContent | (() => ComponentContent)) {
-		this.tabs.push(new Tab(
-			header,
-			typeof content == 'function' ? content : () => content
-		));
+	addTab(
+		header: ComponentContent,
+		content: ComponentContent | (() => ComponentContent),
+		condition: any = true
+	) {
+		if (condition) {
+			this.tabs.push(new Tab(
+				header,
+				typeof content == 'function' ? content : () => content
+			));
+		}
 
 		return this;
 	}

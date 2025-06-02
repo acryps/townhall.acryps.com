@@ -1,4 +1,4 @@
-import { backgroundColor, border, borderBottomColor, borderTop, child, display, flexDirection, flexWrap, marginInline, marginLeft, marginRight, marginTop, overflowY, padding, paddingBlock, paddingInline, position, px, scrollbarWidth, select, StyleSelectorBody } from "@acryps/style";
+import { backgroundColor, border, borderBottomColor, borderTop, child, cursor, display, flexDirection, flexWrap, marginInline, marginLeft, marginRight, marginTop, overflowY, padding, paddingBlock, paddingInline, position, px, scrollbarWidth, select, StyleSelectorBody, whiteSpace } from "@acryps/style";
 import { pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 
 const borderSize = px(2);
@@ -22,6 +22,8 @@ export const tabsStyle = (...content: StyleSelectorBody[]) => select('ui-tabs',
 
 			backgroundColor(pageBackgroundColor),
 			border(borderSize, 'solid', 'currentColor'),
+			cursor('pointer'),
+			whiteSpace('nowrap')
 		)
 			.attribute('ui-active',
 				borderBottomColor(pageBackgroundColor)

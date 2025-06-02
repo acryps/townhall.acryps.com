@@ -2,9 +2,21 @@ import { ViewModel } from "vlserver";
 import { DbContext, Metric, MetricValue } from "../../../managed/database";
 import { hostname } from "os";
 import { updateMetrics } from "../../..";
+import { Worker } from "worker_threads";
 
 export abstract class MetricTracker {
+	static executeWorkerKey = 'EXECUTE_METRIC_WORKER';
 	static tracked: MetricTracker[] = [];
+
+	static async executeTask() {
+		const metric = this.tracked.find(tracker => tracker.metric.tag == process.env[this.executeWorkerKey]);
+
+		if (metric) {
+			await metric.update();
+
+			process.exit();
+		}
+	}
 
 	static async track(tracker: MetricTracker) {
 		this.tracked.push(tracker);
@@ -26,13 +38,10 @@ export abstract class MetricTracker {
 		await metric.update();
 
 		tracker.metric = metric;
-
-		tracker.last = await tracker.metric.values
-			.orderByDescending(value => value.updated)
-			.first();
+		await tracker.updateLast();
 
 		if (updateMetrics) {
-			tracker.update();
+			tracker.dispatchNextUpdate();
 		}
 	}
 
@@ -48,7 +57,44 @@ export abstract class MetricTracker {
 		protected database: DbContext
 	) {}
 
-	// updates the metric, automatically adjusting the update frequency based on effort
+	// loads the last value
+	async updateLast() {
+		this.last = await this.metric.values
+			.orderByDescending(value => value.updated)
+			.first();
+	}
+
+	// updates the metric in background thread, automatically adjusting the update frequency based on effort
+	async dispatchNextUpdate() {
+		console.log(`[metric] updating ${this.metric.tag}`);
+
+		await new Promise<void>(done => {
+			const worker = new Worker(process.argv[1], {
+				env: {
+					...process.env,
+					[MetricTracker.executeWorkerKey]: this.metric.tag
+				}
+			});
+
+			worker.on('error', error => {
+				console.log(`metric updater ${this.metric.tag} failed`, error);
+
+				done();
+			});
+
+			worker.on('exit', () => {
+				done();
+			});
+		});
+
+		// load back
+		await this.updateLast();
+
+		console.log(`[metric] updated ${this.metric.tag} in ${this.last.elapsed}`);
+		setTimeout(() => this.dispatchNextUpdate(), this.last.elapsed * 100 + 1000 * 60 * 5);
+	}
+
+	// may take very long, use `requestUpdate` on main thread.
 	async update() {
 		const start = +new Date();
 		const fetched = await this.fetch();
@@ -74,7 +120,7 @@ export abstract class MetricTracker {
 			await this.last.update();
 		}
 
-		setTimeout(() => this.update(), this.last.elapsed * 100 + 1000 * 60 * 5);
+		return elapsed;
 	}
 
 	abstract fetch(): Promise<number>;

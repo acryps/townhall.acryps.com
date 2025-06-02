@@ -1,7 +1,7 @@
 import { DbClient, RunContext } from "vlquery";
 import { Inject, StaticFileRoute, ViewModel } from "vlserver";
 import { ManagedServer } from "./managed/server";
-import { Article, ArticleImage, Bridge, CompanyType, DbContext, MapType, Movement, PropertyOwner, Resident, ResidentFigure, ResidentRelationship, Tenancy, TenancyQueryProxy } from "./managed/database";
+import { Article, ArticleImage, Bridge, CompanyType, DbContext, MapType, Metric, Movement, PropertyOwner, Resident, ResidentFigure, ResidentRelationship, Tenancy, TenancyQueryProxy } from "./managed/database";
 import ws from 'express-ws';
 import { join } from "path";
 import { GameBridge } from "./bridge";
@@ -48,6 +48,7 @@ import { CompanyAssetTotalMetric } from "./areas/metrics/tracker/company-asset-t
 import { EmptyDwellingCountMetric } from "./areas/metrics/tracker/empty-dwellings";
 import { TrainRouteTileServer } from "./map/layers/shape/train/route";
 import { TrainRoutesTileServer } from "./map/layers/shape/train/routes";
+import { registerMetrics } from "./areas/metrics/metrics";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -62,6 +63,9 @@ DbClient.connectedClient.connect().then(async () => {
 	ws(app.app);
 
 	const database = new DbContext(new RunContext());
+
+	registerMetrics(database);
+	await MetricTracker.executeTask();
 
 	new MapImporter(database);
 
@@ -131,31 +135,6 @@ DbClient.connectedClient.connect().then(async () => {
 	new TrainRouteTileServer(app, database);
 	new TrainRoutesTileServer(app, database);
 	// new MovementTileServer(app, database);
-
-	// order will be keept in client
-	MetricTracker.track(new PopulationSizeMetric(database));
-	MetricTracker.track(new PopulationAgeAverageMetric(database));
-	MetricTracker.track(new RelationDistanceMetric(database));
-
-	MetricTracker.track(new PlayerTraveledBlocksMetric(database));
-
-	MetricTracker.track(new PropertyCountMetric(database));
-	MetricTracker.track(new DwellingCountMetric(database));
-	MetricTracker.track(new EmptyDwellingCountMetric(database));
-	MetricTracker.track(new AllocatedAreaMetric(database));
-	MetricTracker.track(new TotalPropertyValueMetric(database));
-
-	MetricTracker.track(new WorkUnemploymentMetric(database));
-	MetricTracker.track(new WorkOfferTotalMetric(database));
-	MetricTracker.track(new OpenWorkOfferMetric(database));
-
-	for (let type in CompanyType) {
-		if (typeof CompanyType[type] == 'string') {
-			MetricTracker.track(new CompanyCountMetric(database, CompanyType[type]));
-		}
-	}
-
-	MetricTracker.track(new CompanyAssetTotalMetric(database));
 
 	ViewModel.globalFetchingContext = database;
 

@@ -1,23 +1,47 @@
-import { resize, paddingBlock, rem, paddingInline, fontFamily, fontSize, color, backgroundColor, border, borderRadius, outline } from "@acryps/style";
+import { resize, paddingBlock, rem, paddingInline, fontFamily, fontSize, color, backgroundColor, border, borderRadius, outline, child, display, flexDirection, marginBottom, StyleSelectorBody } from "@acryps/style";
 import { pageBackgroundColor, pageTextColor } from "../index.style";
 
-export const fieldTextColor = pageBackgroundColor;
-export const fieldBackgroundColor = pageTextColor;
+export const inputTextColor = pageBackgroundColor;
+export const indexBackgroundColor = pageTextColor;
 
-export const fieldSpacingInline = rem(0.75);
-export const fieldSpacingBlock = rem(0.5);
+export const inputSpacingInline = rem(0.75);
+export const inputSpacingBlock = rem(0.5);
 
-export const fieldStyle = () => [
+export const inputStyle = () => [
 	resize('none'),
 
-	paddingBlock(fieldSpacingBlock),
-	paddingInline(fieldSpacingInline),
+	paddingBlock(inputSpacingBlock),
+	paddingInline(inputSpacingInline),
 
 	fontFamily('inherit'),
 	fontSize(rem(1)),
-	color(fieldTextColor),
-	backgroundColor(fieldBackgroundColor),
+	color(inputTextColor),
+	backgroundColor(indexBackgroundColor),
 	border(0, 'none', 'transparent'),
 	borderRadius(0),
 	outline(0, 'none', 'transparent')
 ];
+
+export const fieldStyle = (...content: StyleSelectorBody[]) => child('ui-field',
+	display('flex'),
+	flexDirection('column'),
+	marginBottom(rem(1)),
+
+	child('input', inputStyle()),
+	child('textarea', inputStyle()),
+	child('select', inputStyle()),
+
+	child('label',
+		display('block'),
+		marginBottom(rem(0.25))
+	),
+
+	child('ui-hint',
+		display('block'),
+		marginBottom(rem(0.75)),
+
+		fontSize(rem(0.75))
+	),
+
+	content
+);

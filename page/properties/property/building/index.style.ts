@@ -1,5 +1,5 @@
 import { backgroundColor, child, display, flexDirection, height, marginBlock, marginBottom, marginInline, marginTop, padding, percentage, rem, textAlign, vh, width } from "@acryps/style";
-import { fieldStyle } from "../../../shared/field.style";
+import { fieldStyle, inputStyle } from "../../../shared/field.style";
 import { negativeColor, pageGutter } from "../../../index.style";
 import { buttonStyle } from "../../../shared/index.style";
 
@@ -26,24 +26,7 @@ export const buildingStyle = () => child('ui-building',
 		marginBlock(pageGutter)
 	),
 
-	child('ui-field',
-		display('flex'),
-		flexDirection('column'),
-		marginBottom(rem(1)),
-
-		child('label',
-			display('block'),
-			marginBottom(rem(0.25))
-		),
-
-		child('input',
-			fieldStyle()
-		),
-
-		child('select',
-			fieldStyle()
-		)
-	),
+	fieldStyle(),
 
 	child('ui-actions',
 		child('ui-action',

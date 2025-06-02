@@ -1,7 +1,7 @@
 import { alignItems, backgroundColor, borderBottom, child, display, flexDirection, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, height, hex, insetBlock, marginBottom, marginLeft, marginTop, minWidth, Number, overflow, paddingBottom, percentage, position, px, rem, right, textAlign, Variable, width } from "@acryps/style";
 import { boxed } from "../shared/boxed.style";
 import { pageGutter } from "../index.style";
-import { fieldStyle } from "../shared/field.style";
+import { inputStyle } from "../shared/field.style";
 
 export const chartLineColor = hex('000');
 export const chartLineWidth = 2;
@@ -21,7 +21,7 @@ export const metricsStyle = () => child('ui-metrics',
 		marginBottom(pageGutter.multiply(2)),
 
 		child('select',
-			fieldStyle()
+			inputStyle()
 		)
 	),
 

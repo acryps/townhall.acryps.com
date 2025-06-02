@@ -1,5 +1,5 @@
 import { child, display, flexDirection, fontSize, height, marginBottom, marginInline, marginLeft, rem, vh } from "@acryps/style";
-import { fieldStyle } from "../../shared/field.style";
+import { fieldStyle, inputStyle } from "../../shared/field.style";
 import { pageGutter } from "../../index.style";
 import { buttonStyle } from "../../shared/index.style";
 
@@ -12,16 +12,7 @@ export const registerTrainRouteStyle = () => child('ui-register-train-route',
 		marginBottom(pageGutter)
 	),
 
-	child('ui-field',
-		display('flex'),
-		flexDirection('column'),
-		marginBottom(rem(1)),
-
-		child('label',
-			display('block'),
-			marginBottom(rem(0.25))
-		),
-
+	fieldStyle(
 		child('ui-used',
 			display('block'),
 			marginBottom(rem(0.5)),
@@ -31,14 +22,6 @@ export const registerTrainRouteStyle = () => child('ui-register-train-route',
 			child('ui-train-route-icon',
 				marginLeft(rem(0.25))
 			)
-		),
-
-		child('input',
-			fieldStyle()
-		),
-
-		child('textarea',
-			fieldStyle()
 		)
 	),
 

@@ -1,5 +1,5 @@
 import { child, display, flexDirection, fontSize, fontWeight, marginBottom, rem } from "@acryps/style";
-import { fieldStyle } from "../../shared/field.style";
+import { fieldStyle, inputStyle } from "../../shared/field.style";
 import { buttonStyle } from "../../shared/index.style";
 
 export const registerCompanyStyle = () => child('ui-register',
@@ -18,27 +18,7 @@ export const registerCompanyStyle = () => child('ui-register',
 		marginBottom(rem(1))
 	),
 
-	child('ui-field',
-		display('flex'),
-		flexDirection('column'),
-		marginBottom(rem(1)),
-
-		child('input', fieldStyle()),
-		child('textarea', fieldStyle()),
-		child('select', fieldStyle()),
-
-		child('label',
-			display('block'),
-			marginBottom(rem(0.5)),
-
-			fontWeight('bold')
-		),
-
-		child('ui-hint',
-			display('block'),
-			marginBottom(rem(0.5))
-		)
-	),
+	fieldStyle(),
 
 	child('ui-action',
 		buttonStyle()

@@ -1,6 +1,7 @@
 import { child, display, fontSize, marginBottom, rem } from "@acryps/style";
 import { pageGutter } from "../../../../index.style";
 import { buttonStyle } from "../../../../shared/index.style";
+import { fieldStyle } from "../../../../shared/field.style";
 
 export const revalueStyle = () => child('ui-revalue',
 	child('ui-guide',
@@ -8,15 +9,7 @@ export const revalueStyle = () => child('ui-revalue',
 		marginBottom(pageGutter)
 	),
 
-	child('ui-field',
-		display('block'),
-		marginBottom(pageGutter),
-
-		child('label',
-			display('block'),
-			marginBottom(rem(0.5))
-		)
-	),
+	fieldStyle(),
 
 	child('ui-action',
 		buttonStyle()

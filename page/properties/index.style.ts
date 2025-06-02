@@ -2,7 +2,7 @@ import { alignContent, alignItems, alignSelf, aspectRatio, backgroundColor, ch, 
 import { card } from "../shared/card.style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { pageGutter } from "../index.style";
-import { fieldBackgroundColor, fieldSpacingBlock, fieldSpacingInline, fieldStyle, fieldTextColor } from "../shared/field.style";
+import { indexBackgroundColor, inputSpacingBlock, inputSpacingInline, inputStyle, inputTextColor } from "../shared/field.style";
 
 export const propertiesStyle = () => child('ui-properties',
 	child('ui-search',
@@ -12,7 +12,7 @@ export const propertiesStyle = () => child('ui-properties',
 		position('relative'),
 
 		child('input',
-			fieldStyle(),
+			inputStyle(),
 
 			width(percentage(100)),
 			maxWidth(rem(30))
@@ -30,13 +30,13 @@ export const propertiesStyle = () => child('ui-properties',
 			left(0),
 			right(0),
 
-			color(fieldTextColor),
-			backgroundColor(fieldBackgroundColor),
+			color(inputTextColor),
+			backgroundColor(indexBackgroundColor),
 
 			child('ui-result',
 				display('block'),
-				paddingBlock(fieldSpacingBlock),
-				paddingInline(fieldSpacingInline),
+				paddingBlock(inputSpacingBlock),
+				paddingInline(inputSpacingInline),
 
 				child('ui-name',
 					display('block'),

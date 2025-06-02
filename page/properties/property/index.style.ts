@@ -1,6 +1,6 @@
 import { alignItems, aspectRatio, backgroundColor, border, borderBottom, child, color, columnGap, display, flexDirection, flexGrow, flexWrap, fontSize, fontWeight, gap, height, imageRendering, justifyContent, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, Mm, objectFit, objectPosition, opacity, padding, percentage, px, ratio, rem, textAlign, textDecorationLine, vh, width } from "@acryps/style";
 import { negativeColor, neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
-import { fieldStyle } from "../../shared/field.style";
+import { inputStyle } from "../../shared/field.style";
 import { buttonStyle } from "../../shared/index.style";
 import { buildingStyle } from "./building/index.style";
 import { ownershipStructureStyle } from "./ownership/index.style";
@@ -197,11 +197,11 @@ export const propertyStyle = () => child('ui-property',
 			),
 
 			child('input',
-				fieldStyle()
+				inputStyle()
 			),
 
 			child('select',
-				fieldStyle()
+				inputStyle()
 			)
 		),
 
@@ -309,7 +309,7 @@ export const propertyStyle = () => child('ui-property',
 				),
 
 				child('select',
-					fieldStyle()
+					inputStyle()
 				),
 
 				child('ui-hint',

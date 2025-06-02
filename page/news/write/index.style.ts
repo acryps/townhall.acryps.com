@@ -1,6 +1,6 @@
 import { alignItems, border, child, display, flexDirection, flexGrow, flexShrink, gap, height, marginBottom, objectFit, px, rem, Rem, width } from "@acryps/style";
 import { boxed } from "../../shared/boxed.style";
-import { fieldStyle } from "../../shared/field.style";
+import { inputStyle } from "../../shared/field.style";
 import { buttonStyle } from "../../shared/index.style";
 import { Shape } from "../../../interface/shape";
 
@@ -19,13 +19,13 @@ export const writeArticleStyle = () => child('ui-write-article',
 		display('block'),
 		marginBottom(rem(1)),
 
-		fieldStyle()
+		inputStyle()
 	),
 
 	child('textarea',
 		marginBottom(rem(1)),
 
-		fieldStyle()
+		inputStyle()
 	),
 
 	child('ui-media',
@@ -50,7 +50,7 @@ export const writeArticleStyle = () => child('ui-write-article',
 			child('input',
 				flexGrow(1),
 
-				fieldStyle()
+				inputStyle()
 			),
 
 			child('ui-action',

@@ -2,7 +2,7 @@ import { alignItems, backgroundColor, border, borderLeft, borderLeftColor, borde
 import { infoColor, neutralColor, pageBackgroundColor, pageGutter } from "../../index.style";
 import { bulletSize, lineSize } from "../index.style";
 import { buttonStyle } from "../../shared/index.style";
-import { fieldStyle } from "../../shared/field.style";
+import { fieldStyle, inputStyle } from "../../shared/field.style";
 
 export const trainRouteStyle = () => child('ui-route',
 	child('ui-header',
@@ -29,24 +29,7 @@ export const trainRouteStyle = () => child('ui-route',
 	),
 
 	child('ui-detail',
-		child('ui-field',
-			display('flex'),
-			flexDirection('column'),
-			marginBottom(rem(1)),
-
-			child('label',
-				display('block'),
-				marginBottom(rem(0.25))
-			),
-
-			child('input',
-				fieldStyle()
-			),
-
-			child('textarea',
-				fieldStyle()
-			)
-		),
+		fieldStyle()
 	),
 
 	child('ui-route',

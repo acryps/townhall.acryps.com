@@ -1,6 +1,6 @@
 import { backgroundColor, borderBottom, child, color, display, flexDirection, fontWeight, marginBottom, marginTop, padding, paddingBottom, px, rem, whiteSpace } from "@acryps/style";
 import { billBackgroundColor, billTextColor } from "../../index.style";
-import { fieldStyle } from "../../shared/field.style";
+import { inputStyle } from "../../shared/field.style";
 import { buttonStyle } from "../../shared/index.style";
 
 export const honestiumStyle = () => child('ui-open-honestium',
@@ -46,7 +46,7 @@ export const honestiumStyle = () => child('ui-open-honestium',
 	),
 
 	child('textarea',
-		fieldStyle(),
+		inputStyle(),
 
 		marginBottom(rem(1))
 	),

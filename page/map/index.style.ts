@@ -4,7 +4,7 @@ import { buttonStyle } from "../shared/index.style";
 import { PageComponent } from "../page";
 import { createFeatureStyle } from "./create/index.style";
 import { boxed } from "../shared/boxed.style";
-import { fieldStyle } from "../shared/field.style";
+import { inputStyle } from "../shared/field.style";
 
 const buttonPaddingSize = rem(0.8);
 
@@ -121,7 +121,7 @@ export const mapStyle = () => [
 				backgroundColor(navigationBackgroundColor),
 
 				child('input',
-					fieldStyle(),
+					inputStyle(),
 					flexGrow(1)
 				)
 			),

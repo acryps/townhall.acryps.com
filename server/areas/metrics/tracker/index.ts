@@ -66,14 +66,19 @@ export abstract class MetricTracker {
 
 	// updates the metric in background thread, automatically adjusting the update frequency based on effort
 	async dispatchNextUpdate() {
-		console.log(`[metric] updating ${this.metric.tag}`);
+		console.log(`[metric] updating ${this.metric.tag} using ${process.argv[1]}`);
 
 		await new Promise<void>(done => {
+			const environment = {};
+
+			for (let key in process.env) {
+				environment[key] = process.env[key];
+			}
+
+			environment[MetricTracker.executeWorkerKey] = this.metric.tag;
+
 			const worker = new Worker(process.argv[1], {
-				env: {
-					...process.env,
-					[MetricTracker.executeWorkerKey]: this.metric.tag
-				}
+				env: environment
 			});
 
 			worker.on('error', error => {

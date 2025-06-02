@@ -64,7 +64,7 @@ DbClient.connectedClient.connect().then(async () => {
 
 	const database = new DbContext(new RunContext());
 
-	registerMetrics(database);
+	await registerMetrics(database);
 	await MetricTracker.executeTask();
 
 	new MapImporter(database);

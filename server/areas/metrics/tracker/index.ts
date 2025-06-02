@@ -9,12 +9,20 @@ export abstract class MetricTracker {
 	static tracked: MetricTracker[] = [];
 
 	static async executeTask() {
-		const metric = this.tracked.find(tracker => tracker.metric.tag == process.env[this.executeWorkerKey]);
+		if (updateMetrics) {
+			console.log(`task ${process.env[this.executeWorkerKey]}`);
 
-		if (metric) {
-			await metric.update();
+			const metric = this.tracked.find(tracker => tracker.metric.tag == process.env[this.executeWorkerKey]);
 
-			process.exit();
+			if (metric) {
+				await metric.update();
+
+				process.exit();
+			} else {
+				for (let tracker of this.tracked) {
+					tracker.dispatchNextUpdate();
+				}
+			}
 		}
 	}
 
@@ -39,10 +47,6 @@ export abstract class MetricTracker {
 
 		tracker.metric = metric;
 		await tracker.updateLast();
-
-		if (updateMetrics) {
-			tracker.dispatchNextUpdate();
-		}
 	}
 
 	tag: string[];

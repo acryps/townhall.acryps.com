@@ -29,11 +29,13 @@ export class TrainRouteSegment {
 
 					// sometimes the station is split by some off-boundary track segments
 					// detect and merge into stop segment
-					const lastIndex = segments.findIndex(peer => peer.stop == stop);
+					if (!route.looping) {
+						const lastIndex = segments.findIndex(peer => peer.stop == stop);
 
-					if (lastIndex != -1) {
-						for (let previous of segments.splice(lastIndex, segments.length - lastIndex)) {
-							currentSegment.path.push(...previous.path);
+						if (lastIndex != -1) {
+							for (let previous of segments.splice(lastIndex, segments.length - lastIndex)) {
+								currentSegment.path.push(...previous.path);
+							}
 						}
 					}
 

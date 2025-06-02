@@ -374,6 +374,7 @@ export interface TrainRouteViewModel {
 	color: string;
 	description: string;
 	id: string;
+	looping: boolean;
 	name: string;
 	opened: Date;
 	textColor: string;

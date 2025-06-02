@@ -880,6 +880,7 @@ export class TrainRouteViewModel {
 	color: string;
 	description: string;
 	id: string;
+	looping: boolean;
 	name: string;
 	opened: Date;
 	textColor: string;
@@ -894,6 +895,7 @@ export class TrainRouteViewModel {
 		raw.color === undefined || (item.color = raw.color === null ? null : `${raw.color}`)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.looping === undefined || (item.looping = !!raw.looping)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
 		raw.textColor === undefined || (item.textColor = raw.textColor === null ? null : `${raw.textColor}`)

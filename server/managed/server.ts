@@ -5077,6 +5077,7 @@ ViewModel.mappings = {
 				color: this.$$model.color,
 				description: this.$$model.description,
 				id: this.$$model.id,
+				looping: this.$$model.looping,
 				name: this.$$model.name,
 				opened: this.$$model.opened,
 				textColor: this.$$model.textColor
@@ -5132,6 +5133,7 @@ ViewModel.mappings = {
 				color: true,
 				description: true,
 				id: true,
+				looping: true,
 				name: true,
 				opened: true,
 				textColor: true
@@ -5148,6 +5150,7 @@ ViewModel.mappings = {
 			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"looping" in data && (item.looping = !!data.looping);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"opened" in data && (item.opened = data.opened === null ? null : new Date(data.opened));
 			"textColor" in data && (item.textColor = data.textColor === null ? null : `${data.textColor}`);
@@ -5172,6 +5175,7 @@ ViewModel.mappings = {
 			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
 			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"looping" in viewModel && (model.looping = !!viewModel.looping);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"opened" in viewModel && (model.opened = viewModel.opened === null ? null : new Date(viewModel.opened));
 			"textColor" in viewModel && (model.textColor = viewModel.textColor === null ? null : `${viewModel.textColor}`);

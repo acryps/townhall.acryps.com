@@ -19,6 +19,8 @@ export class TrainRouteViewModel extends ViewModel<TrainRoute> {
 	closed;
 
 	activePath: TrainRoutePathViewModel;
+	looping;
+
 	stops: TrainStopViewModel[];
 }
 

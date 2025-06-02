@@ -54,8 +54,14 @@ export class TrainRoutePage extends Component {
 						lastSegment = currentSegment;
 					}
 
-					if (pixelIndex == path.length - 1 || pixelIndex == 0) {
-						direction = -direction;
+					if (this.trainRoute.looping) {
+						if (pixelIndex == path.length - 1) {
+							pixelIndex = 0;
+						}
+					} else {
+						if (pixelIndex == path.length - 1 || pixelIndex == 0) {
+							direction = -direction;
+						}
 					}
 
 					pixelIndex += direction;

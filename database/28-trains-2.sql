@@ -4,6 +4,7 @@ ALTER TABLE train_route ADD text_color TEXT;
 ALTER TABLE train_route ADD description TEXT;
 ALTER TABLE train_route ADD opened TIMESTAMP;
 ALTER TABLE train_route ADD closed TIMESTAMP;
+ALTER TABLE train_route ADD looping BOOLEAN;
 
 ALTER TABLE train_route ADD operator_id UUID CONSTRAINT operator__operated_train_routes REFERENCES legal_entity (id);
 

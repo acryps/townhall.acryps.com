@@ -2349,6 +2349,7 @@ export class TrainRouteQueryProxy extends QueryProxy {
 	get code(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get color(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get looping(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get opened(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get operatorId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -2367,6 +2368,7 @@ export class TrainRoute extends Entity<TrainRouteQueryProxy> {
 	color: string;
 	description: string;
 	declare id: string;
+	looping: boolean;
 	name: string;
 	opened: Date;
 	operatorId: string;
@@ -2382,6 +2384,7 @@ export class TrainRoute extends Entity<TrainRouteQueryProxy> {
 			color: { type: "text", name: "color" },
 			description: { type: "text", name: "description" },
 			id: { type: "uuid", name: "id" },
+			looping: { type: "bool", name: "looping" },
 			name: { type: "text", name: "name" },
 			opened: { type: "timestamp", name: "opened" },
 			operatorId: { type: "uuid", name: "operator_id" },

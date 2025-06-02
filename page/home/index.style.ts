@@ -78,6 +78,8 @@ export const homeStyle = () => child('ui-home',
 			position('absolute'),
 			left(pageGutter.divide(2)),
 			bottom(pageGutter.divide(2)),
+			zIndex(10),
+
 			padding(pageGutter.divide(2)),
 			marginRight(pageGutter.divide(2)),
 

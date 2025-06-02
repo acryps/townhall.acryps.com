@@ -36,8 +36,8 @@ export class RelationsPage extends Component {
 				if (!this.nodes.has(member.id)) {
 					let expanded = id == member.id;
 
-					const node: NetworkGraphNode = {
-						element: <ui-resident ui-expanded={expanded} ui-click={async () => {
+					const node = new NetworkGraphNode(
+						<ui-resident ui-expanded={expanded} ui-click={async () => {
 							if (expanded) {
 								open(`/resident/${member.tag}`);
 							}
@@ -60,12 +60,11 @@ export class RelationsPage extends Component {
 							</ui-age>
 						</ui-resident>,
 
-						position: new Point(
+						new Point(
 							Math.random() * this.width - this.width / 2,
 							Math.random() * this.height - this.height / 2
-						).add(anchor),
-						velocity: new Point(0, 0)
-					};
+						).add(anchor)
+					);
 
 					this.rootNode.appendChild(node.element);
 					this.nodes.set(member.id, node);

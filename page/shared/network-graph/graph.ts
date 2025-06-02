@@ -2,10 +2,12 @@ import { Point } from "../../../interface/point";
 import { ResidentSummaryModel } from "../../managed/services";
 
 export class NetworkGraphNode {
-	element: HTMLElement;
+	velocity = new Point(0, 0);
 
-	position: Point;
-	velocity: Point;
+	constructor(
+		public element: HTMLElement,
+		public position: Point
+	) {}
 
 	static simulate(nodes: NetworkGraphNode[], connections: [NetworkGraphNode, NetworkGraphNode][]) {
 		const repulsion = 100;

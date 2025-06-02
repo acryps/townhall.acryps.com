@@ -6,6 +6,7 @@ import { TrainRouteIconComponent } from "../shared/train-route";
 import { routeInterchangeIcon } from "../assets/icons/managed";
 import { convertToLegalCompanyName } from "../../interface/company";
 import { LegalEntityComponent } from "../shared/legal-entity";
+import { RailwayNetworkComponent } from "./network";
 
 export class TrainsPage extends Component {
 	routes: TrainRouteViewModel[];
@@ -24,6 +25,8 @@ export class TrainsPage extends Component {
 		}
 
 		return <ui-trains>
+			{new RailwayNetworkComponent()}
+
 			{this.routes.map(route => <ui-train-route ui-href={`route/${route.code}`} style={routeColor.provide(hex(route.color))}>
 				<ui-header>
 					{new TrainRouteIconComponent(route)}
@@ -71,16 +74,18 @@ export class TrainsPage extends Component {
 	}
 
 	findInterchangePeers(base: TrainRouteViewModel, station: TrainStationViewModel) {
-		const peers = [];
+		return this.findStationRoutes(station).filter(route => route.id != base.id);
+	}
+
+	findStationRoutes(station: TrainStationViewModel) {
+		const routes: TrainRouteViewModel[] = [];
 
 		for (let route of this.routes) {
-			if (base.code != route.code) {
-				if (route.stops.find(stop => stop.stationId == station.id)) {
-					peers.push(route);
-				}
+			if (route.stops.find(stop => stop.stationId == station.id)) {
+				routes.push(route);
 			}
 		}
 
-		return peers;
+		return routes;
 	}
 }

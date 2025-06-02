@@ -1,6 +1,6 @@
-import { alignItems, backgroundColor, border, borderTop, child, ColorValue, display, Dvi, flexDirection, fontSize, fontWeight, gap, height, insetInline, justifyContent, left, marginBottom, marginInline, marginTop, minWidth, overflowY, padding, paddingInline, paddingTop, percentage, position, px, rem, right, rotate, rotateX, rotateY, style, textAlign, top, transform, turn, Variable, width, writingMode } from "@acryps/style";
+import { alignItems, backgroundColor, border, borderTop, child, color, ColorValue, cursor, display, Dvi, flexDirection, flexWrap, fontSize, fontWeight, gap, height, insetInline, justifyContent, left, marginBottom, marginInline, marginTop, minWidth, overflow, overflowY, padding, paddingInline, paddingTop, percentage, position, px, rem, right, rotate, rotateX, rotateY, style, textAlign, top, transform, translate, turn, Variable, vh, vw, whiteSpace, width, writingMode } from "@acryps/style";
 import { boxed } from "../shared/boxed.style";
-import { pageBackgroundColor, pageGutter } from "../index.style";
+import { pageBackgroundColor, pageGutter, pageTextColor } from "../index.style";
 import { trainRouteStyle } from "./route/index.style";
 import { registerTrainRouteStyle } from "./register/index.style";
 
@@ -14,6 +14,49 @@ export const trainStyle = () => child('ui-trains',
 
 	trainRouteStyle(),
 	registerTrainRouteStyle(),
+
+	child('ui-network-graph',
+		display('block'),
+		height(vh(70)),
+		width(vw(100).subtract(bulletSize).subtract(pageGutter.multiply(2))),
+		marginInline(vw(100).subtract(percentage(100)).divide(2).invert()),
+		marginBottom(pageGutter),
+
+		position('relative'),
+		overflow('hidden'),
+
+		child('canvas',
+			height(percentage(100)),
+			width(percentage(100).subtract(bulletSize)),
+			marginInline(pageGutter.add(bulletSize.divide(2)))
+		),
+
+		child('ui-station',
+			position('absolute'),
+
+			display('block'),
+			transform(
+				translate(
+					bulletSize.divide(2).invert().add(pageGutter),
+					bulletSize.divide(2).invert()
+				)
+			),
+
+			backgroundColor(pageBackgroundColor),
+			border(lineSize, 'solid', pageTextColor),
+			cursor('pointer'),
+
+			width(bulletSize.subtract(lineSize.multiply(2))),
+			height(bulletSize.subtract(lineSize.multiply(2))),
+
+			child('ui-name',
+				position('absolute'),
+				left(bulletSize.add(pageGutter)),
+
+				display('block')
+			)
+		)
+	),
 
 	child('ui-train-route',
 		display('block'),

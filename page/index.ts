@@ -53,6 +53,7 @@ import { TrainsPage } from "./train";
 import { TrainRoutePage } from "./train/route";
 import { RegisterTrainRoutePage } from "./train/register";
 import { InsertTrainRouteStopAction } from "./map/train-route/insert-stop";
+import { EditTrainRouteAction } from "./map/train-route/edit-route";
 
 export class Application {
 	static router: Router;
@@ -82,7 +83,10 @@ export class Application {
 					.route('/edit-plot/:id', EditPlotAction)
 					.route('/edit-route/:id', EditRouteAction)
 					.route('/quick-valueation', QuickValueationAction)
+
 					.route('/train-route/insert-stop/:code/:segmentIndex', InsertTrainRouteStopAction)
+					.route('/train-route/edit-route/:code/:segmentIndex', EditTrainRouteAction)
+
 
 					.route('/create/:shape', CreateFeaturePage)
 				)

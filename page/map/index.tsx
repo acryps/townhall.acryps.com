@@ -81,7 +81,7 @@ export class MapPage extends Component {
 		this.toolbar.update();
 	}
 
-	draw(action: string, type: DrawingType = 'closed-shape') {
+	draw(action: string, type: DrawingType = 'closed-shape', shape: Point[] = []) {
 		return new Promise<Point[]>(done => {
 			this.drawing = {
 				type,
@@ -89,7 +89,7 @@ export class MapPage extends Component {
 				complete: shape => done(shape)
 			}
 
-			this.map.enableDrawing();
+			this.map.enableDrawing(shape);
 			this.toolbar.update();
 		});
 	}

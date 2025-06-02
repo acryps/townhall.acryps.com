@@ -3151,6 +3151,26 @@ export class TrainService {
 		});
 	}
 
+	async saveRoutePath(routeId: string, path: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("RqY3M1b2NsbGdyZnZhZ2pibGl6NGRkeW", Service.stringify(routeId))
+		$data.append("BnN2twZGo5ZmBmZTJpcGFwYmc3bTZ5MX", Service.stringify(path))
+
+		return await fetch(Service.toURL("FpZHU4NWUwbTJlNGkzdGNtdjhwd2l3Zj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
 	async setOperator(routeId: string, operatorId: string): Promise<void> {
 		const $data = new FormData();
 		$data.append("IxZHhlem0yOWYwOWV2MnZrYm85YmRhcX", Service.stringify(routeId))

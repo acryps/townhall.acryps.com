@@ -159,7 +159,7 @@ export class TrainRoutePage extends Component {
 								{this.parent.renderInterchange(this.trainRoute, segment.station)}
 
 								{this.editing && <ui-actions>
-									<ui-action>
+									<ui-action ui-href={`/map/${segment.center.x}/${segment.center.y}/5/train-route/edit-route/${this.trainRoute.code}/${segmentIndex}`}>
 										Edit Route
 									</ui-action>
 
@@ -179,7 +179,7 @@ export class TrainRoutePage extends Component {
 								</ui-track>
 
 								{this.editing && <ui-actions>
-									<ui-action>
+									<ui-action ui-href={`/map/${segment.center.x}/${segment.center.y}/5/train-route/edit-route/${this.trainRoute.code}/${segmentIndex}`}>
 										Edit Route
 									</ui-action>
 

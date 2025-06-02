@@ -1194,6 +1194,19 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"FpZHU4NWUwbTJlNGkzdGNtdjhwd2l3Zj",
+			{
+			"RqY3M1b2NsbGdyZnZhZ2pibGl6NGRkeW": { type: "string", isArray: false, isOptional: false },
+				"BnN2twZGo5ZmBmZTJpcGFwYmc3bTZ5MX": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(TrainService),
+			(controller, params) => controller.saveRoutePath(
+				params["RqY3M1b2NsbGdyZnZhZ2pibGl6NGRkeW"],
+				params["BnN2twZGo5ZmBmZTJpcGFwYmc3bTZ5MX"]
+			)
+		);
+
+		this.expose(
 			"lmNThhdDtzaHxwb3FnM3poMWJkMXRlbW",
 			{
 			"IxZHhlem0yOWYwOWV2MnZrYm85YmRhcX": { type: "string", isArray: false, isOptional: false },

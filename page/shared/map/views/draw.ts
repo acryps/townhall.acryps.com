@@ -3,12 +3,19 @@ import { MapView } from ".";
 import { Point } from "../../../../interface/point";
 import { calcualteDanwinstonLine, drawDanwinstonLine } from "../../../../interface/line";
 import { negativeColor, positiveColor } from "../../../index.style";
+import { MapComponent } from "..";
 
 export class MapDrawView extends MapView {
 	readonly targetPixelSize = 5;
 
-	shape: Point[] = [];
 	closeable = new Observable(false);
+
+	constructor(
+		map: MapComponent,
+		public shape: Point[]
+	) {
+		super(map);
+	}
 
 	resize() {
 		// must be an odd number to keep the pattern clean

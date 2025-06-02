@@ -82,8 +82,8 @@ export class MapComponent extends Component {
 	}
 
 	// enable drawing mode
-	enableDrawing() {
-		this.drawer = new MapDrawView(this);
+	enableDrawing(shape: Point[] = []) {
+		this.drawer = new MapDrawView(this, shape);
 		this.updateViews();
 
 		return this;

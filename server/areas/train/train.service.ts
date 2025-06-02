@@ -31,6 +31,20 @@ export class TrainService extends Service {
 		await model.update();
 	}
 
+	async saveRoutePath(routeId: string, path: string) {
+		const route = await this.database.trainRoute.find(routeId);
+
+		const activePath = new TrainRoutePath();
+		activePath.path = Point.pack(Point.unpack(path));
+		activePath.trainRoute = route;
+		activePath.created = new Date();
+
+		await activePath.create();
+
+		route.activePath = activePath;
+		await route.update();
+	}
+
 	async setOperator(routeId: string, operatorId: string) {
 		const route = await this.database.trainRoute.find(routeId);
 		route.operatorId = operatorId;
@@ -51,6 +65,7 @@ export class TrainService extends Service {
 		const activePath = new TrainRoutePath();
 		activePath.path = Point.pack(Point.unpack(path));
 		activePath.trainRoute = route;
+		activePath.created = new Date();
 
 		await activePath.create();
 

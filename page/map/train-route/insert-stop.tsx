@@ -43,7 +43,7 @@ export class InsertTrainRouteStopAction extends Action {
 
 	renderPanel() {
 		return <ui-insert-train-stop>
-			Insert stop for {new TrainRouteIconComponent(this.trainRoute)} in segment #{this.segments.indexOf(this.segment)}.
+			Insert stop for {new TrainRouteIconComponent(this.trainRoute)} in segment #{this.segments.indexOf(this.segment)}
 		</ui-insert-train-stop>
 	}
 }

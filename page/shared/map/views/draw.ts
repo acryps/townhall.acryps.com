@@ -51,6 +51,26 @@ export class MapDrawView extends MapView {
 			this.drawCheckeredLine(this.shape[pointIndex - 1], this.shape[pointIndex], offset);
 		}
 
+		// draw edges
+		if (this.superscale > 1) {
+			this.context.strokeStyle = '#00f';
+
+			for (let point of this.shape) {
+				this.context.strokeRect(
+					(point.x - offset.x) * this.superscale - 0.5,
+					(point.y - offset.y) * this.superscale - 0.5,
+					this.superscale + 1,
+					this.superscale + 1
+				);
+			}
+		} else {
+			this.context.fillStyle = '#00f';
+
+			for (let point of this.shape) {
+				this.context.fillRect(point.x - offset.x, point.y - offset.y, 1, 1);
+			}
+		}
+
 		// draw current line
 		const last = this.shape[this.shape.length - 1];
 		const cursor = this.map.cursor;

@@ -4,9 +4,11 @@ import { fieldStyle } from "../../shared/field.style";
 import { buttonStyle } from "../../shared/index.style";
 import { buildingStyle } from "./building/index.style";
 import { ownershipStructureStyle } from "./ownership/index.style";
+import { tabsStyle } from "../../shared/tabs/index.style";
+import { boxed } from "../../shared/boxed.style";
 
 export const propertyStyle = () => child('ui-property',
-	display('block'),
+	boxed(),
 
 	child('ui-deactivated',
 		display('block'),
@@ -37,6 +39,153 @@ export const propertyStyle = () => child('ui-property',
 			marginBlock(pageGutter)
 		),
 
+		tabsStyle(
+			child('ui-general',
+				child('ui-buildings',
+					display('block'),
+					marginBottom(rem(2)),
+
+					border(px(1), 'solid', 'currentColor'),
+
+					child('ui-building',
+						display('flex'),
+						padding(pageGutter),
+
+						borderBottom(px(1), 'dotted', 'currentColor'),
+
+						child('ui-detail',
+							child('ui-name',
+								display('block'),
+								marginBottom(rem(0.25)),
+
+								fontWeight('bold')
+							),
+
+							child('ui-area',
+								display('block')
+							)
+						),
+
+						child('canvas',
+							marginLeft('auto'),
+							height(rem(5)),
+							width(rem(8)),
+
+							objectFit('contain'),
+							objectPosition('right'),
+							imageRendering('pixelated')
+						)
+					)
+						.attribute('ui-archived',
+							child('ui-name',
+								textDecorationLine('line-through')
+							),
+
+							child('canvas',
+								height(rem(1.5))
+							)
+						),
+
+					child('ui-action',
+						display('flex'),
+						columnGap(pageGutter),
+						alignItems('center'),
+
+						padding(pageGutter)
+					)
+				),
+
+
+				child('ui-plot-boundaries',
+					display('block'),
+					marginBottom(rem(2)),
+
+					border(px(1), 'solid', 'currentColor'),
+
+					child('ui-plot-boundary',
+						display('flex'),
+						padding(pageGutter),
+
+						opacity(0.5),
+						borderBottom(px(1), 'dotted', 'currentColor'),
+
+						child('ui-detail',
+							child('ui-comment',
+								display('block'),
+								marginBottom(rem(0.25)),
+
+								fontWeight('bold')
+							),
+
+							child('ui-area',
+								display('block')
+							)
+						),
+
+						child('canvas',
+							marginLeft('auto'),
+							height(rem(5)),
+							width(rem(8)),
+
+							objectFit('contain'),
+							objectPosition('right'),
+							imageRendering('pixelated')
+						)
+					)
+						.attribute('ui-active',
+							opacity(1)
+						),
+
+					child('ui-action',
+						display('flex'),
+						columnGap(pageGutter),
+						alignItems('center'),
+
+						padding(pageGutter)
+					)
+				),
+			),
+
+			child('ui-ownership-structure',
+				display('block'),
+				marginBottom(rem(2)),
+
+				border(px(1), 'solid', 'currentColor'),
+
+				child('ui-field').attribute('ui-quick-assign',
+					display('block'),
+					padding(pageGutter),
+
+					borderBottom(px(1), 'dotted', 'currentColor'),
+
+					child('label',
+						display('block'),
+						marginBottom(rem(0.25))
+					)
+				),
+
+				child('ui-owner',
+					display('flex'),
+					gap(pageGutter),
+
+					padding(pageGutter),
+					borderBottom(px(1), 'dotted', 'currentColor'),
+
+					child('ui-legal-entity',
+						flexGrow(1)
+					)
+				),
+
+				child('ui-action',
+					display('flex'),
+					columnGap(pageGutter),
+					alignItems('center'),
+
+					padding(pageGutter)
+				)
+			)
+		),
+
 		child('ui-field',
 			display('flex'),
 			flexDirection('column'),
@@ -56,148 +205,9 @@ export const propertyStyle = () => child('ui-property',
 			)
 		),
 
-		child('ui-ownership-structure',
-			display('block'),
-			marginBottom(rem(2)),
-
-			border(px(1), 'solid', 'currentColor'),
-
-			child('ui-field').attribute('ui-quick-assign',
-				display('block'),
-				padding(pageGutter),
-
-				borderBottom(px(1), 'dotted', 'currentColor'),
-
-				child('label',
-					display('block'),
-					marginBottom(rem(0.25))
-				)
-			),
-
-			child('ui-owner',
-				display('flex'),
-				gap(pageGutter),
-
-				padding(pageGutter),
-				borderBottom(px(1), 'dotted', 'currentColor'),
-
-				child('ui-legal-entity',
-					flexGrow(1)
-				)
-			),
-
-			child('ui-action',
-				display('flex'),
-				columnGap(pageGutter),
-				alignItems('center'),
-
-				padding(pageGutter)
-			)
-		),
-
-		child('ui-buildings',
-			display('block'),
-			marginBottom(rem(2)),
-
-			border(px(1), 'solid', 'currentColor'),
-
-			child('ui-building',
-				display('flex'),
-				padding(pageGutter),
-
-				borderBottom(px(1), 'dotted', 'currentColor'),
-
-				child('ui-detail',
-					child('ui-name',
-						display('block'),
-						marginBottom(rem(0.25)),
-
-						fontWeight('bold')
-					),
-
-					child('ui-area',
-						display('block')
-					)
-				),
-
-				child('canvas',
-					marginLeft('auto'),
-					height(rem(5)),
-					width(rem(8)),
-
-					objectFit('contain'),
-					objectPosition('right'),
-					imageRendering('pixelated')
-				)
-			)
-				.attribute('ui-archived',
-					child('ui-name',
-						textDecorationLine('line-through')
-					),
-
-					child('canvas',
-						height(rem(1.5))
-					)
-				),
-
-			child('ui-action',
-				display('flex'),
-				columnGap(pageGutter),
-				alignItems('center'),
-
-				padding(pageGutter)
-			)
-		),
 
 
-		child('ui-plot-boundaries',
-			display('block'),
-			marginBottom(rem(2)),
 
-			border(px(1), 'solid', 'currentColor'),
-
-			child('ui-plot-boundary',
-				display('flex'),
-				padding(pageGutter),
-
-				opacity(0.5),
-				borderBottom(px(1), 'dotted', 'currentColor'),
-
-				child('ui-detail',
-					child('ui-comment',
-						display('block'),
-						marginBottom(rem(0.25)),
-
-						fontWeight('bold')
-					),
-
-					child('ui-area',
-						display('block')
-					)
-				),
-
-				child('canvas',
-					marginLeft('auto'),
-					height(rem(5)),
-					width(rem(8)),
-
-					objectFit('contain'),
-					objectPosition('right'),
-					imageRendering('pixelated')
-				)
-			)
-				.attribute('ui-active',
-					opacity(1)
-				),
-
-			child('ui-action',
-				display('flex'),
-				columnGap(pageGutter),
-				alignItems('center'),
-
-				padding(pageGutter)
-			)
-		),
 
 		child('ui-dwellings',
 			display('block'),

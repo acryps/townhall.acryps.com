@@ -24,7 +24,7 @@ export class TrainRouteTileServer extends ShapeTileServer {
 
 					shapes.push({
 						stroke: '#000',
-						fill: '#fff',
+						fill: '#fff8',
 						bounds: boundary.shape
 					});
 				}

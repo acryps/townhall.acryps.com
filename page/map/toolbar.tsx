@@ -1,6 +1,6 @@
 import { Component } from "@acryps/page";
 import { MapPage } from ".";
-import { addIcon, boroughIcon, captureIcon, dayIcon, deleteIcon, drawIcon, flipIcon, goIcon, movementIcon, priceIcon, propertyRegisterIcon, residentIcon, streetIcon, trainIcon, undoIcon } from "../assets/icons/managed";
+import { addIcon, boroughIcon, captureIcon, dayIcon, deleteIcon, drawIcon, flipIcon, goIcon, movementIcon, priceIcon, propertyRegisterIcon, residentIcon, streetIcon, timeMachineIcon, trainIcon, undoIcon } from "../assets/icons/managed";
 import { PackedPoint, Point } from "../../interface/point";
 import { MapLayer } from "../shared/map/layer";
 import { baseLayer, nightLayer, boroughLayer, propertyLayer, streetLayer, movementHeatmapLayer, propertyUsageLayer, propertyValueHeatmapLayer, trainRoutesLayer } from "../shared/map/layers";
@@ -9,6 +9,7 @@ import { Application } from "..";
 import { activeBoroughColor, activeBoroughContrast } from "./index.style";
 import { hex } from "@acryps/style";
 import { Action } from "../action";
+import { TimeMachineComponent } from "./time-machine";
 
 export class MapToolbarComponent extends Component {
 	declare parent: MapPage;
@@ -19,6 +20,8 @@ export class MapToolbarComponent extends Component {
 	renderedLocations = new Map<string, BoroughSummaryModel>;
 	coordinateTracker: HTMLElement;
 	boroughTracker: HTMLElement;
+
+	timeMachine: TimeMachineComponent;
 
 	keycode = new Map<string, MapLayer | [MapLayer, MapLayer]>()
 			.set(' ', [baseLayer, nightLayer])
@@ -67,6 +70,8 @@ export class MapToolbarComponent extends Component {
 				</ui-action>}
 			</ui-actions>}
 
+			{this.timeMachine}
+
 			<ui-location>
 				{this.coordinateTracker = <ui-coordinates></ui-coordinates>}
 				{this.boroughTracker = <ui-borough></ui-borough>}
@@ -106,6 +111,10 @@ export class MapToolbarComponent extends Component {
 
 					<ui-layer ui-click={() => this.toggleLayer(propertyValueHeatmapLayer)}>
 						{priceIcon()}
+					</ui-layer>
+
+					<ui-layer ui-click={() => this.toggleTimeMachine()}>
+						{timeMachineIcon()}
 					</ui-layer>
 				</ui-layers>
 
@@ -192,6 +201,16 @@ export class MapToolbarComponent extends Component {
 
 		this.parent.map.layers = this.parent.map.layers.filter(layer => layer);
 		this.parent.map.updateLayers();
+	}
+
+	toggleTimeMachine() {
+		if (this.timeMachine) {
+			this.timeMachine = null;
+		} else {
+			this.timeMachine = new TimeMachineComponent(this.parent.map);
+		}
+
+		this.update();
 	}
 
 	getActiveBorough(packed: PackedPoint, cursor: Point) {

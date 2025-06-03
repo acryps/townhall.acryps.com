@@ -1,4 +1,4 @@
-import { alignItems, alignSelf, background, backgroundColor, border, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, display, flexDirection, flexGrow, flexWrap, fontSize, gap, height, Hex, hex, imageRendering, inset, insetInline, justifyContent, margin, marginInline, marginLeft, marginTop, maxWidth, Number, opacity, overflow, padding, paddingBlock, paddingInline, paddingTop, percentage, pointerEvents, position, px, rem, select, style, textAlign, Variable, width } from "@acryps/style";
+import { alignItems, alignSelf, background, backgroundColor, border, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, display, flexDirection, flexGrow, flexShrink, flexWrap, fontSize, gap, height, Hex, hex, imageRendering, inset, insetInline, justifyContent, margin, marginInline, marginLeft, marginTop, maxWidth, Number, opacity, overflow, padding, paddingBlock, paddingInline, paddingTop, percentage, pointerEvents, position, px, rem, select, style, textAlign, Variable, width } from "@acryps/style";
 import { pageTextColor, navigationBackgroundColor, navigationBorderColor, pageGutter, pageBackgroundColor, neutralColor } from "../index.style";
 import { buttonStyle } from "../shared/index.style";
 import { PageComponent } from "../page";
@@ -76,6 +76,28 @@ export const mapStyle = () => [
 						opacity(0.5),
 						pointerEvents('none')
 					)
+			),
+
+			child('ui-time-machine',
+				display('flex'),
+				padding(pageGutter),
+
+				child('ui-action',
+					flexShrink(0),
+
+					buttonStyle(),
+					padding(rem(0.5)),
+					marginInline(px(1).divide(2).invert()),
+
+					color(pageTextColor),
+					backgroundColor(pageBackgroundColor)
+				),
+
+				child('input',
+					flexGrow(1),
+
+					inputStyle()
+				)
 			),
 
 			child('ui-location',

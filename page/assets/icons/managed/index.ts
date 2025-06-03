@@ -2,11 +2,11 @@ import { select, style, content, Font, fontFamily, fontWeight, fontStyle } from 
 
 
 export const iconFont = new Font('icons', fontWeight('normal'), fontStyle('normal'))
-	.addSource('/assets/icons/managed/font/index.eot?db4292393373', 'embedded-opentype')
-	.addSource('/assets/icons/managed/font/index.svg?468d48c8341c', 'svg')
-	.addSource('/assets/icons/managed/font/index.ttf?8f606d6b64cc', 'truetype')
-	.addSource('/assets/icons/managed/font/index.woff?3b358049ccfc', 'woff')
-	.addSource('/assets/icons/managed/font/index.woff2?6df897274bab', 'woff2');
+	.addSource('/assets/icons/managed/font/index.eot?3bca9aec133d', 'embedded-opentype')
+	.addSource('/assets/icons/managed/font/index.svg?e1f091664aa8', 'svg')
+	.addSource('/assets/icons/managed/font/index.ttf?70e0b7dbd1c6', 'truetype')
+	.addSource('/assets/icons/managed/font/index.woff?898300cd3b55', 'woff')
+	.addSource('/assets/icons/managed/font/index.woff2?3e1de22910bf', 'woff2');
 
 export const icons = () => select('ui-icon',
 	fontFamily(iconFont.name),
@@ -41,8 +41,9 @@ export const icons = () => select('ui-icon',
 	style('[ui-speak]').before('\f119'),
 	style('[ui-state]').before('\f11a'),
 	style('[ui-street]').before('\f11b'),
-	style('[ui-train]').before('\f11c'),
-	style('[ui-undo]').before('\f11d'),
+	style('[ui-time-machine]').before('\f11c'),
+	style('[ui-train]').before('\f11d'),
+	style('[ui-undo]').before('\f11e'),
 );
 
 const createIconElement = (name: string) => {
@@ -79,5 +80,6 @@ export const routeInterchangeIcon = () => createIconElement('route-interchange')
 export const speakIcon = () => createIconElement('speak');
 export const stateIcon = () => createIconElement('state');
 export const streetIcon = () => createIconElement('street');
+export const timeMachineIcon = () => createIconElement('time-machine');
 export const trainIcon = () => createIconElement('train');
 export const undoIcon = () => createIconElement('undo');

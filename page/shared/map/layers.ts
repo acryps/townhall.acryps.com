@@ -3,6 +3,8 @@ import { MapLayer } from "./layer/index";
 export const baseLayer = MapLayer.fromTileSource((x, y) => `/tile/base/day/${x}/${y}`, 250, 'source-over');
 export const nightLayer = MapLayer.fromTileSource((x, y) => `/tile/base/night/${x}/${y}`, 250, 'source-over');
 
+export const timeMachineLayer = (date: Date) => MapLayer.fromTileSource((x, y) => `/tile/time-machine/${x}/${y}/${+date}`, 250, 'source-over');
+
 export const propertyLayer = MapLayer.fromShapeSource((x, y) => `/tile/property/${x}/${y}`, 500, 'source-over', true);
 export const boroughLayer = MapLayer.fromShapeSource((x, y) => `/tile/borough/${x}/${y}`, 500, 'source-over', true);
 export const propertyUsageLayer = MapLayer.fromShapeSource((x, y) => `/tile/usage/${x}/${y}`, 500, 'source-over', true);

@@ -49,6 +49,7 @@ import { EmptyDwellingCountMetric } from "./areas/metrics/tracker/empty-dwelling
 import { TrainRouteTileServer } from "./map/layers/shape/train/route";
 import { TrainRoutesTileServer } from "./map/layers/shape/train/routes";
 import { registerMetrics } from "./areas/metrics/metrics";
+import { TimeMachineTileServer } from "./map/layers/time-machine";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -126,6 +127,7 @@ DbClient.connectedClient.connect().then(async () => {
 	StreetFiller.active = new StreetFiller(database).schedule();
 
 	new BaseTileServer(app, database);
+	new TimeMachineTileServer(app, database);
 	new PropertyTileServer(app, database);
 	new StreetTileServer(app, database); // temporarely only!
 	new BoroughTileServer(app, database);

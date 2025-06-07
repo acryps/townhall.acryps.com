@@ -98,6 +98,7 @@ export interface PropertyViewModel {
 	offices: OfficeViewModel[];
 	owners: PropertyOwnerViewModel[];
 	plotBoundaries: PlotBoundarySummaryModel[];
+	trainStations: PropertyTrainStationViewModel[];
 	type: PropertyTypeViewModel;
 	activePlotBoundaryId: string;
 	code: string;
@@ -365,16 +366,11 @@ export interface TrainStationExitViewModel {
 	position: string;
 }
 
-export interface TrainRouteViewModel {
-    activePath: TrainRoutePathViewModel;
-	operator: LegalEntityViewModel;
-	stops: TrainStopViewModel[];
-	closed: Date;
+export interface TrainRouteSummaryModel {
+    closed: Date;
 	code: string;
 	color: string;
-	description: string;
 	id: string;
-	looping: boolean;
 	name: string;
 	opened: Date;
 	textColor: string;
@@ -391,6 +387,12 @@ export interface TrainStationViewModel {
 	name: string;
 }
 
+export interface PropertyTrainStationViewModel {
+    stops: StationTrainStopViewModel[];
+	id: string;
+	name: string;
+}
+
 export interface TrainStopViewModel {
     closed: Date;
 	id: string;
@@ -398,6 +400,16 @@ export interface TrainStopViewModel {
 	opened: Date;
 	stationId: string;
 	trackPosition: string;
+}
+
+export interface StationTrainStopViewModel {
+    route: TrainRouteViewModel;
+	closed: Date;
+	downPlatform: string;
+	id: string;
+	name: string;
+	opened: Date;
+	upPlatform: string;
 }
 
 export interface BillViewModel {
@@ -550,4 +562,19 @@ export interface ValuationViewModel {
 	id: string;
 	item: string;
 	price: number;
+}
+
+export interface TrainRouteViewModel {
+    activePath: TrainRoutePathViewModel;
+	operator: LegalEntityViewModel;
+	stops: TrainStopViewModel[];
+	closed: Date;
+	code: string;
+	color: string;
+	description: string;
+	id: string;
+	looping: boolean;
+	name: string;
+	opened: Date;
+	textColor: string;
 }

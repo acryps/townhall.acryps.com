@@ -1,11 +1,11 @@
 import { Component } from "@acryps/page";
-import { TrainRouteViewModel } from "../../managed/services";
+import { TrainRouteSummaryModel, TrainRouteViewModel } from "../../managed/services";
 import { trainRouteColor, trainRouteTextColor } from "./index.style";
 import { hex } from "@acryps/style";
 
 export class TrainRouteIconComponent extends Component {
 	constructor(
-		private trainRoute: TrainRouteViewModel
+		private trainRoute: TrainRouteSummaryModel
 	) {
 		super();
 	}

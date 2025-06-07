@@ -18,6 +18,7 @@ import { GeneralPropertyTab } from "./general";
 import { PropertyOwnershipStructureTab } from "./ownership-structure";
 import { PropertyUsageTab } from "./usage";
 import { PropertyHistoryTab } from "./history";
+import { PropertyStationsTab } from "./stations";
 
 export class PropertyPage extends Component {
 	declare parameters: { id: string };
@@ -40,6 +41,8 @@ export class PropertyPage extends Component {
 	}
 
 	render(child) {
+
+
 		return <ui-property>
 			<ui-name>
 				{this.property.name || `Property #${this.property.id.substring(0, 8)}`}
@@ -54,6 +57,11 @@ export class PropertyPage extends Component {
 
 				{new Tabs()
 					.addTab('General', () => new GeneralPropertyTab(this))
+					.addItemTabs(
+						this.property.trainStations,
+						station => `Station ${station.name ?? ''}`.trim(),
+						station => new PropertyStationsTab(this, station)
+					)
 					.addTab(`History (${this.property.historicListingGrade?.grade})`, () => new PropertyHistoryTab(this), this.property.historicListingGrade)
 					.addTab('Usage', () => new PropertyUsageTab(this))
 					.addTab('Ownership', () => new PropertyOwnershipStructureTab(this))

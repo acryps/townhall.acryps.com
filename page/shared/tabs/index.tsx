@@ -28,6 +28,21 @@ export class Tabs extends Component {
 		return this;
 	}
 
+	addItemTabs<ItemType>(
+		items: ItemType[],
+		header: (item: ItemType) => ComponentContent,
+		content: (item: ItemType) => ComponentContent
+	) {
+		for (let item of items) {
+			this.tabs.push(new Tab(
+				header(item),
+				() => content(item)
+			));
+		}
+
+		return this;
+	}
+
 	render() {
 		if (!this.active) {
 			this.active = this.tabs[0];

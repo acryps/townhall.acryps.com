@@ -12,6 +12,7 @@ import { PlotBoundaryShapeModel, PlotBoundarySummaryModel } from "./property/plo
 import { exit } from "process";
 import { LegalEntityViewModel } from "./legal-entity";
 import { ValuationSummaryModel } from "./trade/valuation.view";
+import { PropertyTrainStationViewModel, TrainStationViewModel } from "./train/station.view";
 
 export class PropertyOverviewModel extends ViewModel<Property> {
 	id;
@@ -45,6 +46,8 @@ export class PropertyViewModel extends ViewModel<Property> {
 	plotBoundaries: PlotBoundarySummaryModel[];
 
 	owners: PropertyOwnerViewModel[];
+
+	trainStations: PropertyTrainStationViewModel[]
 }
 
 export class PropertyOwnerViewModel extends ViewModel<PropertyOwner> {

@@ -118,8 +118,11 @@ import { BuildingShapeModel } from "./../areas/property/building";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
 import { ValuationSummaryModel } from "./../areas/trade/valuation.view";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
+import { TrainRouteSummaryModel } from "./../areas/train/route.view";
 import { TrainRoutePathViewModel } from "./../areas/train/route.view";
+import { PropertyTrainStationViewModel } from "./../areas/train/station.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
+import { StationTrainStopViewModel } from "./../areas/train/stop.view";
 import { HonestiumViewModel } from "./../areas/vote/bill";
 import { OfficeEmployeeModel } from "./../areas/company.view";
 import { WorkOfferEmplymentModel } from "./../areas/work";
@@ -2232,6 +2235,7 @@ ViewModel.mappings = {
 				offices: (await this.$$model.offices.includeTree(ViewModel.mappings[OfficeViewModel.name].items).toArray()).map(item => new OfficeViewModel(item)),
 				owners: (await this.$$model.owners.includeTree(ViewModel.mappings[PropertyOwnerViewModel.name].items).toArray()).map(item => new PropertyOwnerViewModel(item)),
 				plotBoundaries: (await this.$$model.plotBoundaries.includeTree(ViewModel.mappings[PlotBoundarySummaryModel.name].items).toArray()).map(item => new PlotBoundarySummaryModel(item)),
+				trainStations: (await this.$$model.trainStations.includeTree(ViewModel.mappings[PropertyTrainStationViewModel.name].items).toArray()).map(item => new PropertyTrainStationViewModel(item)),
 				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.$$model.type)),
 				activePlotBoundaryId: this.$$model.activePlotBoundaryId,
 				code: this.$$model.code,
@@ -2316,6 +2320,12 @@ ViewModel.mappings = {
 						[...parents, "plotBoundaries-PropertyViewModel"]
 					);
 				},
+				get trainStations() {
+					return ViewModel.mappings[PropertyTrainStationViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "trainStations-PropertyViewModel"]
+					);
+				},
 				get type() {
 					return ViewModel.mappings[PropertyTypeViewModel.name].getPrefetchingProperties(
 						level,
@@ -2341,6 +2351,7 @@ ViewModel.mappings = {
 			"offices" in data && (item.offices = data.offices && [...data.offices].map(i => ViewModel.mappings[OfficeViewModel.name].toViewModel(i)));
 			"owners" in data && (item.owners = data.owners && [...data.owners].map(i => ViewModel.mappings[PropertyOwnerViewModel.name].toViewModel(i)));
 			"plotBoundaries" in data && (item.plotBoundaries = data.plotBoundaries && [...data.plotBoundaries].map(i => ViewModel.mappings[PlotBoundarySummaryModel.name].toViewModel(i)));
+			"trainStations" in data && (item.trainStations = data.trainStations && [...data.trainStations].map(i => ViewModel.mappings[PropertyTrainStationViewModel.name].toViewModel(i)));
 			"type" in data && (item.type = data.type && ViewModel.mappings[PropertyTypeViewModel.name].toViewModel(data.type));
 			"activePlotBoundaryId" in data && (item.activePlotBoundaryId = data.activePlotBoundaryId === null ? null : `${data.activePlotBoundaryId}`);
 			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
@@ -2369,6 +2380,7 @@ ViewModel.mappings = {
 			"offices" in viewModel && (null);
 			"owners" in viewModel && (null);
 			"plotBoundaries" in viewModel && (null);
+			"trainStations" in viewModel && (null);
 			"type" in viewModel && (model.type.id = viewModel.type ? viewModel.type.id : null);
 			"activePlotBoundaryId" in viewModel && (model.activePlotBoundaryId = viewModel.activePlotBoundaryId === null ? null : `${viewModel.activePlotBoundaryId}`);
 			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
@@ -5081,18 +5093,13 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	[TrainRouteViewModel.name]: class ComposedTrainRouteViewModel extends TrainRouteViewModel {
+	[TrainRouteSummaryModel.name]: class ComposedTrainRouteSummaryModel extends TrainRouteSummaryModel {
 		async map() {
 			return {
-				activePath: new TrainRoutePathViewModel(await BaseServer.unwrap(this.$$model.activePath)),
-				operator: new LegalEntityViewModel(await BaseServer.unwrap(this.$$model.operator)),
-				stops: (await this.$$model.stops.includeTree(ViewModel.mappings[TrainStopViewModel.name].items).toArray()).map(item => new TrainStopViewModel(item)),
 				closed: this.$$model.closed,
 				code: this.$$model.code,
 				color: this.$$model.color,
-				description: this.$$model.description,
 				id: this.$$model.id,
-				looping: this.$$model.looping,
 				name: this.$$model.name,
 				opened: this.$$model.opened,
 				textColor: this.$$model.textColor
@@ -5125,30 +5132,10 @@ ViewModel.mappings = {
 			}
 
 			return {
-				get activePath() {
-					return ViewModel.mappings[TrainRoutePathViewModel.name].getPrefetchingProperties(
-						level,
-						[...parents, "activePath-TrainRouteViewModel"]
-					);
-				},
-				get operator() {
-					return ViewModel.mappings[LegalEntityViewModel.name].getPrefetchingProperties(
-						level,
-						[...parents, "operator-TrainRouteViewModel"]
-					);
-				},
-				get stops() {
-					return ViewModel.mappings[TrainStopViewModel.name].getPrefetchingProperties(
-						level,
-						[...parents, "stops-TrainRouteViewModel"]
-					);
-				},
 				closed: true,
 				code: true,
 				color: true,
-				description: true,
 				id: true,
-				looping: true,
 				name: true,
 				opened: true,
 				textColor: true
@@ -5156,16 +5143,11 @@ ViewModel.mappings = {
 		};
 
 		static toViewModel(data) {
-			const item = new TrainRouteViewModel(null);
-			"activePath" in data && (item.activePath = data.activePath && ViewModel.mappings[TrainRoutePathViewModel.name].toViewModel(data.activePath));
-			"operator" in data && (item.operator = data.operator && ViewModel.mappings[LegalEntityViewModel.name].toViewModel(data.operator));
-			"stops" in data && (item.stops = data.stops && [...data.stops].map(i => ViewModel.mappings[TrainStopViewModel.name].toViewModel(i)));
+			const item = new TrainRouteSummaryModel(null);
 			"closed" in data && (item.closed = data.closed === null ? null : new Date(data.closed));
 			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
 			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
-			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
-			"looping" in data && (item.looping = !!data.looping);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"opened" in data && (item.opened = data.opened === null ? null : new Date(data.opened));
 			"textColor" in data && (item.textColor = data.textColor === null ? null : `${data.textColor}`);
@@ -5173,7 +5155,7 @@ ViewModel.mappings = {
 			return item;
 		}
 
-		static async toModel(viewModel: TrainRouteViewModel) {
+		static async toModel(viewModel: TrainRouteSummaryModel) {
 			let model: TrainRoute;
 			
 			if (viewModel.id) {
@@ -5182,15 +5164,10 @@ ViewModel.mappings = {
 				model = new TrainRoute();
 			}
 			
-			"activePath" in viewModel && (model.activePath.id = viewModel.activePath ? viewModel.activePath.id : null);
-			"operator" in viewModel && (model.operator.id = viewModel.operator ? viewModel.operator.id : null);
-			"stops" in viewModel && (null);
 			"closed" in viewModel && (model.closed = viewModel.closed === null ? null : new Date(viewModel.closed));
 			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
 			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
-			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
-			"looping" in viewModel && (model.looping = !!viewModel.looping);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"opened" in viewModel && (model.opened = viewModel.opened === null ? null : new Date(viewModel.opened));
 			"textColor" in viewModel && (model.textColor = viewModel.textColor === null ? null : `${viewModel.textColor}`);
@@ -5331,6 +5308,77 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[PropertyTrainStationViewModel.name]: class ComposedPropertyTrainStationViewModel extends PropertyTrainStationViewModel {
+		async map() {
+			return {
+				stops: (await this.$$model.stops.includeTree(ViewModel.mappings[StationTrainStopViewModel.name].items).toArray()).map(item => new StationTrainStopViewModel(item)),
+				id: this.$$model.id,
+				name: this.$$model.name
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get stops() {
+					return ViewModel.mappings[StationTrainStopViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "stops-PropertyTrainStationViewModel"]
+					);
+				},
+				id: true,
+				name: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new PropertyTrainStationViewModel(null);
+			"stops" in data && (item.stops = data.stops && [...data.stops].map(i => ViewModel.mappings[StationTrainStopViewModel.name].toViewModel(i)));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PropertyTrainStationViewModel) {
+			let model: TrainStation;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(TrainStation).find(viewModel.id)
+			} else {
+				model = new TrainStation();
+			}
+			
+			"stops" in viewModel && (null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+
+			return model;
+		}
+	},
 	[TrainStopViewModel.name]: class ComposedTrainStopViewModel extends TrainStopViewModel {
 		async map() {
 			return {
@@ -5405,6 +5453,93 @@ ViewModel.mappings = {
 			"opened" in viewModel && (model.opened = viewModel.opened === null ? null : new Date(viewModel.opened));
 			"stationId" in viewModel && (model.stationId = viewModel.stationId === null ? null : `${viewModel.stationId}`);
 			"trackPosition" in viewModel && (model.trackPosition = viewModel.trackPosition === null ? null : `${viewModel.trackPosition}`);
+
+			return model;
+		}
+	},
+	[StationTrainStopViewModel.name]: class ComposedStationTrainStopViewModel extends StationTrainStopViewModel {
+		async map() {
+			return {
+				route: new TrainRouteViewModel(await BaseServer.unwrap(this.$$model.route)),
+				closed: this.$$model.closed,
+				downPlatform: this.$$model.downPlatform,
+				id: this.$$model.id,
+				name: this.$$model.name,
+				opened: this.$$model.opened,
+				upPlatform: this.$$model.upPlatform
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get route() {
+					return ViewModel.mappings[TrainRouteViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "route-StationTrainStopViewModel"]
+					);
+				},
+				closed: true,
+				downPlatform: true,
+				id: true,
+				name: true,
+				opened: true,
+				upPlatform: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new StationTrainStopViewModel(null);
+			"route" in data && (item.route = data.route && ViewModel.mappings[TrainRouteViewModel.name].toViewModel(data.route));
+			"closed" in data && (item.closed = data.closed === null ? null : new Date(data.closed));
+			"downPlatform" in data && (item.downPlatform = data.downPlatform === null ? null : `${data.downPlatform}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"opened" in data && (item.opened = data.opened === null ? null : new Date(data.opened));
+			"upPlatform" in data && (item.upPlatform = data.upPlatform === null ? null : `${data.upPlatform}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: StationTrainStopViewModel) {
+			let model: TrainStop;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(TrainStop).find(viewModel.id)
+			} else {
+				model = new TrainStop();
+			}
+			
+			"route" in viewModel && (model.route.id = viewModel.route ? viewModel.route.id : null);
+			"closed" in viewModel && (model.closed = viewModel.closed === null ? null : new Date(viewModel.closed));
+			"downPlatform" in viewModel && (model.downPlatform = viewModel.downPlatform === null ? null : `${viewModel.downPlatform}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"opened" in viewModel && (model.opened = viewModel.opened === null ? null : new Date(viewModel.opened));
+			"upPlatform" in viewModel && (model.upPlatform = viewModel.upPlatform === null ? null : `${viewModel.upPlatform}`);
 
 			return model;
 		}
@@ -6868,6 +7003,123 @@ ViewModel.mappings = {
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"item" in viewModel && (model.item = viewModel.item === null ? null : `${viewModel.item}`);
 			"price" in viewModel && (model.price = viewModel.price === null ? null : +viewModel.price);
+
+			return model;
+		}
+	},
+	[TrainRouteViewModel.name]: class ComposedTrainRouteViewModel extends TrainRouteViewModel {
+		async map() {
+			return {
+				activePath: new TrainRoutePathViewModel(await BaseServer.unwrap(this.$$model.activePath)),
+				operator: new LegalEntityViewModel(await BaseServer.unwrap(this.$$model.operator)),
+				stops: (await this.$$model.stops.includeTree(ViewModel.mappings[TrainStopViewModel.name].items).toArray()).map(item => new TrainStopViewModel(item)),
+				closed: this.$$model.closed,
+				code: this.$$model.code,
+				color: this.$$model.color,
+				description: this.$$model.description,
+				id: this.$$model.id,
+				looping: this.$$model.looping,
+				name: this.$$model.name,
+				opened: this.$$model.opened,
+				textColor: this.$$model.textColor
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get activePath() {
+					return ViewModel.mappings[TrainRoutePathViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "activePath-TrainRouteViewModel"]
+					);
+				},
+				get operator() {
+					return ViewModel.mappings[LegalEntityViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "operator-TrainRouteViewModel"]
+					);
+				},
+				get stops() {
+					return ViewModel.mappings[TrainStopViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "stops-TrainRouteViewModel"]
+					);
+				},
+				closed: true,
+				code: true,
+				color: true,
+				description: true,
+				id: true,
+				looping: true,
+				name: true,
+				opened: true,
+				textColor: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new TrainRouteViewModel(null);
+			"activePath" in data && (item.activePath = data.activePath && ViewModel.mappings[TrainRoutePathViewModel.name].toViewModel(data.activePath));
+			"operator" in data && (item.operator = data.operator && ViewModel.mappings[LegalEntityViewModel.name].toViewModel(data.operator));
+			"stops" in data && (item.stops = data.stops && [...data.stops].map(i => ViewModel.mappings[TrainStopViewModel.name].toViewModel(i)));
+			"closed" in data && (item.closed = data.closed === null ? null : new Date(data.closed));
+			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
+			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"looping" in data && (item.looping = !!data.looping);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"opened" in data && (item.opened = data.opened === null ? null : new Date(data.opened));
+			"textColor" in data && (item.textColor = data.textColor === null ? null : `${data.textColor}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: TrainRouteViewModel) {
+			let model: TrainRoute;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(TrainRoute).find(viewModel.id)
+			} else {
+				model = new TrainRoute();
+			}
+			
+			"activePath" in viewModel && (model.activePath.id = viewModel.activePath ? viewModel.activePath.id : null);
+			"operator" in viewModel && (model.operator.id = viewModel.operator ? viewModel.operator.id : null);
+			"stops" in viewModel && (null);
+			"closed" in viewModel && (model.closed = viewModel.closed === null ? null : new Date(viewModel.closed));
+			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
+			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"looping" in viewModel && (model.looping = !!viewModel.looping);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"opened" in viewModel && (model.opened = viewModel.opened === null ? null : new Date(viewModel.opened));
+			"textColor" in viewModel && (model.textColor = viewModel.textColor === null ? null : `${viewModel.textColor}`);
 
 			return model;
 		}

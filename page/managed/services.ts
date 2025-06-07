@@ -214,6 +214,7 @@ export class PropertyViewModel {
 	offices: OfficeViewModel[];
 	owners: PropertyOwnerViewModel[];
 	plotBoundaries: PlotBoundarySummaryModel[];
+	trainStations: PropertyTrainStationViewModel[];
 	type: PropertyTypeViewModel;
 	activePlotBoundaryId: string;
 	code: string;
@@ -232,6 +233,7 @@ export class PropertyViewModel {
 		raw.offices === undefined || (item.offices = raw.offices ? raw.offices.map(i => OfficeViewModel["$build"](i)) : null)
 		raw.owners === undefined || (item.owners = raw.owners ? raw.owners.map(i => PropertyOwnerViewModel["$build"](i)) : null)
 		raw.plotBoundaries === undefined || (item.plotBoundaries = raw.plotBoundaries ? raw.plotBoundaries.map(i => PlotBoundarySummaryModel["$build"](i)) : null)
+		raw.trainStations === undefined || (item.trainStations = raw.trainStations ? raw.trainStations.map(i => PropertyTrainStationViewModel["$build"](i)) : null)
 		raw.type === undefined || (item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null)
 		raw.activePlotBoundaryId === undefined || (item.activePlotBoundaryId = raw.activePlotBoundaryId === null ? null : `${raw.activePlotBoundaryId}`)
 		raw.code === undefined || (item.code = raw.code === null ? null : `${raw.code}`)
@@ -871,31 +873,21 @@ export class TrainStationExitViewModel {
 	}
 }
 
-export class TrainRouteViewModel {
-	activePath: TrainRoutePathViewModel;
-	operator: LegalEntityViewModel;
-	stops: TrainStopViewModel[];
+export class TrainRouteSummaryModel {
 	closed: Date;
 	code: string;
 	color: string;
-	description: string;
 	id: string;
-	looping: boolean;
 	name: string;
 	opened: Date;
 	textColor: string;
 
 	private static $build(raw) {
-		const item = new TrainRouteViewModel();
-		raw.activePath === undefined || (item.activePath = raw.activePath ? TrainRoutePathViewModel["$build"](raw.activePath) : null)
-		raw.operator === undefined || (item.operator = raw.operator ? LegalEntityViewModel["$build"](raw.operator) : null)
-		raw.stops === undefined || (item.stops = raw.stops ? raw.stops.map(i => TrainStopViewModel["$build"](i)) : null)
+		const item = new TrainRouteSummaryModel();
 		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
 		raw.code === undefined || (item.code = raw.code === null ? null : `${raw.code}`)
 		raw.color === undefined || (item.color = raw.color === null ? null : `${raw.color}`)
-		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
-		raw.looping === undefined || (item.looping = !!raw.looping)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
 		raw.textColor === undefined || (item.textColor = raw.textColor === null ? null : `${raw.textColor}`)
@@ -932,6 +924,21 @@ export class TrainStationViewModel {
 	}
 }
 
+export class PropertyTrainStationViewModel {
+	stops: StationTrainStopViewModel[];
+	id: string;
+	name: string;
+
+	private static $build(raw) {
+		const item = new PropertyTrainStationViewModel();
+		raw.stops === undefined || (item.stops = raw.stops ? raw.stops.map(i => StationTrainStopViewModel["$build"](i)) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		
+		return item;
+	}
+}
+
 export class TrainStopViewModel {
 	closed: Date;
 	id: string;
@@ -948,6 +955,29 @@ export class TrainStopViewModel {
 		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
 		raw.stationId === undefined || (item.stationId = raw.stationId === null ? null : `${raw.stationId}`)
 		raw.trackPosition === undefined || (item.trackPosition = raw.trackPosition === null ? null : `${raw.trackPosition}`)
+		
+		return item;
+	}
+}
+
+export class StationTrainStopViewModel {
+	route: TrainRouteViewModel;
+	closed: Date;
+	downPlatform: string;
+	id: string;
+	name: string;
+	opened: Date;
+	upPlatform: string;
+
+	private static $build(raw) {
+		const item = new StationTrainStopViewModel();
+		raw.route === undefined || (item.route = raw.route ? TrainRouteViewModel["$build"](raw.route) : null)
+		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
+		raw.downPlatform === undefined || (item.downPlatform = raw.downPlatform === null ? null : `${raw.downPlatform}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
+		raw.upPlatform === undefined || (item.upPlatform = raw.upPlatform === null ? null : `${raw.upPlatform}`)
 		
 		return item;
 	}
@@ -1306,6 +1336,39 @@ export class ValuationViewModel {
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.item === undefined || (item.item = raw.item === null ? null : `${raw.item}`)
 		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
+		
+		return item;
+	}
+}
+
+export class TrainRouteViewModel {
+	activePath: TrainRoutePathViewModel;
+	operator: LegalEntityViewModel;
+	stops: TrainStopViewModel[];
+	closed: Date;
+	code: string;
+	color: string;
+	description: string;
+	id: string;
+	looping: boolean;
+	name: string;
+	opened: Date;
+	textColor: string;
+
+	private static $build(raw) {
+		const item = new TrainRouteViewModel();
+		raw.activePath === undefined || (item.activePath = raw.activePath ? TrainRoutePathViewModel["$build"](raw.activePath) : null)
+		raw.operator === undefined || (item.operator = raw.operator ? LegalEntityViewModel["$build"](raw.operator) : null)
+		raw.stops === undefined || (item.stops = raw.stops ? raw.stops.map(i => TrainStopViewModel["$build"](i)) : null)
+		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
+		raw.code === undefined || (item.code = raw.code === null ? null : `${raw.code}`)
+		raw.color === undefined || (item.color = raw.color === null ? null : `${raw.color}`)
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.looping === undefined || (item.looping = !!raw.looping)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
+		raw.textColor === undefined || (item.textColor = raw.textColor === null ? null : `${raw.textColor}`)
 		
 		return item;
 	}

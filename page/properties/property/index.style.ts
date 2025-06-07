@@ -1,4 +1,4 @@
-import { alignItems, aspectRatio, backgroundColor, border, borderBottom, child, color, columnGap, display, flexDirection, flexGrow, flexWrap, fontSize, fontStyle, fontWeight, gap, height, imageRendering, justifyContent, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, Mm, objectFit, objectPosition, opacity, padding, percentage, px, ratio, rem, textAlign, textDecorationLine, vh, width } from "@acryps/style";
+import { alignItems, aspectRatio, backgroundColor, border, borderBottom, child, color, columnGap, display, flexDirection, flexGrow, flexWrap, fontSize, fontStyle, fontWeight, gap, height, imageRendering, justifyContent, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, Mm, objectFit, objectPosition, opacity, padding, percentage, px, ratio, rem, style, textAlign, textDecorationLine, vh, width } from "@acryps/style";
 import { negativeColor, neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 import { fieldStyle, inputStyle } from "../../shared/field.style";
 import { buttonStyle } from "../../shared/index.style";
@@ -151,6 +151,69 @@ export const propertyStyle = () => child('ui-property',
 					child('ui-action',
 						marginTop(rem(1)),
 
+						buttonStyle()
+					)
+				)
+			),
+
+			child('ui-station',
+				display('block'),
+
+				fieldStyle(),
+
+				child('ui-stops',
+					display('block'),
+					marginBottom(pageGutter),
+
+					border(px(1), 'solid', 'currentColor'),
+
+					child('ui-stop',
+						display('block'),
+						padding(pageGutter),
+
+						fieldStyle(),
+
+						child('ui-route',
+							display('flex'),
+							gap(pageGutter),
+
+							marginBottom(rem(0.75))
+						),
+
+						child('ui-operator',
+							display('block'),
+							marginBottom(pageGutter)
+						),
+
+						child('ui-stops',
+							display('flex'),
+							justifyContent('space-between'),
+							marginBottom(pageGutter)
+						),
+
+						child('ui-platforms',
+							display('flex'),
+							gap(pageGutter),
+
+							fieldStyle(
+								flexGrow(1),
+								marginBottom(0)
+							)
+						),
+
+						style(':not(:last-of-type)',
+							borderBottom(px(1), 'solid', 'currentColor')
+						)
+					)
+						.attribute('ui-closed',
+							opacity(0.5)
+						)
+				),
+
+				child('ui-actions',
+					display('flex'),
+
+					child('ui-action',
 						buttonStyle()
 					)
 				)

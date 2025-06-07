@@ -6,6 +6,8 @@ import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
 import { PropertyService } from "../../managed/services";
 
 export class PropertyUsageTab extends Component {
+	newDwellingCount = 1;
+
 	constructor(
 		private page: PropertyPage
 	) {
@@ -41,22 +43,31 @@ export class PropertyUsageTab extends Component {
 					</ui-name>
 
 					{dwelling.tenants.length ? new ResidentBadgeListComponent(dwelling.tenants.map(tenant => tenant.inhabitant)) : <ui-vacant>
-						<ui-header>
-							Vacant
-						</ui-header>
-
-						<ui-hint>
-							Residents will move in automatically, but it might take some time.
-						</ui-hint>
+						Vacant
 					</ui-vacant>}
 				</ui-dwelling>)}
 
-				<ui-action ui-click={async () => {
-					this.page.property.dwellings.push(await new PropertyService().createDwelling(this.page.property.id));
-					this.update();
-				}}>
-					{addIcon()} Create Dwelling
-				</ui-action>
+				<ui-create>
+					<ui-hint>
+						Each dwelling can hold a family, which will automatically be spawned by the AI system.
+						This might take some time, as the AI generator takes a lot of processing power and is not running 24/7.
+					</ui-hint>
+
+					<ui-field>
+						<label>
+							New Dwellings Count
+						</label>
+
+						<input type='number' min='1' max='100' $ui-value={this.newDwellingCount} />
+					</ui-field>
+
+					<ui-action ui-create-dwellings ui-click={async () => {
+						this.page.property.dwellings.push(...await new PropertyService().createDwellings(this.page.property.id, this.newDwellingCount));
+						this.update();
+					}}>
+						{addIcon()} Create Dwellings
+					</ui-action>
+				</ui-create>
 			</ui-dwellings>
 		</ui-usage>
 	}

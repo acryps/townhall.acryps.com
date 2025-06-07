@@ -2417,11 +2417,12 @@ export class MetricService {
 }
 
 export class PropertyService {
-	async createDwelling(propertyId: string): Promise<PropertyDwellingViewModel> {
+	async createDwellings(propertyId: string, count: number): Promise<Array<PropertyDwellingViewModel>> {
 		const $data = new FormData();
-		$data.append("p2dHJxa2BodTR6NDZodDIxYWEyejlia2", Service.stringify(propertyId))
+		$data.append("9ndGVpMzF2eXQ3OWNlOGtpeHRiMml1N3", Service.stringify(propertyId))
+		$data.append("l5Z3JiZ2J2MTN2dDdxMnEzZ2F5c3BjZm", Service.stringify(count))
 
-		return await fetch(Service.toURL("l3OGBvenJyc3lvbzZleWFmbzFpZ2g5cD"), {
+		return await fetch(Service.toURL("55OHRoMmdoY2Q3c2Rzb3JvZGF3NWRkMG"), {
 			method: "post",
 			credentials: "include",
 			body: $data
@@ -2429,7 +2430,7 @@ export class PropertyService {
 			if ("data" in r) {
 				const d = r.data;
 
-				return d === null ? null : PropertyDwellingViewModel["$build"](d);
+				return d.map(d => d === null ? null : PropertyDwellingViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

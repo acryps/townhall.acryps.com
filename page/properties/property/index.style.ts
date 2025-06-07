@@ -1,4 +1,4 @@
-import { alignItems, aspectRatio, backgroundColor, border, borderBottom, child, color, columnGap, display, flexDirection, flexGrow, flexWrap, fontSize, fontWeight, gap, height, imageRendering, justifyContent, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, Mm, objectFit, objectPosition, opacity, padding, percentage, px, ratio, rem, textAlign, textDecorationLine, vh, width } from "@acryps/style";
+import { alignItems, aspectRatio, backgroundColor, border, borderBottom, child, color, columnGap, display, flexDirection, flexGrow, flexWrap, fontSize, fontStyle, fontWeight, gap, height, imageRendering, justifyContent, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, Mm, objectFit, objectPosition, opacity, padding, percentage, px, ratio, rem, textAlign, textDecorationLine, vh, width } from "@acryps/style";
 import { negativeColor, neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 import { fieldStyle, inputStyle } from "../../shared/field.style";
 import { buttonStyle } from "../../shared/index.style";
@@ -217,14 +217,26 @@ export const propertyStyle = () => child('ui-property',
 
 						child('ui-vacant',
 							display('block'),
+							opacity(0.5)
+						)
+					),
 
-							child('ui-header',
-								display('block')
-							),
+					child('ui-create',
+						display('flex'),
+						flexDirection('column'),
+						padding(pageGutter),
 
-							child('ui-hint',
-								fontSize(rem(0.75))
-							)
+						child('ui-hint',
+							display('block'),
+							marginBottom(rem(1))
+						),
+
+						fieldStyle(),
+
+						child('ui-action',
+							buttonStyle(),
+
+							marginLeft('auto')
 						)
 					),
 
@@ -235,6 +247,11 @@ export const propertyStyle = () => child('ui-property',
 
 						padding(pageGutter)
 					)
+						.attribute('ui-create-dwellings',
+							child('input',
+								inputStyle()
+							)
+						)
 				),
 
 				child('ui-offices',

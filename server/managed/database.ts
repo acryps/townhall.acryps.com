@@ -698,18 +698,21 @@ export class District extends Entity<DistrictQueryProxy> {
 			
 export class DwellingQueryProxy extends QueryProxy {
 	get property(): Partial<PropertyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get propertyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class Dwelling extends Entity<DwellingQueryProxy> {
 	tenants: PrimaryReference<Tenancy, TenancyQueryProxy>;
 		get property(): Partial<ForeignReference<Property>> { return this.$property; }
+	created: Date;
 	declare id: string;
 	propertyId: string;
 	
 	$$meta = {
 		source: "dwelling",
 		columns: {
+			created: { type: "timestamp", name: "created" },
 			id: { type: "uuid", name: "id" },
 			propertyId: { type: "uuid", name: "property_id" }
 		},

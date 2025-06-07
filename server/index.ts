@@ -91,7 +91,13 @@ DbClient.connectedClient.connect().then(async () => {
 		new FillLife(life, database).fillEmptyDwellings();
 
 		(async () => {
-			for (let property of await database.property.toArray()) {
+			const properties = await database.property
+				.where(property => property.deactivated == null)
+				.where(property => property.typeId != null)
+				.where(property => property.boroughId != null)
+				.toArray()
+
+			for (let property of properties) {
 				const owner = await property.owners.orderByDescending(owner => owner.aquired).first();
 
 				if (owner && !owner.aquiredValuationId) {

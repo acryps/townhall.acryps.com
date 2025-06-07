@@ -22,15 +22,23 @@ export class PropertyService extends Service {
 		super();
 	}
 
-	async createDwelling(propertyId: string) {
+	async createDwellings(propertyId: string, count: number) {
+		if (count > 100) {
+			throw 'out of bounds';
+		}
+
 		const property = await this.database.property.find(propertyId);
+		const created = [];
 
-		const dwelling = new Dwelling();
-		dwelling.property = property;
+		for (let index = 0; index < count; index++) {
+			const dwelling = new Dwelling();
+			dwelling.property = property;
+			dwelling.created = new Date();
 
-		await dwelling.create();
+			created.push(dwelling.create());
+		}
 
-		return new PropertyDwellingViewModel(dwelling);
+		return PropertyDwellingViewModel.from(await Promise.all(created));
 	}
 
 	async createBuilding(propertyId: string, boundary: string) {

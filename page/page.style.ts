@@ -1,6 +1,6 @@
-import { backdropFilter, backgroundColor, blur, borderBottom, boxShadow, brightness, child, color, ColorValue, contrast, display, dropShadow, em, filter, fontFamily, fontSize, grayscale, hex, margin, outline, padding, position, px, rem, root, top, Variable, zIndex } from "@acryps/style";
+import { alignItems, backdropFilter, backgroundColor, blur, borderBottom, boxShadow, brightness, child, color, ColorValue, contrast, display, dropShadow, em, filter, fontFamily, fontSize, grayscale, hex, margin, marginLeft, outline, padding, position, px, rem, root, textAlign, top, Variable, zIndex } from "@acryps/style";
 import { homeStyle } from "./home/index.style";
-import { boldFont, boldItalicFont, regularFont, regularItalicFont } from "./assets/font/index.style";
+import { boldFont, boldItalicFont, headlineFont, microFont, regularFont, regularItalicFont } from "./assets/font/index.style";
 import { boroughStyle } from "./borough/index.style";
 import { bannerStyle, createBannerStyle } from "./banner/index.style";
 import { iconFont, icons } from "./assets/icons/managed";
@@ -67,6 +67,7 @@ export const pageStyle = () => root(
 				zIndex(100),
 
 				display('flex'),
+				alignItems('center'),
 				padding(pageGutter),
 
 				backgroundColor(navigationBackgroundColor),
@@ -74,6 +75,21 @@ export const pageStyle = () => root(
 
 				child('ui-logo',
 					fontSize(rem(1.5))
+				),
+
+				child('ui-timer',
+					marginLeft('auto'),
+
+					fontSize(rem(0.8)),
+					textAlign('right'),
+
+					child('ui-date',
+						display('block')
+					),
+
+					child('ui-time',
+						display('block')
+					)
 				)
 			),
 

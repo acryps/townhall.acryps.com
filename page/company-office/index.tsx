@@ -2,6 +2,7 @@ import { Component } from "@acryps/page";
 import { CompanyOfficeService, CompanySummaryModel, CompanyType } from "../managed/services";
 import { companyOfficeIcon } from "../assets/icons/managed";
 import { BannerComponent } from "../banner";
+import { Banner } from "../../interface/banner";
 
 export class CompanyOfficePage extends Component {
 	companies: CompanySummaryModel[];
@@ -47,7 +48,7 @@ export class CompanyOfficePage extends Component {
 						</ui-purpose>}
 					</ui-detail>
 
-					{company.banner && BannerComponent.unpack(company.banner)}
+					{company.banner && new BannerComponent(Banner.unpack(company.banner))}
 				</ui-company>)}
 			</ui-companies>
 		</ui-company-office>

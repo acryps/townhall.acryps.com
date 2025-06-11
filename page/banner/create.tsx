@@ -1,18 +1,19 @@
 import { Component } from "@acryps/page";
 import { BannerComponent } from ".";
 import { deleteIcon } from "../assets/icons/managed";
+import { Banner } from "../../interface/banner";
 
 export class CreateBannerComponent extends Component {
 	declare parameters: { code };
 
 	async onload() {
 		if (!this.parameters.code) {
-			this.navigate(BannerComponent.emptyBanner.pack());
+			this.navigate(Banner.createEmptyBanner().pack());
 		}
 	}
 
 	render() {
-		const banner = BannerComponent.unpack(this.parameters.code);
+		const banner = Banner.unpack(this.parameters.code);
 
 		return <ui-create-banner>
 			{banner}
@@ -23,7 +24,7 @@ export class CreateBannerComponent extends Component {
 				</ui-label>
 
 				<select $ui-value={banner.baseColor} ui-change={() => this.save(banner)}>
-					{Object.keys(BannerComponent.colors).map(color => <option ui-value={color}>
+					{Object.keys(Banner.colors).map(color => <option ui-value={color}>
 						{color}
 					</option>)}
 				</select>
@@ -34,7 +35,7 @@ export class CreateBannerComponent extends Component {
 					{this.preview(layer.offset)}
 
 					<select $ui-value={layer.color} ui-change={() => this.save(banner)}>
-						{Object.keys(BannerComponent.colors).map(color => <option ui-value={color}>
+						{Object.keys(Banner.colors).map(color => <option ui-value={color}>
 							{color}
 						</option>)}
 					</select>
@@ -51,7 +52,7 @@ export class CreateBannerComponent extends Component {
 
 				{banner.layers.length < BannerComponent.maxLayerCount && <ui-create>
 					{banner.layerTypes.map(type => <ui-type ui-click={() => {
-						type.add(Object.keys(BannerComponent.colors)[banner.layers.length + 1]);
+						type.add(Object.keys(Banner.colors)[banner.layers.length + 1]);
 
 						this.save(banner);
 					}}>

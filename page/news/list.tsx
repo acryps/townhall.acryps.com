@@ -1,6 +1,7 @@
 import { Component } from "@acryps/page";
 import { ArticleViewModel } from "../managed/services";
 import { BannerComponent } from "../banner";
+import { Banner } from "../../interface/banner";
 
 export class ArticleListComponent extends Component {
 	articles: ArticleViewModel[];
@@ -29,7 +30,7 @@ export class ArticleListComponent extends Component {
 						</ui-body>
 
 						<ui-publication>
-							{BannerComponent.unpack(article.publication.company.banner)}
+							{new BannerComponent(Banner.unpack(article.publication.company.banner))}
 
 							{article.publication.name}
 						</ui-publication>

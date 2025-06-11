@@ -10,6 +10,7 @@ import { toSimulatedTime } from "../../interface/time";
 import { ImpressionsComponent } from "./impressions";
 import { ArticleNewstickerModel, ArticleViewModel, PublicationService } from "../managed/services";
 import { NewstickerComponent } from "./newsticker";
+import { Banner } from "../../interface/banner";
 
 export class HomePage extends Component {
 	render() {
@@ -168,7 +169,7 @@ export class HomePage extends Component {
 
 				<ui-boroughs>
 					{Application.boroughs.toOrdered(borough => Point.center(Point.unpack(borough.bounds)).distance(Application.center)).map(borough => <ui-borough ui-href={`/borough/${borough.tag}`} style={boroughColor.provide(hex(borough.color))}>
-						{borough.banner && BannerComponent.unpack(borough.banner)}
+						{borough.banner && new BannerComponent(Banner.unpack(borough.banner))}
 
 						<ui-detail>
 							<ui-name>

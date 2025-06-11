@@ -5,6 +5,7 @@ import { linkText } from "../linked-text";
 import { Point } from "../../interface/../interface/point";
 import { MetaPlace } from "@acryps/metadata";
 import { MapComponent } from "../shared/map";
+import { Banner } from "../../interface/banner";
 
 export class BoroughPage extends Component {
 	declare parameters: { tag };
@@ -23,7 +24,7 @@ export class BoroughPage extends Component {
 
 	render() {
 		return <ui-borough>
-			{this.borough.banner && BannerComponent.unpack(this.borough.banner)}
+			{this.borough.banner && new BannerComponent(Banner.unpack(this.borough.banner))}
 
 			<ui-name>
 				{this.borough.name}

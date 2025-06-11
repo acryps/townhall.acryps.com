@@ -3,6 +3,7 @@ import { ArticleViewModel, PublicationService, PublicationViewModel } from "../m
 import { BannerComponent } from "../banner";
 import { ArticleListComponent } from "./list";
 import { convertToLegalCompanyName } from "../../interface/company";
+import { Banner } from "../../interface/banner";
 
 export class PublicationPage extends Component {
 	declare parameters: { tag };
@@ -15,7 +16,7 @@ export class PublicationPage extends Component {
 
 	render() {
 		return <ui-publication>
-			{BannerComponent.unpack(this.publication.company.banner)}
+			{new BannerComponent(Banner.unpack(this.publication.company.banner))}
 
 			<ui-name>
 				{this.publication.name}

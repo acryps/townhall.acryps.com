@@ -2,6 +2,7 @@ import { Component } from "@acryps/page";
 import { ArticleViewModel, PublicationService, PublicationSummaryModel } from "../managed/services";
 import { BannerComponent } from "../banner";
 import { ArticleListComponent } from "./list";
+import { Banner } from "../../interface/banner";
 
 export class NewsPage extends Component {
 	articles: ArticleViewModel[];
@@ -22,7 +23,7 @@ export class NewsPage extends Component {
 		return <ui-news>
 			<ui-publications>
 				{this.publications.map(publication => <ui-publication ui-href={`publication/${publication.tag}`}>
-					{BannerComponent.unpack(publication.company.banner)}
+					{new BannerComponent(Banner.unpack(publication.company.banner))}
 
 					<ui-detail>
 						<ui-name>

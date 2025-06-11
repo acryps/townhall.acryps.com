@@ -54,6 +54,7 @@ import { TrainRoutePage } from "./train/route";
 import { RegisterTrainRoutePage } from "./train/register";
 import { InsertTrainRouteStopAction } from "./map/train-route/insert-stop";
 import { EditTrainRouteAction } from "./map/train-route/edit-route";
+import { ResidentNamesPage } from "./population/names";
 
 export class Application {
 	static router: Router;
@@ -127,7 +128,9 @@ export class Application {
 				.route('/trade/assets/:id', EntityAssetsPage)
 				.route('/trade/valuation/:id', ValuationPage)
 
-				.route('/population', PopulationPage)
+				.route('/population', PopulationPage
+					.route('/names', ResidentNamesPage)
+				)
 
 				.route('/vote', VotePage
 					.route('/propose', ProposeBillPage)

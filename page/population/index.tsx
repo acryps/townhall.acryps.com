@@ -61,7 +61,11 @@ export class PopulationPage extends Component {
 		return <ui-residents>
 			{new SearchComponent()}
 
-			{new PopulationTickerComponent()}
+			<ui-actions>
+				<ui-action ui-href='names'>
+					View Name Frequencies
+				</ui-action>
+			</ui-actions>
 
 			<ui-picks>
 				{this.residents.map(resident => <ui-resident ui-href={`/resident/${resident.tag}`}>

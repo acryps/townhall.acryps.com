@@ -232,6 +232,11 @@ export interface LegalEntityViewModel {
 	state: boolean;
 }
 
+export interface NameFrequencyViewModel {
+    name: string;
+	count: number;
+}
+
 export interface ResidentSummaryModel {
     birthday: Date;
 	familyName: string;

@@ -548,6 +548,19 @@ export class LegalEntityViewModel {
 	}
 }
 
+export class NameFrequencyViewModel {
+	name: string;
+	count: number;
+
+	private static $build(raw) {
+		const item = new NameFrequencyViewModel();
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.count === undefined || (item.count = raw.count === null ? null : +raw.count)
+		
+		return item;
+	}
+}
+
 export class ResidentSummaryModel {
 	birthday: Date;
 	familyName: string;
@@ -2425,6 +2438,48 @@ export class LifeService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : ResidentViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async listGivenNameFrequencies(): Promise<Array<NameFrequencyViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("kwd2V1ZzBubGRrbndoc2B5djU4OGNtbj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : NameFrequencyViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async listFamilyNameFrequencies(): Promise<Array<NameFrequencyViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("N4YmRoODs3MWk5dmI1NWpiNTc1Z2I4MD"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : NameFrequencyViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

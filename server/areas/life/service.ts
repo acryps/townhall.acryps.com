@@ -3,6 +3,7 @@ import { Life } from "../../life";
 import { ResidentEventViewModel, ResidentRelationViewModel, ResidentSummaryModel, ResidentViewModel } from "./resident";
 import { DbContext, ResidentEventView } from "../../managed/database";
 import { ResidentTickerModel } from "./ticker";
+import { NameFrequency, NameFrequencyViewModel } from "./name-frequency";
 
 export class LifeService extends Service {
 	constructor(
@@ -44,8 +45,10 @@ export class LifeService extends Service {
 	listResidents(page: number) {
 		return ResidentSummaryModel.from(
 			this.database.resident
-				.orderByDescending(resident => resident.id)
-				.page(page, 100)
+				.orderByAscending(resident => resident.familyName)
+				.orderByAscending(resident => resident.givenName)
+				.where(resident => resident.deceased == null)
+				.page(page, 250)
 		);
 	}
 
@@ -58,7 +61,19 @@ export class LifeService extends Service {
 					resident.givenName.lowercase().includes(query) ||
 					resident.familyName.lowercase().includes(query)
 				)
-				.limit(10)
+				.limit(25)
 		)
+	}
+
+	async listGivenNameFrequencies() {
+		return NameFrequencyViewModel.from(
+			await NameFrequency.collect(this.database.resident.includeTree({ givenName: true }))
+		);
+	}
+
+	async listFamilyNameFrequencies() {
+		return NameFrequencyViewModel.from(
+			await NameFrequency.collect(this.database.resident.includeTree({ familyName: true }))
+		);
 	}
 }

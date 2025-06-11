@@ -846,6 +846,7 @@ export class Impression extends Entity<ImpressionQueryProxy> {
 			
 export class LawHouseSessionQueryProxy extends QueryProxy {
 	get scope(): Partial<DistrictQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get _Delete(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get ended(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get scopeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get started(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -855,7 +856,8 @@ export class LawHouseSession extends Entity<LawHouseSessionQueryProxy> {
 	get scope(): Partial<ForeignReference<District>> { return this.$scope; }
 	protocol: PrimaryReference<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy>;
 		sessionaries: PrimaryReference<LawHouseSessionary, LawHouseSessionaryQueryProxy>;
-		ended: Date;
+		_Delete: boolean;
+	ended: Date;
 	declare id: string;
 	scopeId: string;
 	started: Date;
@@ -863,6 +865,7 @@ export class LawHouseSession extends Entity<LawHouseSessionQueryProxy> {
 	$$meta = {
 		source: "law_house_session",
 		columns: {
+			_Delete: { type: "bool", name: "__delete" },
 			ended: { type: "timestamp", name: "ended" },
 			id: { type: "uuid", name: "id" },
 			scopeId: { type: "uuid", name: "scope_id" },
@@ -1917,7 +1920,9 @@ export class ResidentQueryProxy extends QueryProxy {
 	get biography(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get birthday(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get coreValues(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get deceased(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get familyName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get fate(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get figureId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get generated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get givenName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -1937,7 +1942,9 @@ export class Resident extends Entity<ResidentQueryProxy> {
 		biography: string;
 	birthday: Date;
 	coreValues: string;
+	deceased: Date;
 	familyName: string;
+	fate: string;
 	figureId: string;
 	generated: Date;
 	givenName: string;
@@ -1952,7 +1959,9 @@ export class Resident extends Entity<ResidentQueryProxy> {
 			biography: { type: "text", name: "biography" },
 			birthday: { type: "timestamp", name: "birthday" },
 			coreValues: { type: "text", name: "core_values" },
+			deceased: { type: "timestamp", name: "deceased" },
 			familyName: { type: "text", name: "family_name" },
+			fate: { type: "text", name: "fate" },
 			figureId: { type: "uuid", name: "figure_id" },
 			generated: { type: "timestamp", name: "generated" },
 			givenName: { type: "text", name: "given_name" },

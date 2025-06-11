@@ -55,6 +55,8 @@ import { ResidentSummaryModel } from "././../areas/life/resident";
 import { ResidentViewModel } from "././../areas/life/resident";
 import { ResidentEventView } from "././database";
 import { ResidentTickerModel } from "././../areas/life/ticker";
+import { NameFrequency } from "././../areas/life/name-frequency";
+import { NameFrequencyViewModel } from "././../areas/life/name-frequency";
 import { LifeService } from "././../areas/life/service";
 import { MetricTracker } from "././../areas/metrics/tracker";
 import { MetricValueViewModel } from "././../areas/metrics/view";
@@ -760,6 +762,24 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(LifeService),
 			(controller, params) => controller.search(
 				params["c2cWYybjR0ZjdramJraXF2d2N0MnZmNX"]
+			)
+		);
+
+		this.expose(
+			"kwd2V1ZzBubGRrbndoc2B5djU4OGNtbj",
+			{},
+			inject => inject.construct(LifeService),
+			(controller, params) => controller.listGivenNameFrequencies(
+				
+			)
+		);
+
+		this.expose(
+			"N4YmRoODs3MWk5dmI1NWpiNTc1Z2I4MD",
+			{},
+			inject => inject.construct(LifeService),
+			(controller, params) => controller.listFamilyNameFrequencies(
+				
 			)
 		);
 
@@ -3705,6 +3725,62 @@ ViewModel.mappings = {
 			"resident" in viewModel && (model.resident.id = viewModel.resident ? viewModel.resident.id : null);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"state" in viewModel && (model.state = !!viewModel.state);
+
+			return model;
+		}
+	},
+	[NameFrequencyViewModel.name]: class ComposedNameFrequencyViewModel extends NameFrequencyViewModel {
+		async map() {
+			return {
+				name: this.$$model.name,
+				count: this.$$model.count
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				name: true,
+				count: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new NameFrequencyViewModel(null);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"count" in data && (item.count = data.count === null ? null : +data.count);
+
+			return item;
+		}
+
+		static async toModel(viewModel: NameFrequencyViewModel) {
+			const model = new NameFrequency();
+			
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"count" in viewModel && (model.count = viewModel.count === null ? null : +viewModel.count);
 
 			return model;
 		}

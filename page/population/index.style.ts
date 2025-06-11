@@ -3,8 +3,24 @@ import { card } from "../shared/card.style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { pageGutter } from "../index.style";
 import { indexBackgroundColor, inputSpacingBlock, inputSpacingInline, inputStyle, inputTextColor } from "../shared/field.style";
+import { nameFrequencies } from "./names/index.style";
+import { boxed } from "../shared/boxed.style";
+import { buttonStyle } from "../shared/index.style";
 
 export const populationStyle = () => child('ui-residents',
+	boxed(),
+
+	nameFrequencies(),
+
+	child('ui-actions',
+		display('block'),
+		marginBottom(pageGutter),
+
+		child('ui-action',
+			buttonStyle()
+		)
+	),
+
 	child('ui-search',
 		display('block'),
 		marginBottom(pageGutter),

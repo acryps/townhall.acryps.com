@@ -1,4 +1,4 @@
-import { child, display, Dvi, fontSize, marginBottom, rem } from "@acryps/style";
+import { child, display, Dvi, fontSize, fontWeight, marginBottom, rem } from "@acryps/style";
 import { collection, collectionItem } from "../../shared/collection.style";
 import { card } from "../../shared/card.style";
 
@@ -25,13 +25,15 @@ export const workOfferStyle = () => child('ui-work-offer',
 	child('ui-contracts',
 		collection(rem(15), rem(1)),
 
-		child('ui-offer',
+		child('ui-contract',
 			collectionItem(),
 			card(),
 
 			child('ui-name',
 				display('block'),
-				marginBottom(rem(0.75))
+				marginBottom(rem(0.75)),
+
+				fontWeight('bold')
 			),
 
 			child('ui-match',

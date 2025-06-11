@@ -55,7 +55,7 @@ export class ResidentPage extends Component {
 				No permanent home
 			</ui-home>}
 
-			{activeWorkContract ? <ui-work ui-href={`/company-office/company/${activeWorkContract.offer.office.company.tag}`}>
+			{activeWorkContract ? <ui-work ui-href={`/company-office/office/${activeWorkContract.offer.office.id}`}>
 				Working as {activeWorkContract.offer.title} for {convertToLegalCompanyName(activeWorkContract.offer.office.company)} in {activeWorkContract.offer.office.property.borough.name}
 			</ui-work> : <ui-work>
 				Not employeed at the time

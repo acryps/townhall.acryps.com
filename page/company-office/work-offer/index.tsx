@@ -27,7 +27,7 @@ export class WorkOfferPage extends Component {
 			</ui-description>
 
 			<ui-contracts>
-				{this.workOffer.workContracts.toSorted((a, b) => +(a.canceled ?? a.signed) - +(b.canceled ?? b.signed)).map(contract => <ui-contract ui-cancled={!!contract.canceled}>
+				{this.workOffer.workContracts.toSorted((a, b) => +(a.canceled ?? a.signed) - +(b.canceled ?? b.signed)).map(contract => <ui-contract ui-cancled={!!contract.canceled} ui-href={`/resident/${contract.worker.tag}`}>
 					<ui-name>
 						{contract.worker.givenName} {contract.worker.familyName} ({toSimulatedAge(contract.worker.birthday)})
 					</ui-name>

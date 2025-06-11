@@ -5,6 +5,7 @@ import { boxed } from "../shared/boxed.style";
 import { buttonStyle } from "../shared/index.style";
 import { headlineFont } from "../assets/font/index.style";
 import { headerBannerStyle } from "../banner/index.style";
+import { pageGutter } from "../index.style";
 
 const bodyLineHeight = 1.3;
 
@@ -78,6 +79,7 @@ export const publicationStyle = () => child('ui-publication',
 		display('flex'),
 		justifyContent('center'),
 		gap(rem(1)),
+		marginBottom(pageGutter),
 
 		child('ui-action',
 			buttonStyle()

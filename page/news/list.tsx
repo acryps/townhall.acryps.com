@@ -3,12 +3,14 @@ import { ArticleViewModel } from "../managed/services";
 import { BannerComponent } from "../banner";
 
 export class ArticleListComponent extends Component {
+	articles: ArticleViewModel[];
+
 	constructor(
-		private articles: ArticleViewModel[]
+		articles: ArticleViewModel[]
 	) {
 		super();
 
-		this.articles = articles.toSorted((a, b) => +b.published - +a.published);
+		this.articles = articles.toSorted((a, b) => b.published > a.published ? 1 : -1);
 	}
 
 	render() {

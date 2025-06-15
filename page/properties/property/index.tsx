@@ -41,8 +41,6 @@ export class PropertyPage extends Component {
 	}
 
 	render(child) {
-
-
 		return <ui-property>
 			<ui-name>
 				{this.property.name || `Property #${this.property.id.substring(0, 8)}`}

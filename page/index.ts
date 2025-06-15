@@ -55,6 +55,11 @@ import { RegisterTrainRoutePage } from "./train/register";
 import { InsertTrainRouteStopAction } from "./map/train-route/insert-stop";
 import { EditTrainRouteAction } from "./map/train-route/edit-route";
 import { ResidentNamesPage } from "./population/names";
+import { PlansPage } from "./plans";
+import { PlanPage } from "./plans/plan";
+import { CreatePlanPage } from "./plans/create";
+import { PlanShapeAction } from "./map/plan-shape";
+import { PlanShapePage } from "./plans/plan/shape";
 
 export class Application {
 	static router: Router;
@@ -88,6 +93,7 @@ export class Application {
 					.route('/train-route/insert-stop/:code/:segmentIndex', InsertTrainRouteStopAction)
 					.route('/train-route/edit-route/:code/:segmentIndex', EditTrainRouteAction)
 
+					.route('/plan-shape/:tag', PlanShapeAction)
 
 					.route('/create/:shape', CreateFeaturePage)
 				)
@@ -137,6 +143,13 @@ export class Application {
 					.route('/honestium', HonestiumPage)
 
 					.route('/bill/:tag', BillPage)
+				)
+
+				.route('/plan', PlansPage
+					.route('/create', CreatePlanPage)
+					.route('/:tag', PlanPage
+						.route('/:id', PlanShapePage)
+					)
 				)
 
 				.route('/law-house', LawHousePage

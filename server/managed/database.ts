@@ -1411,6 +1411,128 @@ export class OfficeCapacity extends Entity<OfficeCapacityQueryProxy> {
 	
 }
 			
+export class PlanQueryProxy extends QueryProxy {
+	get author(): Partial<LegalEntityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get authorId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get updated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Plan extends Entity<PlanQueryProxy> {
+	get author(): Partial<ForeignReference<LegalEntity>> { return this.$author; }
+	shapes: PrimaryReference<PlanShape, PlanShapeQueryProxy>;
+		authorId: string;
+	created: Date;
+	description: string;
+	declare id: string;
+	name: string;
+	tag: string;
+	updated: Date;
+	
+	$$meta = {
+		source: "plan",
+		columns: {
+			authorId: { type: "uuid", name: "author_id" },
+			created: { type: "timestamp", name: "created" },
+			description: { type: "text", name: "description" },
+			id: { type: "uuid", name: "id" },
+			name: { type: "text", name: "name" },
+			tag: { type: "text", name: "tag" },
+			updated: { type: "timestamp", name: "updated" }
+		},
+		get set(): DbSet<Plan, PlanQueryProxy> { 
+			return new DbSet<Plan, PlanQueryProxy>(Plan, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$author = new ForeignReference<LegalEntity>(this, "authorId", LegalEntity);
+	this.shapes = new PrimaryReference<PlanShape, PlanShapeQueryProxy>(this, "planId", PlanShape);
+	}
+	
+	private $author: ForeignReference<LegalEntity>;
+
+	set author(value: Partial<ForeignReference<LegalEntity>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.authorId = value.id as string;
+		} else {
+			this.authorId = null;
+		}
+	}
+
+	
+}
+			
+export class PlanShapeQueryProxy extends QueryProxy {
+	get plan(): Partial<PlanQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get archived(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get closed(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get fill(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get label(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get path(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get planId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get stroke(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class PlanShape extends Entity<PlanShapeQueryProxy> {
+	get plan(): Partial<ForeignReference<Plan>> { return this.$plan; }
+	archived: Date;
+	closed: boolean;
+	created: Date;
+	fill: string;
+	declare id: string;
+	label: string;
+	path: string;
+	planId: string;
+	stroke: string;
+	
+	$$meta = {
+		source: "plan_shape",
+		columns: {
+			archived: { type: "timestamp", name: "archived" },
+			closed: { type: "bool", name: "closed" },
+			created: { type: "timestamp", name: "created" },
+			fill: { type: "text", name: "fill" },
+			id: { type: "uuid", name: "id" },
+			label: { type: "text", name: "label" },
+			path: { type: "text", name: "path" },
+			planId: { type: "uuid", name: "plan_id" },
+			stroke: { type: "text", name: "stroke" }
+		},
+		get set(): DbSet<PlanShape, PlanShapeQueryProxy> { 
+			return new DbSet<PlanShape, PlanShapeQueryProxy>(PlanShape, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$plan = new ForeignReference<Plan>(this, "planId", Plan);
+	}
+	
+	private $plan: ForeignReference<Plan>;
+
+	set plan(value: Partial<ForeignReference<Plan>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.planId = value.id as string;
+		} else {
+			this.planId = null;
+		}
+	}
+
+	
+}
+			
 export class PlayerQueryProxy extends QueryProxy {
 	get legalEntity(): Partial<LegalEntityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get gameUuid(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -3008,6 +3130,8 @@ export class DbContext {
 	movement: DbSet<Movement, MovementQueryProxy>;
 	office: DbSet<Office, OfficeQueryProxy>;
 	officeCapacity: DbSet<OfficeCapacity, OfficeCapacityQueryProxy>;
+	plan: DbSet<Plan, PlanQueryProxy>;
+	planShape: DbSet<PlanShape, PlanShapeQueryProxy>;
 	player: DbSet<Player, PlayerQueryProxy>;
 	plotBoundary: DbSet<PlotBoundary, PlotBoundaryQueryProxy>;
 	property: DbSet<Property, PropertyQueryProxy>;
@@ -3060,6 +3184,8 @@ export class DbContext {
 		this.movement = new DbSet<Movement, MovementQueryProxy>(Movement, this.runContext);
 		this.office = new DbSet<Office, OfficeQueryProxy>(Office, this.runContext);
 		this.officeCapacity = new DbSet<OfficeCapacity, OfficeCapacityQueryProxy>(OfficeCapacity, this.runContext);
+		this.plan = new DbSet<Plan, PlanQueryProxy>(Plan, this.runContext);
+		this.planShape = new DbSet<PlanShape, PlanShapeQueryProxy>(PlanShape, this.runContext);
 		this.player = new DbSet<Player, PlayerQueryProxy>(Player, this.runContext);
 		this.plotBoundary = new DbSet<PlotBoundary, PlotBoundaryQueryProxy>(PlotBoundary, this.runContext);
 		this.property = new DbSet<Property, PropertyQueryProxy>(Property, this.runContext);

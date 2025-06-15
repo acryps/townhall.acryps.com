@@ -1,4 +1,4 @@
-import { child, cursor, display, fontSize, fontWeight, height, margin, marginBottom, marginInline, marginTop, maxHeight, objectFit, percentage, pointerEvents, rem, textDecoration, textDecorationLine, vh, width } from "@acryps/style";
+import { borderTop, child, cursor, display, fontSize, fontWeight, height, margin, marginBottom, marginInline, marginTop, maxHeight, minWidth, objectFit, percentage, pointerEvents, rem, textDecoration, textDecorationLine, vh, width } from "@acryps/style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { pageGutter } from "../index.style";
 import { card } from "../shared/card.style";

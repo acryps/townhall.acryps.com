@@ -18,11 +18,12 @@ export class GoInterface {
 
 			const route = await new Promise<string>(done => {
 				const tasks = [
-					this.find(id, database.article, (id, item) => `/news/article/${id}`),
+					this.find(id, database.article, id => `/news/article/${id}`),
 					this.find(id, database.bill, (id, item) => `/vote/bill/${item.tag}`),
 					this.find(id, database.borough, (id, item) => `/borough/${item.tag}`),
 					this.find(id, database.property, (id, item) => `/property/${id}`),
 					this.find(id, database.resident, (id, item) => `/resident/${item.tag}`),
+					this.find(id, database.street, id => `/street/${id}`),
 
 					// recurse
 					this.find(id, database.vote, (id, item) => `/go/${item.residentId}`),

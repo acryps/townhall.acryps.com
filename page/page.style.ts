@@ -29,6 +29,7 @@ import { assetsStyle } from "./trade/assets/index.style";
 import { metricsStyle } from "./metrics/index.style";
 import { trainStyle } from "./train/index.style";
 import { trainRouteIconStyle } from "./shared/train-route/index.style";
+import { plansStyle } from "./plans/index.style";
 
 export const pageStyle = () => root(
 	boldFont,
@@ -123,6 +124,8 @@ export const pageStyle = () => root(
 				trainStyle(),
 
 				voteStyle(),
+
+				plansStyle(),
 
 				valuationStyle(),
 				assetsStyle(),

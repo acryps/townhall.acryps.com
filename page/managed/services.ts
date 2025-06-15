@@ -728,6 +728,44 @@ export class MetricValueViewModel {
 	}
 }
 
+export class PlanSummaryModel {
+	author: LegalEntityViewModel;
+	id: string;
+	name: string;
+	tag: string;
+
+	private static $build(raw) {
+		const item = new PlanSummaryModel();
+		raw.author === undefined || (item.author = raw.author ? LegalEntityViewModel["$build"](raw.author) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
+		
+		return item;
+	}
+}
+
+export class PlanShapeViewModel {
+	closed: boolean;
+	fill: string;
+	id: string;
+	label: string;
+	path: string;
+	stroke: string;
+
+	private static $build(raw) {
+		const item = new PlanShapeViewModel();
+		raw.closed === undefined || (item.closed = !!raw.closed)
+		raw.fill === undefined || (item.fill = raw.fill === null ? null : `${raw.fill}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.label === undefined || (item.label = raw.label === null ? null : `${raw.label}`)
+		raw.path === undefined || (item.path = raw.path === null ? null : `${raw.path}`)
+		raw.stroke === undefined || (item.stroke = raw.stroke === null ? null : `${raw.stroke}`)
+		
+		return item;
+	}
+}
+
 export class BuildingShapeModel {
 	boundary: string;
 	id: string;
@@ -1269,6 +1307,27 @@ export class LawHouseSessionViewModel {
 		raw.ended === undefined || (item.ended = raw.ended ? new Date(raw.ended) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.started === undefined || (item.started = raw.started ? new Date(raw.started) : null)
+		
+		return item;
+	}
+}
+
+export class PlanViewModel {
+	author: LegalEntityViewModel;
+	shapes: PlanShapeViewModel[];
+	description: string;
+	id: string;
+	name: string;
+	tag: string;
+
+	private static $build(raw) {
+		const item = new PlanViewModel();
+		raw.author === undefined || (item.author = raw.author ? LegalEntityViewModel["$build"](raw.author) : null)
+		raw.shapes === undefined || (item.shapes = raw.shapes ? raw.shapes.map(i => PlanShapeViewModel["$build"](i)) : null)
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		
 		return item;
 	}
@@ -2529,6 +2588,157 @@ export class MetricService {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
 				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class PlanService {
+	async list(): Promise<Array<PlanViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("Q3bXdrZmpqaThtZ2ZvcGkxZ21qN3p1a2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : PlanViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getPlan(tag: string): Promise<PlanViewModel> {
+		const $data = new FormData();
+		$data.append("w5c2gweHR6cWM4NDZ4c3gwNGN1amVpcD", Service.stringify(tag))
+
+		return await fetch(Service.toURL("I3dGZwNmE3NHV5MXg4ZGZmd2dvbmxncj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : PlanViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async create(name: string, description: string, authorId: string): Promise<string> {
+		const $data = new FormData();
+		$data.append("NpND85dGFtY3F1NnMxaH5kbHB0N3ZuM2", Service.stringify(name))
+		$data.append("dpcTIwdnk3a2Fid3kweHU3dWVjMmR2bH", Service.stringify(description))
+		$data.append("dyOTJoeXM4andscmhzMnNoYXN2dmE5Nz", Service.stringify(authorId))
+
+		return await fetch(Service.toURL("d4MmlrOHM3c3QwMHR0N3dnZHI5em01aG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async save(id: string, name: string, description: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("42bzJud35ycmFoNTNnZH8yYnNkMHV1dD", Service.stringify(id))
+		$data.append("F6aWA4OGI1bDlldng0MXZwdD03a3NucG", Service.stringify(name))
+		$data.append("RlYXFxMjkwOWBqczdqbjk3cngzcThsdD", Service.stringify(description))
+
+		return await fetch(Service.toURL("Jrajx1bjg5ejQ4dWR2bGlucmAwNXYxc2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async setAuthor(id: string, authorId: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("9qN2BnenYzcGFlbmI0eHZscndlZ3pjdX", Service.stringify(id))
+		$data.append("hhNjQ2ZWZ5ejZ0cHljd2NydnR2bmdhNG", Service.stringify(authorId))
+
+		return await fetch(Service.toURL("Bqb2dpaHVvNDZvNzpvOHUxOTFib25xZ2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async addShape(tag: string, path: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("Z6aGZxMXJxMXxqZmRzM2AzOWZxbjZ6dG", Service.stringify(tag))
+		$data.append("h1NHhleTFvOWNsYzN2OX5keHFlcjUzY3", Service.stringify(path))
+
+		return await fetch(Service.toURL("w5YWlzbGg1cmp1cXd0MGwzaHV0OTF3N3"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async saveShape(id: string, label: string, stroke: string, fill: string, close: boolean): Promise<void> {
+		const $data = new FormData();
+		$data.append("FpOXI1dXxrYWhjc3J0cX03MThpbX9kb2", Service.stringify(id))
+		$data.append("1scTgxdTZhZTo3MWkyYWFqZT5meDtodW", Service.stringify(label))
+		$data.append("Jsd2RrcHJxZTQwOWhrZGN1bmNubTQ5c3", Service.stringify(stroke))
+		$data.append("lqdWh1YnRkbTt5NzVwMWlvcHFvNGJyY2", Service.stringify(fill))
+		$data.append("FmNDJxa3N0M2JxYWloenlpbmdmZ2k3OD", Service.stringify(close))
+
+		return await fetch(Service.toURL("Jka3kxbW53NG1uej13OW9iZ3hrM35hNG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
 			}
 		});
 	}

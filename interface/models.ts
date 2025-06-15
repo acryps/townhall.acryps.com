@@ -307,6 +307,22 @@ export interface MetricValueViewModel {
 	value: number;
 }
 
+export interface PlanSummaryModel {
+    author: LegalEntityViewModel;
+	id: string;
+	name: string;
+	tag: string;
+}
+
+export interface PlanShapeViewModel {
+    closed: boolean;
+	fill: string;
+	id: string;
+	label: string;
+	path: string;
+	stroke: string;
+}
+
 export interface BuildingShapeModel {
     boundary: string;
 	id: string;
@@ -533,6 +549,15 @@ export interface LawHouseSessionViewModel {
 	ended: Date;
 	id: string;
 	started: Date;
+}
+
+export interface PlanViewModel {
+    author: LegalEntityViewModel;
+	shapes: PlanShapeViewModel[];
+	description: string;
+	id: string;
+	name: string;
+	tag: string;
 }
 
 export interface BuildingSummaryModel {

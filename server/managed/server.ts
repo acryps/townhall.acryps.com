@@ -62,6 +62,10 @@ import { MetricTracker } from "././../areas/metrics/tracker";
 import { MetricValueViewModel } from "././../areas/metrics/view";
 import { MetricViewModel } from "././../areas/metrics/view";
 import { MetricService } from "././../areas/metrics/service";
+import { Plan } from "././database";
+import { PlanShape } from "././database";
+import { PlanViewModel } from "././../areas/plan/plan";
+import { PlanService } from "././../areas/plan/index";
 import { Building } from "././database";
 import { Dwelling } from "././database";
 import { PropertyOwner } from "././database";
@@ -116,6 +120,8 @@ import { WorkContractSummaryModel } from "./../areas/work";
 import { LawHouseSessionaryViewModel } from "./../areas/law-house/session";
 import { LawHouseSessionProtocolViewModel } from "./../areas/law-house/session";
 import { TenancyViewModel } from "./../areas/life/resident";
+import { PlanSummaryModel } from "./../areas/plan/plan";
+import { PlanShapeViewModel } from "./../areas/plan/plan";
 import { BuildingShapeModel } from "./../areas/property/building";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
 import { ValuationSummaryModel } from "./../areas/trade/valuation.view";
@@ -213,6 +219,10 @@ Inject.mappings = {
 	},
 	"MetricService": {
 		objectConstructor: MetricService,
+		parameters: ["DbContext"]
+	},
+	"PlanService": {
+		objectConstructor: PlanService,
 		parameters: ["DbContext"]
 	},
 	"PropertyService": {
@@ -802,6 +812,101 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.plot(
 				params["NvNjYzd3V0MDV4ZWlxaHQ5YndjZHl2cG"],
 				params["ZoNHI0aD8zbTl2bmAyY3c2ZTU5aWBibj"]
+			)
+		);
+
+		this.expose(
+			"Q3bXdrZmpqaThtZ2ZvcGkxZ21qN3p1a2",
+			{},
+			inject => inject.construct(PlanService),
+			(controller, params) => controller.list(
+				
+			)
+		);
+
+		this.expose(
+			"I3dGZwNmE3NHV5MXg4ZGZmd2dvbmxncj",
+			{
+			"w5c2gweHR6cWM4NDZ4c3gwNGN1amVpcD": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PlanService),
+			(controller, params) => controller.getPlan(
+				params["w5c2gweHR6cWM4NDZ4c3gwNGN1amVpcD"]
+			)
+		);
+
+		this.expose(
+			"d4MmlrOHM3c3QwMHR0N3dnZHI5em01aG",
+			{
+			"NpND85dGFtY3F1NnMxaH5kbHB0N3ZuM2": { type: "string", isArray: false, isOptional: false },
+				"dpcTIwdnk3a2Fid3kweHU3dWVjMmR2bH": { type: "string", isArray: false, isOptional: false },
+				"dyOTJoeXM4andscmhzMnNoYXN2dmE5Nz": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PlanService),
+			(controller, params) => controller.create(
+				params["NpND85dGFtY3F1NnMxaH5kbHB0N3ZuM2"],
+				params["dpcTIwdnk3a2Fid3kweHU3dWVjMmR2bH"],
+				params["dyOTJoeXM4andscmhzMnNoYXN2dmE5Nz"]
+			)
+		);
+
+		this.expose(
+			"Jrajx1bjg5ejQ4dWR2bGlucmAwNXYxc2",
+			{
+			"42bzJud35ycmFoNTNnZH8yYnNkMHV1dD": { type: "string", isArray: false, isOptional: false },
+				"F6aWA4OGI1bDlldng0MXZwdD03a3NucG": { type: "string", isArray: false, isOptional: false },
+				"RlYXFxMjkwOWBqczdqbjk3cngzcThsdD": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PlanService),
+			(controller, params) => controller.save(
+				params["42bzJud35ycmFoNTNnZH8yYnNkMHV1dD"],
+				params["F6aWA4OGI1bDlldng0MXZwdD03a3NucG"],
+				params["RlYXFxMjkwOWBqczdqbjk3cngzcThsdD"]
+			)
+		);
+
+		this.expose(
+			"Bqb2dpaHVvNDZvNzpvOHUxOTFib25xZ2",
+			{
+			"9qN2BnenYzcGFlbmI0eHZscndlZ3pjdX": { type: "string", isArray: false, isOptional: false },
+				"hhNjQ2ZWZ5ejZ0cHljd2NydnR2bmdhNG": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PlanService),
+			(controller, params) => controller.setAuthor(
+				params["9qN2BnenYzcGFlbmI0eHZscndlZ3pjdX"],
+				params["hhNjQ2ZWZ5ejZ0cHljd2NydnR2bmdhNG"]
+			)
+		);
+
+		this.expose(
+			"w5YWlzbGg1cmp1cXd0MGwzaHV0OTF3N3",
+			{
+			"Z6aGZxMXJxMXxqZmRzM2AzOWZxbjZ6dG": { type: "string", isArray: false, isOptional: false },
+				"h1NHhleTFvOWNsYzN2OX5keHFlcjUzY3": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PlanService),
+			(controller, params) => controller.addShape(
+				params["Z6aGZxMXJxMXxqZmRzM2AzOWZxbjZ6dG"],
+				params["h1NHhleTFvOWNsYzN2OX5keHFlcjUzY3"]
+			)
+		);
+
+		this.expose(
+			"Jka3kxbW53NG1uej13OW9iZ3hrM35hNG",
+			{
+			"FpOXI1dXxrYWhjc3J0cX03MThpbX9kb2": { type: "string", isArray: false, isOptional: false },
+				"1scTgxdTZhZTo3MWkyYWFqZT5meDtodW": { type: "string", isArray: false, isOptional: false },
+				"Jsd2RrcHJxZTQwOWhrZGN1bmNubTQ5c3": { type: "string", isArray: false, isOptional: false },
+				"lqdWh1YnRkbTt5NzVwMWlvcHFvNGJyY2": { type: "string", isArray: false, isOptional: false },
+				"FmNDJxa3N0M2JxYWloenlpbmdmZ2k3OD": { type: "boolean", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PlanService),
+			(controller, params) => controller.saveShape(
+				params["FpOXI1dXxrYWhjc3J0cX03MThpbX9kb2"],
+				params["1scTgxdTZhZTo3MWkyYWFqZT5meDtodW"],
+				params["Jsd2RrcHJxZTQwOWhrZGN1bmNubTQ5c3"],
+				params["lqdWh1YnRkbTt5NzVwMWlvcHFvNGJyY2"],
+				params["FmNDJxa3N0M2JxYWloenlpbmdmZ2k3OD"]
 			)
 		);
 
@@ -4473,6 +4578,159 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[PlanSummaryModel.name]: class ComposedPlanSummaryModel extends PlanSummaryModel {
+		async map() {
+			return {
+				author: new LegalEntityViewModel(await BaseServer.unwrap(this.$$model.author)),
+				id: this.$$model.id,
+				name: this.$$model.name,
+				tag: this.$$model.tag
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get author() {
+					return ViewModel.mappings[LegalEntityViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "author-PlanSummaryModel"]
+					);
+				},
+				id: true,
+				name: true,
+				tag: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new PlanSummaryModel(null);
+			"author" in data && (item.author = data.author && ViewModel.mappings[LegalEntityViewModel.name].toViewModel(data.author));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PlanSummaryModel) {
+			let model: Plan;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Plan).find(viewModel.id)
+			} else {
+				model = new Plan();
+			}
+			
+			"author" in viewModel && (model.author.id = viewModel.author ? viewModel.author.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
+
+			return model;
+		}
+	},
+	[PlanShapeViewModel.name]: class ComposedPlanShapeViewModel extends PlanShapeViewModel {
+		async map() {
+			return {
+				closed: this.$$model.closed,
+				fill: this.$$model.fill,
+				id: this.$$model.id,
+				label: this.$$model.label,
+				path: this.$$model.path,
+				stroke: this.$$model.stroke
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				closed: true,
+				fill: true,
+				id: true,
+				label: true,
+				path: true,
+				stroke: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new PlanShapeViewModel(null);
+			"closed" in data && (item.closed = !!data.closed);
+			"fill" in data && (item.fill = data.fill === null ? null : `${data.fill}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"label" in data && (item.label = data.label === null ? null : `${data.label}`);
+			"path" in data && (item.path = data.path === null ? null : `${data.path}`);
+			"stroke" in data && (item.stroke = data.stroke === null ? null : `${data.stroke}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PlanShapeViewModel) {
+			let model: PlanShape;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(PlanShape).find(viewModel.id)
+			} else {
+				model = new PlanShape();
+			}
+			
+			"closed" in viewModel && (model.closed = !!viewModel.closed);
+			"fill" in viewModel && (model.fill = viewModel.fill === null ? null : `${viewModel.fill}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"label" in viewModel && (model.label = viewModel.label === null ? null : `${viewModel.label}`);
+			"path" in viewModel && (model.path = viewModel.path === null ? null : `${viewModel.path}`);
+			"stroke" in viewModel && (model.stroke = viewModel.stroke === null ? null : `${viewModel.stroke}`);
+
+			return model;
+		}
+	},
 	[BuildingShapeModel.name]: class ComposedBuildingShapeModel extends BuildingShapeModel {
 		async map() {
 			return {
@@ -6760,6 +7018,94 @@ ViewModel.mappings = {
 			"ended" in viewModel && (model.ended = viewModel.ended === null ? null : new Date(viewModel.ended));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"started" in viewModel && (model.started = viewModel.started === null ? null : new Date(viewModel.started));
+
+			return model;
+		}
+	},
+	[PlanViewModel.name]: class ComposedPlanViewModel extends PlanViewModel {
+		async map() {
+			return {
+				author: new LegalEntityViewModel(await BaseServer.unwrap(this.$$model.author)),
+				shapes: (await this.$$model.shapes.includeTree(ViewModel.mappings[PlanShapeViewModel.name].items).toArray()).map(item => new PlanShapeViewModel(item)),
+				description: this.$$model.description,
+				id: this.$$model.id,
+				name: this.$$model.name,
+				tag: this.$$model.tag
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get author() {
+					return ViewModel.mappings[LegalEntityViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "author-PlanViewModel"]
+					);
+				},
+				get shapes() {
+					return ViewModel.mappings[PlanShapeViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "shapes-PlanViewModel"]
+					);
+				},
+				description: true,
+				id: true,
+				name: true,
+				tag: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new PlanViewModel(null);
+			"author" in data && (item.author = data.author && ViewModel.mappings[LegalEntityViewModel.name].toViewModel(data.author));
+			"shapes" in data && (item.shapes = data.shapes && [...data.shapes].map(i => ViewModel.mappings[PlanShapeViewModel.name].toViewModel(i)));
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PlanViewModel) {
+			let model: Plan;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Plan).find(viewModel.id)
+			} else {
+				model = new Plan();
+			}
+			
+			"author" in viewModel && (model.author.id = viewModel.author ? viewModel.author.id : null);
+			"shapes" in viewModel && (null);
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 
 			return model;
 		}

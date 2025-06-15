@@ -57,6 +57,16 @@ export class LegalEntitySelectorComponent extends Component {
 			type='search'
 		/>;
 
+		if (this.selection) {
+			if (this.selection.state) {
+				input.placeholder = 'State';
+			} else {
+				input.placeholder = this.selection.borough?.name ?? this.selection.company?.name ?? `${this.selection.resident?.givenName} ${this.selection.resident?.familyName}`;
+			}
+		} else {
+			input.placeholder = '';
+		}
+
 		requestAnimationFrame(() => {
 			input.onkeyup = () => this.updateSearchResults(input.value);
 

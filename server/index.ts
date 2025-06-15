@@ -50,6 +50,7 @@ import { TrainRouteTileServer } from "./map/layers/shape/train/route";
 import { TrainRoutesTileServer } from "./map/layers/shape/train/routes";
 import { registerMetrics } from "./areas/metrics/metrics";
 import { TimeMachineTileServer } from "./map/layers/time-machine";
+import { PlanTileServer } from "./map/layers/shape/plan";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -142,6 +143,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new PropertyOwnershipTileServer(app, database);
 	new TrainRouteTileServer(app, database);
 	new TrainRoutesTileServer(app, database);
+	new PlanTileServer(app, database);
 	// new MovementTileServer(app, database);
 
 	ViewModel.globalFetchingContext = database;

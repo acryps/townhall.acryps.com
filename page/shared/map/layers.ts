@@ -13,5 +13,7 @@ export const streetLayer = MapLayer.fromShapeSource((x, y) => `/tile/street/${x}
 export const trainRoutesLayer = MapLayer.fromShapeSource((x, y) => `/tile/train-routes/${x}/${y}`, 500, 'source-over');
 export const trainRouteLayer = (code: string) => MapLayer.fromShapeSource((x, y) => `/tile/train-route/${code}/${x}/${y}`, 500, 'source-over');
 
+export const planLayer = (tag: string) => MapLayer.fromShapeSource((x, y) => `/tile/plan/${tag}/${x}/${y}`, 500, 'source-over');
+
 export const movementHeatmapLayer = MapLayer.fromTileSource((x, y) => `/tile/movement/${x}/${y}`, 250, 'source-over');
 export const propertyValueHeatmapLayer = MapLayer.fromTileSource((x, y) => `/tile/property-value/${x}/${y}`, 200, 'color');

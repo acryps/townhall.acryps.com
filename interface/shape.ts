@@ -28,7 +28,7 @@ export class Shape {
 		}
 
 		// use normal algorithm for fill
-		if (shape.fill) {
+		if (shape.fill && !shape.open) {
 			context.beginPath();
 
 			for (let index = 0; index < bounds.length; index++) {

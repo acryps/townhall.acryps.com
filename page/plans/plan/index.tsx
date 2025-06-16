@@ -1,7 +1,7 @@
 import { Component } from "@acryps/page";
 import { PlanViewModel, PlanService } from "../../managed/services";
 import { LegalEntitySelectorComponent } from "../../shared/legal-entity/select";
-import { addIcon } from "../../assets/icons/managed";
+import { addIcon, planIcon } from "../../assets/icons/managed";
 import { Point } from "../../../interface/point";
 import { Application } from "../..";
 import { BoundaryComponent } from "../../properties/property/boundary";
@@ -20,6 +20,10 @@ export class PlanPage extends Component {
 	render(child) {
 		if (child) {
 			return <ui-plan>
+				<ui-header ui-href='.'>
+					{planIcon()} {this.plan.name}
+				</ui-header>
+
 				{child}
 			</ui-plan>;
 		}
@@ -48,12 +52,12 @@ export class PlanPage extends Component {
 			})}
 
 			<ui-shapes>
-				{this.plan.shapes.map(shape => <ui-shape ui-href={shape.id}>
+				{this.plan.shapes.map(shape => <ui-shape ui-href={shape.id} ui-archived={!!shape.archived}>
 					<ui-name>
 						{shape.label ?? `Shape #${shape.id}`}
 					</ui-name>
 
-					{new BoundaryComponent(shape.path)}
+					{new BoundaryComponent(shape.path, null, shape.closed)}
 				</ui-shape>)}
 
 				<ui-action ui-href={`/map/${center.x}/${center.y}/5/plan-shape/${this.plan.tag}`}>

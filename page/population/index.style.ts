@@ -2,7 +2,7 @@ import { aspectRatio, backgroundColor, ch, child, color, display, flexWrap, font
 import { card } from "../shared/card.style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { pageGutter } from "../index.style";
-import { indexBackgroundColor, inputSpacingBlock, inputSpacingInline, inputStyle, inputTextColor } from "../shared/field.style";
+import { inputBackgroundColor, inputSpacingBlock, inputSpacingInline, inputStyle, inputTextColor } from "../shared/field.style";
 import { nameFrequencies } from "./names/index.style";
 import { boxed } from "../shared/boxed.style";
 import { buttonStyle } from "../shared/index.style";
@@ -47,7 +47,7 @@ export const populationStyle = () => child('ui-residents',
 			right(0),
 
 			color(inputTextColor),
-			backgroundColor(indexBackgroundColor),
+			backgroundColor(inputBackgroundColor),
 
 			child('ui-result',
 				display('block'),

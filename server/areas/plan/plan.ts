@@ -19,6 +19,7 @@ export class PlanViewModel extends PlanSummaryModel {
 
 export class PlanShapeViewModel extends ViewModel<PlanShape> {
 	id;
+	archived;
 
 	path;
 	closed;

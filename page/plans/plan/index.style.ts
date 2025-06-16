@@ -1,13 +1,15 @@
-import { alignItems, border, borderBottom, child, columnGap, display, fontWeight, height, imageRendering, marginBlock, marginBottom, marginInline, marginLeft, marginTop, objectFit, objectPosition, padding, percentage, px, rem, vh, width } from "@acryps/style";
+import { alignItems, border, borderBottom, child, columnGap, display, fontWeight, height, imageRendering, marginBlock, marginBottom, marginInline, marginLeft, marginTop, objectFit, objectPosition, padding, percentage, px, rem, textDecorationLine, vh, width } from "@acryps/style";
 import { fieldStyle } from "../../shared/field.style";
 import { pageGutter } from "../../index.style";
 import { planShapeStyle } from "./shape/index.style";
+import { topicHeaderStyle } from "../../shared/topic-header.style";
 
 export const planStyle = () => child('ui-plan',
 	display('block'),
 
 	planShapeStyle(),
 
+	topicHeaderStyle(),
 	fieldStyle(),
 
 	child('ui-map-container',
@@ -44,7 +46,16 @@ export const planStyle = () => child('ui-plan',
 				objectPosition('right'),
 				imageRendering('pixelated')
 			)
-		),
+		)
+			.attribute('ui-archived',
+				child('ui-name',
+					textDecorationLine('line-through')
+				),
+
+				child('canvas',
+					height(rem(1.5))
+				)
+			),
 
 		child('ui-action',
 			display('flex'),

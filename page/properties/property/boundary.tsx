@@ -10,7 +10,8 @@ export class BoundaryComponent extends Component {
 
 	constructor(
 		private shape: PackedPointArray,
-		private previousShape?: PackedPointArray
+		private previousShape?: PackedPointArray,
+		private closed = true
 	) {
 		super();
 
@@ -57,7 +58,8 @@ export class BoundaryComponent extends Component {
 		Shape.render({
 			bounds: shape,
 			stroke: color.toValueString(),
-			fill: color.toValueString()
+			fill: color.toValueString(),
+			open: !this.closed
 		}, topLeft, context);
 
 		const image = new Image();

@@ -315,7 +315,8 @@ export interface PlanSummaryModel {
 }
 
 export interface PlanShapeViewModel {
-    closed: boolean;
+    archived: Date;
+	closed: boolean;
 	fill: string;
 	id: string;
 	label: string;

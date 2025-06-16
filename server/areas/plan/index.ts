@@ -104,4 +104,18 @@ export class PlanService extends Service {
 		plan.updated = new Date();
 		plan.update();
 	}
+
+	async archiveShape(id: string) {
+		const shape = await this.database.planShape.find(id);
+		shape.archived = new Date();
+
+		await shape.update();
+	}
+
+	async unarchiveShape(id: string) {
+		const shape = await this.database.planShape.find(id);
+		shape.archived = null;
+
+		await shape.update();
+	}
 }

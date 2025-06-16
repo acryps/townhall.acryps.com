@@ -20,13 +20,15 @@ export class PlanTileServer extends ShapeTileServer {
 				const shapes = [];
 
 				for (let shape of await plan.shapes.toArray()) {
-					shapes.push({
-						fill: shape.fill,
-						stroke: shape.stroke,
-						bounds: shape.path,
-						open: !shape.closed,
-						name: shape.label
-					});
+					if (!shape.archived) {
+						shapes.push({
+							fill: shape.fill,
+							stroke: shape.stroke,
+							bounds: shape.path,
+							open: !shape.closed,
+							name: shape.label
+						});
+					}
 				}
 
 				return shapes;

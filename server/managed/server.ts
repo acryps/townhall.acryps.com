@@ -911,6 +911,28 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"J0YWB2bWxvYWM0dmNrb2lzd3l5eHc0OX",
+			{
+			"x2bzozdmBnaTZ5ND8wcn1vbnVidn9ob3": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PlanService),
+			(controller, params) => controller.archiveShape(
+				params["x2bzozdmBnaTZ5ND8wcn1vbnVidn9ob3"]
+			)
+		);
+
+		this.expose(
+			"p0NzVieGxuN28zOGFkentucjs1Z3g1en",
+			{
+			"hrcXEydXZ4dzs4ZjkxMDZiZDlwYnRjZn": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PlanService),
+			(controller, params) => controller.unarchiveShape(
+				params["hrcXEydXZ4dzs4ZjkxMDZiZDlwYnRjZn"]
+			)
+		);
+
+		this.expose(
 			"55OHRoMmdoY2Q3c2Rzb3JvZGF3NWRkMG",
 			{
 			"9ndGVpMzF2eXQ3OWNlOGtpeHRiMml1N3": { type: "string", isArray: false, isOptional: false },
@@ -4656,6 +4678,7 @@ ViewModel.mappings = {
 	[PlanShapeViewModel.name]: class ComposedPlanShapeViewModel extends PlanShapeViewModel {
 		async map() {
 			return {
+				archived: this.$$model.archived,
 				closed: this.$$model.closed,
 				fill: this.$$model.fill,
 				id: this.$$model.id,
@@ -4691,6 +4714,7 @@ ViewModel.mappings = {
 			}
 
 			return {
+				archived: true,
 				closed: true,
 				fill: true,
 				id: true,
@@ -4702,6 +4726,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new PlanShapeViewModel(null);
+			"archived" in data && (item.archived = data.archived === null ? null : new Date(data.archived));
 			"closed" in data && (item.closed = !!data.closed);
 			"fill" in data && (item.fill = data.fill === null ? null : `${data.fill}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
@@ -4721,6 +4746,7 @@ ViewModel.mappings = {
 				model = new PlanShape();
 			}
 			
+			"archived" in viewModel && (model.archived = viewModel.archived === null ? null : new Date(viewModel.archived));
 			"closed" in viewModel && (model.closed = !!viewModel.closed);
 			"fill" in viewModel && (model.fill = viewModel.fill === null ? null : `${viewModel.fill}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);

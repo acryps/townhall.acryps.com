@@ -746,6 +746,7 @@ export class PlanSummaryModel {
 }
 
 export class PlanShapeViewModel {
+	archived: Date;
 	closed: boolean;
 	fill: string;
 	id: string;
@@ -755,6 +756,7 @@ export class PlanShapeViewModel {
 
 	private static $build(raw) {
 		const item = new PlanShapeViewModel();
+		raw.archived === undefined || (item.archived = raw.archived ? new Date(raw.archived) : null)
 		raw.closed === undefined || (item.closed = !!raw.closed)
 		raw.fill === undefined || (item.fill = raw.fill === null ? null : `${raw.fill}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
@@ -2729,6 +2731,44 @@ export class PlanService {
 		$data.append("FmNDJxa3N0M2JxYWloenlpbmdmZ2k3OD", Service.stringify(close))
 
 		return await fetch(Service.toURL("Jka3kxbW53NG1uej13OW9iZ3hrM35hNG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async archiveShape(id: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("x2bzozdmBnaTZ5ND8wcn1vbnVidn9ob3", Service.stringify(id))
+
+		return await fetch(Service.toURL("J0YWB2bWxvYWM0dmNrb2lzd3l5eHc0OX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async unarchiveShape(id: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("hrcXEydXZ4dzs4ZjkxMDZiZDlwYnRjZn", Service.stringify(id))
+
+		return await fetch(Service.toURL("p0NzVieGxuN28zOGFkentucjs1Z3g1en"), {
 			method: "post",
 			credentials: "include",
 			body: $data

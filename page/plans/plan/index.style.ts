@@ -1,8 +1,9 @@
-import { alignItems, border, borderBottom, child, columnGap, display, fontWeight, height, imageRendering, marginBlock, marginBottom, marginInline, marginLeft, marginTop, objectFit, objectPosition, padding, percentage, px, rem, textDecorationLine, vh, width } from "@acryps/style";
+import { alignItems, border, borderBottom, child, columnGap, display, flexWrap, fontWeight, height, imageRendering, marginBlock, marginBottom, marginInline, marginLeft, marginTop, objectFit, objectPosition, padding, percentage, px, rem, textDecorationLine, vh, width } from "@acryps/style";
 import { fieldStyle } from "../../shared/field.style";
 import { pageGutter } from "../../index.style";
 import { planShapeStyle } from "./shape/index.style";
 import { topicHeaderStyle } from "../../shared/topic-header.style";
+import { buttonStyle } from "../../shared/index.style";
 
 export const planStyle = () => child('ui-plan',
 	display('block'),
@@ -18,6 +19,16 @@ export const planStyle = () => child('ui-plan',
 
 		marginInline(pageGutter.invert()),
 		marginBlock(pageGutter)
+	),
+
+	child('ui-actions',
+		display('flex'),
+		flexWrap('wrap'),
+		marginBottom(pageGutter),
+
+		child('ui-action',
+			buttonStyle()
+		)
 	),
 
 	child('ui-shapes',

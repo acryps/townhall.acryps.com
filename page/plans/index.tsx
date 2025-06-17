@@ -1,7 +1,8 @@
 import { Component } from "@acryps/page";
 import { PlanService, PlanSummaryModel } from "../managed/services";
 import { LegalEntityComponent } from "../shared/legal-entity";
-import { addIcon } from "../assets/icons/managed";
+import { addIcon, mapIcon } from "../assets/icons/managed";
+import { Application } from "..";
 
 export class PlansPage extends Component {
 	plans: PlanSummaryModel[];
@@ -27,6 +28,10 @@ export class PlansPage extends Component {
 			</ui-hint>
 
 			<ui-actions>
+				<ui-action ui-href={`/map/${Application.center.x}/${Application.center.y}/5/plans/${btoa(JSON.stringify([]))}`}>
+					{mapIcon()} View Plans
+				</ui-action>
+
 				<ui-action ui-href='create'>
 					{addIcon()} Create Plan
 				</ui-action>

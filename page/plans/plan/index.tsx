@@ -1,7 +1,7 @@
 import { Component } from "@acryps/page";
 import { PlanViewModel, PlanService } from "../../managed/services";
 import { LegalEntitySelectorComponent } from "../../shared/legal-entity/select";
-import { addIcon, planIcon } from "../../assets/icons/managed";
+import { addIcon, mapIcon, planIcon } from "../../assets/icons/managed";
 import { Point } from "../../../interface/point";
 import { Application } from "../..";
 import { BoundaryComponent } from "../../properties/property/boundary";
@@ -36,6 +36,12 @@ export class PlanPage extends Component {
 
 		return <ui-plan>
 			{map}
+
+			<ui-actions>
+				<ui-action ui-href={`/map/${center.x}/${center.y}/5/plans/${btoa(JSON.stringify([this.plan.tag]))}`}>
+					{mapIcon()} View on Map
+				</ui-action>
+			</ui-actions>
 
 			<ui-field>
 				<input $ui-value={this.plan.name} ui-change={() => this.save()} />

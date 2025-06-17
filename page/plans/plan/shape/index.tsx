@@ -42,6 +42,8 @@ export class PlanShapePage extends Component {
 				<input type='color' $ui-value={this.shape.stroke} ui-change={() => this.save()} />
 
 				<ui-color-presets>
+					{this.renderColorPreset('stroke', '000', 'Default')}
+
 					{this.renderColorPreset('stroke', 'f50', 'Railway Line')}
 
 					{this.renderColorPreset('stroke', '0000', 'None')}
@@ -68,6 +70,8 @@ export class PlanShapePage extends Component {
 				<input type='color' $ui-value={this.shape.fill} ui-change={() => this.save()} />
 
 				<ui-color-presets>
+					{this.renderColorPreset('fill', 'fff', 'Default')}
+
 					{this.renderColorPreset('fill', 'eee', 'Street')}
 					{this.renderColorPreset('fill', '00f', 'Residential')}
 					{this.renderColorPreset('fill', 'f00', 'Commercial')}

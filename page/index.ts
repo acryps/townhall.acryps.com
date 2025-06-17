@@ -60,6 +60,7 @@ import { PlanPage } from "./plans/plan";
 import { CreatePlanPage } from "./plans/create";
 import { PlanShapeAction } from "./map/plan-shape";
 import { PlanShapePage } from "./plans/plan/shape";
+import { PlanViewAction } from "./map/plans";
 
 export class Application {
 	static router: Router;
@@ -93,6 +94,7 @@ export class Application {
 					.route('/train-route/insert-stop/:code/:segmentIndex', InsertTrainRouteStopAction)
 					.route('/train-route/edit-route/:code/:segmentIndex', EditTrainRouteAction)
 
+					.route('/plans/:tags', PlanViewAction)
 					.route('/plan-shape/:tag', PlanShapeAction)
 
 					.route('/create/:shape', CreateFeaturePage)

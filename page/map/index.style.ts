@@ -4,7 +4,7 @@ import { buttonStyle } from "../shared/index.style";
 import { PageComponent } from "../page";
 import { createFeatureStyle } from "./create/index.style";
 import { boxed } from "../shared/boxed.style";
-import { inputStyle } from "../shared/field.style";
+import { fieldStyle, inputStyle } from "../shared/field.style";
 
 const buttonPaddingSize = rem(0.8);
 
@@ -110,6 +110,37 @@ export const mapStyle = () => [
 				fontSize(rem(0.75)),
 				color(activeBoroughContrast),
 				backgroundColor(activeBoroughColor),
+			),
+
+			child('ui-plans',
+				display('flex'),
+				gap(pageGutter.divide(2)),
+				flexWrap('wrap'),
+
+				paddingTop(pageGutter.divide(2)),
+				paddingInline(pageGutter),
+
+				backgroundColor(navigationBackgroundColor),
+
+				child('ui-plan',
+					display('block'),
+
+					child('select',
+						inputStyle(),
+
+						width(rem(10))
+					)
+				),
+
+				child('ui-add',
+					display('block'),
+
+					child('select',
+						inputStyle(),
+
+						width(rem(10))
+					)
+				)
 			),
 
 			child('ui-create-building',

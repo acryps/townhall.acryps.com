@@ -1,4 +1,4 @@
-import { caretColor, child, display, fontSize, fontWeight, marginBottom, rem } from "@acryps/style";
+import { alignItems, backgroundColor, caretColor, child, display, flexWrap, fontSize, fontWeight, gap, marginBottom, outline, px, rem } from "@acryps/style";
 import { boxed } from "../shared/boxed.style";
 import { pageGutter } from "../index.style";
 import { buttonStyle } from "../shared/index.style";
@@ -26,7 +26,10 @@ export const plansStyle = () => child('ui-plans',
 	),
 
 	child('ui-actions',
-		display('block'),
+		display('flex'),
+		gap(pageGutter),
+		flexWrap('wrap'),
+
 		marginBottom(pageGutter),
 
 		child('ui-action',

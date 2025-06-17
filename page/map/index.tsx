@@ -100,6 +100,14 @@ export class MapPage extends Component {
 			...changes
 		};
 
-		history.replaceState(null, '', `/map/${this.parameters.x}/${this.parameters.y}/${this.parameters.zoom}`);
+		console.log(location.pathname)
+
+		history.replaceState(
+			null, '',
+			location.pathname.replace(
+				/\/map\/-?[0-9]+(\.[0-9]+)?\/-?[0-9]+(\.[0-9]+)?\/[0-9]+(\.[0-9]+)?/,
+				`/map/${this.parameters.x}/${this.parameters.y}/${this.parameters.zoom}`
+			)
+		);
 	}
 }

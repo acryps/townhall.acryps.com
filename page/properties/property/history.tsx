@@ -2,7 +2,7 @@ import { Component } from "@acryps/page";
 import { PropertyPage } from ".";
 import { ChangeFrameViewModel, ChangeService, HistoricListingGradeViewModel, HistoricListingModifierViewModel, HistoricListingService } from "../../managed/services";
 import { Point } from "../../../interface/point";
-import { ChangeFramesComponent } from "./change-frames";
+import { ChangeFramesComponent } from "../../shared/change-frames";
 
 export class PropertyHistoryTab extends Component {
 	grades: HistoricListingGradeViewModel[];

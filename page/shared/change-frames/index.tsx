@@ -1,11 +1,16 @@
 import { Component } from "@acryps/page";
 import { Point } from "../../../interface/point";
 import { ChangeFrameViewModel, ChangeService, PlotBoundaryShapeModel } from "../../managed/services";
-import { frameMarker, frameTime } from "./index.style";
+import { frameMarker, frameTime, phaseLength } from "./index.style";
+import { ChangePhase } from "./phase";
+import { Length } from "@acryps/style";
+import { toSimulatedAge } from "../../../interface/time";
 
 export class ChangeFramesComponent extends Component {
 	frames: ChangeFrameViewModel[];
 	images = new Map<ChangeFrameViewModel, Promise<HTMLImageElement>>;
+
+	gaps: [];
 
 	constructor(
 		private plot: PlotBoundaryShapeModel
@@ -17,7 +22,7 @@ export class ChangeFramesComponent extends Component {
 		const bounds = Point.bounds(Point.unpack(this.plot.shape), 5);
 
 		this.frames = await new ChangeService().getChanges(bounds.x.min, bounds.y.min, bounds.x.max, bounds.y.max);
-		this.frames.sort((a, b) => a.captured > b.captured ? 1 : -1)
+		this.frames.sort((a, b) => a.captured > b.captured ? 1 : -1);
 
 		for (let frame of this.frames) {
 			const image = new Image();
@@ -41,12 +46,10 @@ export class ChangeFramesComponent extends Component {
 	}
 
 	render() {
-		let timeline: HTMLElement;
+		const frameElements: HTMLElement[] = [];
 
 		const first = Math.min(...this.frames.map(frame => +frame.captured));
 		const last = Math.max(...this.frames.map(frame => +frame.captured));
-
-		const toTimeOffset = (time: Date) => 1 / (last - first) * (+time - first);
 
 		const canvas = document.createElement('canvas');
 		let context: CanvasRenderingContext2D;
@@ -68,11 +71,15 @@ export class ChangeFramesComponent extends Component {
 
 				context.drawImage(image, 0, 0);
 
-				timeline.style.setProperty(frameMarker.propertyName, toTimeOffset(frame.captured).toString());
+				frameElements[currentFrame].removeAttribute('ui-active');
+
+				// timeline.style.setProperty(frameMarker.propertyName, toTimeOffset(frame.captured).toString());
 
 				if (++currentFrame == this.frames.length) {
 					currentFrame = 0;
 				}
+
+				frameElements[currentFrame].setAttribute('ui-active', '');
 
 				setTimeout(() => nextFrame(), 100);
 			};
@@ -80,13 +87,29 @@ export class ChangeFramesComponent extends Component {
 			nextFrame();
 		});
 
+		const phases = ChangePhase.split(this.frames);
+
 		return <ui-change-frames>
 			{canvas}
 
-			{timeline = <ui-timeline>
-				<ui-line>
-					{this.frames.map((frame, index) => <ui-frame style={frameTime.provide(toTimeOffset(frame.captured))} ui-click={() => currentFrame = index}></ui-frame>)}
-				</ui-line>
+			<ui-timeline>
+				<ui-phases>
+					{phases.map((phase, index) => [
+						index > 0 && <ui-elapsed>
+							{toSimulatedAge(phase.start, phases[index].end)}y
+						</ui-elapsed>,
+
+						<ui-phase style={phaseLength.provide(phase.length)}>
+							{phase.frames.map((frame, index) => {
+								const element = <ui-frame style={frameTime.provide(phase.offset(frame))} ui-click={() => currentFrame = index}></ui-frame>
+
+								frameElements.push(element);
+
+								return element;
+							})}
+						</ui-phase>
+					])}
+				</ui-phases>
 
 				<ui-references>
 					<ui-start>
@@ -97,7 +120,7 @@ export class ChangeFramesComponent extends Component {
 						{new Date(last).toLocaleDateString()}
 					</ui-end>
 				</ui-references>
-			</ui-timeline>}
+			</ui-timeline>
 		</ui-change-frames>
 	}
 }

@@ -25,7 +25,6 @@ export class ChangeService extends Service {
 			Math.ceil(maxY / tileSize)
 		);
 
-
 		let lastChange;
 		const changes: ChangeFrame[] = [];
 

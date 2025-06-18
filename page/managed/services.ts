@@ -401,6 +401,19 @@ export class WorkContractSummaryModel {
 	}
 }
 
+export class ChangeFrameViewModel {
+	hash: string;
+	captured: Date;
+
+	private static $build(raw) {
+		const item = new ChangeFrameViewModel();
+		raw.hash === undefined || (item.hash = raw.hash === null ? null : `${raw.hash}`)
+		raw.captured === undefined || (item.captured = raw.captured ? new Date(raw.captured) : null)
+		
+		return item;
+	}
+}
+
 export class CityViewModel {
 	centerX: number;
 	centerY: number;
@@ -1932,6 +1945,32 @@ export class BoroughService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : DistrictViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class ChangeService {
+	async getChanges(minX: number, minY: number, maxX: number, maxY: number): Promise<Array<ChangeFrameViewModel>> {
+		const $data = new FormData();
+		$data.append("JyMHZwbWcyNDBiZWE0anE3N21xeXRkNT", Service.stringify(minX))
+		$data.append("ZpNXF0Zmh4Yn1sYz00bDhkdXRzZHY0ZW", Service.stringify(minY))
+		$data.append("VydzRiNXZoNjdhb3luM3RjcmQwOXc5az", Service.stringify(maxX))
+		$data.append("1lcWRjbGY3aXB6OXh6cGFlbmc2bzd6eT", Service.stringify(maxY))
+
+		return await fetch(Service.toURL("Y5d2dmMjM4MHNyNng4bXJya3BjdTZjbm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ChangeFrameViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

@@ -51,6 +51,7 @@ import { TrainRoutesTileServer } from "./map/layers/shape/train/routes";
 import { registerMetrics } from "./areas/metrics/metrics";
 import { TimeMachineTileServer } from "./map/layers/time-machine";
 import { PlanTileServer } from "./map/layers/shape/plan";
+import { ChangeFrame } from "./areas/change/frame";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -77,7 +78,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new LegalEntityReferenceCounter(database).schedule();
 
 	const life = new Life(database);
-	await life.load();
+	life.load();
 
 	const lawHouse = new LawHouse(database, new Language('smart'), life);
 
@@ -145,6 +146,8 @@ DbClient.connectedClient.connect().then(async () => {
 	new TrainRoutesTileServer(app, database);
 	new PlanTileServer(app, database);
 	// new MovementTileServer(app, database);
+	//
+	ChangeFrame.registerInterface(app);
 
 	ViewModel.globalFetchingContext = database;
 

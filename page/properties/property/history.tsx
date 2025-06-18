@@ -1,6 +1,8 @@
 import { Component } from "@acryps/page";
 import { PropertyPage } from ".";
-import { HistoricListingGradeViewModel, HistoricListingModifierViewModel, HistoricListingService } from "../../managed/services";
+import { ChangeFrameViewModel, ChangeService, HistoricListingGradeViewModel, HistoricListingModifierViewModel, HistoricListingService } from "../../managed/services";
+import { Point } from "../../../interface/point";
+import { ChangeFramesComponent } from "./change-frames";
 
 export class PropertyHistoryTab extends Component {
 	grades: HistoricListingGradeViewModel[];
@@ -19,6 +21,8 @@ export class PropertyHistoryTab extends Component {
 
 	render() {
 		return <ui-history>
+			{new ChangeFramesComponent(this.page.activePlotBoundary)}
+
 			<ui-historic-listing>
 				<ui-header>Historic Listing</ui-header>
 

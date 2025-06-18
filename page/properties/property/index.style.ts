@@ -1,4 +1,4 @@
-import { alignItems, aspectRatio, backgroundColor, border, borderBottom, child, color, columnGap, display, flexDirection, flexGrow, flexWrap, fontSize, fontStyle, fontWeight, gap, height, imageRendering, justifyContent, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, Mm, objectFit, objectPosition, opacity, padding, percentage, px, ratio, rem, style, textAlign, textDecorationLine, vh, width } from "@acryps/style";
+import { alignContent, alignItems, alignSelf, aspectRatio, background, backgroundColor, backgroundImage, backgroundPosition, backgroundPositionX, backgroundSize, border, borderBottom, bottom, child, color, colorStop, columnGap, display, Dvi, flexDirection, flexGrow, flexWrap, fontSize, fontStyle, fontWeight, gap, height, imageRendering, justifyContent, justifyItems, left, linearGradient, LinearGradient, lineHeight, margin, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, milliseconds, min, Mm, objectFit, objectPosition, opacity, padding, percentage, position, px, ratio, rem, style, textAlign, textDecorationLine, top, turn, Variable, vh, width } from "@acryps/style";
 import { negativeColor, neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 import { fieldStyle, inputStyle } from "../../shared/field.style";
 import { buttonStyle } from "../../shared/index.style";
@@ -6,6 +6,12 @@ import { buildingStyle } from "./building/index.style";
 import { ownershipStructureStyle } from "./ownership/index.style";
 import { tabsStyle } from "../../shared/tabs/index.style";
 import { boxed } from "../../shared/boxed.style";
+
+export const frameTime = new Variable<Number>('frame-time');
+export const frameMarker = new Variable<Number>('frame-marker');
+
+const frameTic = rem(0.25);
+const frameHeight = min(rem(20), vh(50));
 
 export const propertyStyle = () => child('ui-property',
 	boxed(),
@@ -351,6 +357,70 @@ export const propertyStyle = () => child('ui-property',
 			),
 
 			child('ui-history',
+				child('ui-change-frames',
+					display('block'),
+					marginBottom(pageGutter),
+
+					border(px(1), 'solid', 'currentColor'),
+
+					child('canvas',
+						height(frameHeight),
+						width(percentage(100)),
+
+						objectFit('contain'),
+						imageRendering('pixelated'),
+						backgroundColor(pageTextColor)
+					),
+
+					child('ui-loading',
+						display('flex'),
+						alignItems('center'),
+						justifyContent('center'),
+
+						height(rem(1).add(frameTic).add(frameHeight).add(pageGutter.multiply(3)))
+					),
+
+					child('ui-timeline',
+						display('block'),
+						padding(pageGutter),
+
+						child('ui-line',
+							position('relative'),
+
+							display('flex'),
+							height(rem(0.5)),
+							marginBottom(rem(0.5).add(frameTic)),
+
+							backgroundImage(
+								linearGradient(turn(0.25),
+									colorStop(percentage(50), pageTextColor),
+									colorStop(percentage(50), 'transparent')
+								)
+							),
+							backgroundSize([percentage(200)]),
+							backgroundPositionX(percentage(100).subtract(percentage(100).multiply(frameMarker))).transition(milliseconds(100)),
+
+							child('ui-frame',
+								position('absolute'),
+								top(frameTic.invert()),
+								bottom(frameTic.invert()),
+								left(percentage(100).multiply(frameTime)),
+
+								width(px(1)),
+								backgroundColor(pageTextColor),
+								opacity(0.5)
+							)
+						),
+
+						child('ui-references',
+							display('flex'),
+							justifyContent('space-between'),
+
+							fontSize(rem(0.75))
+						)
+					)
+				),
+
 				child('ui-historic-listing',
 					display('block'),
 					padding(pageGutter),

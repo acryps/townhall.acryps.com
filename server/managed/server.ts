@@ -21,6 +21,10 @@ import { MapService } from "././../areas/map.service";
 import { BoroughSummaryModel } from "././../areas/borough.summary";
 import { DistrictViewModel } from "././../areas/vote/district";
 import { BoroughService } from "././../areas/borough/service";
+import { MapType } from "././database";
+import { ChangeFrame } from "././../areas/change/frame";
+import { ChangeFrameViewModel } from "././../areas/change/frame";
+import { ChangeService } from "././../areas/change/index";
 import { CityViewModel } from "././../areas/city/city";
 import { CityService } from "././../areas/city/service";
 import { Company } from "././database";
@@ -179,6 +183,10 @@ Inject.mappings = {
 	},
 	"BoroughService": {
 		objectConstructor: BoroughService,
+		parameters: ["DbContext"]
+	},
+	"ChangeService": {
+		objectConstructor: ChangeService,
 		parameters: ["DbContext"]
 	},
 	"CityService": {
@@ -488,6 +496,23 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(BoroughService),
 			(controller, params) => controller.listDistricts(
 				
+			)
+		);
+
+		this.expose(
+			"Y5d2dmMjM4MHNyNng4bXJya3BjdTZjbm",
+			{
+			"JyMHZwbWcyNDBiZWE0anE3N21xeXRkNT": { type: "number", isArray: false, isOptional: false },
+				"ZpNXF0Zmh4Yn1sYz00bDhkdXRzZHY0ZW": { type: "number", isArray: false, isOptional: false },
+				"VydzRiNXZoNjdhb3luM3RjcmQwOXc5az": { type: "number", isArray: false, isOptional: false },
+				"1lcWRjbGY3aXB6OXh6cGFlbmc2bzd6eT": { type: "number", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(ChangeService),
+			(controller, params) => controller.getChanges(
+				params["JyMHZwbWcyNDBiZWE0anE3N21xeXRkNT"],
+				params["ZpNXF0Zmh4Yn1sYz00bDhkdXRzZHY0ZW"],
+				params["VydzRiNXZoNjdhb3luM3RjcmQwOXc5az"],
+				params["1lcWRjbGY3aXB6OXh6cGFlbmc2bzd6eT"]
 			)
 		);
 
@@ -3199,6 +3224,62 @@ ViewModel.mappings = {
 			"canceled" in viewModel && (model.canceled = viewModel.canceled === null ? null : new Date(viewModel.canceled));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"signed" in viewModel && (model.signed = viewModel.signed === null ? null : new Date(viewModel.signed));
+
+			return model;
+		}
+	},
+	[ChangeFrameViewModel.name]: class ComposedChangeFrameViewModel extends ChangeFrameViewModel {
+		async map() {
+			return {
+				hash: this.$$model.hash,
+				captured: this.$$model.captured
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				hash: true,
+				captured: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ChangeFrameViewModel(null);
+			"hash" in data && (item.hash = data.hash === null ? null : `${data.hash}`);
+			"captured" in data && (item.captured = data.captured === null ? null : new Date(data.captured));
+
+			return item;
+		}
+
+		static async toModel(viewModel: ChangeFrameViewModel) {
+			const model = new ChangeFrame();
+			
+			"hash" in viewModel && (model.hash = viewModel.hash === null ? null : `${viewModel.hash}`);
+			"captured" in viewModel && (model.captured = viewModel.captured === null ? null : new Date(viewModel.captured));
 
 			return model;
 		}

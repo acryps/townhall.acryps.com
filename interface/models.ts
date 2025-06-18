@@ -172,6 +172,11 @@ export interface WorkContractSummaryModel {
 	signed: Date;
 }
 
+export interface ChangeFrameViewModel {
+    hash: string;
+	captured: Date;
+}
+
 export interface CityViewModel {
     centerX: number;
 	centerY: number;

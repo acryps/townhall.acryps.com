@@ -62,7 +62,7 @@ export class ChangeService extends Service {
 
 			console.log(tiles.length, fetched)
 
-			if (fetched > count * 10) {
+			if (fetched > count * 3) {
 				break;
 			}
 

@@ -27,33 +27,49 @@ export class ChangeService extends Service {
 
 		let lastChange;
 		const changes: ChangeFrame[] = [];
+		const count = 50;
+		let fetched = 0;
 
 		const canvas = new Canvas(maxX - minX, maxY - minY);
 		const context = canvas.getContext('2d');
 		context.translate(-minX, -minY);
 
-		const tiles = await this.database.mapTile
-			.where(tile => tile.type == MapType.overworld)
-			.where(tile => tile.complete == true)
-			.where(tile => tile.regionX >= minRegion.x && tile.regionX <= maxRegion.x)
-			.where(tile => tile.regionY >= minRegion.y && tile.regionY <= maxRegion.y)
-			.orderByDescending(tile => tile.captured)
-			.skip(changes.length)
-			.limit(500)
-			.toArray();
+		do {
+			const tiles = await this.database.mapTile
+				.where(tile => tile.type == MapType.overworld)
+				.where(tile => tile.complete == true)
+				.where(tile => tile.regionX >= minRegion.x && tile.regionX <= maxRegion.x)
+				.where(tile => tile.regionY >= minRegion.y && tile.regionY <= maxRegion.y)
+				.orderByDescending(tile => tile.captured)
+				.skip(fetched)
+				.limit(count * 2)
+				.toArray();
 
-		for (let tile of tiles) {
-			const image = await loadImage(tile.image);
-			context.drawImage(image, tile.regionX * tileSize, tile.regionY * tileSize);
+			for (let tile of tiles) {
+				const image = await loadImage(tile.image);
+				context.drawImage(image, tile.regionX * tileSize, tile.regionY * tileSize);
 
-			const change = new ChangeFrame(canvas.toBufferSync('png'), tile.captured);
+				const change = new ChangeFrame(await canvas.toBuffer('png'), tile.captured);
 
-			if (change.hash != lastChange?.hash) {
-				changes.push(change);
+				if (change.hash != lastChange?.hash) {
+					changes.push(change);
 
-				lastChange = change;
+					lastChange = change;
+				}
+			};
+
+			fetched += tiles.length;
+
+			console.log(tiles.length, fetched)
+
+			if (fetched > count * 10) {
+				break;
 			}
-		};
+
+			if (tiles.length < count) {
+				break;
+			}
+		} while (changes.length < count);
 
 		return ChangeFrameViewModel.from(changes);
 	}

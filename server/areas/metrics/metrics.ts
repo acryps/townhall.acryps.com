@@ -1,6 +1,7 @@
 import { CompanyType, DbContext } from "../../managed/database";
 import { MetricTracker } from "./tracker";
 import { AllocatedAreaMetric } from "./tracker/allocated-area";
+import { NewsArticleCountMetric } from "./tracker/articles";
 import { PopulationAgeAverageMetric } from "./tracker/average-age";
 import { CompanyAssetTotalMetric } from "./tracker/company-asset-total";
 import { CompanyCountMetric } from "./tracker/company-count";
@@ -32,6 +33,8 @@ export const registerMetrics = async (database: DbContext) => {
 	await MetricTracker.track(new WorkUnemploymentMetric(database));
 	await MetricTracker.track(new WorkOfferTotalMetric(database));
 	await MetricTracker.track(new OpenWorkOfferMetric(database));
+
+	await MetricTracker.track(new NewsArticleCountMetric(database));
 
 	for (let type in CompanyType) {
 		if (typeof CompanyType[type] == 'string') {

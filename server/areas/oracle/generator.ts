@@ -25,24 +25,26 @@ export class Oracle {
 			}
 		}, 1000 * 60);
 
-		setInterval(async () => {
+		const expandNext = async () => {
 			const reviewed = await this.database.oracleProposal
 				.where(proposal => proposal.reviewed != null)
 				.where(proposal => proposal.realistic == true)
 				.toArray();
 
-			console.log('reviewed', reviewed);
-
 			for (let proposal of reviewed) {
 				const articles = await proposal.articles.count();
 
 				if (!articles) {
-					this.expand(proposal);
+					await this.expand(proposal);
 
-					return;
+					break;
 				}
 			}
-		}, 1000 * 60);
+
+			setTimeout(() => expandNext(), 1000 * 60);
+		};
+
+		expandNext();
 	}
 
 	async propose() {
@@ -96,7 +98,7 @@ export class Oracle {
 
 			const interpreter = new Interpreter();
 
-			interpreter.addTool('published', [{ type: String, name: 'publication' }, { type: String, name: 'title' }, { type: String, name: 'body' }], async (publicationId, title, body) => {
+			interpreter.addTool('publish', [{ type: String, name: 'publication' }, { type: String, name: 'title' }, { type: String, name: 'body' }], async (publicationId, title, body) => {
 				const publication = publications.find(publication => publication.id == publicationId);
 
 				if (!publication) {

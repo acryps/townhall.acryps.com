@@ -38,9 +38,11 @@ export class Oracle {
 
 				if (!articles) {
 					this.expand(proposal);
+
+					return;
 				}
 			}
-		}, 1000 * 60 * 5);
+		}, 1000 * 60);
 	}
 
 	async propose() {
@@ -67,7 +69,7 @@ export class Oracle {
 				Your goal is to come up with changes to the lore based on a certain item.
 				Do not repeat what already happened, come up with new ideas.
 
-				Today ${toSimulatedTime(new Date()).toDateString()}, ${item.name} is doing something newsworth.
+				Today ${toSimulatedTime(new Date()).toDateString()}, ${item.name} is doing something ${Math.random() > 0.3 ? 'positively' : 'negatively'} newsworthy.
 				Invent something that they did, for example: ${item.actions.join(', ')}...
 
 				I have provided extra context so you can make a realistic lore update.
@@ -123,12 +125,11 @@ export class Oracle {
 				Your job is to write an article about this and publish it.
 				I have provided all the context I have about this above.
 				Only write about stuff provided in the context, do not invent new facts.
+				Make multiple sections, maybe explain some background / context to get readers up to speed.
+				Do not add section headers or any formatting (like bold text).
 
 				Please pick a suitable publication for the article, the following can be picked:
-				${publications.map(publication => `
-					${publication.name} (id=${publication.id})
-					${publication.description}
-				`).join('\n\n')}
+				${publications.map(publication => `- ${publication.name} (id=${publication.id}): "${publication.description}"`).join('\n')}
 
 				When you are ready, call 'publish', pass the publications id, the title and the body of the article.
 				Do not mention todays date, or that this is today.

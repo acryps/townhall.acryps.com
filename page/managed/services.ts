@@ -2706,6 +2706,25 @@ export class OracleService {
 		});
 	}
 
+	async discardArticle(id: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("kzOWdxdWF6ZWRjZmB1cWQ1NTg2ank0Yn", Service.stringify(id))
+
+		return await fetch(Service.toURL("F6bzczaH5iZGNqNWtsNDltaGtla245NG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
 	async about(id: string): Promise<string> {
 		const $data = new FormData();
 		$data.append("N4NzU2OXtwMjhmOWZ6cHgwaXdpbjU1NT", Service.stringify(id))

@@ -86,7 +86,6 @@ DbClient.connectedClient.connect().then(async () => {
 	if (runLife) {
 		new Oracle(database, new LegalEntityManager(database)).schedule();
 
-		/*
 		lawHouse.schedule();
 		life.vote();
 
@@ -127,8 +126,6 @@ DbClient.connectedClient.connect().then(async () => {
 				}
 			}
 		})();
-
-		*/
 	}
 
 	// add missing figures

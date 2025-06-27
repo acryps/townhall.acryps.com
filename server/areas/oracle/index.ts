@@ -36,6 +36,17 @@ export class OracleService extends Service {
 		await proposal.update();
 	}
 
+	async discardArticle(id: string) {
+		const article = await this.database.article.find(id);
+
+		if (!article.oracleProposalId) {
+			throw new Error(`Article '${article.title}' was not published by the oracle and cannot be discarded`);
+		}
+
+		article.published = null;
+		await article.update();
+	}
+
 	async about(id: string) {
 		const entity = await this.legalEntityManager.findBySourceId(id);
 

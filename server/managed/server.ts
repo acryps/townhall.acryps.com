@@ -875,6 +875,17 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"F6bzczaH5iZGNqNWtsNDltaGtla245NG",
+			{
+			"kzOWdxdWF6ZWRjZmB1cWQ1NTg2ank0Yn": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(OracleService),
+			(controller, params) => controller.discardArticle(
+				params["kzOWdxdWF6ZWRjZmB1cWQ1NTg2ank0Yn"]
+			)
+		);
+
+		this.expose(
 			"M4N2ZjaWNsdWByOHxidTdpOTlib3loOG",
 			{
 			"N4NzU2OXtwMjhmOWZ6cHgwaXdpbjU1NT": { type: "string", isArray: false, isOptional: false }

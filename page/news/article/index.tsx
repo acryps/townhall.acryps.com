@@ -1,5 +1,5 @@
 import { Component } from "@acryps/page";
-import { ArticleImageViewModel, ArticleViewModel, PublicationService } from "../../managed/services";
+import { ArticleImageViewModel, ArticleViewModel, OracleService, PublicationService } from "../../managed/services";
 import { MetaNewsArticle, MetaOrganization } from "@acryps/metadata";
 import { AnnotatedTextComponent } from "../../shared/annotaded-text";
 import { BannerComponent } from "../../banner";
@@ -56,6 +56,14 @@ export class ArticePage extends Component {
 				</ui-guide>
 
 				{this.article.oracleProposal.lore}
+
+				<ui-action ui-click={async () => {
+					if (confirm('Are you sure? This will delete this article and make the oracle create a replacement. It might take some time to generate the new article')) {
+						await new OracleService().discardArticle(this.article.id);
+					}
+				}}>
+					Regenerate Article
+				</ui-action>
 			</ui-oracle>}
 		</ui-article>;
 	}

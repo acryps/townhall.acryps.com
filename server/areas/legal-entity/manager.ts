@@ -11,6 +11,10 @@ export class LegalEntityManager extends Manager {
 		super();
 	}
 
+	static getItemId(entity: LegalEntity) {
+		return entity.boroughId ?? entity.companyId ?? entity.residentId;
+	}
+
 	async findBySourceId(id: string | 'state') {
 		if (id == 'state') {
 			return await this.database.legalEntity.first(entity => entity.state == true);

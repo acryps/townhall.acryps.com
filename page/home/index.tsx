@@ -4,7 +4,7 @@ import { OnlinePlayerComponent } from "./online";
 import { boroughColor } from "./index.style";
 import { hex } from "@acryps/style";
 import { BannerComponent } from "../banner";
-import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, metricIcon, planIcon, priceIcon, propertyRegisterIcon, publicationIcon, residentIcon, trainIcon } from "../assets/icons/managed";
+import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, metricIcon, oracleIcon, planIcon, priceIcon, propertyRegisterIcon, publicationIcon, residentIcon, trainIcon } from "../assets/icons/managed";
 import { Point } from "../../interface/point";
 import { toSimulatedTime } from "../../interface/time";
 import { ImpressionsComponent } from "./impressions";
@@ -157,6 +157,18 @@ export class HomePage extends Component {
 
 					<ui-description>
 						Come here if you mean business!
+					</ui-description>
+				</ui-topic>
+
+				<ui-topic ui-href='/oracle'>
+					{oracleIcon()}
+
+					<ui-name>
+						Oracle
+					</ui-name>
+
+					<ui-description>
+						Lore proposing oracle
 					</ui-description>
 				</ui-topic>
 			</ui-topics>

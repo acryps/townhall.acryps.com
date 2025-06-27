@@ -312,6 +312,11 @@ export interface MetricValueViewModel {
 	value: number;
 }
 
+export interface OracleProposalSummaryModel {
+    id: string;
+	lore: string;
+}
+
 export interface PlanSummaryModel {
     author: LegalEntityViewModel;
 	id: string;
@@ -347,6 +352,7 @@ export interface ArticleNewstickerModel {
 
 export interface ArticleViewModel {
     images: ArticleImageViewModel[];
+	oracleProposal: OracleProposalSummaryModel;
 	publication: PublicationSummaryModel;
 	body: string;
 	id: string;
@@ -555,6 +561,12 @@ export interface LawHouseSessionViewModel {
 	ended: Date;
 	id: string;
 	started: Date;
+}
+
+export interface OracleProposalViewModel {
+    entity: LegalEntityViewModel;
+	id: string;
+	lore: string;
 }
 
 export interface PlanViewModel {

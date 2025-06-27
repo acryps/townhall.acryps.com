@@ -741,6 +741,19 @@ export class MetricValueViewModel {
 	}
 }
 
+export class OracleProposalSummaryModel {
+	id: string;
+	lore: string;
+
+	private static $build(raw) {
+		const item = new OracleProposalSummaryModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.lore === undefined || (item.lore = raw.lore === null ? null : `${raw.lore}`)
+		
+		return item;
+	}
+}
+
 export class PlanSummaryModel {
 	author: LegalEntityViewModel;
 	id: string;
@@ -824,6 +837,7 @@ export class ArticleNewstickerModel {
 
 export class ArticleViewModel {
 	images: ArticleImageViewModel[];
+	oracleProposal: OracleProposalSummaryModel;
 	publication: PublicationSummaryModel;
 	body: string;
 	id: string;
@@ -833,6 +847,7 @@ export class ArticleViewModel {
 	private static $build(raw) {
 		const item = new ArticleViewModel();
 		raw.images === undefined || (item.images = raw.images ? raw.images.map(i => ArticleImageViewModel["$build"](i)) : null)
+		raw.oracleProposal === undefined || (item.oracleProposal = raw.oracleProposal ? OracleProposalSummaryModel["$build"](raw.oracleProposal) : null)
 		raw.publication === undefined || (item.publication = raw.publication ? PublicationSummaryModel["$build"](raw.publication) : null)
 		raw.body === undefined || (item.body = raw.body === null ? null : `${raw.body}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
@@ -1322,6 +1337,21 @@ export class LawHouseSessionViewModel {
 		raw.ended === undefined || (item.ended = raw.ended ? new Date(raw.ended) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.started === undefined || (item.started = raw.started ? new Date(raw.started) : null)
+		
+		return item;
+	}
+}
+
+export class OracleProposalViewModel {
+	entity: LegalEntityViewModel;
+	id: string;
+	lore: string;
+
+	private static $build(raw) {
+		const item = new OracleProposalViewModel();
+		raw.entity === undefined || (item.entity = raw.entity ? LegalEntityViewModel["$build"](raw.entity) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.lore === undefined || (item.lore = raw.lore === null ? null : `${raw.lore}`)
 		
 		return item;
 	}
@@ -2625,6 +2655,70 @@ export class MetricService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : MetricValueViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class OracleService {
+	async nextProposal(): Promise<OracleProposalViewModel> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("JseDtianR6Z3dkZ2RpNnFrcWdjeTFieX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : OracleProposalViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async review(id: string, realistic: boolean): Promise<void> {
+		const $data = new FormData();
+		$data.append("JiMXRuNDI4MzI2ZGFpdXN1amZ5eDBwYW", Service.stringify(id))
+		$data.append("Zqb3A0bWU0c3c4d3didTY1ZW45dmd6aW", Service.stringify(realistic))
+
+		return await fetch(Service.toURL("c1M3BrenZva2ZjaXBjcGZrYj5uMTZ2bm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async about(id: string): Promise<string> {
+		const $data = new FormData();
+		$data.append("N4NzU2OXtwMjhmOWZ6cHgwaXdpbjU1NT", Service.stringify(id))
+
+		return await fetch(Service.toURL("M4N2ZjaWNsdWByOHxidTdpOTlib3loOG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

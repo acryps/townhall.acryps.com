@@ -33,6 +33,8 @@ export class Annotator {
 		this.properties = await this.database.property
 			.where(property => property.name.length().valueOf() > 0)
 			.toArray();
+
+		setTimeout(() => this.load(), 1000 * 60 * 5);
 	}
 
 	static annotate(source: string) {

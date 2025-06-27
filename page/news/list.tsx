@@ -2,6 +2,7 @@ import { Component } from "@acryps/page";
 import { ArticleViewModel } from "../managed/services";
 import { BannerComponent } from "../banner";
 import { Banner } from "../../interface/banner";
+import { oracleIcon } from "../assets/icons/managed";
 
 export class ArticleListComponent extends Component {
 	articles: ArticleViewModel[];
@@ -30,6 +31,10 @@ export class ArticleListComponent extends Component {
 						</ui-body>
 
 						<ui-publication>
+							{article.oracleProposal && <ui-oracle>
+								{oracleIcon()} Oracle
+							</ui-oracle>}
+
 							{new BannerComponent(Banner.unpack(article.publication.company.banner))}
 
 							{article.publication.name}

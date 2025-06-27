@@ -48,6 +48,15 @@ export class ArticePage extends Component {
 			<ui-body>
 				{this.content}
 			</ui-body>
+
+			{this.article.oracleProposal && <ui-oracle>
+				<ui-guide>
+					This article was written by the oracle based on this lore update.
+					The lore has been rated as 'realistic' by one of us.
+				</ui-guide>
+
+				{this.article.oracleProposal.lore}
+			</ui-oracle>}
 		</ui-article>;
 	}
 

@@ -61,6 +61,7 @@ import { CreatePlanPage } from "./plans/create";
 import { PlanShapeAction } from "./map/plan-shape";
 import { PlanShapePage } from "./plans/plan/shape";
 import { PlanViewAction } from "./map/plans";
+import { OraclePage } from "./oracle";
 
 export class Application {
 	static router: Router;
@@ -125,6 +126,8 @@ export class Application {
 				.route('/news/article/:id', ArticePage)
 				.route('/news/publication/:tag', PublicationPage)
 				.route('/news', NewsPage)
+
+				.route('/oracle', OraclePage)
 
 				.route('/metrics', MetricsPage)
 

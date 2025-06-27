@@ -24,16 +24,6 @@ export class NewsPage extends Component {
 			<ui-publications>
 				{this.publications.map(publication => <ui-publication ui-href={`publication/${publication.tag}`}>
 					{new BannerComponent(Banner.unpack(publication.company.banner))}
-
-					<ui-detail>
-						<ui-name>
-							{publication.name}
-						</ui-name>
-
-						<ui-description>
-							{publication.description}
-						</ui-description>
-					</ui-detail>
 				</ui-publication>)}
 			</ui-publications>
 

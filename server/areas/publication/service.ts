@@ -30,6 +30,7 @@ export class PublicationService extends Service {
 	async getNewsticker() {
 		return ArticleNewstickerModel.from(this.database.article
 			.where(article => article.published != null)
+			.where(article => article.oracleProposalId == null)
 			.orderByDescending(article => article.published)
 			.limit(5)
 		);

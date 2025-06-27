@@ -1,4 +1,4 @@
-import { alignItems, border, borderBottom, child, display, em, Em, flexDirection, fontSize, fontWeight, gap, height, hex, Hex, imageRendering, justifyContent, lineHeight, marginBlock, marginBottom, marginInline, marginTop, maxHeight, maxWidth, min, objectFit, overflow, paddingLeft, paddingRight, percentage, px, Px, rem, scrollSnapType, textAlign, textOverflow, vh, vw, whiteSpace, width } from "@acryps/style";
+import { alignItems, border, borderBottom, ch, child, display, Dvi, em, Em, flexDirection, flexWrap, fontSize, fontWeight, gap, height, hex, Hex, imageRendering, justifyContent, lineHeight, marginBlock, marginBottom, marginInline, marginRight, marginTop, maxHeight, maxWidth, min, objectFit, overflow, overflowY, paddingLeft, paddingRight, percentage, px, Px, rem, scrollSnapType, textAlign, textOverflow, vh, vw, whiteSpace, width } from "@acryps/style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { card } from "../shared/card.style";
 import { boxed } from "../shared/boxed.style";
@@ -13,31 +13,21 @@ export const newsStyle = () => child('ui-news',
 	boxed(),
 
 	child('ui-publications',
-		collection(rem(15), rem(1)),
-		marginBottom(rem(2)),
+		display('flex'),
+		gap(pageGutter),
+		marginBottom(pageGutter.multiply(2)),
+
+		overflowY('auto'),
 
 		child('ui-publication',
-			collectionItem(),
-			card(),
-
 			display('flex'),
-			alignItems('center'),
-			gap(rem(1)),
+			border(px(1), 'solid', 'currentColor'),
 
 			child('ui-banner',
 				fontSize(0),
 
 				child('img',
 					height(rem(4))
-				)
-			),
-
-			child('ui-detail',
-				child('ui-name',
-					display('block'),
-					marginBottom(rem(0.5)),
-
-					fontWeight('bold')
 				)
 			)
 		)
@@ -130,6 +120,14 @@ export const articleListStyle = () => child('ui-articles',
 				marginTop(rem(0.5)),
 
 				fontSize(rem(0.8)),
+
+				child('ui-oracle',
+					display('flex'),
+					gap(ch(0.5)),
+					alignItems('center'),
+
+					marginRight(rem(1))
+				),
 
 				child('ui-banner',
 					fontSize(0),

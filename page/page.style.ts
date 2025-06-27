@@ -30,6 +30,7 @@ import { metricsStyle } from "./metrics/index.style";
 import { trainStyle } from "./train/index.style";
 import { trainRouteIconStyle } from "./shared/train-route/index.style";
 import { plansStyle } from "./plans/index.style";
+import { oracleStyle } from "./oracle/index.style";
 
 export const pageStyle = () => root(
 	boldFont,
@@ -113,6 +114,8 @@ export const pageStyle = () => root(
 				publicationStyle(),
 				articleStyle(),
 				writeArticleStyle(),
+
+				oracleStyle(),
 
 				metricsStyle(),
 

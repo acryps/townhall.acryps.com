@@ -6,6 +6,7 @@ import { Point } from "../../../interface/point";
 import { convertToCompanyTypeName } from "../../../interface/company";
 import { BannerComponent } from "../../banner";
 import { Banner } from "../../../interface/banner";
+import { AboutComponent } from "../../shared/about";
 
 export class CompanyPage extends Component {
 	declare parameters: { tag };
@@ -44,6 +45,8 @@ export class CompanyPage extends Component {
 			<ui-description>
 				{this.company.description}
 			</ui-description>
+
+			{new AboutComponent(this.company.id)}
 
 			<ui-actions>
 				<ui-action ui-href={`/trade/assets/${this.company.id}`}>

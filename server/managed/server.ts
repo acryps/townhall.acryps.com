@@ -66,6 +66,12 @@ import { MetricTracker } from "././../areas/metrics/tracker";
 import { MetricValueViewModel } from "././../areas/metrics/view";
 import { MetricViewModel } from "././../areas/metrics/view";
 import { MetricService } from "././../areas/metrics/service";
+import { Oracle } from "././../areas/oracle/generator";
+import { Interpreter } from "././../life/interpreter";
+import { SystemMessage } from "././../life/interpreter";
+import { Language } from "././../life/language";
+import { OracleProposalViewModel } from "././../areas/oracle/proposal";
+import { OracleService } from "././../areas/oracle/index";
 import { Plan } from "././database";
 import { PlanShape } from "././database";
 import { PlanViewModel } from "././../areas/plan/plan";
@@ -124,6 +130,7 @@ import { WorkContractSummaryModel } from "./../areas/work";
 import { LawHouseSessionaryViewModel } from "./../areas/law-house/session";
 import { LawHouseSessionProtocolViewModel } from "./../areas/law-house/session";
 import { TenancyViewModel } from "./../areas/life/resident";
+import { OracleProposalSummaryModel } from "./../areas/oracle/proposal";
 import { PlanSummaryModel } from "./../areas/plan/plan";
 import { PlanShapeViewModel } from "./../areas/plan/plan";
 import { BuildingShapeModel } from "./../areas/property/building";
@@ -161,6 +168,7 @@ import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
 import { Metric } from "./../managed/database";
 import { MetricValue } from "./../managed/database";
+import { OracleProposal } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
 import { Asset } from "./../areas/trade/asset";
 import { TrainStationExit } from "./../managed/database";
@@ -228,6 +236,10 @@ Inject.mappings = {
 	"MetricService": {
 		objectConstructor: MetricService,
 		parameters: ["DbContext"]
+	},
+	"OracleService": {
+		objectConstructor: OracleService,
+		parameters: ["DbContext","LegalEntityManager"]
 	},
 	"PlanService": {
 		objectConstructor: PlanService,
@@ -837,6 +849,39 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.plot(
 				params["NvNjYzd3V0MDV4ZWlxaHQ5YndjZHl2cG"],
 				params["ZoNHI0aD8zbTl2bmAyY3c2ZTU5aWBibj"]
+			)
+		);
+
+		this.expose(
+			"JseDtianR6Z3dkZ2RpNnFrcWdjeTFieX",
+			{},
+			inject => inject.construct(OracleService),
+			(controller, params) => controller.nextProposal(
+				
+			)
+		);
+
+		this.expose(
+			"c1M3BrenZva2ZjaXBjcGZrYj5uMTZ2bm",
+			{
+			"JiMXRuNDI4MzI2ZGFpdXN1amZ5eDBwYW": { type: "string", isArray: false, isOptional: false },
+				"Zqb3A0bWU0c3c4d3didTY1ZW45dmd6aW": { type: "boolean", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(OracleService),
+			(controller, params) => controller.review(
+				params["JiMXRuNDI4MzI2ZGFpdXN1amZ5eDBwYW"],
+				params["Zqb3A0bWU0c3c4d3didTY1ZW45dmd6aW"]
+			)
+		);
+
+		this.expose(
+			"M4N2ZjaWNsdWByOHxidTdpOTlib3loOG",
+			{
+			"N4NzU2OXtwMjhmOWZ6cHgwaXdpbjU1NT": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(OracleService),
+			(controller, params) => controller.about(
+				params["N4NzU2OXtwMjhmOWZ6cHgwaXdpbjU1NT"]
 			)
 		);
 
@@ -4681,6 +4726,68 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[OracleProposalSummaryModel.name]: class ComposedOracleProposalSummaryModel extends OracleProposalSummaryModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				lore: this.$$model.lore
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				lore: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new OracleProposalSummaryModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"lore" in data && (item.lore = data.lore === null ? null : `${data.lore}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: OracleProposalSummaryModel) {
+			let model: OracleProposal;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(OracleProposal).find(viewModel.id)
+			} else {
+				model = new OracleProposal();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"lore" in viewModel && (model.lore = viewModel.lore === null ? null : `${viewModel.lore}`);
+
+			return model;
+		}
+	},
 	[PlanSummaryModel.name]: class ComposedPlanSummaryModel extends PlanSummaryModel {
 		async map() {
 			return {
@@ -5032,6 +5139,7 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				images: (await this.$$model.images.includeTree(ViewModel.mappings[ArticleImageViewModel.name].items).toArray()).map(item => new ArticleImageViewModel(item)),
+				oracleProposal: new OracleProposalSummaryModel(await BaseServer.unwrap(this.$$model.oracleProposal)),
 				publication: new PublicationSummaryModel(await BaseServer.unwrap(this.$$model.publication)),
 				body: this.$$model.body,
 				id: this.$$model.id,
@@ -5072,6 +5180,12 @@ ViewModel.mappings = {
 						[...parents, "images-ArticleViewModel"]
 					);
 				},
+				get oracleProposal() {
+					return ViewModel.mappings[OracleProposalSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "oracleProposal-ArticleViewModel"]
+					);
+				},
 				get publication() {
 					return ViewModel.mappings[PublicationSummaryModel.name].getPrefetchingProperties(
 						level,
@@ -5088,6 +5202,7 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new ArticleViewModel(null);
 			"images" in data && (item.images = data.images && [...data.images].map(i => ViewModel.mappings[ArticleImageViewModel.name].toViewModel(i)));
+			"oracleProposal" in data && (item.oracleProposal = data.oracleProposal && ViewModel.mappings[OracleProposalSummaryModel.name].toViewModel(data.oracleProposal));
 			"publication" in data && (item.publication = data.publication && ViewModel.mappings[PublicationSummaryModel.name].toViewModel(data.publication));
 			"body" in data && (item.body = data.body === null ? null : `${data.body}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
@@ -5107,6 +5222,7 @@ ViewModel.mappings = {
 			}
 			
 			"images" in viewModel && (null);
+			"oracleProposal" in viewModel && (model.oracleProposal.id = viewModel.oracleProposal ? viewModel.oracleProposal.id : null);
 			"publication" in viewModel && (model.publication.id = viewModel.publication ? viewModel.publication.id : null);
 			"body" in viewModel && (model.body = viewModel.body === null ? null : `${viewModel.body}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
@@ -7125,6 +7241,77 @@ ViewModel.mappings = {
 			"ended" in viewModel && (model.ended = viewModel.ended === null ? null : new Date(viewModel.ended));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"started" in viewModel && (model.started = viewModel.started === null ? null : new Date(viewModel.started));
+
+			return model;
+		}
+	},
+	[OracleProposalViewModel.name]: class ComposedOracleProposalViewModel extends OracleProposalViewModel {
+		async map() {
+			return {
+				entity: new LegalEntityViewModel(await BaseServer.unwrap(this.$$model.entity)),
+				id: this.$$model.id,
+				lore: this.$$model.lore
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get entity() {
+					return ViewModel.mappings[LegalEntityViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "entity-OracleProposalViewModel"]
+					);
+				},
+				id: true,
+				lore: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new OracleProposalViewModel(null);
+			"entity" in data && (item.entity = data.entity && ViewModel.mappings[LegalEntityViewModel.name].toViewModel(data.entity));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"lore" in data && (item.lore = data.lore === null ? null : `${data.lore}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: OracleProposalViewModel) {
+			let model: OracleProposal;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(OracleProposal).find(viewModel.id)
+			} else {
+				model = new OracleProposal();
+			}
+			
+			"entity" in viewModel && (model.entity.id = viewModel.entity ? viewModel.entity.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"lore" in viewModel && (model.lore = viewModel.lore === null ? null : `${viewModel.lore}`);
 
 			return model;
 		}

@@ -14,8 +14,11 @@ export class CompanyType extends QueryEnum {
 }
 
 export class ArticleQueryProxy extends QueryProxy {
+	get oracleProposal(): Partial<OracleProposalQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get publication(): Partial<PublicationQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get body(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get generatedSummary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get oracleProposalId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get publicationId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get published(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get title(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -23,9 +26,12 @@ export class ArticleQueryProxy extends QueryProxy {
 
 export class Article extends Entity<ArticleQueryProxy> {
 	images: PrimaryReference<ArticleImage, ArticleImageQueryProxy>;
-		get publication(): Partial<ForeignReference<Publication>> { return this.$publication; }
+		get oracleProposal(): Partial<ForeignReference<OracleProposal>> { return this.$oracleProposal; }
+	get publication(): Partial<ForeignReference<Publication>> { return this.$publication; }
 	body: string;
+	generatedSummary: string;
 	declare id: string;
+	oracleProposalId: string;
 	publicationId: string;
 	published: Date;
 	title: string;
@@ -34,7 +40,9 @@ export class Article extends Entity<ArticleQueryProxy> {
 		source: "article",
 		columns: {
 			body: { type: "text", name: "body" },
+			generatedSummary: { type: "text", name: "generated_summary" },
 			id: { type: "uuid", name: "id" },
+			oracleProposalId: { type: "uuid", name: "oracle_proposal_id" },
 			publicationId: { type: "uuid", name: "publication_id" },
 			published: { type: "timestamp", name: "published" },
 			title: { type: "text", name: "title" }
@@ -48,9 +56,22 @@ export class Article extends Entity<ArticleQueryProxy> {
 		super();
 		
 		this.images = new PrimaryReference<ArticleImage, ArticleImageQueryProxy>(this, "articleId", ArticleImage);
-		this.$publication = new ForeignReference<Publication>(this, "publicationId", Publication);
+		this.$oracleProposal = new ForeignReference<OracleProposal>(this, "oracleProposalId", OracleProposal);
+	this.$publication = new ForeignReference<Publication>(this, "publicationId", Publication);
 	}
 	
+	private $oracleProposal: ForeignReference<OracleProposal>;
+
+	set oracleProposal(value: Partial<ForeignReference<OracleProposal>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.oracleProposalId = value.id as string;
+		} else {
+			this.oracleProposalId = null;
+		}
+	}
+
 	private $publication: ForeignReference<Publication>;
 
 	set publication(value: Partial<ForeignReference<Publication>>) {
@@ -1038,7 +1059,8 @@ export class LegalEntityQueryProxy extends QueryProxy {
 export class LegalEntity extends Entity<LegalEntityQueryProxy> {
 	get borough(): Partial<ForeignReference<Borough>> { return this.$borough; }
 	get company(): Partial<ForeignReference<Company>> { return this.$company; }
-	operatedTrainRoutes: PrimaryReference<TrainRoute, TrainRouteQueryProxy>;
+	oracleProposals: PrimaryReference<OracleProposal, OracleProposalQueryProxy>;
+		operatedTrainRoutes: PrimaryReference<TrainRoute, TrainRouteQueryProxy>;
 		get resident(): Partial<ForeignReference<Resident>> { return this.$resident; }
 	boroughId: string;
 	companyId: string;
@@ -1065,7 +1087,8 @@ export class LegalEntity extends Entity<LegalEntityQueryProxy> {
 		
 		this.$borough = new ForeignReference<Borough>(this, "boroughId", Borough);
 	this.$company = new ForeignReference<Company>(this, "companyId", Company);
-	this.operatedTrainRoutes = new PrimaryReference<TrainRoute, TrainRouteQueryProxy>(this, "operatorId", TrainRoute);
+	this.oracleProposals = new PrimaryReference<OracleProposal, OracleProposalQueryProxy>(this, "entityId", OracleProposal);
+		this.operatedTrainRoutes = new PrimaryReference<TrainRoute, TrainRouteQueryProxy>(this, "operatorId", TrainRoute);
 		this.$resident = new ForeignReference<Resident>(this, "residentId", Resident);
 	}
 	
@@ -1405,6 +1428,62 @@ export class OfficeCapacity extends Entity<OfficeCapacityQueryProxy> {
 			this.officeId = value.id as string;
 		} else {
 			this.officeId = null;
+		}
+	}
+
+	
+}
+			
+export class OracleProposalQueryProxy extends QueryProxy {
+	get entity(): Partial<LegalEntityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get entityId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get lore(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get proposed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get realistic(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get reviewed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class OracleProposal extends Entity<OracleProposalQueryProxy> {
+	get entity(): Partial<ForeignReference<LegalEntity>> { return this.$entity; }
+	articles: PrimaryReference<Article, ArticleQueryProxy>;
+		entityId: string;
+	declare id: string;
+	lore: string;
+	proposed: Date;
+	realistic: boolean;
+	reviewed: Date;
+	
+	$$meta = {
+		source: "oracle_proposal",
+		columns: {
+			entityId: { type: "uuid", name: "entity_id" },
+			id: { type: "uuid", name: "id" },
+			lore: { type: "text", name: "lore" },
+			proposed: { type: "timestamp", name: "proposed" },
+			realistic: { type: "bool", name: "realistic" },
+			reviewed: { type: "timestamp", name: "reviewed" }
+		},
+		get set(): DbSet<OracleProposal, OracleProposalQueryProxy> { 
+			return new DbSet<OracleProposal, OracleProposalQueryProxy>(OracleProposal, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$entity = new ForeignReference<LegalEntity>(this, "entityId", LegalEntity);
+	this.articles = new PrimaryReference<Article, ArticleQueryProxy>(this, "oracleProposalId", Article);
+	}
+	
+	private $entity: ForeignReference<LegalEntity>;
+
+	set entity(value: Partial<ForeignReference<LegalEntity>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.entityId = value.id as string;
+		} else {
+			this.entityId = null;
 		}
 	}
 
@@ -3130,6 +3209,7 @@ export class DbContext {
 	movement: DbSet<Movement, MovementQueryProxy>;
 	office: DbSet<Office, OfficeQueryProxy>;
 	officeCapacity: DbSet<OfficeCapacity, OfficeCapacityQueryProxy>;
+	oracleProposal: DbSet<OracleProposal, OracleProposalQueryProxy>;
 	plan: DbSet<Plan, PlanQueryProxy>;
 	planShape: DbSet<PlanShape, PlanShapeQueryProxy>;
 	player: DbSet<Player, PlayerQueryProxy>;
@@ -3184,6 +3264,7 @@ export class DbContext {
 		this.movement = new DbSet<Movement, MovementQueryProxy>(Movement, this.runContext);
 		this.office = new DbSet<Office, OfficeQueryProxy>(Office, this.runContext);
 		this.officeCapacity = new DbSet<OfficeCapacity, OfficeCapacityQueryProxy>(OfficeCapacity, this.runContext);
+		this.oracleProposal = new DbSet<OracleProposal, OracleProposalQueryProxy>(OracleProposal, this.runContext);
 		this.plan = new DbSet<Plan, PlanQueryProxy>(Plan, this.runContext);
 		this.planShape = new DbSet<PlanShape, PlanShapeQueryProxy>(PlanShape, this.runContext);
 		this.player = new DbSet<Player, PlayerQueryProxy>(Player, this.runContext);

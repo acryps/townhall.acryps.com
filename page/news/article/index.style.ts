@@ -1,7 +1,8 @@
-import { child, display, marginBottom, rem, fontSize, whiteSpace, marginTop, width, percentage, maxHeight, vh, objectFit, imageRendering, scrollSnapType, overflowX, height, backgroundColor, gap, color, marginInline, paddingInline, flexShrink, overflow, flexGrow, scrollSnapAlign, flexDirection, paddingBlock, outline, px, alignSelf, scrollbarWidth, vw, Hex, position, inset, zIndex, background, padding, hex, cursor, min } from "@acryps/style";
+import { child, display, marginBottom, rem, fontSize, whiteSpace, marginTop, width, percentage, maxHeight, vh, objectFit, imageRendering, scrollSnapType, overflowX, height, backgroundColor, gap, color, marginInline, paddingInline, flexShrink, overflow, flexGrow, scrollSnapAlign, flexDirection, paddingBlock, outline, px, alignSelf, scrollbarWidth, vw, Hex, position, inset, zIndex, background, padding, hex, cursor, min, border } from "@acryps/style";
 import { headlineFont } from "../../assets/font/index.style";
 import { boxed, boxedMaxContentWidth } from "../../shared/boxed.style";
 import { neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
+import { oracleProposalColor } from "../../oracle/index.style";
 
 const slideWidth = min(boxedMaxContentWidth, vw(100).subtract(pageGutter.multiply(2)))
 
@@ -100,5 +101,20 @@ export const articleStyle = () => child('ui-article',
 		marginTop(rem(0.5)),
 
 		whiteSpace('pre-wrap'),
+	),
+
+	child('ui-oracle',
+		display('block'),
+		padding(pageGutter),
+		marginTop(pageGutter),
+
+		border(px(2), 'solid', oracleProposalColor),
+
+		child('ui-guide',
+			display('block'),
+			marginBottom(pageGutter),
+
+			fontSize(rem(0.8))
+		)
 	)
 )

@@ -52,6 +52,7 @@ import { registerMetrics } from "./areas/metrics/metrics";
 import { TimeMachineTileServer } from "./map/layers/time-machine";
 import { PlanTileServer } from "./map/layers/shape/plan";
 import { ChangeFrame } from "./areas/change/frame";
+import { Oracle } from "./areas/oracle/generator";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -83,6 +84,9 @@ DbClient.connectedClient.connect().then(async () => {
 	const lawHouse = new LawHouse(database, new Language('smart'), life);
 
 	if (runLife) {
+		new Oracle(database, new LegalEntityManager(database)).schedule();
+
+		/*
 		lawHouse.schedule();
 		life.vote();
 
@@ -123,6 +127,8 @@ DbClient.connectedClient.connect().then(async () => {
 				}
 			}
 		})();
+
+		*/
 	}
 
 	// add missing figures

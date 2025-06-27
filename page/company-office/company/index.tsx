@@ -46,8 +46,6 @@ export class CompanyPage extends Component {
 				{this.company.description}
 			</ui-description>
 
-			{new AboutComponent(this.company.id)}
-
 			<ui-actions>
 				<ui-action ui-href={`/trade/assets/${this.company.id}`}>
 					View Assets

@@ -89,9 +89,13 @@ DbClient.connectedClient.connect().then(async () => {
 		lawHouse.schedule();
 		life.vote();
 
-		setInterval(() => {
-			life.tick();
-		}, 1000 * 30);
+		const nextTick = async () => {
+			await life.tick();
+
+			setTimeout(() => nextTick(), 1000 * 30);
+		}
+
+		setTimeout(() => nextTick(), 1000 * 30);
 
 		new FillLife(life, database).fillEmptyDwellings();
 

@@ -3,6 +3,7 @@ import { headlineFont } from "../../assets/font/index.style";
 import { boxed, boxedMaxContentWidth } from "../../shared/boxed.style";
 import { neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 import { oracleProposalColor } from "../../oracle/index.style";
+import { buttonStyle } from "../../shared/index.style";
 
 const slideWidth = min(boxedMaxContentWidth, vw(100).subtract(pageGutter.multiply(2)))
 
@@ -115,6 +116,19 @@ export const articleStyle = () => child('ui-article',
 			marginBottom(pageGutter),
 
 			fontSize(rem(0.8))
+		),
+
+		child('ui-lore',
+			display('block'),
+			marginBottom(pageGutter)
+		),
+
+		child('ui-actions',
+			display('flex'),
+
+			child('ui-action',
+				buttonStyle()
+			)
 		)
 	)
 )

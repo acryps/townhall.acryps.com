@@ -55,15 +55,21 @@ export class ArticePage extends Component {
 					The lore has been rated as 'realistic' by one of us.
 				</ui-guide>
 
-				{this.article.oracleProposal.lore}
+				<ui-lore>
+					{this.article.oracleProposal.lore}
+				</ui-lore>
 
-				<ui-action ui-click={async () => {
-					if (confirm('Are you sure? This will delete this article and make the oracle create a replacement. It might take some time to generate the new article')) {
-						await new OracleService().discardArticle(this.article.id);
-					}
-				}}>
-					Regenerate Article
-				</ui-action>
+				<ui-actions>
+					<ui-action ui-click={async () => {
+						if (confirm('Are you sure? This will delete this article and make the oracle create a replacement. It might take some time to generate the new article')) {
+							await new OracleService().discardArticle(this.article.id);
+
+							this.navigate('/news');
+						}
+					}}>
+						Regenerate Article
+					</ui-action>
+				</ui-actions>
 			</ui-oracle>}
 		</ui-article>;
 	}

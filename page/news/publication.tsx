@@ -1,5 +1,5 @@
 import { Component } from "@acryps/page";
-import { ArticleViewModel, PublicationService, PublicationViewModel } from "../managed/services";
+import { ArticlePreviewModel, PublicationService, PublicationViewModel } from "../managed/services";
 import { BannerComponent } from "../banner";
 import { ArticleListComponent } from "./list";
 import { convertToLegalCompanyName } from "../../interface/company";

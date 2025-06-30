@@ -94,6 +94,7 @@ import { ArticleImage } from "././database";
 import { Publication } from "././database";
 import { ArticleImageViewModel } from "././../areas/publication/article";
 import { ArticleNewstickerModel } from "././../areas/publication/article";
+import { ArticlePreviewModel } from "././../areas/publication/article";
 import { ArticleViewModel } from "././../areas/publication/article";
 import { PublicationViewModel } from "././../areas/publication/publication";
 import { Annotator } from "././../annotate";
@@ -134,6 +135,7 @@ import { OracleProposalSummaryModel } from "./../areas/oracle/proposal";
 import { PlanSummaryModel } from "./../areas/plan/plan";
 import { PlanShapeViewModel } from "./../areas/plan/plan";
 import { BuildingShapeModel } from "./../areas/property/building";
+import { ArticleOpinionViewModel } from "./../areas/publication/article";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
 import { ValuationSummaryModel } from "./../areas/trade/valuation.view";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
@@ -169,6 +171,7 @@ import { ResidentRelationship } from "./../managed/database";
 import { Metric } from "./../managed/database";
 import { MetricValue } from "./../managed/database";
 import { OracleProposal } from "./../managed/database";
+import { ArticleOpinion } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
 import { Asset } from "./../areas/trade/asset";
 import { TrainStationExit } from "./../managed/database";
@@ -5146,7 +5149,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	[ArticleViewModel.name]: class ComposedArticleViewModel extends ArticleViewModel {
+	[ArticlePreviewModel.name]: class ComposedArticlePreviewModel extends ArticlePreviewModel {
 		async map() {
 			return {
 				images: (await this.$$model.images.includeTree(ViewModel.mappings[ArticleImageViewModel.name].items).toArray()).map(item => new ArticleImageViewModel(item)),
@@ -5188,19 +5191,19 @@ ViewModel.mappings = {
 				get images() {
 					return ViewModel.mappings[ArticleImageViewModel.name].getPrefetchingProperties(
 						level,
-						[...parents, "images-ArticleViewModel"]
+						[...parents, "images-ArticlePreviewModel"]
 					);
 				},
 				get oracleProposal() {
 					return ViewModel.mappings[OracleProposalSummaryModel.name].getPrefetchingProperties(
 						level,
-						[...parents, "oracleProposal-ArticleViewModel"]
+						[...parents, "oracleProposal-ArticlePreviewModel"]
 					);
 				},
 				get publication() {
 					return ViewModel.mappings[PublicationSummaryModel.name].getPrefetchingProperties(
 						level,
-						[...parents, "publication-ArticleViewModel"]
+						[...parents, "publication-ArticlePreviewModel"]
 					);
 				},
 				body: true,
@@ -5211,7 +5214,7 @@ ViewModel.mappings = {
 		};
 
 		static toViewModel(data) {
-			const item = new ArticleViewModel(null);
+			const item = new ArticlePreviewModel(null);
 			"images" in data && (item.images = data.images && [...data.images].map(i => ViewModel.mappings[ArticleImageViewModel.name].toViewModel(i)));
 			"oracleProposal" in data && (item.oracleProposal = data.oracleProposal && ViewModel.mappings[OracleProposalSummaryModel.name].toViewModel(data.oracleProposal));
 			"publication" in data && (item.publication = data.publication && ViewModel.mappings[PublicationSummaryModel.name].toViewModel(data.publication));
@@ -5223,7 +5226,7 @@ ViewModel.mappings = {
 			return item;
 		}
 
-		static async toModel(viewModel: ArticleViewModel) {
+		static async toModel(viewModel: ArticlePreviewModel) {
 			let model: Article;
 			
 			if (viewModel.id) {
@@ -5239,6 +5242,81 @@ ViewModel.mappings = {
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"published" in viewModel && (model.published = viewModel.published === null ? null : new Date(viewModel.published));
 			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
+
+			return model;
+		}
+	},
+	[ArticleOpinionViewModel.name]: class ComposedArticleOpinionViewModel extends ArticleOpinionViewModel {
+		async map() {
+			return {
+				author: new ResidentSummaryModel(await BaseServer.unwrap(this.$$model.author)),
+				comment: this.$$model.comment,
+				commented: this.$$model.commented,
+				id: this.$$model.id
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get author() {
+					return ViewModel.mappings[ResidentSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "author-ArticleOpinionViewModel"]
+					);
+				},
+				comment: true,
+				commented: true,
+				id: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ArticleOpinionViewModel(null);
+			"author" in data && (item.author = data.author && ViewModel.mappings[ResidentSummaryModel.name].toViewModel(data.author));
+			"comment" in data && (item.comment = data.comment === null ? null : `${data.comment}`);
+			"commented" in data && (item.commented = data.commented === null ? null : new Date(data.commented));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ArticleOpinionViewModel) {
+			let model: ArticleOpinion;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ArticleOpinion).find(viewModel.id)
+			} else {
+				model = new ArticleOpinion();
+			}
+			
+			"author" in viewModel && (model.author.id = viewModel.author ? viewModel.author.id : null);
+			"comment" in viewModel && (model.comment = viewModel.comment === null ? null : `${viewModel.comment}`);
+			"commented" in viewModel && (model.commented = viewModel.commented === null ? null : new Date(viewModel.commented));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 
 			return model;
 		}
@@ -7559,11 +7637,117 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[ArticleViewModel.name]: class ComposedArticleViewModel extends ArticleViewModel {
+		async map() {
+			return {
+				images: (await this.$$model.images.includeTree(ViewModel.mappings[ArticleImageViewModel.name].items).toArray()).map(item => new ArticleImageViewModel(item)),
+				opinions: (await this.$$model.opinions.includeTree(ViewModel.mappings[ArticleOpinionViewModel.name].items).toArray()).map(item => new ArticleOpinionViewModel(item)),
+				oracleProposal: new OracleProposalSummaryModel(await BaseServer.unwrap(this.$$model.oracleProposal)),
+				publication: new PublicationSummaryModel(await BaseServer.unwrap(this.$$model.publication)),
+				body: this.$$model.body,
+				id: this.$$model.id,
+				published: this.$$model.published,
+				title: this.$$model.title
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get images() {
+					return ViewModel.mappings[ArticleImageViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "images-ArticleViewModel"]
+					);
+				},
+				get opinions() {
+					return ViewModel.mappings[ArticleOpinionViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "opinions-ArticleViewModel"]
+					);
+				},
+				get oracleProposal() {
+					return ViewModel.mappings[OracleProposalSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "oracleProposal-ArticleViewModel"]
+					);
+				},
+				get publication() {
+					return ViewModel.mappings[PublicationSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "publication-ArticleViewModel"]
+					);
+				},
+				body: true,
+				id: true,
+				published: true,
+				title: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ArticleViewModel(null);
+			"images" in data && (item.images = data.images && [...data.images].map(i => ViewModel.mappings[ArticleImageViewModel.name].toViewModel(i)));
+			"opinions" in data && (item.opinions = data.opinions && [...data.opinions].map(i => ViewModel.mappings[ArticleOpinionViewModel.name].toViewModel(i)));
+			"oracleProposal" in data && (item.oracleProposal = data.oracleProposal && ViewModel.mappings[OracleProposalSummaryModel.name].toViewModel(data.oracleProposal));
+			"publication" in data && (item.publication = data.publication && ViewModel.mappings[PublicationSummaryModel.name].toViewModel(data.publication));
+			"body" in data && (item.body = data.body === null ? null : `${data.body}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"published" in data && (item.published = data.published === null ? null : new Date(data.published));
+			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ArticleViewModel) {
+			let model: Article;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Article).find(viewModel.id)
+			} else {
+				model = new Article();
+			}
+			
+			"images" in viewModel && (null);
+			"opinions" in viewModel && (null);
+			"oracleProposal" in viewModel && (model.oracleProposal.id = viewModel.oracleProposal ? viewModel.oracleProposal.id : null);
+			"publication" in viewModel && (model.publication.id = viewModel.publication ? viewModel.publication.id : null);
+			"body" in viewModel && (model.body = viewModel.body === null ? null : `${viewModel.body}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"published" in viewModel && (model.published = viewModel.published === null ? null : new Date(viewModel.published));
+			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
+
+			return model;
+		}
+	},
 	[PublicationViewModel.name]: class ComposedPublicationViewModel extends PublicationViewModel {
 		async map() {
 			return {
 				company: new CompanySummaryModel(await BaseServer.unwrap(this.$$model.company)),
-				articles: (await this.$$model.articles.includeTree(ViewModel.mappings[ArticleViewModel.name].items).toArray()).map(item => new ArticleViewModel(item)),
+				articles: (await this.$$model.articles.includeTree(ViewModel.mappings[ArticlePreviewModel.name].items).toArray()).map(item => new ArticlePreviewModel(item)),
 				description: this.$$model.description,
 				id: this.$$model.id,
 				incorporation: this.$$model.incorporation,
@@ -7605,7 +7789,7 @@ ViewModel.mappings = {
 					);
 				},
 				get articles() {
-					return ViewModel.mappings[ArticleViewModel.name].getPrefetchingProperties(
+					return ViewModel.mappings[ArticlePreviewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "articles-PublicationViewModel"]
 					);
@@ -7621,7 +7805,7 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new PublicationViewModel(null);
 			"company" in data && (item.company = data.company && ViewModel.mappings[CompanySummaryModel.name].toViewModel(data.company));
-			"articles" in data && (item.articles = data.articles && [...data.articles].map(i => ViewModel.mappings[ArticleViewModel.name].toViewModel(i)));
+			"articles" in data && (item.articles = data.articles && [...data.articles].map(i => ViewModel.mappings[ArticlePreviewModel.name].toViewModel(i)));
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"incorporation" in data && (item.incorporation = data.incorporation === null ? null : new Date(data.incorporation));

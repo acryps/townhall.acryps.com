@@ -1,4 +1,4 @@
-import { child, display, marginBottom, rem, fontSize, whiteSpace, marginTop, width, percentage, maxHeight, vh, objectFit, imageRendering, scrollSnapType, overflowX, height, backgroundColor, gap, color, marginInline, paddingInline, flexShrink, overflow, flexGrow, scrollSnapAlign, flexDirection, paddingBlock, outline, px, alignSelf, scrollbarWidth, vw, Hex, position, inset, zIndex, background, padding, hex, cursor, min, border } from "@acryps/style";
+import { child, display, marginBottom, rem, fontSize, whiteSpace, marginTop, width, percentage, maxHeight, vh, objectFit, imageRendering, scrollSnapType, overflowX, height, backgroundColor, gap, color, marginInline, paddingInline, flexShrink, overflow, flexGrow, scrollSnapAlign, flexDirection, paddingBlock, outline, px, alignSelf, scrollbarWidth, vw, Hex, position, inset, zIndex, background, padding, hex, cursor, min, border, alignItems, justifyContent, opacity } from "@acryps/style";
 import { headlineFont } from "../../assets/font/index.style";
 import { boxed, boxedMaxContentWidth } from "../../shared/boxed.style";
 import { neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
@@ -104,10 +104,37 @@ export const articleStyle = () => child('ui-article',
 		whiteSpace('pre-wrap'),
 	),
 
+	child('ui-opinions',
+		display('block'),
+		marginTop(pageGutter.multiply(2)),
+
+		child('ui-opinion',
+			display('block'),
+			marginTop(pageGutter),
+
+			fontSize(rem(0.9)),
+
+			child('ui-meta',
+				display('flex'),
+				alignItems('center'),
+				justifyContent('space-between'),
+				marginBottom(rem(0.25)),
+
+				fontSize(rem(0.8))
+			),
+
+			child('ui-comment',
+				display('block'),
+
+				whiteSpace('pre-wrap')
+			)
+		)
+	),
+
 	child('ui-oracle',
 		display('block'),
 		padding(pageGutter),
-		marginTop(pageGutter),
+		marginTop(pageGutter.multiply(2)),
 
 		border(px(2), 'solid', oracleProposalColor),
 

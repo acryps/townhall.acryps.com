@@ -1,11 +1,11 @@
 import { Component } from "@acryps/page";
-import { ArticleViewModel, PublicationService } from "../../managed/services";
+import { ArticlePreviewModel, PublicationService } from "../../managed/services";
 import { ArticleMediaEditorComponent } from "./media";
 
 export class WriteArticlePage extends Component {
 	declare parameters: { id: string };
 
-	article: ArticleViewModel;
+	article: ArticlePreviewModel;
 
 	async onload() {
 		this.article = await new PublicationService().getArticle(this.parameters.id);

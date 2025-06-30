@@ -1,6 +1,6 @@
 import { Service } from "vlserver";
 import { Article, ArticleImage, DbContext, Publication } from "../../managed/database";
-import { ArticleImageViewModel, ArticleNewstickerModel, ArticleViewModel } from "./article";
+import { ArticleImageViewModel, ArticleNewstickerModel, ArticlePreviewModel, ArticleViewModel } from "./article";
 import { PublicationViewModel } from "./publication";
 import { Annotator } from "../../annotate";
 
@@ -45,7 +45,7 @@ export class PublicationService extends Service {
 			query = query.where(article => article.publicationId == publication);
 		}
 
-		return ArticleViewModel.from(query);
+		return ArticlePreviewModel.from(query);
 	}
 
 	async createArticle(publicationId: string) {

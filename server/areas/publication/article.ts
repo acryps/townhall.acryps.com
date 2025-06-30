@@ -1,7 +1,8 @@
 import { ViewModel } from "vlserver";
-import { Article, ArticleImage } from "../../managed/database";
+import { Article, ArticleImage, ArticleOpinion } from "../../managed/database";
 import { PublicationSummaryModel } from "./publication";
 import { OracleProposalSummaryModel, OracleProposalViewModel } from "../oracle/proposal";
+import { ResidentSummaryModel } from "../life/resident";
 
 export class ArticleNewstickerModel extends ViewModel<Article> {
 	id;
@@ -10,7 +11,7 @@ export class ArticleNewstickerModel extends ViewModel<Article> {
 	published;
 }
 
-export class ArticleViewModel extends ViewModel<Article> {
+export class ArticlePreviewModel extends ViewModel<Article> {
 	id;
 
 	title;
@@ -21,6 +22,19 @@ export class ArticleViewModel extends ViewModel<Article> {
 	publication: PublicationSummaryModel;
 
 	oracleProposal: OracleProposalSummaryModel;
+}
+
+export class ArticleViewModel extends ArticlePreviewModel {
+	opinions: ArticleOpinionViewModel[];
+}
+
+export class ArticleOpinionViewModel extends ViewModel<ArticleOpinion> {
+	id;
+
+	commented;
+	comment;
+
+	author: ResidentSummaryModel;
 }
 
 export class ArticleImageViewModel extends ViewModel<ArticleImage> {

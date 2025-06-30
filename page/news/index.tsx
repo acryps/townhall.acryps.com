@@ -1,11 +1,11 @@
 import { Component } from "@acryps/page";
-import { ArticleViewModel, PublicationService, PublicationSummaryModel } from "../managed/services";
+import { ArticlePreviewModel, PublicationService, PublicationSummaryModel } from "../managed/services";
 import { BannerComponent } from "../banner";
 import { ArticleListComponent } from "./list";
 import { Banner } from "../../interface/banner";
 
 export class NewsPage extends Component {
-	articles: ArticleViewModel[];
+	articles: ArticlePreviewModel[];
 	publications: PublicationSummaryModel[];
 
 	async onload() {

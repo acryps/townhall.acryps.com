@@ -8,7 +8,7 @@ import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, me
 import { Point } from "../../interface/point";
 import { toSimulatedTime } from "../../interface/time";
 import { ImpressionsComponent } from "./impressions";
-import { ArticleNewstickerModel, ArticleViewModel, PublicationService } from "../managed/services";
+import { ArticleNewstickerModel, ArticlePreviewModel, PublicationService } from "../managed/services";
 import { NewstickerComponent } from "./newsticker";
 import { Banner } from "../../interface/banner";
 

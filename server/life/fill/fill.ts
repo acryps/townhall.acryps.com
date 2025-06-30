@@ -18,6 +18,7 @@ export class FillLife {
 	async fillEmptyDwellings() {
 		const properties = await this.database.property
 			.where(property => property.deactivated == null)
+			.where(property => property.boroughId != null)
 			.include(property => property.borough)
 			.include(property => property.dwellings)
 			.toArray();

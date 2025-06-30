@@ -53,6 +53,7 @@ import { TimeMachineTileServer } from "./map/layers/time-machine";
 import { PlanTileServer } from "./map/layers/shape/plan";
 import { ChangeFrame } from "./areas/change/frame";
 import { Oracle } from "./areas/oracle/generator";
+import { ArticleOpinionGenerator } from "./areas/publication/opinion";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -85,6 +86,7 @@ DbClient.connectedClient.connect().then(async () => {
 
 	if (runLife) {
 		new Oracle(database, new LegalEntityManager(database)).schedule();
+		new ArticleOpinionGenerator(database).schedule();
 
 		lawHouse.schedule();
 		life.vote();

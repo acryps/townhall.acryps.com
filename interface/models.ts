@@ -350,7 +350,7 @@ export interface ArticleNewstickerModel {
 	title: string;
 }
 
-export interface ArticleViewModel {
+export interface ArticlePreviewModel {
     images: ArticleImageViewModel[];
 	oracleProposal: OracleProposalSummaryModel;
 	publication: PublicationSummaryModel;
@@ -358,6 +358,13 @@ export interface ArticleViewModel {
 	id: string;
 	published: Date;
 	title: string;
+}
+
+export interface ArticleOpinionViewModel {
+    author: ResidentSummaryModel;
+	comment: string;
+	commented: Date;
+	id: string;
 }
 
 export interface ArticleImageViewModel {
@@ -593,9 +600,20 @@ export interface PlotBoundarySummaryModel {
 	shape: string;
 }
 
+export interface ArticleViewModel {
+    images: ArticleImageViewModel[];
+	opinions: ArticleOpinionViewModel[];
+	oracleProposal: OracleProposalSummaryModel;
+	publication: PublicationSummaryModel;
+	body: string;
+	id: string;
+	published: Date;
+	title: string;
+}
+
 export interface PublicationViewModel {
     company: CompanySummaryModel;
-	articles: ArticleViewModel[];
+	articles: ArticlePreviewModel[];
 	description: string;
 	id: string;
 	incorporation: Date;

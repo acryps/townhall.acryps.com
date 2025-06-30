@@ -1,8 +1,10 @@
 import { Component } from "@acryps/page";
-import { ArticleImageViewModel, ArticleViewModel, OracleService, PublicationService } from "../../managed/services";
+import { ArticleImageViewModel, ArticlePreviewModel, ArticleViewModel, OracleService, PublicationService } from "../../managed/services";
 import { MetaNewsArticle, MetaOrganization } from "@acryps/metadata";
 import { AnnotatedTextComponent } from "../../shared/annotaded-text";
 import { BannerComponent } from "../../banner";
+import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
+import { toSimulatedAge } from "../../../interface/time";
 
 export class ArticePage extends Component {
 	declare parameters: { id };
@@ -48,6 +50,24 @@ export class ArticePage extends Component {
 			<ui-body>
 				{this.content}
 			</ui-body>
+
+			<ui-opinions>
+				{this.article.opinions.map(opinion => <ui-opinion>
+					<ui-meta>
+						<ui-name ui-href={`/resident/${opinion.author.tag}`}>
+							{opinion.author.givenName} {opinion.author.familyName}
+						</ui-name>
+
+						<ui-date>
+							{opinion.commented.toLocaleDateString()}, {toSimulatedAge(opinion.commented)} years ago.
+						</ui-date>
+					</ui-meta>
+
+					<ui-comment>
+						{opinion.comment}
+					</ui-comment>
+				</ui-opinion>)}
+			</ui-opinions>
 
 			{this.article.oracleProposal && <ui-oracle>
 				<ui-guide>

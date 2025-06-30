@@ -835,7 +835,7 @@ export class ArticleNewstickerModel {
 	}
 }
 
-export class ArticleViewModel {
+export class ArticlePreviewModel {
 	images: ArticleImageViewModel[];
 	oracleProposal: OracleProposalSummaryModel;
 	publication: PublicationSummaryModel;
@@ -845,7 +845,7 @@ export class ArticleViewModel {
 	title: string;
 
 	private static $build(raw) {
-		const item = new ArticleViewModel();
+		const item = new ArticlePreviewModel();
 		raw.images === undefined || (item.images = raw.images ? raw.images.map(i => ArticleImageViewModel["$build"](i)) : null)
 		raw.oracleProposal === undefined || (item.oracleProposal = raw.oracleProposal ? OracleProposalSummaryModel["$build"](raw.oracleProposal) : null)
 		raw.publication === undefined || (item.publication = raw.publication ? PublicationSummaryModel["$build"](raw.publication) : null)
@@ -853,6 +853,23 @@ export class ArticleViewModel {
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.published === undefined || (item.published = raw.published ? new Date(raw.published) : null)
 		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
+		
+		return item;
+	}
+}
+
+export class ArticleOpinionViewModel {
+	author: ResidentSummaryModel;
+	comment: string;
+	commented: Date;
+	id: string;
+
+	private static $build(raw) {
+		const item = new ArticleOpinionViewModel();
+		raw.author === undefined || (item.author = raw.author ? ResidentSummaryModel["$build"](raw.author) : null)
+		raw.comment === undefined || (item.comment = raw.comment === null ? null : `${raw.comment}`)
+		raw.commented === undefined || (item.commented = raw.commented ? new Date(raw.commented) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		
 		return item;
 	}
@@ -1414,9 +1431,34 @@ export class PlotBoundarySummaryModel {
 	}
 }
 
+export class ArticleViewModel {
+	images: ArticleImageViewModel[];
+	opinions: ArticleOpinionViewModel[];
+	oracleProposal: OracleProposalSummaryModel;
+	publication: PublicationSummaryModel;
+	body: string;
+	id: string;
+	published: Date;
+	title: string;
+
+	private static $build(raw) {
+		const item = new ArticleViewModel();
+		raw.images === undefined || (item.images = raw.images ? raw.images.map(i => ArticleImageViewModel["$build"](i)) : null)
+		raw.opinions === undefined || (item.opinions = raw.opinions ? raw.opinions.map(i => ArticleOpinionViewModel["$build"](i)) : null)
+		raw.oracleProposal === undefined || (item.oracleProposal = raw.oracleProposal ? OracleProposalSummaryModel["$build"](raw.oracleProposal) : null)
+		raw.publication === undefined || (item.publication = raw.publication ? PublicationSummaryModel["$build"](raw.publication) : null)
+		raw.body === undefined || (item.body = raw.body === null ? null : `${raw.body}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.published === undefined || (item.published = raw.published ? new Date(raw.published) : null)
+		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
+		
+		return item;
+	}
+}
+
 export class PublicationViewModel {
 	company: CompanySummaryModel;
-	articles: ArticleViewModel[];
+	articles: ArticlePreviewModel[];
 	description: string;
 	id: string;
 	incorporation: Date;
@@ -1426,7 +1468,7 @@ export class PublicationViewModel {
 	private static $build(raw) {
 		const item = new PublicationViewModel();
 		raw.company === undefined || (item.company = raw.company ? CompanySummaryModel["$build"](raw.company) : null)
-		raw.articles === undefined || (item.articles = raw.articles ? raw.articles.map(i => ArticleViewModel["$build"](i)) : null)
+		raw.articles === undefined || (item.articles = raw.articles ? raw.articles.map(i => ArticlePreviewModel["$build"](i)) : null)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.incorporation === undefined || (item.incorporation = raw.incorporation ? new Date(raw.incorporation) : null)
@@ -3191,7 +3233,7 @@ export class PublicationService {
 		});
 	}
 
-	async listNewestArticles(page: number, publication: string): Promise<Array<ArticleViewModel>> {
+	async listNewestArticles(page: number, publication: string): Promise<Array<ArticlePreviewModel>> {
 		const $data = new FormData();
 		$data.append("dzdXMydWI2ZmE4a3Vya2Q4NTpjeWc1bz", Service.stringify(page))
 		$data.append("FzenJlNHNwNmh4c2ZhaHtmejswaDVqaj", Service.stringify(publication))
@@ -3204,7 +3246,7 @@ export class PublicationService {
 			if ("data" in r) {
 				const d = r.data;
 
-				return d.map(d => d === null ? null : ArticleViewModel["$build"](d));
+				return d.map(d => d === null ? null : ArticlePreviewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

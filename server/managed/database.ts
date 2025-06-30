@@ -26,6 +26,7 @@ export class ArticleQueryProxy extends QueryProxy {
 
 export class Article extends Entity<ArticleQueryProxy> {
 	images: PrimaryReference<ArticleImage, ArticleImageQueryProxy>;
+		opinions: PrimaryReference<ArticleOpinion, ArticleOpinionQueryProxy>;
 		get oracleProposal(): Partial<ForeignReference<OracleProposal>> { return this.$oracleProposal; }
 	get publication(): Partial<ForeignReference<Publication>> { return this.$publication; }
 	body: string;
@@ -56,6 +57,7 @@ export class Article extends Entity<ArticleQueryProxy> {
 		super();
 		
 		this.images = new PrimaryReference<ArticleImage, ArticleImageQueryProxy>(this, "articleId", ArticleImage);
+		this.opinions = new PrimaryReference<ArticleOpinion, ArticleOpinionQueryProxy>(this, "articleId", ArticleOpinion);
 		this.$oracleProposal = new ForeignReference<OracleProposal>(this, "oracleProposalId", OracleProposal);
 	this.$publication = new ForeignReference<Publication>(this, "publicationId", Publication);
 	}
@@ -129,6 +131,72 @@ export class ArticleImage extends Entity<ArticleImageQueryProxy> {
 			this.articleId = value.id as string;
 		} else {
 			this.articleId = null;
+		}
+	}
+
+	
+}
+			
+export class ArticleOpinionQueryProxy extends QueryProxy {
+	get article(): Partial<ArticleQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get author(): Partial<ResidentQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get articleId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get authorId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get comment(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get commented(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class ArticleOpinion extends Entity<ArticleOpinionQueryProxy> {
+	get article(): Partial<ForeignReference<Article>> { return this.$article; }
+	get author(): Partial<ForeignReference<Resident>> { return this.$author; }
+	articleId: string;
+	authorId: string;
+	comment: string;
+	commented: Date;
+	declare id: string;
+	
+	$$meta = {
+		source: "article_opinion",
+		columns: {
+			articleId: { type: "uuid", name: "article_id" },
+			authorId: { type: "uuid", name: "author_id" },
+			comment: { type: "text", name: "comment" },
+			commented: { type: "timestamp", name: "commented" },
+			id: { type: "uuid", name: "id" }
+		},
+		get set(): DbSet<ArticleOpinion, ArticleOpinionQueryProxy> { 
+			return new DbSet<ArticleOpinion, ArticleOpinionQueryProxy>(ArticleOpinion, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$article = new ForeignReference<Article>(this, "articleId", Article);
+	this.$author = new ForeignReference<Resident>(this, "authorId", Resident);
+	}
+	
+	private $article: ForeignReference<Article>;
+
+	set article(value: Partial<ForeignReference<Article>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.articleId = value.id as string;
+		} else {
+			this.articleId = null;
+		}
+	}
+
+	private $author: ForeignReference<Resident>;
+
+	set author(value: Partial<ForeignReference<Resident>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.authorId = value.id as string;
+		} else {
+			this.authorId = null;
 		}
 	}
 
@@ -2133,7 +2201,8 @@ export class ResidentQueryProxy extends QueryProxy {
 }
 
 export class Resident extends Entity<ResidentQueryProxy> {
-	get figure(): Partial<ForeignReference<ResidentFigure>> { return this.$figure; }
+	articleOpinions: PrimaryReference<ArticleOpinion, ArticleOpinionQueryProxy>;
+		get figure(): Partial<ForeignReference<ResidentFigure>> { return this.$figure; }
 	tenancies: PrimaryReference<Tenancy, TenancyQueryProxy>;
 		get mainTenancy(): Partial<ForeignReference<Tenancy>> { return this.$mainTenancy; }
 	appointedLawHouseSessions: PrimaryReference<LawHouseSessionary, LawHouseSessionaryQueryProxy>;
@@ -2179,6 +2248,7 @@ export class Resident extends Entity<ResidentQueryProxy> {
 	constructor() {
 		super();
 		
+		this.articleOpinions = new PrimaryReference<ArticleOpinion, ArticleOpinionQueryProxy>(this, "authorId", ArticleOpinion);
 		this.$figure = new ForeignReference<ResidentFigure>(this, "figureId", ResidentFigure);
 	this.tenancies = new PrimaryReference<Tenancy, TenancyQueryProxy>(this, "inhabitantId", Tenancy);
 		this.$mainTenancy = new ForeignReference<Tenancy>(this, "mainTenancyId", Tenancy);
@@ -3185,6 +3255,7 @@ export class ResidentEventView extends View<ResidentEventViewProxy> {
 export class DbContext {
 	article: DbSet<Article, ArticleQueryProxy>;
 	articleImage: DbSet<ArticleImage, ArticleImageQueryProxy>;
+	articleOpinion: DbSet<ArticleOpinion, ArticleOpinionQueryProxy>;
 	bill: DbSet<Bill, BillQueryProxy>;
 	billHonestium: DbSet<BillHonestium, BillHonestiumQueryProxy>;
 	borough: DbSet<Borough, BoroughQueryProxy>;
@@ -3240,6 +3311,7 @@ export class DbContext {
 	constructor(private runContext: RunContext) {
 		this.article = new DbSet<Article, ArticleQueryProxy>(Article, this.runContext);
 		this.articleImage = new DbSet<ArticleImage, ArticleImageQueryProxy>(ArticleImage, this.runContext);
+		this.articleOpinion = new DbSet<ArticleOpinion, ArticleOpinionQueryProxy>(ArticleOpinion, this.runContext);
 		this.bill = new DbSet<Bill, BillQueryProxy>(Bill, this.runContext);
 		this.billHonestium = new DbSet<BillHonestium, BillHonestiumQueryProxy>(BillHonestium, this.runContext);
 		this.borough = new DbSet<Borough, BoroughQueryProxy>(Borough, this.runContext);

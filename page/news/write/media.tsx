@@ -1,10 +1,10 @@
 import { Component } from "@acryps/page";
-import { ArticleViewModel, PublicationService } from "../../managed/services";
+import { ArticlePreviewModel, PublicationService } from "../../managed/services";
 import { deleteIcon } from "../../assets/icons/managed";
 
 export class ArticleMediaEditorComponent extends Component {
 	constructor(
-		private article: ArticleViewModel
+		private article: ArticlePreviewModel
 	) {
 		super();
 	}

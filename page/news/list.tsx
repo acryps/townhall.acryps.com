@@ -1,14 +1,14 @@
 import { Component } from "@acryps/page";
-import { ArticleViewModel } from "../managed/services";
+import { ArticlePreviewModel } from "../managed/services";
 import { BannerComponent } from "../banner";
 import { Banner } from "../../interface/banner";
 import { oracleIcon } from "../assets/icons/managed";
 
 export class ArticleListComponent extends Component {
-	articles: ArticleViewModel[];
+	articles: ArticlePreviewModel[];
 
 	constructor(
-		articles: ArticleViewModel[]
+		articles: ArticlePreviewModel[]
 	) {
 		super();
 

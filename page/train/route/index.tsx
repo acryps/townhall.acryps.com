@@ -10,6 +10,8 @@ import { TrainRouteSegment, TrainRouteStopSegment, TrainRouteTrackSegment } from
 import { addIcon, drawIcon } from "../../assets/icons/managed";
 import { LegalEntitySelectorComponent } from "../../shared/legal-entity/select";
 import { LegalEntityComponent } from "../../shared/legal-entity";
+import { MetaOrganization, MetaPlace, MetaTrainTrip } from "@acryps/metadata";
+import { convertToLegalCompanyName } from "../../../interface/company";
 
 export class TrainRoutePage extends Component {
 	declare parameters: { code };
@@ -24,6 +26,21 @@ export class TrainRoutePage extends Component {
 		this.trainRoute = await new TrainService().getRoute(this.parameters.code);
 
 		this.segments = TrainRouteSegment.split(this.trainRoute, this.parent.stations);
+
+		const stops = this.segments.filter(segment => segment instanceof TrainRouteStopSegment)
+		const start = stops[0];
+		const end = stops.at(-1);
+
+		if (start && end) {
+			new MetaTrainTrip({
+				name: this.trainRoute.name,
+				trainName: this.trainRoute.code,
+				departureStation: new MetaPlace({ name: start.station.name ?? start.station.property.name }),
+				arrivalStation: new MetaPlace({ name: end.station.name ?? end.station.property.name }),
+				provider: new MetaOrganization({ name: this.trainRoute.operator?.company?.name ?? this.trainRoute.operator?.borough?.name }),
+				itinerary: stops.map(stop => new MetaPlace({ name: stop.station.name ?? stop.station.property.name })) as any
+			}).apply();
+		}
 	}
 
 	render() {

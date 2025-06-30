@@ -7,6 +7,7 @@ import { routeInterchangeIcon } from "../assets/icons/managed";
 import { convertToLegalCompanyName } from "../../interface/company";
 import { LegalEntityComponent } from "../shared/legal-entity";
 import { RailwayNetworkComponent } from "./network";
+import { MetaTrainTrip } from "@acryps/metadata";
 
 export class TrainsPage extends Component {
 	routes: TrainRouteViewModel[];

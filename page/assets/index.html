@@ -4,12 +4,26 @@
 		<meta charset="UTF-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	
+
 		<link rel="icon" href="/assets/icon.svg">
-		
-		<title>Townhall</title>
+
+		{metadata}
+
+		<title>{title}</title>
+
+		<style>
+
+			ui-preloaded {
+				display: none;
+			}
+
+		</style>
 	</head>
 	<body>
+		<ui-preloaded>
+			{content}
+		</ui-preloaded>
+
 		<script src="/bundle/index.js" type="module"></script>
 	</body>
 </html>

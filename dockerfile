@@ -1,5 +1,8 @@
 FROM node:22
 
+RUN apt-get update && apt-get install -y chromium
+RUN which chromium
+
 WORKDIR /usr/src/app
 COPY . .
 

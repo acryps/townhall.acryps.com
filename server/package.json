@@ -1,7 +1,7 @@
 {
 	"name": "server-townhall",
 	"scripts": {
-		"build": "npx vlserver compile && esbuild index.ts --bundle --outfile=.built/index.js --platform=node --target=es2018 --external:express-ws --external:sharp --external:skia-canvas --external:pg --external:ollama && vlquery compile",
+		"build": "npx vlserver compile && esbuild index.ts --bundle --outfile=.built/index.js --platform=node --target=es2018 --external:express-ws --external:sharp --external:skia-canvas --external:pg --external:puppeteer-core --external:ollama && vlquery compile",
 		"start": "npm run build && environment node --max-old-space-size=8192 .built/index.js",
 		"typecheck": "npx vlserver compile && tsc --noEmit",
 		"database:update": "environment vlquery create-context"
@@ -12,10 +12,12 @@
 		"pguser": "Postgres user",
 		"pgpassword": "Postgres password",
 		"townhallServerAddress": "Minecraft File Server Location",
-
 		"runLife?": "Run Life (YES to enable)",
 		"updateMetrics": "Update Metrics (YES to enable)",
-
+		"preload": {
+			"updatePages": "Update Preloaded Pages (YES to enable)",
+			"browserApplicationPath": "Browser Application Path (use 'which chromium' to get path)"
+		},
 		"languageModel": {
 			"model": {
 				"smart": "Smart Language Model and Size",
@@ -30,6 +32,7 @@
 		"js-md5": "^0.7.3",
 		"node-fetch": "^2.6.6",
 		"ollama": "^0.5.10",
+		"puppeteer-core": "^24.11.1",
 		"sharp": "^0.30.2",
 		"skia-canvas": "^2.0.1",
 		"vlquery": "^7.2.0",

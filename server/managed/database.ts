@@ -1792,6 +1792,38 @@ export class PlotBoundary extends Entity<PlotBoundaryQueryProxy> {
 	
 }
 			
+export class PreloadedPageQueryProxy extends QueryProxy {
+	get content(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get link(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get metadata(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get title(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get updated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class PreloadedPage extends Entity<PreloadedPageQueryProxy> {
+	content: string;
+	declare id: string;
+	link: string;
+	metadata: string;
+	title: string;
+	updated: Date;
+	
+	$$meta = {
+		source: "preloaded_page",
+		columns: {
+			content: { type: "text", name: "content" },
+			id: { type: "uuid", name: "id" },
+			link: { type: "text", name: "link" },
+			metadata: { type: "text", name: "metadata" },
+			title: { type: "text", name: "title" },
+			updated: { type: "timestamp", name: "updated" }
+		},
+		get set(): DbSet<PreloadedPage, PreloadedPageQueryProxy> { 
+			return new DbSet<PreloadedPage, PreloadedPageQueryProxy>(PreloadedPage, null);
+		}
+	};
+}
+			
 export class PropertyQueryProxy extends QueryProxy {
 	get activePlotBoundary(): Partial<PlotBoundaryQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get borough(): Partial<BoroughQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -3285,6 +3317,7 @@ export class DbContext {
 	planShape: DbSet<PlanShape, PlanShapeQueryProxy>;
 	player: DbSet<Player, PlayerQueryProxy>;
 	plotBoundary: DbSet<PlotBoundary, PlotBoundaryQueryProxy>;
+	preloadedPage: DbSet<PreloadedPage, PreloadedPageQueryProxy>;
 	property: DbSet<Property, PropertyQueryProxy>;
 	propertyHistoricListingModifier: DbSet<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>;
 	propertyOwner: DbSet<PropertyOwner, PropertyOwnerQueryProxy>;
@@ -3341,6 +3374,7 @@ export class DbContext {
 		this.planShape = new DbSet<PlanShape, PlanShapeQueryProxy>(PlanShape, this.runContext);
 		this.player = new DbSet<Player, PlayerQueryProxy>(Player, this.runContext);
 		this.plotBoundary = new DbSet<PlotBoundary, PlotBoundaryQueryProxy>(PlotBoundary, this.runContext);
+		this.preloadedPage = new DbSet<PreloadedPage, PreloadedPageQueryProxy>(PreloadedPage, this.runContext);
 		this.property = new DbSet<Property, PropertyQueryProxy>(Property, this.runContext);
 		this.propertyHistoricListingModifier = new DbSet<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>(PropertyHistoricListingModifier, this.runContext);
 		this.propertyOwner = new DbSet<PropertyOwner, PropertyOwnerQueryProxy>(PropertyOwner, this.runContext);

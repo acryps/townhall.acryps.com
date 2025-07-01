@@ -1,8 +1,8 @@
 import { Component } from "@acryps/page";
 import { LifeService, ResidentSummaryModel, ResidentTickerModel } from "../managed/services";
-import { toSimulatedAge, toSimulatedTime } from "../../interface/time";
 import { SearchComponent } from "./search";
 import { PopulationTickerComponent } from "./ticker";
+import { Time } from "../../interface/time";
 
 export class PopulationPage extends Component {
 	residents: ResidentSummaryModel[];
@@ -82,7 +82,7 @@ export class PopulationPage extends Component {
 					</ui-name>
 
 					<ui-age>
-						{toSimulatedAge(resident.birthday)} years old
+						{new Time(resident.birthday).age()} years old
 					</ui-age>
 				</ui-resident>)}
 

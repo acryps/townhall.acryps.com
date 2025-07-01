@@ -1,8 +1,8 @@
 import { Component } from "@acryps/page";
 import { TradeService, ValuationViewModel } from "../../managed/services";
-import { toSimulatedAge } from "../../../interface/time";
 import { LegalEntityComponent } from "../../shared/legal-entity";
 import { convertToCurrency } from "../../../interface/currency";
+import { Time } from "../../../interface/time";
 
 export class ValuationPage extends Component {
 	declare parameters: { id };
@@ -19,7 +19,7 @@ export class ValuationPage extends Component {
 	render() {
 		return <ui-valuation>
 			<ui-time>
-				{this.valuation.estimated.toLocaleDateString()}, {toSimulatedAge(this.valuation.estimated)} years ago.
+				{this.valuation.estimated.toLocaleDateString()}, {new Time(this.valuation.estimated).age()} years ago.
 			</ui-time>
 
 			{this.valuation.issuer ? <ui-issuer>

@@ -1,4 +1,4 @@
-import { toSimulatedAge } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 import { WorkContract, WorkOffer } from "../../managed/database";
 import { Interpreter, SystemMessage, UserMessage } from "../interpreter";
 
@@ -26,7 +26,7 @@ export const fireWorstMatch = async (offer: WorkOffer) => {
 			${offer.task}
 
 			The following people currently work in this position:
-			${contracts.map(contract => `${contract.id.split('-')[0]}, employed since ${toSimulatedAge(contract.signed)}: ${contract.match}`).join('\n')}
+			${contracts.map(contract => `${contract.id.split('-')[0]}, employed since ${new Time(contract.signed).age}: ${contract.match}`).join('\n')}
 		`)
 	]);
 

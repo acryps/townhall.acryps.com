@@ -36,6 +36,9 @@ import { CompanyViewModel } from "././../areas/company.view";
 import { OfficeViewModel } from "././../areas/company.view";
 import { WorkOfferViewModel } from "././../areas/work";
 import { CompanyOfficeService } from "././../areas/company-office/service";
+import { EpochTimelineModel } from "././../areas/epoch/epoch";
+import { EpochViewModel } from "././../areas/epoch/epoch";
+import { EpochService } from "././../areas/epoch/index";
 import { PlayerViewModel } from "././../areas/player.view";
 import { GameService } from "././../areas/game/game.service";
 import { PropertyHistoricListingModifier } from "././database";
@@ -159,6 +162,7 @@ import { WaterBody } from "./../managed/database";
 import { WorkOffer } from "./../managed/database";
 import { WorkContract } from "./../managed/database";
 import { City } from "./../managed/database";
+import { Epoch } from "./../managed/database";
 import { HistoricListingGrade } from "./../managed/database";
 import { HistoricListingModifier } from "./../managed/database";
 import { Impression } from "./../managed/database";
@@ -206,6 +210,10 @@ Inject.mappings = {
 	},
 	"CompanyOfficeService": {
 		objectConstructor: CompanyOfficeService,
+		parameters: ["DbContext"]
+	},
+	"EpochService": {
+		objectConstructor: EpochService,
 		parameters: ["DbContext"]
 	},
 	"GameService": {
@@ -615,6 +623,24 @@ export class ManagedServer extends BaseServer {
 				params["l3YzB6dWcycDFoeWFseWdha2RhMzptcT"],
 				params["dodHJhcWgxYzd4eDF4ejNva2d6Mzl3OX"],
 				params["kxZTQ1eDJuMGM4NWh6ZH1vMzM3NjZpM2"]
+			)
+		);
+
+		this.expose(
+			"ZocWgzc2BueXhqbGVtZTYyc2E3b3Zwem",
+			{},
+			inject => inject.construct(EpochService),
+			(controller, params) => controller.timeline(
+				
+			)
+		);
+
+		this.expose(
+			"NtYmVpcjM3eWZ4OWczaHVsMWVpbmN0cW",
+			{},
+			inject => inject.construct(EpochService),
+			(controller, params) => controller.getEpochs(
+				
 			)
 		);
 
@@ -3417,6 +3443,80 @@ ViewModel.mappings = {
 			"incorporated" in viewModel && (model.incorporated = viewModel.incorporated === null ? null : new Date(viewModel.incorporated));
 			"mainImpressionId" in viewModel && (model.mainImpressionId = viewModel.mainImpressionId === null ? null : `${viewModel.mainImpressionId}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+
+			return model;
+		}
+	},
+	[EpochTimelineModel.name]: class ComposedEpochTimelineModel extends EpochTimelineModel {
+		async map() {
+			return {
+				end: this.$$model.end,
+				id: this.$$model.id,
+				offset: this.$$model.offset,
+				rate: this.$$model.rate,
+				start: this.$$model.start
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				end: true,
+				id: true,
+				offset: true,
+				rate: true,
+				start: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new EpochTimelineModel(null);
+			"end" in data && (item.end = data.end === null ? null : new Date(data.end));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"offset" in data && (item.offset = data.offset === null ? null : +data.offset);
+			"rate" in data && (item.rate = data.rate === null ? null : +data.rate);
+			"start" in data && (item.start = data.start === null ? null : new Date(data.start));
+
+			return item;
+		}
+
+		static async toModel(viewModel: EpochTimelineModel) {
+			let model: Epoch;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Epoch).find(viewModel.id)
+			} else {
+				model = new Epoch();
+			}
+			
+			"end" in viewModel && (model.end = viewModel.end === null ? null : new Date(viewModel.end));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"offset" in viewModel && (model.offset = viewModel.offset === null ? null : +viewModel.offset);
+			"rate" in viewModel && (model.rate = viewModel.rate === null ? null : +viewModel.rate);
+			"start" in viewModel && (model.start = viewModel.start === null ? null : new Date(viewModel.start));
 
 			return model;
 		}
@@ -7237,6 +7337,88 @@ ViewModel.mappings = {
 			"canceled" in viewModel && (model.canceled = viewModel.canceled === null ? null : new Date(viewModel.canceled));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"signed" in viewModel && (model.signed = viewModel.signed === null ? null : new Date(viewModel.signed));
+
+			return model;
+		}
+	},
+	[EpochViewModel.name]: class ComposedEpochViewModel extends EpochViewModel {
+		async map() {
+			return {
+				description: this.$$model.description,
+				end: this.$$model.end,
+				id: this.$$model.id,
+				name: this.$$model.name,
+				offset: this.$$model.offset,
+				rate: this.$$model.rate,
+				start: this.$$model.start
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				description: true,
+				end: true,
+				id: true,
+				name: true,
+				offset: true,
+				rate: true,
+				start: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new EpochViewModel(null);
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			"end" in data && (item.end = data.end === null ? null : new Date(data.end));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"offset" in data && (item.offset = data.offset === null ? null : +data.offset);
+			"rate" in data && (item.rate = data.rate === null ? null : +data.rate);
+			"start" in data && (item.start = data.start === null ? null : new Date(data.start));
+
+			return item;
+		}
+
+		static async toModel(viewModel: EpochViewModel) {
+			let model: Epoch;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Epoch).find(viewModel.id)
+			} else {
+				model = new Epoch();
+			}
+			
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+			"end" in viewModel && (model.end = viewModel.end === null ? null : new Date(viewModel.end));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"offset" in viewModel && (model.offset = viewModel.offset === null ? null : +viewModel.offset);
+			"rate" in viewModel && (model.rate = viewModel.rate === null ? null : +viewModel.rate);
+			"start" in viewModel && (model.start = viewModel.start === null ? null : new Date(viewModel.start));
 
 			return model;
 		}

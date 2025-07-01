@@ -1,6 +1,5 @@
 import { Component } from "@acryps/page";
 import { CityService, CityViewModel } from "../../managed/services";
-import { toSimulatedAge } from "../../../interface/time";
 
 export class MapStartPage extends Component {
 	cities: CityViewModel[];

@@ -1,5 +1,4 @@
 import { MetricTracker } from ".";
-import { toSimulatedAge } from "../../../../interface/time";
 
 export class WorkUnemploymentMetric extends MetricTracker {
 	tag = ['work', 'unemployment'];

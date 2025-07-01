@@ -1,7 +1,7 @@
 import { Component } from "@acryps/page";
 import { SearchComponent } from ".";
-import { toSimulatedAge } from "../../../interface/time";
 import { ResidentViewModel } from "../../managed/services";
+import { Time } from "../../../interface/time";
 
 export class SearchResultsComponent extends Component {
 	results: ResidentViewModel[] = [];
@@ -15,7 +15,7 @@ export class SearchResultsComponent extends Component {
 
 				<ui-detail>
 					<ui-age>
-						{toSimulatedAge(result.birthday)}
+						{new Time(result.birthday).age()}
 					</ui-age>
 				</ui-detail>
 			</ui-result>)}

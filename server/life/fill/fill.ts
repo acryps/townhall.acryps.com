@@ -1,6 +1,6 @@
 import { Life } from "..";
 import { Point } from "../../../interface/point";
-import { toRealTime, toSimulatedAge, toSimulatedTime } from "../../../interface/time";
+import { Time, toRealTime } from "../../../interface/time";
 import { Borough, DbContext, Dwelling, Property, Resident, ResidentRelationship, Tenancy, WorkContract, WorkOffer } from "../../managed/database";
 import { female, genders, male } from "../gender";
 import { Interpreter, SystemMessage, UserMessage } from "../interpreter";
@@ -49,7 +49,7 @@ export class FillLife {
 		const interpreter = new Interpreter();
 		interpreter.remember([
 			new SystemMessage(`
-				We are in a fictional world, the current year is ${toSimulatedTime(new Date())}.
+				We are in a fictional world, the current year is ${Time.now().year}.
 				Your job is to generate a fictional family.
 
 				When generating people, call the 'addPerson' function.
@@ -99,13 +99,12 @@ export class FillLife {
 			resident.familyName = familyName;
 
 			// assign random age
-			let birthday = toSimulatedTime(new Date());
-			birthday.setFullYear(birthday.getFullYear() - age, Math.random() * 31, Math.random() * 12);
-			resident.birthday = toRealTime(birthday);
+			let birthday = Time.from(Time.now().year, Math.random() * 31, Math.random() * 12);
+			resident.birthday = birthday.real;
 
 			resident.coreValues = coreValues;
 
-			console.log(`+ ${resident.givenName} ${resident.familyName} ${resident.birthday.toLocaleString()} ${toSimulatedAge(resident.birthday)}`);
+			console.log(`+ ${resident.givenName} ${resident.familyName} ${resident.birthday.toLocaleString()} ${new Time(resident.birthday).age()}`);
 
 			members.push(resident);
 		});
@@ -157,7 +156,7 @@ export class FillLife {
 			await this.updateBiography(member, job, members);
 			await this.life.assignFigure(member);
 
-			if (job && toSimulatedAge(member.birthday) > 18) {
+			if (job && new Time(member.birthday).age() > 18) {
 				const contract = new WorkContract();
 				contract.worker = member;
 				contract.offer = job;
@@ -277,7 +276,7 @@ export class FillLife {
 		});
 
 		await interpreter.execute(new UserMessage(`
-			Come up with a fictional biography of ${resident.givenName} ${resident.familyName} aged ${toSimulatedAge(resident.birthday)}.
+			Come up with a fictional biography of ${resident.givenName} ${resident.familyName} aged ${new Time(resident.birthday).age()}.
 			Make sure to highlight their core values, without directly mentioning them: ${resident.coreValues}.
 			Never mention any dates.
 
@@ -288,7 +287,7 @@ export class FillLife {
 			`}
 
 			Family members:
-			${familyMembers.filter(member => member.id != resident.id).map(member => `- ${member.givenName} ${member.familyName}, aged ${toSimulatedAge(member.birthday)}`).join('\n')}
+			${familyMembers.filter(member => member.id != resident.id).map(member => `- ${member.givenName} ${member.familyName}, aged ${new Time(member.birthday).age()}`).join('\n')}
 		`));
 	}
 }

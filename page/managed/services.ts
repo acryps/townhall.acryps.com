@@ -435,6 +435,25 @@ export class CityViewModel {
 	}
 }
 
+export class EpochTimelineModel {
+	end: Date;
+	id: string;
+	offset: number;
+	rate: number;
+	start: Date;
+
+	private static $build(raw) {
+		const item = new EpochTimelineModel();
+		raw.end === undefined || (item.end = raw.end ? new Date(raw.end) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.offset === undefined || (item.offset = raw.offset === null ? null : +raw.offset)
+		raw.rate === undefined || (item.rate = raw.rate === null ? null : +raw.rate)
+		raw.start === undefined || (item.start = raw.start ? new Date(raw.start) : null)
+		
+		return item;
+	}
+}
+
 export class HistoricListingGradeViewModel {
 	description: string;
 	grade: number;
@@ -1338,6 +1357,29 @@ export class WorkContractEmploymentModel {
 	}
 }
 
+export class EpochViewModel {
+	description: string;
+	end: Date;
+	id: string;
+	name: string;
+	offset: number;
+	rate: number;
+	start: Date;
+
+	private static $build(raw) {
+		const item = new EpochViewModel();
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
+		raw.end === undefined || (item.end = raw.end ? new Date(raw.end) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.offset === undefined || (item.offset = raw.offset === null ? null : +raw.offset)
+		raw.rate === undefined || (item.rate = raw.rate === null ? null : +raw.rate)
+		raw.start === undefined || (item.start = raw.start ? new Date(raw.start) : null)
+		
+		return item;
+	}
+}
+
 export class LawHouseSessionViewModel {
 	scope: DistrictViewModel;
 	protocol: LawHouseSessionProtocolViewModel[];
@@ -2201,6 +2243,50 @@ export class CompanyOfficeService {
 				const d = r.data;
 
 				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class EpochService {
+	async timeline(): Promise<Array<EpochTimelineModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("ZocWgzc2BueXhqbGVtZTYyc2E3b3Zwem"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : EpochTimelineModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getEpochs(): Promise<Array<EpochViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("NtYmVpcjM3eWZ4OWczaHVsMWVpbmN0cW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : EpochViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

@@ -1,7 +1,5 @@
 
 import { Bill, Borough, DbContext, District, Dwelling, PlotBoundary, Resident, ResidentRelationship, Vote } from "../managed/database";
-import { createWriteStream, writeFileSync } from "fs";
-import { toSimulatedAge, toSimulatedTime } from "../../interface/time";
 import { TickFactor } from "./factor";
 import { Gender, genders } from "./gender";
 import { NameGenerator } from "./name";
@@ -11,6 +9,7 @@ import { Interpreter, SystemMessage, UserMessage } from "./interpreter";
 import { Interface } from "readline/promises";
 import { config } from "process";
 import { Point } from "../../interface/point";
+import { Time } from "../../interface/time";
 
 export class Life {
 	// weights, of how many people do what on a tick
@@ -42,7 +41,7 @@ export class Life {
 		this.familyNameGenerator = new NameGenerator('family', this.residents.map(resident => resident.familyName));
 		this.givenNameGenerators = genders.map(gender => new NameGenerator('given', this.residents.map(resident => resident.givenName), gender));
 
-		console.log(`[life] now: ${toSimulatedTime(new Date()).toISOString()}`);
+		console.log(`[life] now: ${Time.now().toString()}`);
 	}
 
 	async updateResidentAnchors() {
@@ -245,7 +244,7 @@ export class Life {
 
 			await interpreter.execute(
 				new SystemMessage(`
-					${initiator.givenName} and ${peer.givenName} have meet ${toSimulatedAge(existingRelationship.bonded)} years ago.
+					${initiator.givenName} and ${peer.givenName} have meet ${new Time(existingRelationship.bonded).age()} years ago.
 					They had their fun times, but sadly they cannot continue their connection.
 					Come up with a fictional story, why they are no longer friends, ...
 
@@ -302,7 +301,7 @@ export class Life {
 	async compilePersonDescription(resident: Resident, relationships: ResidentRelationship[]) {
 		return `
 			${resident.givenName} ${resident.familyName}
-			age ${toSimulatedAge(resident.birthday)}
+			age ${new Time(resident.birthday).age()}
 
 			${resident.biography}
 
@@ -317,7 +316,7 @@ export class Life {
 		for (let relationship of relationships) {
 			const peer = relationship.initiatorId == resident.id ? await relationship.peer.fetch() : await relationship.initiator.fetch();
 
-			relations.push(`- ${relationship} with ${peer.givenName} ${peer.familyName} (since ${toSimulatedAge(relationship.bonded)} years): ${relationship.summary}`);
+			relations.push(`- ${relationship} with ${peer.givenName} ${peer.familyName} (since ${new Time(relationship.bonded).age()} years): ${relationship.summary}`);
 		}
 
 		return relations;

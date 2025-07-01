@@ -1,5 +1,4 @@
-import { toSimulatedTime } from "../interface/time";
-import { Application } from "./index";
+import { Time } from "../interface/time";
 import { Component } from "@acryps/page";
 
 export class PageComponent extends Component {
@@ -8,9 +7,9 @@ export class PageComponent extends Component {
 		const time: HTMLElement = <ui-time></ui-time>;
 
 		const updateTime = () => {
-			const simulated = toSimulatedTime(new Date());
-			date.textContent = simulated.toLocaleDateString();
-			time.textContent = simulated.toLocaleTimeString();
+			const simulated = Time.now();
+			date.textContent = simulated.toDateString();
+			time.textContent = simulated.toTimeString();
 
 			requestAnimationFrame(() => updateTime());
 		}
@@ -23,7 +22,7 @@ export class PageComponent extends Component {
 					townhall
 				</ui-logo>
 
-				<ui-timer>
+				<ui-timer ui-href='/time'>
 					{date}
 					{time}
 				</ui-timer>

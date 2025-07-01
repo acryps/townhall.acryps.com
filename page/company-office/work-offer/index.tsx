@@ -1,6 +1,6 @@
 import { Component } from "@acryps/page";
 import { CompanyOfficeService, WorkOfferViewModel } from "../../managed/services";
-import { toSimulatedAge } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 import { convertToLegalCompanyName } from "../../../interface/company";
 
 export class WorkOfferPage extends Component {
@@ -29,7 +29,7 @@ export class WorkOfferPage extends Component {
 			<ui-contracts>
 				{this.workOffer.workContracts.toSorted((a, b) => +(a.canceled ?? a.signed) - +(b.canceled ?? b.signed)).map(contract => <ui-contract ui-cancled={!!contract.canceled} ui-href={`/resident/${contract.worker.tag}`}>
 					<ui-name>
-						{contract.worker.givenName} {contract.worker.familyName} ({toSimulatedAge(contract.worker.birthday)})
+						{contract.worker.givenName} {contract.worker.familyName} ({new Time(contract.worker.birthday).age()})
 					</ui-name>
 
 					<ui-match>

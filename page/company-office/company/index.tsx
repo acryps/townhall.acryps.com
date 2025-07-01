@@ -1,12 +1,12 @@
 import { Component } from "@acryps/page";
 import { CompanyOfficeService, CompanyType, CompanyViewModel } from "../../managed/services";
-import { toSimulatedAge } from "../../../interface/time";
 import { MapComponent } from "../../shared/map";
 import { Point } from "../../../interface/point";
 import { convertToCompanyTypeName } from "../../../interface/company";
 import { BannerComponent } from "../../banner";
 import { Banner } from "../../../interface/banner";
 import { AboutComponent } from "../../shared/about";
+import { Time } from "../../../interface/time";
 
 export class CompanyPage extends Component {
 	declare parameters: { tag };
@@ -39,7 +39,7 @@ export class CompanyPage extends Component {
 			</ui-purpose>}
 
 			<ui-founding>
-				Founded {this.company.created.toLocaleDateString()}, {toSimulatedAge(this.company.created)} years ago.
+				Founded {this.company.created.toLocaleDateString()}, {new Time(this.company.created).age()} years ago.
 			</ui-founding>
 
 			<ui-description>

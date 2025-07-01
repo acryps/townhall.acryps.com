@@ -1,4 +1,3 @@
-import { toSimulatedTime } from "../../../interface/time";
 import { Office, WorkContract, WorkOffer } from "../../managed/database";
 import { Interpreter, SystemMessage, UserMessage } from "../interpreter";
 import { Language } from "../language";

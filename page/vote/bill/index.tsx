@@ -1,7 +1,7 @@
 import { Component } from "@acryps/page";
 import { BillViewModel, VoteService } from "../../managed/services";
 import { VoteTickerComponent } from "./ticker";
-import { toSimulatedAge } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 
 export class BillPage extends Component {
 	declare parameters: { tag };
@@ -31,7 +31,7 @@ export class BillPage extends Component {
 
 			{this.bill.certified && <ui-certification>
 				<ui-date>
-					Certified {toSimulatedAge(this.bill.certified)} years ago.
+					Certified {new Time(this.bill.certified).age()} years ago.
 				</ui-date>
 
 				<ui-result>

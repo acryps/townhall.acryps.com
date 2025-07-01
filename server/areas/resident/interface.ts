@@ -3,7 +3,7 @@ import { Life } from "../../life";
 import { DbContext } from "../../managed/database";
 import { ManagedServer } from "../../managed/server";
 import { join } from "path";
-import { toSimulatedAge } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 
 export class ResidentImageInterface {
 	constructor(
@@ -32,7 +32,7 @@ export class ResidentImageInterface {
 
 			let image: Buffer;
 
-			if (toSimulatedAge(resident.birthday) < 18) {
+			if (new Time(resident.birthday).age() < 18) {
 				image = child;
 			} else if (resident.figureId) {
 				if (figureCache.has(resident.figureId)) {

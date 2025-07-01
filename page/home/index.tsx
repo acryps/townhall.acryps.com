@@ -6,19 +6,19 @@ import { hex } from "@acryps/style";
 import { BannerComponent } from "../banner";
 import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, metricIcon, oracleIcon, planIcon, priceIcon, propertyRegisterIcon, publicationIcon, residentIcon, trainIcon } from "../assets/icons/managed";
 import { Point } from "../../interface/point";
-import { toSimulatedTime } from "../../interface/time";
 import { ImpressionsComponent } from "./impressions";
 import { ArticleNewstickerModel, ArticlePreviewModel, PublicationService } from "../managed/services";
 import { NewstickerComponent } from "./newsticker";
 import { Banner } from "../../interface/banner";
+import { Time } from "../../interface/time";
 
 export class HomePage extends Component {
 	render() {
-		const time = <ui-time></ui-time>;
+		const time = <ui-time ui-href='/time'></ui-time>;
 
 		requestAnimationFrame(() => {
 			const updateTime = () => {
-				time.textContent = toSimulatedTime(new Date()).toLocaleString();
+				time.textContent = Time.now().toString();
 
 				if (this.loaded) {
 					requestAnimationFrame(() => updateTime());
@@ -36,7 +36,8 @@ export class HomePage extends Component {
 
 			<ui-description>
 				Welcome to our minecraft server.
-				We are currently in the year {toSimulatedTime(new Date()).getFullYear()} but time is a bit faster here.
+				Step into a unique world where civilization is guided by advanced language models.
+				Discover the latest updates, browse our meticulously maintained property registry, or simply explore the evolving map and see what surprises await.
 			</ui-description>
 
 			<ui-topics>

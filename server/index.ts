@@ -1,7 +1,7 @@
 import { DbClient, RunContext } from "vlquery";
 import { Inject, StaticFileRoute, ViewModel } from "vlserver";
 import { ManagedServer } from "./managed/server";
-import { Article, ArticleImage, Bridge, CompanyType, DbContext, MapType, Metric, Movement, PropertyOwner, Resident, ResidentFigure, ResidentRelationship, Tenancy, TenancyQueryProxy } from "./managed/database";
+import { DbContext } from "./managed/database";
 import ws from 'express-ws';
 import { join } from "path";
 import { GameBridge } from "./bridge";
@@ -16,7 +16,6 @@ import { Language } from "./life/language";
 import { GoInterface } from "./go";
 import { PropertyTileServer } from "./map/layers/shape/property";
 import { BoroughTileServer } from "./map/layers/shape/borough";
-import { MovementTileServer } from "./map/layers/heatmap/density/movement";
 import { PropertyUsageTileServer } from "./map/layers/shape/usage";
 import { ImpressionImageInterface } from "./areas/impressions/interface";
 import { StreetTileServer } from "./map/layers/shape/street";
@@ -30,22 +29,7 @@ import { PropertyOwnershipTileServer } from "./map/layers/shape/propety-ownershi
 import { PropertyValueator } from "./areas/trade/valuation/property";
 import { LegalEntityManager } from "./areas/legal-entity/manager";
 import { FillLife } from "./life/fill/fill";
-import { createWriteStream } from "fs";
 import { MetricTracker } from "./areas/metrics/tracker";
-import { PopulationSizeMetric } from "./areas/metrics/tracker/population-size";
-import { PropertyCountMetric } from "./areas/metrics/tracker/property-count";
-import { AllocatedAreaMetric } from "./areas/metrics/tracker/allocated-area";
-import { PopulationAgeAverageMetric } from "./areas/metrics/tracker/average-age";
-import { WorkUnemploymentMetric } from "./areas/metrics/tracker/unemployment";
-import { TotalPropertyValueMetric } from "./areas/metrics/tracker/total-property-value";
-import { DwellingCountMetric } from "./areas/metrics/tracker/dwelling-count";
-import { PlayerTraveledBlocksMetric } from "./areas/metrics/tracker/player-traveled-blocks";
-import { RelationDistanceMetric } from "./areas/metrics/tracker/relation-distance";
-import { OpenWorkOfferMetric } from "./areas/metrics/tracker/open-work-offer";
-import { WorkOfferTotalMetric } from "./areas/metrics/tracker/work-offers";
-import { CompanyCountMetric } from "./areas/metrics/tracker/company-count";
-import { CompanyAssetTotalMetric } from "./areas/metrics/tracker/company-asset-total";
-import { EmptyDwellingCountMetric } from "./areas/metrics/tracker/empty-dwellings";
 import { TrainRouteTileServer } from "./map/layers/shape/train/route";
 import { TrainRoutesTileServer } from "./map/layers/shape/train/routes";
 import { registerMetrics } from "./areas/metrics/metrics";
@@ -56,6 +40,8 @@ import { Oracle } from "./areas/oracle/generator";
 import { ArticleOpinionGenerator } from "./areas/publication/opinion";
 import { Preload } from "./preload";
 import { registerPreload } from "./preload/routes";
+import { ScheduledEpoch } from "../interface/time/epoch";
+import { Time } from "../interface/time";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -73,6 +59,8 @@ DbClient.connectedClient.connect().then(async () => {
 	ws(app.app);
 
 	const database = new DbContext(new RunContext());
+
+	ScheduledEpoch.import(await database.epoch.toArray());
 
 	await registerMetrics(database);
 	await MetricTracker.executeTask();

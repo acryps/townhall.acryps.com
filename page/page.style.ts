@@ -1,4 +1,4 @@
-import { alignItems, backdropFilter, backgroundColor, blur, borderBottom, boxShadow, brightness, child, color, ColorValue, contrast, display, dropShadow, em, filter, fontFamily, fontSize, grayscale, hex, margin, marginLeft, outline, padding, position, px, rem, root, textAlign, top, Variable, zIndex } from "@acryps/style";
+import { alignItems, backdropFilter, backgroundColor, blur, borderBottom, boxShadow, brightness, child, color, ColorValue, contrast, cursor, display, dropShadow, em, filter, fontFamily, fontSize, grayscale, hex, margin, marginLeft, outline, padding, position, px, rem, root, textAlign, top, Variable, zIndex } from "@acryps/style";
 import { homeStyle } from "./home/index.style";
 import { boldFont, boldItalicFont, headlineFont, microFont, regularFont, regularItalicFont } from "./assets/font/index.style";
 import { boroughStyle } from "./borough/index.style";
@@ -31,6 +31,7 @@ import { trainStyle } from "./train/index.style";
 import { trainRouteIconStyle } from "./shared/train-route/index.style";
 import { plansStyle } from "./plans/index.style";
 import { oracleStyle } from "./oracle/index.style";
+import { timeStyle } from "./time/index.style";
 
 export const pageStyle = () => root(
 	boldFont,
@@ -85,6 +86,8 @@ export const pageStyle = () => root(
 					fontSize(rem(0.8)),
 					textAlign('right'),
 
+					cursor('pointer'),
+
 					child('ui-date',
 						display('block')
 					),
@@ -121,6 +124,8 @@ export const pageStyle = () => root(
 
 				populationStyle(),
 				residentStyle(),
+
+				timeStyle(),
 
 				streetStyle(),
 

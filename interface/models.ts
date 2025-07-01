@@ -186,6 +186,14 @@ export interface CityViewModel {
 	name: string;
 }
 
+export interface EpochTimelineModel {
+    end: Date;
+	id: string;
+	offset: number;
+	rate: number;
+	start: Date;
+}
+
 export interface HistoricListingGradeViewModel {
     description: string;
 	grade: number;
@@ -559,6 +567,16 @@ export interface WorkContractEmploymentModel {
 	canceled: Date;
 	id: string;
 	signed: Date;
+}
+
+export interface EpochViewModel {
+    description: string;
+	end: Date;
+	id: string;
+	name: string;
+	offset: number;
+	rate: number;
+	start: Date;
 }
 
 export interface LawHouseSessionViewModel {

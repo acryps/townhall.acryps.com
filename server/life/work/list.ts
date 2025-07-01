@@ -1,4 +1,4 @@
-import { toSimulatedTime } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 import { Company, Office, WorkOffer } from "../../managed/database";
 import { Interpreter, SystemMessage, UserMessage } from "../interpreter";
 
@@ -90,7 +90,7 @@ export const adjustRoleList = async (office: Office, roles: WorkOffer[], target:
 			Always use the singular form for the jobs name, not the plural.
 			Distribute the people according to how many people would work in a real company, even if this means creating big groups of similar workers.
 			Beware that some activities might be outsourced and are not part of this companies offices.
-			We are currently in the year ${toSimulatedTime(new Date())}, beware that many jobs that exist now did not back in the day.
+			We are currently in the year ${Time.now().year}, beware that many jobs that exist now did not back in the day.
 			Make a list of at least ${minimumRoleCount} different roles.
 
 			I will provide a list of the current role distribution, you need to adjust it to reach ${target} people.

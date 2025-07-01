@@ -1,6 +1,6 @@
 import { Component } from "@acryps/page";
 import { ChatInteractionViewModel, ChatService, LifeService, ResidentViewModel } from "../../managed/services";
-import { toSimulatedAge } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 import { px } from "@acryps/style";
 import { InteractionsComponent } from "./interactions";
 import { pusher } from "./index.style";
@@ -58,7 +58,7 @@ export class ChatPage extends Component {
 				</ui-name>
 
 				<ui-age>
-					Born {this.parent.resident.birthday.toLocaleDateString()}, aged {toSimulatedAge(this.parent.resident.birthday)}
+					Born {this.parent.resident.birthday.toLocaleDateString()}, aged {new Time(this.parent.resident.birthday).age()}
 				</ui-age>
 
 				<ui-legal>

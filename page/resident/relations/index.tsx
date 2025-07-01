@@ -1,7 +1,7 @@
 import { Component } from "@acryps/page";
 import { ResidentPage } from "..";
 import { LifeService, ResidentRelationViewModel, ResidentSummaryModel } from "../../managed/services";
-import { toSimulatedAge, toSimulatedTime } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 import { relationIcon } from "../../assets/icons/managed";
 import { Point } from "../../../interface/point";
 import { drawDanwinstonLine } from "../../../interface/line";
@@ -56,7 +56,7 @@ export class RelationsPage extends Component {
 							</ui-family-name>
 
 							<ui-age>
-								{toSimulatedTime(member.birthday).toLocaleDateString()} - {toSimulatedAge(member.birthday)}
+								{new Time(member.birthday).toDateString()} - {new Time(member.birthday).age()}
 							</ui-age>
 						</ui-resident>,
 

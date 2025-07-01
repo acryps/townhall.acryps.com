@@ -1,5 +1,5 @@
 import { Bill, BillHonestium, Borough, Company, District, Resident, ResidentFigure, ResidentRelationship } from "../managed/database";
-import { toSimulatedTime } from "../../interface/time";
+import { Time } from "../../interface/time";
 import { NameType } from "./name";
 import { Gender } from "./gender";
 import { Ollama, Tool } from "ollama";
@@ -14,7 +14,7 @@ export class Language {
 		Pilegron, a fictional city.
 		Somewhere Europe, in a place like England, but it is not England.
 		This is fictional, there is not Europe or England, it's just similar.
-		It is currently ${toSimulatedTime(new Date()).toDateString()}.
+		It is currently ${Time.now().toDateString()}.
 		Well known world events, like the World Wars, did not happen here.
 	`;
 
@@ -54,7 +54,7 @@ export class Language {
 		Invent a person who lives here.
 		Their given name is ${givenName}, family name ${familyName}.
 		${gender.pronoun} lives in ${home.name}, described later.
-		${gender.pronoun} is ${toSimulatedTime(new Date()).getFullYear() - toSimulatedTime(birthday).getFullYear()} years old.
+		${gender.pronoun} is ${new Time(birthday).age()} years old.
 		If the person is still a little kid, keep the story short.
 
 		${gender.pronoun} has a social standing of ${standing}.
@@ -66,7 +66,7 @@ export class Language {
 		Imagine a creative given and family name, probable occupation, core beliefs and principles.
 		Do not mention facts like age or social standing.
 
-		Remember, we are currently in the year ${toSimulatedTime(new Date()).getUTCFullYear()}.
+		Remember, we are currently in the year ${Time.now().year}.
 		The people might not be progressive, they might not be nice, or kind.
 		We cannot have everybody be a nice, socially hyperaware, environment-friendly gardener, some people will be industrialists, stupid, populists or whatever else.
 
@@ -161,7 +161,7 @@ export class Language {
 		Given the following biography, bill proposal and q&a, what would ${resident.givenName} ${resident.familyName} vote?
 
 		The people do not have to be progressive, they might vote conservatively even in cases where it might not align with modern values.
-		Do not forget, we are not in the current year, this is ${toSimulatedTime(new Date()).getFullYear()}.
+		Do not forget, we are not in the current year, this is ${Time.now().year}.
 		All voting is anonymous, and everybody is free to express their beliefs, even if they would be percieved as distruptive or evil by other people.
 
 		${this.environment()}

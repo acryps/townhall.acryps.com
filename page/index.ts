@@ -2,7 +2,7 @@ import { Router, PathRouter, Component } from "@acryps/page";
 import { PageComponent } from "./page";
 import { PropertiesComponent } from "./properties/index";
 import { PropertyPage } from "./properties/property/index";
-import { BoroughService, BoroughSummaryModel, BoroughViewModel, GameService, PlayerViewModel, Service } from "./managed/services";
+import { BoroughService, BoroughSummaryModel, BoroughViewModel, EpochService, GameService, PlayerViewModel, Service } from "./managed/services";
 import { registerDirectives } from "@acryps/page-default-directives";
 import { HomePage } from "./home";
 import { pageStyle } from "./page.style";
@@ -62,6 +62,8 @@ import { PlanShapeAction } from "./map/plan-shape";
 import { PlanShapePage } from "./plans/plan/shape";
 import { PlanViewAction } from "./map/plans";
 import { OraclePage } from "./oracle";
+import { ScheduledEpoch } from "../interface/time/epoch";
+import { TimePage } from "./time";
 
 export class Application {
 	static router: Router;
@@ -82,6 +84,7 @@ export class Application {
 			location.pathname = '/home';
 		}
 
+		ScheduledEpoch.import(await new EpochService().timeline());
 		this.boroughs = await new BoroughService().list();
 
 		this.router = new PathRouter(
@@ -116,6 +119,8 @@ export class Application {
 				.route('/street/:id', StreetPage
 					.route('/plots', StreetPlotsPage)
 				)
+
+				.route('/time', TimePage)
 
 				.route('/train', TrainsPage
 					.route('/register/:path', RegisterTrainRoutePage)

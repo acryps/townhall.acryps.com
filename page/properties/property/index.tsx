@@ -3,7 +3,7 @@ import { BoroughSummaryModel, BoroughViewModel, BuildingSummaryModel, HistoricLi
 import { Component } from "@acryps/page";
 import { MapComponent } from "../../shared/map";
 import { PackedPoint, PackedPointArray, Point } from "../../../interface/point";
-import { toSimulatedAge } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 import { addIcon, captureIcon, deleteIcon, drawIcon, lawIcon } from "../../assets/icons/managed";
 import { MetaGovernmentBuilding, MetaPlace } from "@acryps/metadata";
 import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
@@ -50,7 +50,7 @@ export class PropertyPage extends Component {
 				{new MapComponent().highlight(Point.unpack(this.activePlotBoundary.shape))}
 
 				{this.property.deactivated && <ui-deactivated>
-					This plot has been archived {toSimulatedAge(this.property.deactivated)} years ago ({this.property.deactivated.toLocaleDateString()})
+					This plot has been archived {new Time(this.property.deactivated).age()} years ago ({this.property.deactivated.toLocaleDateString()})
 				</ui-deactivated>}
 
 				{new Tabs()

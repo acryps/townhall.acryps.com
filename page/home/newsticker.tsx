@@ -1,7 +1,7 @@
 import { Component } from "@acryps/page";
 import { PublicationService } from "../managed/services";
 import { ArticleNewstickerModel } from "../../interface/models";
-import { toSimulatedAge, toSimulatedTime } from "../../interface/time";
+import { Time } from "../../interface/time";
 
 export class NewstickerComponent extends Component {
 	newsticker: ArticleNewstickerModel[] = [];
@@ -28,7 +28,7 @@ export class NewstickerComponent extends Component {
 			</ui-title>
 
 			<ui-date>
-				{toSimulatedTime(article.published).toLocaleDateString()}
+				{new Time(article.published).toDateString()}
 			</ui-date>
 		</ui-article>;
 	}

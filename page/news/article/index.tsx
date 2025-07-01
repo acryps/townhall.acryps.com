@@ -4,7 +4,7 @@ import { MetaNewsArticle, MetaOrganization } from "@acryps/metadata";
 import { AnnotatedTextComponent } from "../../shared/annotaded-text";
 import { BannerComponent } from "../../banner";
 import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
-import { toSimulatedAge } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 
 export class ArticePage extends Component {
 	declare parameters: { id };
@@ -59,7 +59,7 @@ export class ArticePage extends Component {
 						</ui-name>
 
 						<ui-date>
-							{opinion.commented.toLocaleDateString()}, {toSimulatedAge(opinion.commented)} years ago.
+							{opinion.commented.toLocaleDateString()}, {new Time(opinion.commented).age()} years ago.
 						</ui-date>
 					</ui-meta>
 

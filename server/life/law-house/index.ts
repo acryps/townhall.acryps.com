@@ -1,5 +1,5 @@
 import { Life } from "..";
-import { toSimulatedAge } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 import { BillHonestium, Company, DbContext, District, LawHouseSession, Property, Resident, Vote } from "../../managed/database";
 import { Language } from "../language";
 import { LawHouseSessionManager } from "./session";
@@ -64,7 +64,7 @@ export class LawHouse {
 	// no children
 	async collectLegallyCompetentResidents(district: District) {
 		return (await this.collectResidents(district))
-			.filter(resident => toSimulatedAge(resident.birthday) > 18)
+			.filter(resident => new Time(resident.birthday).age() > 18)
 	}
 
 	private async collectResidents(district: District) {

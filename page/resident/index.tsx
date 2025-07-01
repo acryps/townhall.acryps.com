@@ -1,6 +1,6 @@
 import { Component } from "@acryps/page";
 import { ChatService, LifeService, ResidentEventViewModel, ResidentViewModel } from "../managed/services";
-import { toSimulatedAge } from "../../interface/time";
+import { Time } from "../../interface/time";
 import { chatIcon, electionIcon, homeIcon, relationGraphIcon } from "../assets/icons/managed";
 import { MetaPerson } from "@acryps/metadata";
 import { convertToLegalCompanyName } from "../../interface/company";
@@ -46,11 +46,11 @@ export class ResidentPage extends Component {
 			</ui-name>
 
 			<ui-age>
-				Born {this.resident.birthday.toLocaleDateString()}, aged {toSimulatedAge(this.resident.birthday)}
+				Born {this.resident.birthday.toLocaleDateString()}, aged {new Time(this.resident.birthday).age()}
 			</ui-age>
 
 			{this.resident.mainTenancy ? <ui-home>
-				Lives in {this.resident.mainTenancy.dwelling.property.borough.name} since {toSimulatedAge(this.resident.mainTenancy.start)} years
+				Lives in {this.resident.mainTenancy.dwelling.property.borough.name} since {new Time(this.resident.mainTenancy.start).age()} years
 			</ui-home> : <ui-home>
 				No permanent home
 			</ui-home>}
@@ -82,7 +82,7 @@ export class ResidentPage extends Component {
 			<ui-timeline>
 				{this.events.map(event => <ui-event>
 					<ui-time>
-						{toSimulatedAge(event.timestamp)} years ago
+						{new Time(event.timestamp).age()} years ago
 					</ui-time>
 
 					<ui-action>

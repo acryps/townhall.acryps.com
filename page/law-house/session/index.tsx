@@ -2,7 +2,7 @@ import { Component } from "@acryps/page";
 import { LawHouseService, LawHouseSessionProtocolViewModel, LawHouseSessionViewModel } from "../../managed/services";
 import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
 import { speakIcon } from "../../assets/icons/managed";
-import { toSimulatedAge } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 
 export class LawHouseSessionPage extends Component {
 	declare parameters: { id };
@@ -81,7 +81,7 @@ export class LawHouseSessionPage extends Component {
 		for (let sessionary of this.session.sessionaries) {
 			if (!LawHouseSessionPage.voices.has(sessionary.resident.id)) {
 				const voice = voices[Math.floor(voices.length * Math.random())];
-				const pitch = (-8 / 79) * toSimulatedAge(sessionary.resident.birthday) + (687.4 / 79);
+				const pitch = (-8 / 79) * new Time(sessionary.resident.birthday).age() + (687.4 / 79);
 
 				LawHouseSessionPage.voices.set(sessionary.resident.id, {
 					voice,

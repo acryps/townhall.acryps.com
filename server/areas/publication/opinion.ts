@@ -1,5 +1,4 @@
-import { A } from "ollama/dist/shared/ollama.7cdb1e15";
-import { toSimulatedAge, toSimulatedTime } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 import { Interpreter, SystemMessage, UserMessage } from "../../life/interpreter";
 import { Article, ArticleOpinion, DbContext } from "../../managed/database";
 
@@ -63,7 +62,7 @@ export class ArticleOpinionGenerator {
 
 			interpreter.remember([
 				new UserMessage(`# ${article.title}`),
-				new UserMessage(`Published at ${toSimulatedTime(article.published).toLocaleString()} by ${publication.name}`),
+				new UserMessage(`Published at ${new Time(article.published)} by ${publication.name}`),
 				new UserMessage(article.body)
 			]);
 
@@ -72,7 +71,7 @@ export class ArticleOpinionGenerator {
 
 				interpreter.remember([
 					new UserMessage(`
-						Comment by ${author.givenName} ${author.familyName} written at ${toSimulatedTime(opinion.commented).toLocaleString()}:
+						Comment by ${author.givenName} ${author.familyName} written at ${new Time(opinion.commented)}:
 						"${opinion.comment}"
 					`)
 				]);
@@ -81,14 +80,14 @@ export class ArticleOpinionGenerator {
 			interpreter.remember([
 				new UserMessage(`
 					# ${resident.givenName} ${resident.familyName}
-					Born ${toSimulatedTime(resident.birthday)}, aged ${toSimulatedAge(resident.birthday)}
+					Born ${new Time(resident.birthday).toDateString()}, aged ${new Time(resident.birthday).age()}
 
 					${resident.biography}
 				`)
 			]);
 
 			interpreter.execute(new SystemMessage(`
-				We are in a fictional world, it is currently ${toSimulatedTime(new Date()).toLocaleString()}.
+				We are in a fictional world, it is currently ${Time.now()}.
 				Pretend that you are ${resident.givenName} ${resident.familyName}, writing a comment about this article.
 				I have appended the article, other comments and your biography.
 				The comments are allowed to be positive or critical, people can even be mad, estatic or even out right rude.

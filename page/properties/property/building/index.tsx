@@ -4,7 +4,7 @@ import { BuildingShapeModel, BuildingSummaryModel, PropertyService } from "../..
 import { MapComponent } from "../../../shared/map";
 import { Point } from "../../../../interface/point";
 import { deleteIcon } from "../../../assets/icons/managed";
-import { toSimulatedAge } from "../../../../interface/time";
+import { Time } from "../../../../interface/time";
 
 export class BuildingPage extends Component {
 	declare parent: PropertyPage;
@@ -23,7 +23,7 @@ export class BuildingPage extends Component {
 			</ui-identifier>
 
 			{this.building.archived && <ui-deactivated>
-				This building has been archived {toSimulatedAge(this.building.archived)} years ago ({this.building.archived.toLocaleDateString()})
+				This building has been archived {new Time(this.building.archived).age()} years ago ({this.building.archived.toLocaleDateString()})
 			</ui-deactivated>}
 
 			{new MapComponent().highlight(Point.unpack(this.building.boundary))}

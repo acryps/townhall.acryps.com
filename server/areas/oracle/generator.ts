@@ -1,6 +1,5 @@
-import { Entity } from "vlquery";
 import { convertToLegalCompanyName } from "../../../interface/company";
-import { toSimulatedAge, toSimulatedTime } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 import { Annotator } from "../../annotate";
 import { Article, DbContext, LegalEntity, OracleProposal } from "../../managed/database";
 import { LegalEntityManager } from "../legal-entity/manager";
@@ -71,7 +70,7 @@ export class Oracle {
 				Your goal is to come up with changes to the lore based on a certain item.
 				Do not repeat what already happened, come up with new ideas.
 
-				Today ${toSimulatedTime(new Date()).toDateString()}, ${item.name} is doing something ${Math.random() > 0.3 ? 'positively' : 'negatively'} newsworthy.
+				Today ${Time.now().toDateString()}, ${item.name} is doing something ${Math.random() > 0.3 ? 'positively' : 'negatively'} newsworthy.
 				Invent something that they did, for example: ${item.actions.join(', ')}...
 
 				I have provided extra context so you can make a realistic lore update.
@@ -120,7 +119,7 @@ export class Oracle {
 			interpreter.remember(context);
 
 			interpreter.execute(new SystemMessage(`
-				We are in a fictional world, current date: ${toSimulatedTime(new Date()).toDateString()}.
+				We are in a fictional world, current date: ${Time.now().toDateString()}.
 				Something just happened:
 				${proposal.lore}
 
@@ -209,7 +208,7 @@ export class Oracle {
 				},
 				{
 					title: `Founding of ${convertToLegalCompanyName(company)}`,
-					body: toSimulatedTime(company.created).toDateString()
+					body: new Time(company.created).toDateString()
 				}
 			);
 		}
@@ -268,7 +267,7 @@ export class Oracle {
 
 		for (let article of contextArticles) {
 			context.push({
-				title: `Article by ${(await article.publication.fetch()).name} (${toSimulatedTime(article.published).toDateString()}): ${article.title}`,
+				title: `Article by ${(await article.publication.fetch()).name} (${new Time(article.published).toDateString()}): ${article.title}`,
 				body: article.body
 			});
 		}

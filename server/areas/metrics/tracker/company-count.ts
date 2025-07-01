@@ -1,6 +1,5 @@
 import { MetricTracker } from ".";
 import { convertToCompanyTypeName } from "../../../../interface/company";
-import { toSimulatedAge } from "../../../../interface/time";
 import { CompanyType, DbContext } from "../../../managed/database";
 
 export class CompanyCountMetric extends MetricTracker {

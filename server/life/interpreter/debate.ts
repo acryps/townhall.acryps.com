@@ -1,4 +1,4 @@
-import { toSimulatedAge } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 import { Resident } from "../../managed/database";
 import { Interpreter, SystemMessage, UserMessage } from ".";
 
@@ -40,7 +40,7 @@ export class Debate {
 			const property = await dwelling?.property.fetch();
 			const borough = await property?.borough.fetch();
 
-			peopleDescriptions.push(`${person.id.split('-')[0]}: ${person.givenName} ${person.familyName}, aged ${toSimulatedAge(person.birthday)}, living in ${borough?.name ?? 'the city'}, ${person.politicalSetting}`);
+			peopleDescriptions.push(`${person.id.split('-')[0]}: ${person.givenName} ${person.familyName}, aged ${new Time(person.birthday).age()}, living in ${borough?.name ?? 'the city'}, ${person.politicalSetting}`);
 		}
 
 		console.log(peopleDescriptions)

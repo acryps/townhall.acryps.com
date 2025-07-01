@@ -1,6 +1,5 @@
 import { Component } from "@acryps/page";
 import { LifeService, ResidentSummaryModel } from "../../managed/services";
-import { toSimulatedAge } from "../../../interface/time";
 import { SearchResultsComponent } from "./results";
 
 export class SearchComponent extends Component {

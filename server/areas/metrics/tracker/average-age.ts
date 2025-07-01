@@ -1,5 +1,5 @@
 import { MetricTracker } from ".";
-import { toSimulatedAge } from "../../../../interface/time";
+import { Time } from "../../../../interface/time";
 
 export class PopulationAgeAverageMetric extends MetricTracker {
 	tag = ['population', 'age', 'average'];
@@ -15,7 +15,7 @@ export class PopulationAgeAverageMetric extends MetricTracker {
 		let sum = 0;
 
 		for (let resident of residents) {
-			sum += toSimulatedAge(resident.birthday);
+			sum += new Time(resident.birthday).age();
 		}
 
 		return Math.floor(sum / residents.length * 100) / 100;

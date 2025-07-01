@@ -112,29 +112,33 @@ export class Preload {
 		await page.setUserAgent(Preload.userAgent);
 
 		for (let link of links) {
-			let entry = this.indexed.find(page => page.link == link);
+			try {
+				let entry = this.indexed.find(page => page.link == link);
 
-			if (!entry) {
-				entry = new PreloadedPage();
-				entry.link = link;
+				if (!entry) {
+					entry = new PreloadedPage();
+					entry.link = link;
 
-				await entry.create();
+					await entry.create();
+				}
+
+				console.log(`updating ${link}...`);
+
+				await page.goto(`http://localhost:${port}${link}`);
+
+				// ensure page load
+				await page.waitForSelector('.page');
+				await page.waitForNetworkIdle();
+
+				entry.title = await page.title();
+				entry.metadata = await page.evaluate(() => document.querySelector('script[type="application/ld+json"]')?.textContent);
+				entry.content = (await page.evaluate(() => document.querySelector('.content').innerHTML)).trim();
+
+				entry.updated = new Date();
+				await entry.update();
+			} catch (error) {
+				console.error(`preload of ${link} failed`, error);
 			}
-
-			console.log(`updating ${link}...`);
-
-			await page.goto(`http://localhost:${port}${link}`);
-
-			// ensure page load
-			await page.waitForSelector('.page');
-			await page.waitForNetworkIdle();
-
-			entry.title = await page.title();
-			entry.metadata = await page.evaluate(() => document.querySelector('script[type="application/ld+json"]')?.textContent);
-			entry.content = (await page.evaluate(() => document.querySelector('.content').innerHTML)).trim();
-
-			entry.updated = new Date();
-			await entry.update();
 		}
 
 		await page.close();

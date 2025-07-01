@@ -832,6 +832,41 @@ export class Dwelling extends Entity<DwellingQueryProxy> {
 	
 }
 			
+export class EpochQueryProxy extends QueryProxy {
+	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get end(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get offset(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get rate(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get start(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Epoch extends Entity<EpochQueryProxy> {
+	description: string;
+	end: Date;
+	declare id: string;
+	name: string;
+	offset: number;
+	rate: number;
+	start: Date;
+	
+	$$meta = {
+		source: "epoch",
+		columns: {
+			description: { type: "text", name: "description" },
+			end: { type: "timestamp", name: "end" },
+			id: { type: "uuid", name: "id" },
+			name: { type: "text", name: "name" },
+			offset: { type: "float4", name: "offset" },
+			rate: { type: "float4", name: "rate" },
+			start: { type: "timestamp", name: "start" }
+		},
+		get set(): DbSet<Epoch, EpochQueryProxy> { 
+			return new DbSet<Epoch, EpochQueryProxy>(Epoch, null);
+		}
+	};
+}
+			
 export class HistoricListingGradeQueryProxy extends QueryProxy {
 	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get grade(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -3299,6 +3334,7 @@ export class DbContext {
 	company: DbSet<Company, CompanyQueryProxy>;
 	district: DbSet<District, DistrictQueryProxy>;
 	dwelling: DbSet<Dwelling, DwellingQueryProxy>;
+	epoch: DbSet<Epoch, EpochQueryProxy>;
 	historicListingGrade: DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>;
 	historicListingModifier: DbSet<HistoricListingModifier, HistoricListingModifierQueryProxy>;
 	impression: DbSet<Impression, ImpressionQueryProxy>;
@@ -3356,6 +3392,7 @@ export class DbContext {
 		this.company = new DbSet<Company, CompanyQueryProxy>(Company, this.runContext);
 		this.district = new DbSet<District, DistrictQueryProxy>(District, this.runContext);
 		this.dwelling = new DbSet<Dwelling, DwellingQueryProxy>(Dwelling, this.runContext);
+		this.epoch = new DbSet<Epoch, EpochQueryProxy>(Epoch, this.runContext);
 		this.historicListingGrade = new DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>(HistoricListingGrade, this.runContext);
 		this.historicListingModifier = new DbSet<HistoricListingModifier, HistoricListingModifierQueryProxy>(HistoricListingModifier, this.runContext);
 		this.impression = new DbSet<Impression, ImpressionQueryProxy>(Impression, this.runContext);

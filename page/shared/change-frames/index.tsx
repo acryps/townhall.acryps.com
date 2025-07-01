@@ -4,7 +4,7 @@ import { ChangeFrameViewModel, ChangeService, PlotBoundaryShapeModel } from "../
 import { frameMarker, frameTime, phaseLength } from "./index.style";
 import { ChangePhase } from "./phase";
 import { Length } from "@acryps/style";
-import { toSimulatedAge } from "../../../interface/time";
+import { Time } from "../../../interface/time";
 
 export class ChangeFramesComponent extends Component {
 	frames: ChangeFrameViewModel[];
@@ -96,7 +96,7 @@ export class ChangeFramesComponent extends Component {
 				<ui-phases>
 					{phases.map((phase, index) => [
 						index > 0 && <ui-elapsed>
-							{toSimulatedAge(phase.start, phases[index].end)}y
+							{new Time(phase.start).age(new Time(phases[index].end))}y
 						</ui-elapsed>,
 
 						<ui-phase style={phaseLength.provide(phase.length)}>

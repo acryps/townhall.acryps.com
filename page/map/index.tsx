@@ -5,6 +5,7 @@ import { registerInteraction } from "../shared/map/interaction";
 import { Point } from "../../interface/point";
 import { Action } from "../action";
 import { MapToolbarComponent } from "./toolbar";
+import { MapStartPage } from "./start";
 
 export type DrawingType = 'closed-shape' | 'path' | 'any';
 
@@ -49,6 +50,8 @@ export class MapPage extends Component {
 					});
 
 					this.toolbar.updateLocationIndicator();
+
+					localStorage.setItem(MapStartPage.lastLocationStorageKey, this.map.cursor.pack());
 				}, scale => {
 					this.updateParameters({
 						zoom: (Math.sqrt(1 / scale) * this.zoomAccuracy).toFixed(0)

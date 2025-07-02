@@ -74,6 +74,21 @@ export class MapService extends Service {
 		);
 	}
 
+	async getLastChangeLocation() {
+		const changedTile = await this.database.mapTile
+			.where(tile => tile.complete == true)
+			.orderByDescending(tile => tile.captured)
+			.includeTree({ regionX: true, regionY: true })
+			.first();
+
+		const size = 250;
+
+		return new Point(
+			changedTile.regionX * size + size / 2,
+			changedTile.regionY * size + size / 2
+		).pack();
+	}
+
 	async getHistory() {
 		return HistoryEntryViewModel.from(await Proxy.getHistory());
 	}

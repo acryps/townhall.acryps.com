@@ -1759,6 +1759,27 @@ export class MapService {
 		});
 	}
 
+	async getLastChangeLocation(): Promise<string> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("YzdX1xaXlicD5la2kycXdvZ3dyYm03bz"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async getHistory(): Promise<Array<HistoryEntryViewModel>> {
 		const $data = new FormData();
 		

@@ -362,6 +362,15 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"YzdX1xaXlicD5la2kycXdvZ3dyYm03bz",
+			{},
+			inject => inject.construct(MapService),
+			(controller, params) => controller.getLastChangeLocation(
+				
+			)
+		);
+
+		this.expose(
 			"oyOTdvb2V4aXw3eHhsNXdyZnp4aGk1bD",
 			{},
 			inject => inject.construct(MapService),

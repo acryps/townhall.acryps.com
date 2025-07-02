@@ -40,7 +40,6 @@ import { CreateBuildingAction } from "./map/create-building";
 import { Metadata } from "@acryps/metadata";
 import { StreetPage } from "./street";
 import { EditRouteAction } from "./map/edit-route";
-import { StreetPlotsPage } from "./street/plots";
 import { BuildingPage } from "./properties/property/building";
 import { ValuationPage } from "./trade/valuation";
 import { PropertyOwnershipPage } from "./properties/property/ownership";
@@ -116,9 +115,7 @@ export class Application {
 				.route('/borough/register/:bounds', RegisterBoroughPage)
 				.route('/borough/:tag', BoroughPage)
 
-				.route('/street/:id', StreetPage
-					.route('/plots', StreetPlotsPage)
-				)
+				.route('/street/:id', StreetPage)
 
 				.route('/time', TimePage)
 

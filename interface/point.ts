@@ -1,4 +1,4 @@
-import { calcualteDanwinstonLine } from "./line";
+import { calcualteDanwinstonLine, calculateDanwinstonShapePath } from "./line";
 import { Shape } from "./shape";
 
 export type PackedPoint = string;
@@ -399,6 +399,11 @@ export class Point {
 					pixels.set(point.pack(), point);
 				}
 			}
+		}
+
+		// make sure outline is correct
+		for (let point of calculateDanwinstonShapePath(shape)) {
+			pixels.set(point.pack(), point);
 		}
 
 		return pixels;

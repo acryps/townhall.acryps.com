@@ -68,10 +68,6 @@ export class StreetPage extends Component {
 					<ui-action ui-href={`/map/${center.x}/${center.y}/5/edit-route/${this.street.id}`}>
 						{drawIcon()} Edit Route
 					</ui-action>
-
-					<ui-action ui-href='plots'>
-						{streetIcon()} View Plots
-					</ui-action>
 				</ui-routes>
 
 				<ui-actions>

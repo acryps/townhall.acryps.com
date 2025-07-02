@@ -8,7 +8,7 @@ export const timeMachineLayer = (date: Date) => MapLayer.fromTileSource((x, y) =
 export const propertyLayer = MapLayer.fromShapeSource((x, y) => `/tile/property/${x}/${y}`, 500, 'source-over', true);
 export const boroughLayer = MapLayer.fromShapeSource((x, y) => `/tile/borough/${x}/${y}`, 500, 'source-over', true);
 export const propertyUsageLayer = MapLayer.fromShapeSource((x, y) => `/tile/usage/${x}/${y}`, 500, 'source-over', true);
-export const streetLayer = MapLayer.fromShapeSource((x, y) => `/tile/street/${x}/${y}`, 500, 'source-over', true);
+export const streetLayer = MapLayer.fromTileSource((x, y) => `/tile/street/${x}/${y}`, 500, 'source-over', (x, y) => `/pick/street/${x}/${y}`);
 
 export const trainRoutesLayer = MapLayer.fromShapeSource((x, y) => `/tile/train-routes/${x}/${y}`, 500, 'source-over');
 export const trainRouteLayer = (code: string) => MapLayer.fromShapeSource((x, y) => `/tile/train-route/${code}/${x}/${y}`, 500, 'source-over');

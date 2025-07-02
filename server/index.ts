@@ -18,7 +18,7 @@ import { PropertyTileServer } from "./map/layers/shape/property";
 import { BoroughTileServer } from "./map/layers/shape/borough";
 import { PropertyUsageTileServer } from "./map/layers/shape/usage";
 import { ImpressionImageInterface } from "./areas/impressions/interface";
-import { StreetTileServer } from "./map/layers/shape/street";
+import { StreetTileServer } from "./map/layers/filled/street";
 import { updateWorkOffers } from "./life/work/offers";
 import { Annotator } from "./annotate";
 import { PlotterInterface } from "./plot/interface";

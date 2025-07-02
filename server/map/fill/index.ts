@@ -1,8 +1,8 @@
-import { calcualteDanwinstonLine } from "../../../interface/line";
+import { calcualteDanwinstonLine, calculateDanwinstonShapePath, drawDanwinstonLine } from "../../../interface/line";
 import { PackedPoint, Point } from "../../../interface/point";
 
 export abstract class Filler<SourceType> {
-	cached = new Map<SourceType, Point[]>;
+	cached = new Map<PackedPoint, SourceType>;
 
 	abstract fetch(): Promise<SourceType[]>;
 	abstract obstacles(): Promise<Point[][]>;
@@ -16,7 +16,7 @@ export abstract class Filler<SourceType> {
 	schedule() {
 		const next = async () => {
 			console.log(`filling ${this.constructor.name}...`);
-			await this.update();
+			this.cached = await this.update();
 			console.log(`filled ${this.constructor.name}`);
 
 			setTimeout(() => next(), 1000 * 60 * 5);
@@ -31,63 +31,38 @@ export abstract class Filler<SourceType> {
 		const source = await this.fetch();
 		source.sort((a, b) => this.rank(a, b));
 
-		const obstacles = new Set<PackedPoint>();
+		// true contains obstacles
+		const map = new Map<PackedPoint, SourceType | true>();
 
 		for (let obstacle of await this.obstacles()) {
 			for (let packed of Point.fill(obstacle).keys()) {
-				obstacles.add(packed);
+				map.set(packed, true);
 			}
 		}
-
-		const filledShapes = new Map<SourceType, Point[]>();
 
 		for (let item of source) {
 			const shape = await this.route(item);
 			const searchField = Point.searchMap(shape.radius);
-			const filled = new Map<PackedPoint, Point>();
 
-			// find free pixels
-			for (let segmentIndex = 1; segmentIndex < shape.route.length; segmentIndex++) {
-				const start = shape.route[segmentIndex - 1];
-				const end = shape.route[segmentIndex];
+			for (let point of calculateDanwinstonShapePath(shape.route, false)) {
+				for (let offset of searchField) {
+					const target = point.add(offset);
+					const packed = target.pack();
 
-				const points = calcualteDanwinstonLine(start, end);
-
-				for (let point of points) {
-					for (let offset of searchField) {
-						const target = point.add(offset);
-						const packed = target.pack();
-
-						if (!obstacles.has(packed)) {
-							if (!filled.has(packed)) {
-								filled.set(packed, target);
-							}
-						}
+					if (!map.has(packed)) {
+						map.set(packed, item);
 					}
 				}
 			}
+		}
 
-			// create shapes
-			const shapes = Point.groupShapes(filled);
-
-			for (let shape of shapes) {
-				const boundary = Point.bounds([...shape.values()]);
-
-				if (boundary.width > 1 && boundary.height > 1) {
-					const outline = Point.outline(shape);
-
-					filledShapes.set(item, outline);
-				}
-			}
-
-			// mark filled items as occupied
-			for (let point of filled.keys()) {
-				obstacles.add(point);
+		// remove obstacles
+		for (let [point, value] of map) {
+			if (value === true) {
+				map.delete(point);
 			}
 		}
 
-		this.cached = filledShapes;
-
-		return filledShapes;
+		return map as Map<PackedPoint, SourceType>;
 	}
 }

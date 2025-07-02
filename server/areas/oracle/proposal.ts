@@ -9,8 +9,5 @@ export class OracleProposalSummaryModel extends ViewModel<OracleProposal> {
 }
 
 export class OracleProposalViewModel extends OracleProposalSummaryModel {
-	id;
-
-	lore;
 	entity: LegalEntityViewModel;
 }

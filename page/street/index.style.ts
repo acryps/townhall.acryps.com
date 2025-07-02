@@ -9,19 +9,6 @@ export const streetStyle = () => child('ui-street',
 
 	fieldStyle(),
 
-	child('ui-plots',
-		display('block'),
-
-		child('ui-progress',
-			display('block')
-		),
-
-		child('canvas',
-			width(percentage(100)),
-			imageRendering('pixelated')
-		)
-	),
-
 	child('ui-content',
 		child('ui-map-container',
 			width(percentage(100).add(pageGutter.multiply(2))),
@@ -44,7 +31,9 @@ export const streetStyle = () => child('ui-street',
 				fontSize(rem(0.8))
 			),
 
-			fieldStyle(),
+			fieldStyle(
+				marginInline(pageGutter)
+			),
 
 			child('ui-route',
 				display('flex'),
@@ -60,15 +49,19 @@ export const streetStyle = () => child('ui-street',
 
 				child('canvas',
 					marginLeft('auto'),
-					height(rem(5)),
 					width(rem(8)),
+					height(rem(2)),
 					objectFit('contain'),
 
 					imageRendering('pixelated')
 				)
 			)
 				.attribute('ui-active',
-					opacity(1)
+					opacity(1),
+
+					child('canvas',
+						height(rem(5))
+					)
 				),
 
 			child('ui-action',

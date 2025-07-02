@@ -18,7 +18,7 @@ export class ImpressionsComponent extends Component {
 		}
 
 		setTimeout(() => {
-			if (this.loaded) {
+			if (document.contains(this.rootNode)) {
 				this.reload();
 			}
 		}, 3000);

@@ -4,6 +4,7 @@ import { Time } from "../../interface/time";
 import { chatIcon, electionIcon, homeIcon, relationGraphIcon } from "../assets/icons/managed";
 import { MetaPerson } from "@acryps/metadata";
 import { convertToLegalCompanyName } from "../../interface/company";
+import { PoliticalCompassComponent } from "../shared/political-compass";
 
 export class ResidentPage extends Component {
 	declare parameters: { tag };
@@ -78,6 +79,8 @@ export class ResidentPage extends Component {
 			<ui-biography>
 				{this.resident.biography}
 			</ui-biography>
+
+			{this.resident.compassSocial !== null && new PoliticalCompassComponent(this.resident.compassSocial, this.resident.compassEconomic)}
 
 			<ui-timeline>
 				{this.events.map(event => <ui-event>

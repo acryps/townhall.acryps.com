@@ -4242,6 +4242,8 @@ ViewModel.mappings = {
 				workContracts: (await this.$$model.workContracts.includeTree(ViewModel.mappings[WorkContractEmploymentModel.name].items).toArray()).map(item => new WorkContractEmploymentModel(item)),
 				biography: this.$$model.biography,
 				birthday: this.$$model.birthday,
+				compassEconomic: this.$$model.compassEconomic,
+				compassSocial: this.$$model.compassSocial,
 				familyName: this.$$model.familyName,
 				givenName: this.$$model.givenName,
 				id: this.$$model.id,
@@ -4289,6 +4291,8 @@ ViewModel.mappings = {
 				},
 				biography: true,
 				birthday: true,
+				compassEconomic: true,
+				compassSocial: true,
 				familyName: true,
 				givenName: true,
 				id: true,
@@ -4302,6 +4306,8 @@ ViewModel.mappings = {
 			"workContracts" in data && (item.workContracts = data.workContracts && [...data.workContracts].map(i => ViewModel.mappings[WorkContractEmploymentModel.name].toViewModel(i)));
 			"biography" in data && (item.biography = data.biography === null ? null : `${data.biography}`);
 			"birthday" in data && (item.birthday = data.birthday === null ? null : new Date(data.birthday));
+			"compassEconomic" in data && (item.compassEconomic = data.compassEconomic === null ? null : +data.compassEconomic);
+			"compassSocial" in data && (item.compassSocial = data.compassSocial === null ? null : +data.compassSocial);
 			"familyName" in data && (item.familyName = data.familyName === null ? null : `${data.familyName}`);
 			"givenName" in data && (item.givenName = data.givenName === null ? null : `${data.givenName}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
@@ -4323,6 +4329,8 @@ ViewModel.mappings = {
 			"workContracts" in viewModel && (null);
 			"biography" in viewModel && (model.biography = viewModel.biography === null ? null : `${viewModel.biography}`);
 			"birthday" in viewModel && (model.birthday = viewModel.birthday === null ? null : new Date(viewModel.birthday));
+			"compassEconomic" in viewModel && (model.compassEconomic = viewModel.compassEconomic === null ? null : +viewModel.compassEconomic);
+			"compassSocial" in viewModel && (model.compassSocial = viewModel.compassSocial === null ? null : +viewModel.compassSocial);
 			"familyName" in viewModel && (model.familyName = viewModel.familyName === null ? null : `${viewModel.familyName}`);
 			"givenName" in viewModel && (model.givenName = viewModel.givenName === null ? null : `${viewModel.givenName}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);

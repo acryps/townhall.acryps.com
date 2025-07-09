@@ -2255,6 +2255,8 @@ export class ResidentQueryProxy extends QueryProxy {
 	get mainTenancy(): Partial<TenancyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get biography(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get birthday(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get compassEconomic(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get compassSocial(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get coreValues(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get deceased(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get familyName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -2278,6 +2280,8 @@ export class Resident extends Entity<ResidentQueryProxy> {
 		workContracts: PrimaryReference<WorkContract, WorkContractQueryProxy>;
 		biography: string;
 	birthday: Date;
+	compassEconomic: number;
+	compassSocial: number;
 	coreValues: string;
 	deceased: Date;
 	familyName: string;
@@ -2295,6 +2299,8 @@ export class Resident extends Entity<ResidentQueryProxy> {
 		columns: {
 			biography: { type: "text", name: "biography" },
 			birthday: { type: "timestamp", name: "birthday" },
+			compassEconomic: { type: "float4", name: "compass_economic" },
+			compassSocial: { type: "float4", name: "compass_social" },
 			coreValues: { type: "text", name: "core_values" },
 			deceased: { type: "timestamp", name: "deceased" },
 			familyName: { type: "text", name: "family_name" },

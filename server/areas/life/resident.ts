@@ -24,6 +24,9 @@ export class ResidentViewModel extends ViewModel<Resident> {
 
 	mainTenancy: TenancyViewModel;
 	workContracts: WorkContractEmploymentModel[];
+
+	compassSocial;
+	compassEconomic;
 }
 
 export class ResidentRelationViewModel extends ViewModel<ResidentRelationship> {

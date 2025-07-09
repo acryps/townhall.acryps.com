@@ -617,6 +617,8 @@ export class ResidentViewModel {
 	workContracts: WorkContractEmploymentModel[];
 	biography: string;
 	birthday: Date;
+	compassEconomic: number;
+	compassSocial: number;
 	familyName: string;
 	givenName: string;
 	id: string;
@@ -628,6 +630,8 @@ export class ResidentViewModel {
 		raw.workContracts === undefined || (item.workContracts = raw.workContracts ? raw.workContracts.map(i => WorkContractEmploymentModel["$build"](i)) : null)
 		raw.biography === undefined || (item.biography = raw.biography === null ? null : `${raw.biography}`)
 		raw.birthday === undefined || (item.birthday = raw.birthday ? new Date(raw.birthday) : null)
+		raw.compassEconomic === undefined || (item.compassEconomic = raw.compassEconomic === null ? null : +raw.compassEconomic)
+		raw.compassSocial === undefined || (item.compassSocial = raw.compassSocial === null ? null : +raw.compassSocial)
 		raw.familyName === undefined || (item.familyName = raw.familyName === null ? null : `${raw.familyName}`)
 		raw.givenName === undefined || (item.givenName = raw.givenName === null ? null : `${raw.givenName}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)

@@ -263,6 +263,8 @@ export interface ResidentViewModel {
 	workContracts: WorkContractEmploymentModel[];
 	biography: string;
 	birthday: Date;
+	compassEconomic: number;
+	compassSocial: number;
 	familyName: string;
 	givenName: string;
 	id: string;

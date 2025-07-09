@@ -3,8 +3,9 @@ import { boxed } from "../shared/boxed.style";
 import { buttonStyle } from "../shared/index.style";
 import { ChatPage } from "./chat";
 import { chatStyle } from "./chat/index.style";
-import { navigationBorderColor } from "../index.style";
+import { navigationBorderColor, pageGutter } from "../index.style";
 import { relationsStyle } from "./relations/index.style";
+import { politicalCompassStyle } from "../shared/political-compass/index.style";
 
 export const residentStyle = () => child('ui-resident',
 	boxed(),
@@ -68,6 +69,10 @@ export const residentStyle = () => child('ui-resident',
 		marginBottom(rem(3)),
 
 		whiteSpace('pre-wrap')
+	),
+
+	politicalCompassStyle(rem(8),
+		marginBottom(rem(3))
 	),
 
 	child('ui-timeline',

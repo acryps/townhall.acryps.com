@@ -42,6 +42,7 @@ import { Preload } from "./preload";
 import { registerPreload } from "./preload/routes";
 import { ScheduledEpoch } from "../interface/time/epoch";
 import { Time } from "../interface/time";
+import { PoliticalCompassRater } from "./life/political-compass";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -78,24 +79,27 @@ DbClient.connectedClient.connect().then(async () => {
 	new LegalEntityReferenceCounter(database).schedule();
 
 	const life = new Life(database);
-	life.load();
+	life.load().then(() => {
+		if (runLife) {
+			const nextTick = async () => {
+				await life.tick();
+
+				setTimeout(() => nextTick(), 1000 * 30);
+			}
+
+			setTimeout(() => nextTick(), 1000 * 30);
+		}
+	});
 
 	const lawHouse = new LawHouse(database, new Language('smart'), life);
 
 	if (runLife) {
 		new Oracle(database, new LegalEntityManager(database)).schedule();
 		new ArticleOpinionGenerator(database).schedule();
+		new PoliticalCompassRater(database).next();
 
 		lawHouse.schedule();
 		life.vote();
-
-		const nextTick = async () => {
-			await life.tick();
-
-			setTimeout(() => nextTick(), 1000 * 30);
-		}
-
-		setTimeout(() => nextTick(), 1000 * 30);
 
 		new FillLife(life, database).fillEmptyDwellings();
 

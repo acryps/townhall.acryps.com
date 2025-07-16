@@ -7,6 +7,8 @@ import { CompanyAssetTotalMetric } from "./tracker/company-asset-total";
 import { CompanyCountMetric } from "./tracker/company-count";
 import { DwellingCountMetric } from "./tracker/dwelling-count";
 import { EmptyDwellingCountMetric } from "./tracker/empty-dwellings";
+import { HomelessCountMetric } from "./tracker/homeless-count";
+import { HomelessRateMetric } from "./tracker/homeless-rate";
 import { OpenWorkOfferMetric } from "./tracker/open-work-offer";
 import { PlayerTraveledBlocksMetric } from "./tracker/player-traveled-blocks";
 import { PopulationSizeMetric } from "./tracker/population-size";
@@ -23,6 +25,9 @@ export const registerMetrics = async (database: DbContext) => {
 	await MetricTracker.track(new RelationDistanceMetric(database));
 
 	await MetricTracker.track(new PlayerTraveledBlocksMetric(database));
+
+	await MetricTracker.track(new HomelessCountMetric(database));
+	await MetricTracker.track(new HomelessRateMetric(database));
 
 	await MetricTracker.track(new PropertyCountMetric(database));
 	await MetricTracker.track(new DwellingCountMetric(database));

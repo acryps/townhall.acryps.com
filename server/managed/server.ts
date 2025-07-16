@@ -533,6 +533,39 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"F0c3JlYTJ0bmlmOH9ndmc1bzdncWp3bz",
+			{
+			"ppbnl3ZnRkZ2Y5ZzN6MzBveXQ0NnA2Yn": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(BoroughService),
+			(controller, params) => controller.residentCount(
+				params["ppbnl3ZnRkZ2Y5ZzN6MzBveXQ0NnA2Yn"]
+			)
+		);
+
+		this.expose(
+			"g2cTFyMzs4dGFlc28zNDFhcmEwM2RwNX",
+			{
+			"ZwOGlmdXxqZGwwcGZnMmFwZGNjMGhscD": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(BoroughService),
+			(controller, params) => controller.officeCount(
+				params["ZwOGlmdXxqZGwwcGZnMmFwZGNjMGhscD"]
+			)
+		);
+
+		this.expose(
+			"ZhY2Jia2JwZnQweWl0cTNoN2hzajJscW",
+			{
+			"hoY3FwZXBtcnJvcDRsNmdlY2c3N2x6ZD": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(BoroughService),
+			(controller, params) => controller.propertyCount(
+				params["hoY3FwZXBtcnJvcDRsNmdlY2c3N2x6ZD"]
+			)
+		);
+
+		this.expose(
 			"Y5d2dmMjM4MHNyNng4bXJya3BjdTZjbm",
 			{
 			"JyMHZwbWcyNDBiZWE0anE3N21xeXRkNT": { type: "number", isArray: false, isOptional: false },

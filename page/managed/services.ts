@@ -2091,6 +2091,69 @@ export class BoroughService {
 			}
 		});
 	}
+
+	async residentCount(id: string): Promise<number> {
+		const $data = new FormData();
+		$data.append("ppbnl3ZnRkZ2Y5ZzN6MzBveXQ0NnA2Yn", Service.stringify(id))
+
+		return await fetch(Service.toURL("F0c3JlYTJ0bmlmOH9ndmc1bzdncWp3bz"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : +d;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async officeCount(id: string): Promise<number> {
+		const $data = new FormData();
+		$data.append("ZwOGlmdXxqZGwwcGZnMmFwZGNjMGhscD", Service.stringify(id))
+
+		return await fetch(Service.toURL("g2cTFyMzs4dGFlc28zNDFhcmEwM2RwNX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : +d;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async propertyCount(id: string): Promise<number> {
+		const $data = new FormData();
+		$data.append("hoY3FwZXBtcnJvcDRsNmdlY2c3N2x6ZD", Service.stringify(id))
+
+		return await fetch(Service.toURL("ZhY2Jia2JwZnQweWl0cTNoN2hzajJscW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : +d;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
 }
 
 export class ChangeService {

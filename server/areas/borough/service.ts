@@ -50,4 +50,23 @@ export class BoroughService extends Service {
 				.orderByAscending(borough => borough.billPrefix)
 		);
 	}
+
+	async residentCount(id: string) {
+		return await this.database.resident
+			.where(resident => resident.mainTenancy.dwelling.property.boroughId == id)
+			.count();
+	}
+
+	async officeCount(id: string) {
+		return await this.database.office
+			.where(office => office.property.boroughId == id)
+			.count();
+	}
+
+	async propertyCount(id: string) {
+		return await this.database.property
+			.where(property => property.deactivated == null)
+			.where(property => property.boroughId == id)
+			.count()
+	}
 }

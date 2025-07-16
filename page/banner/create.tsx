@@ -16,7 +16,7 @@ export class CreateBannerComponent extends Component {
 		const banner = Banner.unpack(this.parameters.code);
 
 		return <ui-create-banner>
-			{banner}
+			{new BannerComponent(banner)}
 
 			<ui-field>
 				<ui-label>
@@ -64,13 +64,13 @@ export class CreateBannerComponent extends Component {
 	}
 
 	preview(offset: number) {
-		const banner = new BannerComponent('white');
+		const banner = new Banner('white');
 		banner.layers.push({ offset, color: 'black' });
 
-		return banner;
+		return new BannerComponent(banner);
 	}
 
-	save(banner: BannerComponent) {
+	save(banner: Banner) {
 		this.parameters.code = banner.pack();
 		this.update();
 	}

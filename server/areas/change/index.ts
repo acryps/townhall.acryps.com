@@ -4,6 +4,7 @@ import { Point } from "../../../interface/point";
 import { Canvas, loadImage } from "skia-canvas";
 import { createHash, Hash } from "node:crypto";
 import { ChangeFrame, ChangeFrameViewModel } from "./frame";
+import { mapBaseTileSize } from "../../../interface/tile";
 
 export class ChangeService extends Service {
 	constructor(
@@ -13,7 +14,7 @@ export class ChangeService extends Service {
 	}
 
 	async getChanges(minX: number, minY: number, maxX: number, maxY: number) {
-		const tileSize = 250;
+		const tileSize = mapBaseTileSize;
 
 		const minRegion = new Point(
 			Math.floor(minX / tileSize),

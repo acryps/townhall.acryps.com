@@ -1,8 +1,10 @@
+import { mapBaseTileSize } from "../interface/tile";
+
 const fetch = require('node-fetch');
 const sharp = require('sharp');
 
 export class TileSet {
-	size = 250;
+	size = mapBaseTileSize;
 
 	loader?: Promise<void>;
 	image: Buffer;

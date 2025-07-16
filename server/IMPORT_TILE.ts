@@ -1,6 +1,7 @@
 import { createHash, Hash } from "crypto";
 import { DbContext, MapTile, MapType } from "./managed/database";
 import { Canvas, loadImage } from "skia-canvas";
+import { mapBaseTileSize } from "../interface/tile";
 
 const sharp = require('sharp');
 
@@ -48,7 +49,7 @@ export const tileimport = async (database: DbContext) => {
 
 	console.log(hashes);
 
-	const tile = 250;
+	const tile = mapBaseTileSize;
 	const size = 8000;
 
 	const regions = size / tile;

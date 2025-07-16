@@ -2,9 +2,10 @@ import { createHash } from "crypto";
 import { DbContext, MapTile, MapType } from "../managed/database";
 import { Canvas, CanvasRenderingContext2D, loadImage } from "skia-canvas";
 import { Point } from "../../interface/point";
+import { mapBaseTileSize } from "../../interface/tile";
 
 export class MapImporter {
-	static readonly tile = 250;
+	static readonly tile = mapBaseTileSize;
 
 	static readonly debounce = 1000 * 30;
 

@@ -17,6 +17,7 @@ import { StreetViewModel } from "././../areas/street.view";
 import { WaterBodyViewModel } from "././../areas/water-body.view";
 import { Point } from "././../../interface/point";
 import { PropertyManager } from "././../areas/property/manager";
+import { mapBaseTileSize } from "././../../interface/tile";
 import { MapService } from "././../areas/map.service";
 import { BoroughSummaryModel } from "././../areas/borough.summary";
 import { DistrictViewModel } from "././../areas/vote/district";

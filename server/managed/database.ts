@@ -629,6 +629,7 @@ export class CityQueryProxy extends QueryProxy {
 	get mainImpressionId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get orderIndex(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class City extends Entity<CityQueryProxy> {
@@ -640,6 +641,7 @@ export class City extends Entity<CityQueryProxy> {
 	mainImpressionId: string;
 	name: string;
 	orderIndex: number;
+	tag: string;
 	
 	$$meta = {
 		source: "city",
@@ -650,7 +652,8 @@ export class City extends Entity<CityQueryProxy> {
 			incorporated: { type: "timestamp", name: "incorporated" },
 			mainImpressionId: { type: "uuid", name: "main_impression_id" },
 			name: { type: "text", name: "name" },
-			orderIndex: { type: "int4", name: "order_index" }
+			orderIndex: { type: "int4", name: "order_index" },
+			tag: { type: "text", name: "tag" }
 		},
 		get set(): DbSet<City, CityQueryProxy> { 
 			return new DbSet<City, CityQueryProxy>(City, null);

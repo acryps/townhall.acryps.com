@@ -43,6 +43,7 @@ import { registerPreload } from "./preload/routes";
 import { ScheduledEpoch } from "../interface/time/epoch";
 import { Time } from "../interface/time";
 import { PoliticalCompassRater } from "./life/political-compass";
+import { WallpaperInterface } from "./map/wallpaper";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -148,7 +149,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new BaseTileServer(app, database);
 	new TimeMachineTileServer(app, database);
 	new PropertyTileServer(app, database);
-	new StreetTileServer(app, database); // temporarely only!
+	new StreetTileServer(app);
 	new BoroughTileServer(app, database);
 	new PropertyUsageTileServer(app, database);
 	new PropertyValueTileServer(app, database);
@@ -178,6 +179,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new ResidentImageInterface(app, database, life);
 	new ImpressionImageInterface(app, database);
 	new PlotterInterface(app, database);
+	new WallpaperInterface(app, database);
 
 	app.createInjector = context => new Inject({
 		Context: context,

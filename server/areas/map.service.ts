@@ -12,6 +12,7 @@ import { StreetViewModel } from "./street.view";
 import { WaterBodyViewModel } from "./water-body.view";
 import { Point } from "../../interface/point";
 import { PropertyManager } from "./property/manager";
+import { mapBaseTileSize } from "../../interface/tile";
 
 export class MapService extends Service {
 	constructor(
@@ -81,7 +82,7 @@ export class MapService extends Service {
 			.includeTree({ regionX: true, regionY: true })
 			.first();
 
-		const size = 250;
+		const size = mapBaseTileSize;
 
 		return new Point(
 			changedTile.regionX * size + size / 2,

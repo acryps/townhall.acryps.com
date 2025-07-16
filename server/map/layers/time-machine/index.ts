@@ -1,13 +1,14 @@
 import { Canvas } from "skia-canvas";
 import { DbContext, MapType } from "../../../managed/database";
 import { ManagedServer } from "../../../managed/server";
+import { mapBaseTileSize } from "../../../../interface/tile";
 
 export class TimeMachineTileServer {
 	constructor(
 		private app: ManagedServer,
 		private database: DbContext
 	) {
-		const canvas = new Canvas(250, 250);
+		const canvas = new Canvas(mapBaseTileSize, mapBaseTileSize);
 		const context = canvas.getContext('2d');
 		const imageData = context.createImageData(canvas.width, canvas.height);
 

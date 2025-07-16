@@ -12,11 +12,11 @@ export const registerPreload = (manager: Preload, database: DbContext) => {
 		article => [article.id]
 	);
 
-	// manager.route<Resident>(
-	//	(tag) => `/resident/${tag}`,
-	//	() => database.resident.toArray(),
-	//	resident => [resident.tag]
-	// );
+	manager.route<Resident>(
+		(tag) => `/resident/${tag}`,
+		() => database.resident.toArray(),
+		resident => [resident.tag]
+	);
 
 	manager.route<Property>(
 		(id) => `/property/${id}`,

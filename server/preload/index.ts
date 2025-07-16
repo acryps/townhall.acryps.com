@@ -24,6 +24,12 @@ export class Preload {
 		this.routes.push(new PreloadRoute<ItemType>(link, source, extract));
 	}
 
+	sitemap(host: string) {
+		return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+			${this.indexed.map(page => `<url><loc>https://${host}${page.link}</loc></url>`).join('')}
+		</urlset>`;
+	}
+
 	async executeTask() {
 		if (updatePreloadedPages) {
 			this.update();
@@ -32,6 +38,11 @@ export class Preload {
 
 	apply(app, indexPagePath: string, defaultTitle: string) {
 		const indexPage = readFileSync(indexPagePath).toString();
+
+		app.get('/sitemap.xml', async (request, response) => {
+			response.contentType('application/xml');
+			response.end(this.sitemap(request.get('host')));
+		});
 
 		app.use('*', async (request, response) => {
 			let page = indexPage;

@@ -1,7 +1,8 @@
+import { mapBaseTileSize } from "../../../interface/tile";
 import { MapLayer } from "./layer/index";
 
-export const baseLayer = MapLayer.fromTileSource((x, y) => `/tile/base/day/${x}/${y}`, 250, 'source-over');
-export const nightLayer = MapLayer.fromTileSource((x, y) => `/tile/base/night/${x}/${y}`, 250, 'source-over');
+export const baseLayer = MapLayer.fromTileSource((x, y) => `/tile/base/day/${x}/${y}`, mapBaseTileSize, 'source-over');
+export const nightLayer = MapLayer.fromTileSource((x, y) => `/tile/base/night/${x}/${y}`, mapBaseTileSize, 'source-over');
 
 export const timeMachineLayer = (date: Date) => MapLayer.fromTileSource((x, y) => `/tile/time-machine/${x}/${y}/${+date}`, 250, 'source-over');
 

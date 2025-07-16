@@ -1,5 +1,6 @@
 import { PackedPoint, Point } from "../../../../interface/point";
 import { Shape } from "../../../../interface/shape";
+import { getTiles } from "../../../../interface/tile";
 import { Label } from "./label";
 
 export class MapLayer {
@@ -28,7 +29,7 @@ export class MapLayer {
 	async update(center: Point, width: number, height: number) {
 		const tasks: Promise<any>[] = [];
 
-		for (let tile of this.getTiles(center, width, height)) {
+		for (let tile of getTiles(center, width, height, this.size)) {
 			const tileHash = tile.pack();
 
 			if (this.tiles.has(tileHash)) {
@@ -54,24 +55,6 @@ export class MapLayer {
 		await Promise.all(tasks);
 	}
 
-	protected getTiles(center: Point, width: number, height: number) {
-		const tiles: Point[] = [];
-
-		const minX = Math.floor((center.x - width / 2 - this.size / 2) / this.size);
-		const maxX = Math.ceil((center.x + width / 2 + this.size / 2) / this.size);
-
-		const minY = Math.floor((center.y - height / 2 - this.size / 2) / this.size);
-		const maxY = Math.ceil((center.y + height / 2 + this.size / 2) / this.size);
-
-		for (let x = minX; x < maxX; x++) {
-			for (let y = minY; y < maxY; y++) {
-				tiles.push(new Point(x, y));
-			}
-		}
-
-		return tiles;
-	}
-
 	render(center: Point, width: number, height: number, superscale: number) {
 		const left = Math.floor(center.x - width / 2);
 		const top = Math.floor(center.y - height / 2);
@@ -81,7 +64,7 @@ export class MapLayer {
 
 		this.context.imageSmoothingEnabled = false;
 
-		for (let tile of this.getTiles(center, width, height)) {
+		for (let tile of getTiles(center, width, height, this.size)) {
 			const image = this.tiles.get(tile.pack());
 
 			if (image && !(image instanceof Promise)) {

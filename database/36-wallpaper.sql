@@ -1,0 +1,1 @@
+ALTER TABLE city ADD tag TEXT UNIQUE;

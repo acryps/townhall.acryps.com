@@ -7,6 +7,7 @@ import { BannerComponent } from "../../banner";
 import { Banner } from "../../../interface/banner";
 import { AboutComponent } from "../../shared/about";
 import { Time } from "../../../interface/time";
+import { MetaOrganization } from "@acryps/metadata";
 
 export class CompanyPage extends Component {
 	declare parameters: { tag };
@@ -15,6 +16,11 @@ export class CompanyPage extends Component {
 
 	async onload() {
 		this.company = await new CompanyOfficeService().find(this.parameters.tag);
+
+		new MetaOrganization({
+			name: this.company.name,
+			description: this.company.description
+		}).apply();
 	}
 
 	render() {

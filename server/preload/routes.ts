@@ -1,5 +1,5 @@
 import { Preload } from ".";
-import { Article, Borough, DbContext, Property, Resident, TrainRoute } from "../managed/database";
+import { Article, Borough, Company, DbContext, Property, Resident, TrainRoute } from "../managed/database";
 
 export const registerPreload = (manager: Preload, database: DbContext) => {
 	manager.route('/home');
@@ -29,7 +29,13 @@ export const registerPreload = (manager: Preload, database: DbContext) => {
 	manager.route<Borough>(
 		(tag) => `/borough/${tag}`,
 		() => database.borough.toArray(),
-		property => [property.tag]
+		borough => [borough.tag]
+	);
+
+	manager.route<Company>(
+		(tag) => `/company-office/company/${tag}`,
+		() => database.company.toArray(),
+		company => [company.tag]
 	);
 
 	manager.route<TrainRoute>(

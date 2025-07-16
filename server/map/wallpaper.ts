@@ -33,9 +33,11 @@ export class WallpaperInterface {
 				return;
 			}
 
-			if (cache.get(city.id)) {
+			const cached = cache.get(city.id);
+
+			if (cached) {
 				response.contentType('image/png');
-				response.end(cache);
+				response.end(cached);
 
 				return;
 			}

@@ -14,6 +14,10 @@
 		"townhallServerAddress": "Minecraft File Server Location",
 		"runLife?": "Run Life (YES to enable)",
 		"updateMetrics": "Update Metrics (YES to enable)",
+		"itemContext": {
+			"compose": "Compose Item Context (YES to enable)",
+			"write": "Write Item Context with LLM (YES to enable)"
+		},
 		"preload": {
 			"updatePages": "Update Preloaded Pages (YES to enable)",
 			"browserApplicationPath": "Browser Application Path (use 'which chromium' to get path)"

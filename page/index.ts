@@ -63,6 +63,7 @@ import { PlanViewAction } from "./map/plans";
 import { OraclePage } from "./oracle";
 import { ScheduledEpoch } from "../interface/time/epoch";
 import { TimePage } from "./time";
+import { ItemContextPage } from "./item-context";
 
 export class Application {
 	static router: Router;
@@ -111,6 +112,8 @@ export class Application {
 						.route('/revalue/:ownerId', RevaluePropertyPage)
 					)
 				)
+
+				.route('/item-context/:id', ItemContextPage)
 
 				.route('/borough/register/:bounds', RegisterBoroughPage)
 				.route('/borough/:tag', BoroughPage)

@@ -3,6 +3,8 @@ import { boxed } from "../shared/boxed.style";
 import { bannerStyle, headerBannerStyle } from "../banner/index.style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { pageGutter } from "../index.style";
+import { buttonStyle } from "../shared/index.style";
+import { microFont } from "../assets/font/index.style";
 
 export const boroughStyle = () => child('ui-borough',
 	boxed(),
@@ -61,6 +63,15 @@ export const boroughStyle = () => child('ui-borough',
 
 	child('ui-map-container',
 		width(percentage(100)),
-		aspectRatio(ratio(1, 1))
+		aspectRatio(ratio(1, 1)),
+		marginBottom(pageGutter)
+	),
+
+	child('ui-actions',
+		display('flex'),
+
+		child('ui-action',
+			buttonStyle()
+		)
 	)
 )

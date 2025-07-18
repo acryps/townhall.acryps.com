@@ -39,7 +39,7 @@ export class Annotator {
 
 	static annotate(source: string) {
 		let content: AnnotatedTextPart[] = [source];
-		const referencedItems = [];
+		const referencedItems: { id: string }[] = [];
 
 		content = this.annotateType(content, referencedItems, 'company', this.instance.companies, company => [
 			convertToLegalCompanyName(company),

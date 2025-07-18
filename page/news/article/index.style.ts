@@ -157,5 +157,14 @@ export const articleStyle = () => child('ui-article',
 				buttonStyle()
 			)
 		)
+	),
+
+	child('ui-actions',
+		display('flex'),
+		marginTop(pageGutter.multiply(2)),
+
+		child('ui-action',
+			buttonStyle()
+		)
 	)
 )

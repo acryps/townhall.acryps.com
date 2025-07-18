@@ -2,11 +2,11 @@ import { select, style, content, Font, fontFamily, fontWeight, fontStyle } from 
 
 
 export const iconFont = new Font('icons', fontWeight('normal'), fontStyle('normal'))
-	.addSource('/assets/icons/managed/font/index.eot?89a9b8c1c1c6', 'embedded-opentype')
-	.addSource('/assets/icons/managed/font/index.svg?6e6fc428a7df', 'svg')
-	.addSource('/assets/icons/managed/font/index.ttf?5af4bcc10f80', 'truetype')
-	.addSource('/assets/icons/managed/font/index.woff?e7b8652b03d7', 'woff')
-	.addSource('/assets/icons/managed/font/index.woff2?fc6831c69fe2', 'woff2');
+	.addSource('/assets/icons/managed/font/index.eot?358d54d4fdec', 'embedded-opentype')
+	.addSource('/assets/icons/managed/font/index.svg?1fddced3ee82', 'svg')
+	.addSource('/assets/icons/managed/font/index.ttf?0f14ca84d0d6', 'truetype')
+	.addSource('/assets/icons/managed/font/index.woff?af5a25d5b1c8', 'woff')
+	.addSource('/assets/icons/managed/font/index.woff2?9de9f443d01a', 'woff2');
 
 export const icons = () => select('ui-icon',
 	fontFamily(iconFont.name),
@@ -27,25 +27,26 @@ export const icons = () => select('ui-icon',
 	style('[ui-flip]').before('\f10b'),
 	style('[ui-go]').before('\f10c'),
 	style('[ui-home]').before('\f10d'),
-	style('[ui-law]').before('\f10e'),
-	style('[ui-map]').before('\f10f'),
-	style('[ui-metric]').before('\f110'),
-	style('[ui-movement]').before('\f111'),
-	style('[ui-oracle]').before('\f112'),
-	style('[ui-plan]').before('\f113'),
-	style('[ui-price]').before('\f114'),
-	style('[ui-property-register]').before('\f115'),
-	style('[ui-publication]').before('\f116'),
-	style('[ui-relation-graph]').before('\f117'),
-	style('[ui-relation]').before('\f118'),
-	style('[ui-resident]').before('\f119'),
-	style('[ui-route-interchange]').before('\f11a'),
-	style('[ui-speak]').before('\f11b'),
-	style('[ui-state]').before('\f11c'),
-	style('[ui-street]').before('\f11d'),
-	style('[ui-time-machine]').before('\f11e'),
-	style('[ui-train]').before('\f11f'),
-	style('[ui-undo]').before('\f120'),
+	style('[ui-item-context]').before('\f10e'),
+	style('[ui-law]').before('\f10f'),
+	style('[ui-map]').before('\f110'),
+	style('[ui-metric]').before('\f111'),
+	style('[ui-movement]').before('\f112'),
+	style('[ui-oracle]').before('\f113'),
+	style('[ui-plan]').before('\f114'),
+	style('[ui-price]').before('\f115'),
+	style('[ui-property-register]').before('\f116'),
+	style('[ui-publication]').before('\f117'),
+	style('[ui-relation-graph]').before('\f118'),
+	style('[ui-relation]').before('\f119'),
+	style('[ui-resident]').before('\f11a'),
+	style('[ui-route-interchange]').before('\f11b'),
+	style('[ui-speak]').before('\f11c'),
+	style('[ui-state]').before('\f11d'),
+	style('[ui-street]').before('\f11e'),
+	style('[ui-time-machine]').before('\f11f'),
+	style('[ui-train]').before('\f120'),
+	style('[ui-undo]').before('\f121'),
 );
 
 const createIconElement = (name: string) => {
@@ -68,6 +69,7 @@ export const electionIcon = () => createIconElement('election');
 export const flipIcon = () => createIconElement('flip');
 export const goIcon = () => createIconElement('go');
 export const homeIcon = () => createIconElement('home');
+export const itemContextIcon = () => createIconElement('item-context');
 export const lawIcon = () => createIconElement('law');
 export const mapIcon = () => createIconElement('map');
 export const metricIcon = () => createIconElement('metric');

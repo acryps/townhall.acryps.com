@@ -13,6 +13,12 @@ export class CompanyType extends QueryEnum {
 	static readonly nonProfit = "non_profit";
 }
 
+export class ItemContextLinkRank extends QueryEnum {
+	static readonly far = "far";
+	static readonly near = "near";
+	static readonly primary = "primary";
+}
+
 export class ArticleQueryProxy extends QueryProxy {
 	get oracleProposal(): Partial<OracleProposalQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get publication(): Partial<PublicationQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -969,6 +975,173 @@ export class Impression extends Entity<ImpressionQueryProxy> {
 			return new DbSet<Impression, ImpressionQueryProxy>(Impression, null);
 		}
 	};
+}
+			
+export class ItemContextQueryProxy extends QueryProxy {
+	get context(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get dependencyComplete(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get itemId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get summary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tagline(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get updated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class ItemContext extends Entity<ItemContextQueryProxy> {
+	fragments: PrimaryReference<ItemContextFragment, ItemContextFragmentQueryProxy>;
+		links: PrimaryReference<ItemContextLink, ItemContextLinkQueryProxy>;
+		context: string;
+	dependencyComplete: boolean;
+	declare id: string;
+	itemId: string;
+	name: string;
+	summary: string;
+	tagline: string;
+	updated: Date;
+	
+	$$meta = {
+		source: "item_context",
+		columns: {
+			context: { type: "text", name: "context" },
+			dependencyComplete: { type: "bool", name: "dependency_complete" },
+			id: { type: "uuid", name: "id" },
+			itemId: { type: "uuid", name: "item_id" },
+			name: { type: "text", name: "name" },
+			summary: { type: "text", name: "summary" },
+			tagline: { type: "text", name: "tagline" },
+			updated: { type: "timestamp", name: "updated" }
+		},
+		get set(): DbSet<ItemContext, ItemContextQueryProxy> { 
+			return new DbSet<ItemContext, ItemContextQueryProxy>(ItemContext, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.fragments = new PrimaryReference<ItemContextFragment, ItemContextFragmentQueryProxy>(this, "itemId", ItemContextFragment);
+		this.links = new PrimaryReference<ItemContextLink, ItemContextLinkQueryProxy>(this, "sourceId", ItemContextLink);
+	}
+}
+			
+export class ItemContextFragmentQueryProxy extends QueryProxy {
+	get item(): Partial<ItemContextQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get content(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get itemId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get orderIndex(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get rank(): "far" | "near" | "primary" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get title(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class ItemContextFragment extends Entity<ItemContextFragmentQueryProxy> {
+	get item(): Partial<ForeignReference<ItemContext>> { return this.$item; }
+	content: string;
+	declare id: string;
+	itemId: string;
+	orderIndex: number;
+	rank: ItemContextLinkRank;
+	title: string;
+	
+	$$meta = {
+		source: "item_context_fragment",
+		columns: {
+			content: { type: "text", name: "content" },
+			id: { type: "uuid", name: "id" },
+			itemId: { type: "uuid", name: "item_id" },
+			orderIndex: { type: "int4", name: "order_index" },
+			rank: { type: "item_context_link_rank", name: "rank" },
+			title: { type: "text", name: "title" }
+		},
+		get set(): DbSet<ItemContextFragment, ItemContextFragmentQueryProxy> { 
+			return new DbSet<ItemContextFragment, ItemContextFragmentQueryProxy>(ItemContextFragment, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$item = new ForeignReference<ItemContext>(this, "itemId", ItemContext);
+	}
+	
+	private $item: ForeignReference<ItemContext>;
+
+	set item(value: Partial<ForeignReference<ItemContext>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.itemId = value.id as string;
+		} else {
+			this.itemId = null;
+		}
+	}
+
+	
+}
+			
+export class ItemContextLinkQueryProxy extends QueryProxy {
+	get source(): Partial<ItemContextQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get target(): Partial<ItemContextQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get connection(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get rank(): "far" | "near" | "primary" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get sourceId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get targetId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class ItemContextLink extends Entity<ItemContextLinkQueryProxy> {
+	get source(): Partial<ForeignReference<ItemContext>> { return this.$source; }
+	get target(): Partial<ForeignReference<ItemContext>> { return this.$target; }
+	connection: string;
+	declare id: string;
+	rank: ItemContextLinkRank;
+	sourceId: string;
+	targetId: string;
+	
+	$$meta = {
+		source: "item_context_link",
+		columns: {
+			connection: { type: "text", name: "connection" },
+			id: { type: "uuid", name: "id" },
+			rank: { type: "item_context_link_rank", name: "rank" },
+			sourceId: { type: "uuid", name: "source_id" },
+			targetId: { type: "uuid", name: "target_id" }
+		},
+		get set(): DbSet<ItemContextLink, ItemContextLinkQueryProxy> { 
+			return new DbSet<ItemContextLink, ItemContextLinkQueryProxy>(ItemContextLink, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$source = new ForeignReference<ItemContext>(this, "sourceId", ItemContext);
+	this.$target = new ForeignReference<ItemContext>(this, "targetId", ItemContext);
+	}
+	
+	private $source: ForeignReference<ItemContext>;
+
+	set source(value: Partial<ForeignReference<ItemContext>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.sourceId = value.id as string;
+		} else {
+			this.sourceId = null;
+		}
+	}
+
+	private $target: ForeignReference<ItemContext>;
+
+	set target(value: Partial<ForeignReference<ItemContext>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.targetId = value.id as string;
+		} else {
+			this.targetId = null;
+		}
+	}
+
+	
 }
 			
 export class LawHouseSessionQueryProxy extends QueryProxy {
@@ -3347,6 +3520,9 @@ export class DbContext {
 	historicListingGrade: DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>;
 	historicListingModifier: DbSet<HistoricListingModifier, HistoricListingModifierQueryProxy>;
 	impression: DbSet<Impression, ImpressionQueryProxy>;
+	itemContext: DbSet<ItemContext, ItemContextQueryProxy>;
+	itemContextFragment: DbSet<ItemContextFragment, ItemContextFragmentQueryProxy>;
+	itemContextLink: DbSet<ItemContextLink, ItemContextLinkQueryProxy>;
 	lawHouseSession: DbSet<LawHouseSession, LawHouseSessionQueryProxy>;
 	lawHouseSessionProtocol: DbSet<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy>;
 	lawHouseSessionary: DbSet<LawHouseSessionary, LawHouseSessionaryQueryProxy>;
@@ -3405,6 +3581,9 @@ export class DbContext {
 		this.historicListingGrade = new DbSet<HistoricListingGrade, HistoricListingGradeQueryProxy>(HistoricListingGrade, this.runContext);
 		this.historicListingModifier = new DbSet<HistoricListingModifier, HistoricListingModifierQueryProxy>(HistoricListingModifier, this.runContext);
 		this.impression = new DbSet<Impression, ImpressionQueryProxy>(Impression, this.runContext);
+		this.itemContext = new DbSet<ItemContext, ItemContextQueryProxy>(ItemContext, this.runContext);
+		this.itemContextFragment = new DbSet<ItemContextFragment, ItemContextFragmentQueryProxy>(ItemContextFragment, this.runContext);
+		this.itemContextLink = new DbSet<ItemContextLink, ItemContextLinkQueryProxy>(ItemContextLink, this.runContext);
 		this.lawHouseSession = new DbSet<LawHouseSession, LawHouseSessionQueryProxy>(LawHouseSession, this.runContext);
 		this.lawHouseSessionProtocol = new DbSet<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy>(LawHouseSessionProtocol, this.runContext);
 		this.lawHouseSessionary = new DbSet<LawHouseSessionary, LawHouseSessionaryQueryProxy>(LawHouseSessionary, this.runContext);

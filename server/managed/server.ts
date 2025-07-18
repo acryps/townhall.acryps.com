@@ -49,6 +49,13 @@ import { HistoricListingModifierViewModel } from "././../areas/history-listing/m
 import { HistoricListingService } from "././../areas/history-listing/listing.service";
 import { ImpressionViewModel } from "././../areas/impressions/impression";
 import { ImpressionService } from "././../areas/impressions/service";
+import { ItemContextTracker } from "././../context";
+import { ItemContextBacklinkViewModel } from "././../areas/item-context/context";
+import { ItemContextFragmentViewModel } from "././../areas/item-context/context";
+import { ItemContextLinkViewModel } from "././../areas/item-context/context";
+import { ItemContextViewModel } from "././../areas/item-context/context";
+import { Annotator } from "././../annotate";
+import { ItemContextService } from "././../areas/item-context/index";
 import { LawHouseSessionSummaryModel } from "././../areas/law-house/session";
 import { LawHouseSessionViewModel } from "././../areas/law-house/session";
 import { LawHouseService } from "././../areas/law-house/service";
@@ -101,7 +108,6 @@ import { ArticleNewstickerModel } from "././../areas/publication/article";
 import { ArticlePreviewModel } from "././../areas/publication/article";
 import { ArticleViewModel } from "././../areas/publication/article";
 import { PublicationViewModel } from "././../areas/publication/publication";
-import { Annotator } from "././../annotate";
 import { PublicationService } from "././../areas/publication/service";
 import { ChatManager } from "././../areas/resident/chat/manager";
 import { ChatInteractionViewModel } from "././../areas/resident/chat/interaction";
@@ -132,6 +138,7 @@ import { TenantViewModel } from "./../areas/property.view";
 import { StreetRouteSummaryModel } from "./../areas/street.view";
 import { WorkOfferSummaryModel } from "./../areas/work";
 import { WorkContractSummaryModel } from "./../areas/work";
+import { ItemContextSummaryModel } from "./../areas/item-context/context";
 import { LawHouseSessionaryViewModel } from "./../areas/law-house/session";
 import { LawHouseSessionProtocolViewModel } from "./../areas/law-house/session";
 import { TenancyViewModel } from "./../areas/life/resident";
@@ -167,6 +174,9 @@ import { Epoch } from "./../managed/database";
 import { HistoricListingGrade } from "./../managed/database";
 import { HistoricListingModifier } from "./../managed/database";
 import { Impression } from "./../managed/database";
+import { ItemContext } from "./../managed/database";
+import { ItemContextLink } from "./../managed/database";
+import { ItemContextFragment } from "./../managed/database";
 import { LawHouseSession } from "./../managed/database";
 import { LawHouseSessionary } from "./../managed/database";
 import { LawHouseSessionProtocol } from "./../managed/database";
@@ -227,6 +237,10 @@ Inject.mappings = {
 	},
 	"ImpressionService": {
 		objectConstructor: ImpressionService,
+		parameters: ["DbContext"]
+	},
+	"ItemContextService": {
+		objectConstructor: ItemContextService,
 		parameters: ["DbContext"]
 	},
 	"LawHouseService": {
@@ -766,6 +780,50 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(ImpressionService),
 			(controller, params) => controller.list(
 				
+			)
+		);
+
+		this.expose(
+			"oxeGFxaTJud290OTFmYnZpZ3lqajIwa3",
+			{
+			"hzeXR4aGQzc3JlcW82OWVnZWZodWE5N2": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(ItemContextService),
+			(controller, params) => controller.getContext(
+				params["hzeXR4aGQzc3JlcW82OWVnZWZodWE5N2"]
+			)
+		);
+
+		this.expose(
+			"E1cWFsczY0Mzp3MHNnMHloaDdwb29vd3",
+			{
+			"tsYXRpeGVsYXhzcnJnd3BrenExc3g0Mz": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(ItemContextService),
+			(controller, params) => controller.annotateContext(
+				params["tsYXRpeGVsYXhzcnJnd3BrenExc3g0Mz"]
+			)
+		);
+
+		this.expose(
+			"ZzNWdiZHV2aWg0ZzY3aDVkaXI3ZWg5MT",
+			{
+			"QwcWFycm5ibnZuaTE2c3FncDR2MTFsOH": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(ItemContextService),
+			(controller, params) => controller.getFragments(
+				params["QwcWFycm5ibnZuaTE2c3FncDR2MTFsOH"]
+			)
+		);
+
+		this.expose(
+			"FqNDJjNzZ5NmJlb2Y0cTEzZTAwcDNrbT",
+			{
+			"ZxbWl0bnh5ZGE3NjFzbGk1ZzpzN3ExeG": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(ItemContextService),
+			(controller, params) => controller.getBacklinks(
+				params["ZxbWl0bnh5ZGE3NjFzbGk1ZzpzN3ExeG"]
 			)
 		);
 
@@ -3828,6 +3886,217 @@ ViewModel.mappings = {
 			}
 			
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
+
+			return model;
+		}
+	},
+	[ItemContextSummaryModel.name]: class ComposedItemContextSummaryModel extends ItemContextSummaryModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				itemId: this.$$model.itemId,
+				name: this.$$model.name,
+				tagline: this.$$model.tagline
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				itemId: true,
+				name: true,
+				tagline: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ItemContextSummaryModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"itemId" in data && (item.itemId = data.itemId === null ? null : `${data.itemId}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"tagline" in data && (item.tagline = data.tagline === null ? null : `${data.tagline}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ItemContextSummaryModel) {
+			let model: ItemContext;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ItemContext).find(viewModel.id)
+			} else {
+				model = new ItemContext();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"itemId" in viewModel && (model.itemId = viewModel.itemId === null ? null : `${viewModel.itemId}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"tagline" in viewModel && (model.tagline = viewModel.tagline === null ? null : `${viewModel.tagline}`);
+
+			return model;
+		}
+	},
+	[ItemContextLinkViewModel.name]: class ComposedItemContextLinkViewModel extends ItemContextLinkViewModel {
+		async map() {
+			return {
+				target: new ItemContextSummaryModel(await BaseServer.unwrap(this.$$model.target)),
+				connection: this.$$model.connection,
+				id: this.$$model.id
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get target() {
+					return ViewModel.mappings[ItemContextSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "target-ItemContextLinkViewModel"]
+					);
+				},
+				connection: true,
+				id: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ItemContextLinkViewModel(null);
+			"target" in data && (item.target = data.target && ViewModel.mappings[ItemContextSummaryModel.name].toViewModel(data.target));
+			"connection" in data && (item.connection = data.connection === null ? null : `${data.connection}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ItemContextLinkViewModel) {
+			let model: ItemContextLink;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ItemContextLink).find(viewModel.id)
+			} else {
+				model = new ItemContextLink();
+			}
+			
+			"target" in viewModel && (model.target.id = viewModel.target ? viewModel.target.id : null);
+			"connection" in viewModel && (model.connection = viewModel.connection === null ? null : `${viewModel.connection}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+
+			return model;
+		}
+	},
+	[ItemContextFragmentViewModel.name]: class ComposedItemContextFragmentViewModel extends ItemContextFragmentViewModel {
+		async map() {
+			return {
+				content: this.$$model.content,
+				id: this.$$model.id,
+				rank: this.$$model.rank,
+				title: this.$$model.title
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				content: true,
+				id: true,
+				rank: true,
+				title: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ItemContextFragmentViewModel(null);
+			"content" in data && (item.content = data.content === null ? null : `${data.content}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"rank" in data && (item.rank = data.rank === null ? null : data.rank);
+			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ItemContextFragmentViewModel) {
+			let model: ItemContextFragment;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ItemContextFragment).find(viewModel.id)
+			} else {
+				model = new ItemContextFragment();
+			}
+			
+			"content" in viewModel && (model.content = viewModel.content === null ? null : `${viewModel.content}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"rank" in viewModel && (model.rank = viewModel.rank === null ? null : viewModel.rank);
 			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
 
 			return model;
@@ -7470,6 +7739,173 @@ ViewModel.mappings = {
 			"offset" in viewModel && (model.offset = viewModel.offset === null ? null : +viewModel.offset);
 			"rate" in viewModel && (model.rate = viewModel.rate === null ? null : +viewModel.rate);
 			"start" in viewModel && (model.start = viewModel.start === null ? null : new Date(viewModel.start));
+
+			return model;
+		}
+	},
+	[ItemContextViewModel.name]: class ComposedItemContextViewModel extends ItemContextViewModel {
+		async map() {
+			return {
+				links: (await this.$$model.links.includeTree(ViewModel.mappings[ItemContextLinkViewModel.name].items).toArray()).map(item => new ItemContextLinkViewModel(item)),
+				id: this.$$model.id,
+				itemId: this.$$model.itemId,
+				name: this.$$model.name,
+				summary: this.$$model.summary,
+				tagline: this.$$model.tagline,
+				updated: this.$$model.updated
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get links() {
+					return ViewModel.mappings[ItemContextLinkViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "links-ItemContextViewModel"]
+					);
+				},
+				id: true,
+				itemId: true,
+				name: true,
+				summary: true,
+				tagline: true,
+				updated: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ItemContextViewModel(null);
+			"links" in data && (item.links = data.links && [...data.links].map(i => ViewModel.mappings[ItemContextLinkViewModel.name].toViewModel(i)));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"itemId" in data && (item.itemId = data.itemId === null ? null : `${data.itemId}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"summary" in data && (item.summary = data.summary === null ? null : `${data.summary}`);
+			"tagline" in data && (item.tagline = data.tagline === null ? null : `${data.tagline}`);
+			"updated" in data && (item.updated = data.updated === null ? null : new Date(data.updated));
+
+			return item;
+		}
+
+		static async toModel(viewModel: ItemContextViewModel) {
+			let model: ItemContext;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ItemContext).find(viewModel.id)
+			} else {
+				model = new ItemContext();
+			}
+			
+			"links" in viewModel && (null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"itemId" in viewModel && (model.itemId = viewModel.itemId === null ? null : `${viewModel.itemId}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"summary" in viewModel && (model.summary = viewModel.summary === null ? null : `${viewModel.summary}`);
+			"tagline" in viewModel && (model.tagline = viewModel.tagline === null ? null : `${viewModel.tagline}`);
+			"updated" in viewModel && (model.updated = viewModel.updated === null ? null : new Date(viewModel.updated));
+
+			return model;
+		}
+	},
+	[ItemContextBacklinkViewModel.name]: class ComposedItemContextBacklinkViewModel extends ItemContextBacklinkViewModel {
+		async map() {
+			return {
+				source: new ItemContextSummaryModel(await BaseServer.unwrap(this.$$model.source)),
+				target: new ItemContextSummaryModel(await BaseServer.unwrap(this.$$model.target)),
+				connection: this.$$model.connection,
+				id: this.$$model.id
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get source() {
+					return ViewModel.mappings[ItemContextSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "source-ItemContextBacklinkViewModel"]
+					);
+				},
+				get target() {
+					return ViewModel.mappings[ItemContextSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "target-ItemContextBacklinkViewModel"]
+					);
+				},
+				connection: true,
+				id: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ItemContextBacklinkViewModel(null);
+			"source" in data && (item.source = data.source && ViewModel.mappings[ItemContextSummaryModel.name].toViewModel(data.source));
+			"target" in data && (item.target = data.target && ViewModel.mappings[ItemContextSummaryModel.name].toViewModel(data.target));
+			"connection" in data && (item.connection = data.connection === null ? null : `${data.connection}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ItemContextBacklinkViewModel) {
+			let model: ItemContextLink;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ItemContextLink).find(viewModel.id)
+			} else {
+				model = new ItemContextLink();
+			}
+			
+			"source" in viewModel && (model.source.id = viewModel.source ? viewModel.source.id : null);
+			"target" in viewModel && (model.target.id = viewModel.target ? viewModel.target.id : null);
+			"connection" in viewModel && (model.connection = viewModel.connection === null ? null : `${viewModel.connection}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 
 			return model;
 		}

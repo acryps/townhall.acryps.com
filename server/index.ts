@@ -44,10 +44,13 @@ import { ScheduledEpoch } from "../interface/time/epoch";
 import { Time } from "../interface/time";
 import { PoliticalCompassRater } from "./life/political-compass";
 import { WallpaperInterface } from "./map/wallpaper";
+import { ItemContextTracker } from "./context";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
 export const updatePreloadedPages = process.env.PRELOAD_UPDATE_PAGES == 'YES';
+export const composeItemContexts = process.env.UPDATE_ITEM_COMPOSE == 'YES';
+export const writeItemContexts = process.env.UPDATE_ITEM_WRITE == 'YES';
 
 export const port = +process.env.PORT || 7420;
 
@@ -75,7 +78,9 @@ DbClient.connectedClient.connect().then(async () => {
 	new MapImporter(database);
 
 	const annotator = new Annotator(database);
-	annotator.load();
+	await annotator.load();
+
+	ItemContextTracker.instance = new ItemContextTracker(database);
 
 	new LegalEntityReferenceCounter(database).schedule();
 

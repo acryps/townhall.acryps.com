@@ -17,6 +17,14 @@ const ollama = new Ollama({
 	host: process.env.LANGUAGE_MODEL_HOST // default: http://127.0.0.1:11434
 });
 
+export class ToolError extends Error {
+	constructor(
+		public issue: string
+	) {
+		super();
+	}
+}
+
 export class Interpreter {
 	tools: Tool[] = [];
 	history: InterpreterMessage[] = [];
@@ -121,6 +129,10 @@ export class Interpreter {
 				await call.tool.action(...call.values);
 			} catch (error) {
 				console.warn(`[interpreter] tool call failed: ${call.tool.name}`, error);
+
+				if (error instanceof ToolError) {
+					messages.push(new SystemMessage(error.issue));
+				}
 
 				return await this.execute(...messages);
 			}

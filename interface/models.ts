@@ -6,6 +6,12 @@ export enum CompanyType {
 	nonProfit = "non_profit"
 }
 
+export enum ItemContextLinkRank {
+	far = "far",
+	near = "near",
+	primary = "primary"
+}
+
 export interface BoroughSummaryModel {
     banner: string;
 	bounds: string;
@@ -215,6 +221,26 @@ export interface HistoricListingModifierViewModel {
 
 export interface ImpressionViewModel {
     id: string;
+	title: string;
+}
+
+export interface ItemContextSummaryModel {
+    id: string;
+	itemId: string;
+	name: string;
+	tagline: string;
+}
+
+export interface ItemContextLinkViewModel {
+    target: ItemContextSummaryModel;
+	connection: string;
+	id: string;
+}
+
+export interface ItemContextFragmentViewModel {
+    content: string;
+	id: string;
+	rank: ItemContextLinkRank;
 	title: string;
 }
 
@@ -579,6 +605,23 @@ export interface EpochViewModel {
 	offset: number;
 	rate: number;
 	start: Date;
+}
+
+export interface ItemContextViewModel {
+    links: ItemContextLinkViewModel[];
+	id: string;
+	itemId: string;
+	name: string;
+	summary: string;
+	tagline: string;
+	updated: Date;
+}
+
+export interface ItemContextBacklinkViewModel {
+    source: ItemContextSummaryModel;
+	target: ItemContextSummaryModel;
+	connection: string;
+	id: string;
 }
 
 export interface LawHouseSessionViewModel {

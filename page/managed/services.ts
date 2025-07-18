@@ -6,6 +6,12 @@ export enum CompanyType {
 	nonProfit = "non_profit"
 }
 
+export enum ItemContextLinkRank {
+	far = "far",
+	near = "near",
+	primary = "primary"
+}
+
 export class BoroughSummaryModel {
 	banner: string;
 	bounds: string;
@@ -508,6 +514,55 @@ export class ImpressionViewModel {
 	private static $build(raw) {
 		const item = new ImpressionViewModel();
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
+		
+		return item;
+	}
+}
+
+export class ItemContextSummaryModel {
+	id: string;
+	itemId: string;
+	name: string;
+	tagline: string;
+
+	private static $build(raw) {
+		const item = new ItemContextSummaryModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.itemId === undefined || (item.itemId = raw.itemId === null ? null : `${raw.itemId}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.tagline === undefined || (item.tagline = raw.tagline === null ? null : `${raw.tagline}`)
+		
+		return item;
+	}
+}
+
+export class ItemContextLinkViewModel {
+	target: ItemContextSummaryModel;
+	connection: string;
+	id: string;
+
+	private static $build(raw) {
+		const item = new ItemContextLinkViewModel();
+		raw.target === undefined || (item.target = raw.target ? ItemContextSummaryModel["$build"](raw.target) : null)
+		raw.connection === undefined || (item.connection = raw.connection === null ? null : `${raw.connection}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		
+		return item;
+	}
+}
+
+export class ItemContextFragmentViewModel {
+	content: string;
+	id: string;
+	rank: ItemContextLinkRank;
+	title: string;
+
+	private static $build(raw) {
+		const item = new ItemContextFragmentViewModel();
+		raw.content === undefined || (item.content = raw.content === null ? null : `${raw.content}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.rank === undefined || (item.rank = raw.rank)
 		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
 		
 		return item;
@@ -1379,6 +1434,46 @@ export class EpochViewModel {
 		raw.offset === undefined || (item.offset = raw.offset === null ? null : +raw.offset)
 		raw.rate === undefined || (item.rate = raw.rate === null ? null : +raw.rate)
 		raw.start === undefined || (item.start = raw.start ? new Date(raw.start) : null)
+		
+		return item;
+	}
+}
+
+export class ItemContextViewModel {
+	links: ItemContextLinkViewModel[];
+	id: string;
+	itemId: string;
+	name: string;
+	summary: string;
+	tagline: string;
+	updated: Date;
+
+	private static $build(raw) {
+		const item = new ItemContextViewModel();
+		raw.links === undefined || (item.links = raw.links ? raw.links.map(i => ItemContextLinkViewModel["$build"](i)) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.itemId === undefined || (item.itemId = raw.itemId === null ? null : `${raw.itemId}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.summary === undefined || (item.summary = raw.summary === null ? null : `${raw.summary}`)
+		raw.tagline === undefined || (item.tagline = raw.tagline === null ? null : `${raw.tagline}`)
+		raw.updated === undefined || (item.updated = raw.updated ? new Date(raw.updated) : null)
+		
+		return item;
+	}
+}
+
+export class ItemContextBacklinkViewModel {
+	source: ItemContextSummaryModel;
+	target: ItemContextSummaryModel;
+	connection: string;
+	id: string;
+
+	private static $build(raw) {
+		const item = new ItemContextBacklinkViewModel();
+		raw.source === undefined || (item.source = raw.source ? ItemContextSummaryModel["$build"](raw.source) : null)
+		raw.target === undefined || (item.target = raw.target ? ItemContextSummaryModel["$build"](raw.target) : null)
+		raw.connection === undefined || (item.connection = raw.connection === null ? null : `${raw.connection}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		
 		return item;
 	}
@@ -2547,6 +2642,92 @@ export class ImpressionService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : ImpressionViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class ItemContextService {
+	async getContext(id: string): Promise<ItemContextViewModel> {
+		const $data = new FormData();
+		$data.append("hzeXR4aGQzc3JlcW82OWVnZWZodWE5N2", Service.stringify(id))
+
+		return await fetch(Service.toURL("oxeGFxaTJud290OTFmYnZpZ3lqajIwa3"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : ItemContextViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async annotateContext(id: string): Promise<string> {
+		const $data = new FormData();
+		$data.append("tsYXRpeGVsYXhzcnJnd3BrenExc3g0Mz", Service.stringify(id))
+
+		return await fetch(Service.toURL("E1cWFsczY0Mzp3MHNnMHloaDdwb29vd3"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getFragments(id: string): Promise<Array<ItemContextFragmentViewModel>> {
+		const $data = new FormData();
+		$data.append("QwcWFycm5ibnZuaTE2c3FncDR2MTFsOH", Service.stringify(id))
+
+		return await fetch(Service.toURL("ZzNWdiZHV2aWg0ZzY3aDVkaXI3ZWg5MT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ItemContextFragmentViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getBacklinks(id: string): Promise<Array<ItemContextBacklinkViewModel>> {
+		const $data = new FormData();
+		$data.append("ZxbWl0bnh5ZGE3NjFzbGk1ZzpzN3ExeG", Service.stringify(id))
+
+		return await fetch(Service.toURL("FqNDJjNzZ5NmJlb2Y0cTEzZTAwcDNrbT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ItemContextBacklinkViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

@@ -5,6 +5,7 @@ import { AnnotatedTextComponent } from "../../shared/annotaded-text";
 import { BannerComponent } from "../../banner";
 import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
 import { Time } from "../../../interface/time";
+import { itemContextIcon } from "../../assets/icons/managed";
 
 export class ArticePage extends Component {
 	declare parameters: { id };
@@ -91,6 +92,12 @@ export class ArticePage extends Component {
 					</ui-action>
 				</ui-actions>
 			</ui-oracle>}
+
+			<ui-actions>
+				<ui-action ui-href={`/item-context/${this.article.id}`}>
+					{itemContextIcon()} View Context
+				</ui-action>
+			</ui-actions>
 		</ui-article>;
 	}
 

@@ -77,6 +77,9 @@ import { MetricTracker } from "././../areas/metrics/tracker";
 import { MetricValueViewModel } from "././../areas/metrics/view";
 import { MetricViewModel } from "././../areas/metrics/view";
 import { MetricService } from "././../areas/metrics/service";
+import { MilitaryUnitSummaryModel } from "././../areas/military/unit";
+import { MilitaryUnitViewModel } from "././../areas/military/unit";
+import { MiliatryService } from "././../areas/military/index";
 import { Oracle } from "././../areas/oracle/generator";
 import { Interpreter } from "././../life/interpreter";
 import { SystemMessage } from "././../life/interpreter";
@@ -185,6 +188,7 @@ import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
 import { Metric } from "./../managed/database";
 import { MetricValue } from "./../managed/database";
+import { MilitaryUnit } from "./../managed/database";
 import { OracleProposal } from "./../managed/database";
 import { ArticleOpinion } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
@@ -261,6 +265,10 @@ Inject.mappings = {
 	},
 	"MetricService": {
 		objectConstructor: MetricService,
+		parameters: ["DbContext"]
+	},
+	"MiliatryService": {
+		objectConstructor: MiliatryService,
 		parameters: ["DbContext"]
 	},
 	"OracleService": {
@@ -979,6 +987,26 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.plot(
 				params["NvNjYzd3V0MDV4ZWlxaHQ5YndjZHl2cG"],
 				params["ZoNHI0aD8zbTl2bmAyY3c2ZTU5aWBibj"]
+			)
+		);
+
+		this.expose(
+			"IxbGhidGxjcnZ5djQzZzRsZ3M4dDNybD",
+			{
+			"52MjhhM2pvZ21vMm9rcnViYWA3NmA1Mm": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(MiliatryService),
+			(controller, params) => controller.getUnit(
+				params["52MjhhM2pvZ21vMm9rcnViYWA3NmA1Mm"]
+			)
+		);
+
+		this.expose(
+			"5reGQ1NH1qMWlxNzcyZDF0MHh1ZHs0Y2",
+			{},
+			inject => inject.construct(MiliatryService),
+			(controller, params) => controller.getUnits(
+				
 			)
 		);
 
@@ -5160,6 +5188,84 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[MilitaryUnitSummaryModel.name]: class ComposedMilitaryUnitSummaryModel extends MilitaryUnitSummaryModel {
+		async map() {
+			return {
+				banner: this.$$model.banner,
+				code: this.$$model.code,
+				disbanded: this.$$model.disbanded,
+				id: this.$$model.id,
+				name: this.$$model.name,
+				parentId: this.$$model.parentId
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				banner: true,
+				code: true,
+				disbanded: true,
+				id: true,
+				name: true,
+				parentId: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new MilitaryUnitSummaryModel(null);
+			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
+			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
+			"disbanded" in data && (item.disbanded = data.disbanded === null ? null : new Date(data.disbanded));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"parentId" in data && (item.parentId = data.parentId === null ? null : `${data.parentId}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: MilitaryUnitSummaryModel) {
+			let model: MilitaryUnit;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(MilitaryUnit).find(viewModel.id)
+			} else {
+				model = new MilitaryUnit();
+			}
+			
+			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
+			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
+			"disbanded" in viewModel && (model.disbanded = viewModel.disbanded === null ? null : new Date(viewModel.disbanded));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"parentId" in viewModel && (model.parentId = viewModel.parentId === null ? null : `${viewModel.parentId}`);
+
+			return model;
+		}
+	},
 	[OracleProposalSummaryModel.name]: class ComposedOracleProposalSummaryModel extends OracleProposalSummaryModel {
 		async map() {
 			return {
@@ -7999,6 +8105,110 @@ ViewModel.mappings = {
 			"ended" in viewModel && (model.ended = viewModel.ended === null ? null : new Date(viewModel.ended));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"started" in viewModel && (model.started = viewModel.started === null ? null : new Date(viewModel.started));
+
+			return model;
+		}
+	},
+	[MilitaryUnitViewModel.name]: class ComposedMilitaryUnitViewModel extends MilitaryUnitViewModel {
+		async map() {
+			return {
+				parent: new MilitaryUnitSummaryModel(await BaseServer.unwrap(this.$$model.parent)),
+				subunits: (await this.$$model.subunits.includeTree(ViewModel.mappings[MilitaryUnitSummaryModel.name].items).toArray()).map(item => new MilitaryUnitSummaryModel(item)),
+				banner: this.$$model.banner,
+				code: this.$$model.code,
+				created: this.$$model.created,
+				description: this.$$model.description,
+				disbanded: this.$$model.disbanded,
+				id: this.$$model.id,
+				name: this.$$model.name,
+				parentId: this.$$model.parentId
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get parent() {
+					return ViewModel.mappings[MilitaryUnitSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "parent-MilitaryUnitViewModel"]
+					);
+				},
+				get subunits() {
+					return ViewModel.mappings[MilitaryUnitSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "subunits-MilitaryUnitViewModel"]
+					);
+				},
+				banner: true,
+				code: true,
+				created: true,
+				description: true,
+				disbanded: true,
+				id: true,
+				name: true,
+				parentId: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new MilitaryUnitViewModel(null);
+			"parent" in data && (item.parent = data.parent && ViewModel.mappings[MilitaryUnitSummaryModel.name].toViewModel(data.parent));
+			"subunits" in data && (item.subunits = data.subunits && [...data.subunits].map(i => ViewModel.mappings[MilitaryUnitSummaryModel.name].toViewModel(i)));
+			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
+			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
+			"created" in data && (item.created = data.created === null ? null : new Date(data.created));
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			"disbanded" in data && (item.disbanded = data.disbanded === null ? null : new Date(data.disbanded));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"parentId" in data && (item.parentId = data.parentId === null ? null : `${data.parentId}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: MilitaryUnitViewModel) {
+			let model: MilitaryUnit;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(MilitaryUnit).find(viewModel.id)
+			} else {
+				model = new MilitaryUnit();
+			}
+			
+			"parent" in viewModel && (model.parent.id = viewModel.parent ? viewModel.parent.id : null);
+			"subunits" in viewModel && (null);
+			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
+			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
+			"created" in viewModel && (model.created = viewModel.created === null ? null : new Date(viewModel.created));
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+			"disbanded" in viewModel && (model.disbanded = viewModel.disbanded === null ? null : new Date(viewModel.disbanded));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"parentId" in viewModel && (model.parentId = viewModel.parentId === null ? null : `${viewModel.parentId}`);
 
 			return model;
 		}

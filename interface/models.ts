@@ -348,6 +348,15 @@ export interface MetricValueViewModel {
 	value: number;
 }
 
+export interface MilitaryUnitSummaryModel {
+    banner: string;
+	code: string;
+	disbanded: Date;
+	id: string;
+	name: string;
+	parentId: string;
+}
+
 export interface OracleProposalSummaryModel {
     id: string;
 	lore: string;
@@ -631,6 +640,19 @@ export interface LawHouseSessionViewModel {
 	ended: Date;
 	id: string;
 	started: Date;
+}
+
+export interface MilitaryUnitViewModel {
+    parent: MilitaryUnitSummaryModel;
+	subunits: MilitaryUnitSummaryModel[];
+	banner: string;
+	code: string;
+	created: Date;
+	description: string;
+	disbanded: Date;
+	id: string;
+	name: string;
+	parentId: string;
 }
 
 export interface OracleProposalViewModel {

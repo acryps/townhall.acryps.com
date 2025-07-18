@@ -64,6 +64,9 @@ import { OraclePage } from "./oracle";
 import { ScheduledEpoch } from "../interface/time/epoch";
 import { TimePage } from "./time";
 import { ItemContextPage } from "./item-context";
+import { MilitaryPage } from "./military";
+import { MilitaryUnit } from "../server/managed/database";
+import { MilitaryUnitPage } from "./military/unit";
 
 export class Application {
 	static router: Router;
@@ -135,6 +138,10 @@ export class Application {
 				.route('/oracle', OraclePage)
 
 				.route('/metrics', MetricsPage)
+
+				.route('/military', MilitaryPage
+					.route('/unit/:id', MilitaryUnitPage)
+				)
 
 				.route('/resident/:tag', ResidentPage
 					.route('/chat/:chat', ChatPage)

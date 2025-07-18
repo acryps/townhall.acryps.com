@@ -1538,6 +1538,118 @@ export class MetricValue extends Entity<MetricValueQueryProxy> {
 	
 }
 			
+export class MilitaryFacilityQueryProxy extends QueryProxy {
+	get unit(): Partial<MilitaryUnitQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get closed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get opened(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get unitId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class MilitaryFacility extends Entity<MilitaryFacilityQueryProxy> {
+	get unit(): Partial<ForeignReference<MilitaryUnit>> { return this.$unit; }
+	closed: Date;
+	declare id: string;
+	opened: Date;
+	unitId: string;
+	
+	$$meta = {
+		source: "military_facility",
+		columns: {
+			closed: { type: "timestamp", name: "closed" },
+			id: { type: "uuid", name: "id" },
+			opened: { type: "timestamp", name: "opened" },
+			unitId: { type: "uuid", name: "unit_id" }
+		},
+		get set(): DbSet<MilitaryFacility, MilitaryFacilityQueryProxy> { 
+			return new DbSet<MilitaryFacility, MilitaryFacilityQueryProxy>(MilitaryFacility, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$unit = new ForeignReference<MilitaryUnit>(this, "unitId", MilitaryUnit);
+	}
+	
+	private $unit: ForeignReference<MilitaryUnit>;
+
+	set unit(value: Partial<ForeignReference<MilitaryUnit>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.unitId = value.id as string;
+		} else {
+			this.unitId = null;
+		}
+	}
+
+	
+}
+			
+export class MilitaryUnitQueryProxy extends QueryProxy {
+	get parent(): Partial<MilitaryUnitQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get banner(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get code(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get disbanded(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get parentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class MilitaryUnit extends Entity<MilitaryUnitQueryProxy> {
+	get parent(): Partial<ForeignReference<MilitaryUnit>> { return this.$parent; }
+	subunits: PrimaryReference<MilitaryUnit, MilitaryUnitQueryProxy>;
+		facilities: PrimaryReference<MilitaryFacility, MilitaryFacilityQueryProxy>;
+		banner: string;
+	code: string;
+	created: Date;
+	description: string;
+	disbanded: Date;
+	declare id: string;
+	name: string;
+	parentId: string;
+	
+	$$meta = {
+		source: "military_unit",
+		columns: {
+			banner: { type: "text", name: "banner" },
+			code: { type: "text", name: "code" },
+			created: { type: "timestamp", name: "created" },
+			description: { type: "text", name: "description" },
+			disbanded: { type: "timestamp", name: "disbanded" },
+			id: { type: "uuid", name: "id" },
+			name: { type: "text", name: "name" },
+			parentId: { type: "uuid", name: "parent_id" }
+		},
+		get set(): DbSet<MilitaryUnit, MilitaryUnitQueryProxy> { 
+			return new DbSet<MilitaryUnit, MilitaryUnitQueryProxy>(MilitaryUnit, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$parent = new ForeignReference<MilitaryUnit>(this, "parentId", MilitaryUnit);
+	this.subunits = new PrimaryReference<MilitaryUnit, MilitaryUnitQueryProxy>(this, "parentId", MilitaryUnit);
+		this.facilities = new PrimaryReference<MilitaryFacility, MilitaryFacilityQueryProxy>(this, "unitId", MilitaryFacility);
+	}
+	
+	private $parent: ForeignReference<MilitaryUnit>;
+
+	set parent(value: Partial<ForeignReference<MilitaryUnit>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.parentId = value.id as string;
+		} else {
+			this.parentId = null;
+		}
+	}
+
+	
+}
+			
 export class MovementQueryProxy extends QueryProxy {
 	get player(): Partial<PlayerQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get driving(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -3530,6 +3642,8 @@ export class DbContext {
 	mapTile: DbSet<MapTile, MapTileQueryProxy>;
 	metric: DbSet<Metric, MetricQueryProxy>;
 	metricValue: DbSet<MetricValue, MetricValueQueryProxy>;
+	militaryFacility: DbSet<MilitaryFacility, MilitaryFacilityQueryProxy>;
+	militaryUnit: DbSet<MilitaryUnit, MilitaryUnitQueryProxy>;
 	movement: DbSet<Movement, MovementQueryProxy>;
 	office: DbSet<Office, OfficeQueryProxy>;
 	officeCapacity: DbSet<OfficeCapacity, OfficeCapacityQueryProxy>;
@@ -3591,6 +3705,8 @@ export class DbContext {
 		this.mapTile = new DbSet<MapTile, MapTileQueryProxy>(MapTile, this.runContext);
 		this.metric = new DbSet<Metric, MetricQueryProxy>(Metric, this.runContext);
 		this.metricValue = new DbSet<MetricValue, MetricValueQueryProxy>(MetricValue, this.runContext);
+		this.militaryFacility = new DbSet<MilitaryFacility, MilitaryFacilityQueryProxy>(MilitaryFacility, this.runContext);
+		this.militaryUnit = new DbSet<MilitaryUnit, MilitaryUnitQueryProxy>(MilitaryUnit, this.runContext);
 		this.movement = new DbSet<Movement, MovementQueryProxy>(Movement, this.runContext);
 		this.office = new DbSet<Office, OfficeQueryProxy>(Office, this.runContext);
 		this.officeCapacity = new DbSet<OfficeCapacity, OfficeCapacityQueryProxy>(OfficeCapacity, this.runContext);

@@ -33,6 +33,7 @@ import { plansStyle } from "./plans/index.style";
 import { oracleStyle } from "./oracle/index.style";
 import { timeStyle } from "./time/index.style";
 import { itemContextStyle } from "./item-context/index.style";
+import { militaryStyle } from "./military/index.style";
 
 export const pageStyle = () => root(
 	boldFont,
@@ -124,6 +125,8 @@ export const pageStyle = () => root(
 				oracleStyle(),
 
 				metricsStyle(),
+
+				militaryStyle(),
 
 				populationStyle(),
 				residentStyle(),

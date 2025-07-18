@@ -1,4 +1,4 @@
-import { alignContent, alignItems, border, child, columnGap, display, height, hex, imageRendering, justifyContent, marginBottom, maxWidth, min, padding, px, rem, select, style, vh, vw, width } from "@acryps/style";
+import { alignContent, alignItems, border, child, columnGap, display, DistributedJustificationMode, height, hex, imageRendering, justifyContent, marginBottom, maxWidth, min, padding, px, rem, select, style, vh, vw, width } from "@acryps/style";
 
 export const bannerStyle = () => select('ui-banner',
 	child('img',
@@ -6,9 +6,9 @@ export const bannerStyle = () => select('ui-banner',
 	)
 );
 
-export const headerBannerStyle = () => child('ui-banner',
+export const headerBannerStyle = (alignment: DistributedJustificationMode = 'center') => child('ui-banner',
 	display('flex'),
-	justifyContent('center'),
+	justifyContent(alignment),
 	marginBottom(rem(1)),
 
 	child('img',

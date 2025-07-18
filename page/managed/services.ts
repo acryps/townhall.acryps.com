@@ -819,6 +819,27 @@ export class MetricValueViewModel {
 	}
 }
 
+export class MilitaryUnitSummaryModel {
+	banner: string;
+	code: string;
+	disbanded: Date;
+	id: string;
+	name: string;
+	parentId: string;
+
+	private static $build(raw) {
+		const item = new MilitaryUnitSummaryModel();
+		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
+		raw.code === undefined || (item.code = raw.code === null ? null : `${raw.code}`)
+		raw.disbanded === undefined || (item.disbanded = raw.disbanded ? new Date(raw.disbanded) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.parentId === undefined || (item.parentId = raw.parentId === null ? null : `${raw.parentId}`)
+		
+		return item;
+	}
+}
+
 export class OracleProposalSummaryModel {
 	id: string;
 	lore: string;
@@ -1495,6 +1516,35 @@ export class LawHouseSessionViewModel {
 		raw.ended === undefined || (item.ended = raw.ended ? new Date(raw.ended) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.started === undefined || (item.started = raw.started ? new Date(raw.started) : null)
+		
+		return item;
+	}
+}
+
+export class MilitaryUnitViewModel {
+	parent: MilitaryUnitSummaryModel;
+	subunits: MilitaryUnitSummaryModel[];
+	banner: string;
+	code: string;
+	created: Date;
+	description: string;
+	disbanded: Date;
+	id: string;
+	name: string;
+	parentId: string;
+
+	private static $build(raw) {
+		const item = new MilitaryUnitViewModel();
+		raw.parent === undefined || (item.parent = raw.parent ? MilitaryUnitSummaryModel["$build"](raw.parent) : null)
+		raw.subunits === undefined || (item.subunits = raw.subunits ? raw.subunits.map(i => MilitaryUnitSummaryModel["$build"](i)) : null)
+		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
+		raw.code === undefined || (item.code = raw.code === null ? null : `${raw.code}`)
+		raw.created === undefined || (item.created = raw.created ? new Date(raw.created) : null)
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
+		raw.disbanded === undefined || (item.disbanded = raw.disbanded ? new Date(raw.disbanded) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.parentId === undefined || (item.parentId = raw.parentId === null ? null : `${raw.parentId}`)
 		
 		return item;
 	}
@@ -3052,6 +3102,50 @@ export class MetricService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : MetricValueViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class MiliatryService {
+	async getUnit(id: string): Promise<MilitaryUnitViewModel> {
+		const $data = new FormData();
+		$data.append("52MjhhM2pvZ21vMm9rcnViYWA3NmA1Mm", Service.stringify(id))
+
+		return await fetch(Service.toURL("IxbGhidGxjcnZ5djQzZzRsZ3M4dDNybD"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : MilitaryUnitViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getUnits(): Promise<Array<MilitaryUnitSummaryModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("5reGQ1NH1qMWlxNzcyZDF0MHh1ZHs0Y2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : MilitaryUnitSummaryModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

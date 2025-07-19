@@ -3,7 +3,7 @@ import { MapPage } from ".";
 import { addIcon, boroughIcon, captureIcon, dayIcon, deleteIcon, drawIcon, flipIcon, goIcon, movementIcon, priceIcon, propertyRegisterIcon, residentIcon, streetIcon, timeMachineIcon, trainIcon, undoIcon } from "../assets/icons/managed";
 import { PackedPoint, Point } from "../../interface/point";
 import { MapLayer } from "../shared/map/layer";
-import { baseLayer, nightLayer, boroughLayer, propertyLayer, streetLayer, movementHeatmapLayer, propertyUsageLayer, propertyValueHeatmapLayer, trainRoutesLayer } from "../shared/map/layers";
+import { baseLayer, nightLayer, boroughLayer, propertyLayer, streetLayer, movementHeatmapLayer, propertyUsageLayer, propertyValueHeatmapLayer, trainRoutesLayer, propertyOwnershipLayer } from "../shared/map/layers";
 import { BoroughSummaryModel } from "../managed/services";
 import { Application } from "..";
 import { activeBoroughColor, activeBoroughContrast } from "./index.style";
@@ -92,6 +92,10 @@ export class MapToolbarComponent extends Component {
 					</ui-layer>
 
 					<ui-layer ui-click={() => this.toggleLayer(propertyLayer)}>
+						{propertyRegisterIcon()}
+					</ui-layer>
+
+					<ui-layer ui-click={() => this.toggleLayer(propertyOwnershipLayer)}>
 						{propertyRegisterIcon()}
 					</ui-layer>
 

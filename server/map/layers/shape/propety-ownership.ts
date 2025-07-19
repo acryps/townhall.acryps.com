@@ -20,18 +20,36 @@ export class PropertyOwnershipTileServer extends ShapeTileServer {
 					.include(property => property.owners)
 					.toArray();
 
-				const pricedProperties = await database.propertyOwner.where(owner => owner.aquiredValuation.price != null).toArray();
-				console.log(pricedProperties);
-
 				for (let property of properties) {
 					if (property.activePlotBoundaryId) {
 						const activePlotBoundary = await property.activePlotBoundary.fetch();
-						const owners = await property.owners.toArray();
-						const priced = pricedProperties.find(priced => priced.propertyId == property.id);
+
+						const ownership = await property.owners
+							.orderByDescending(owner => owner.aquired)
+							.include(owner => owner.owner)
+							.first();
+
+						let color = '#fff';
+
+						if (ownership) {
+							const entity = await ownership.owner.fetch();
+
+							if (entity) {
+								if (entity.state) {
+									color = '#20b2bf';
+								} else if (entity.boroughId) {
+									color = '#20bf23';
+								} else if (entity.companyId) {
+									color = '#bf2050';
+								} else if (entity.residentId) {
+									color = '#d4e20d';
+								}
+							}
+						}
 
 						shapes.push({
 							id: property.id,
-							fill: owners.length ? (priced ? '#0f0' : '#ff0') : '#f00',
+							fill: color,
 							stroke: '#000',
 							bounds: activePlotBoundary.shape
 						});

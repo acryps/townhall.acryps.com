@@ -217,6 +217,7 @@ export class PropertyViewModel {
 	buildings: BuildingSummaryModel[];
 	dwellings: PropertyDwellingViewModel[];
 	historicListingModifiers: PropertyHistoricListingModifierViewModel[];
+	militaryFacilities: MilitaryFacilityViewModel[];
 	offices: OfficeViewModel[];
 	owners: PropertyOwnerViewModel[];
 	plotBoundaries: PlotBoundarySummaryModel[];
@@ -236,6 +237,7 @@ export class PropertyViewModel {
 		raw.buildings === undefined || (item.buildings = raw.buildings ? raw.buildings.map(i => BuildingSummaryModel["$build"](i)) : null)
 		raw.dwellings === undefined || (item.dwellings = raw.dwellings ? raw.dwellings.map(i => PropertyDwellingViewModel["$build"](i)) : null)
 		raw.historicListingModifiers === undefined || (item.historicListingModifiers = raw.historicListingModifiers ? raw.historicListingModifiers.map(i => PropertyHistoricListingModifierViewModel["$build"](i)) : null)
+		raw.militaryFacilities === undefined || (item.militaryFacilities = raw.militaryFacilities ? raw.militaryFacilities.map(i => MilitaryFacilityViewModel["$build"](i)) : null)
 		raw.offices === undefined || (item.offices = raw.offices ? raw.offices.map(i => OfficeViewModel["$build"](i)) : null)
 		raw.owners === undefined || (item.owners = raw.owners ? raw.owners.map(i => PropertyOwnerViewModel["$build"](i)) : null)
 		raw.plotBoundaries === undefined || (item.plotBoundaries = raw.plotBoundaries ? raw.plotBoundaries.map(i => PlotBoundarySummaryModel["$build"](i)) : null)
@@ -906,6 +908,27 @@ export class BuildingShapeModel {
 	}
 }
 
+export class MilitaryFacilityViewModel {
+	property: PropertySummaryModel;
+	unit: MilitaryUnitSummaryModel;
+	closed: Date;
+	id: string;
+	name: string;
+	opened: Date;
+
+	private static $build(raw) {
+		const item = new MilitaryFacilityViewModel();
+		raw.property === undefined || (item.property = raw.property ? PropertySummaryModel["$build"](raw.property) : null)
+		raw.unit === undefined || (item.unit = raw.unit ? MilitaryUnitSummaryModel["$build"](raw.unit) : null)
+		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
+		
+		return item;
+	}
+}
+
 export class PlotBoundaryShapeModel {
 	id: string;
 	shape: string;
@@ -1524,6 +1547,7 @@ export class LawHouseSessionViewModel {
 export class MilitaryUnitViewModel {
 	parent: MilitaryUnitSummaryModel;
 	subunits: MilitaryUnitSummaryModel[];
+	facilities: MilitaryFacilityViewModel[];
 	banner: string;
 	code: string;
 	created: Date;
@@ -1537,6 +1561,7 @@ export class MilitaryUnitViewModel {
 		const item = new MilitaryUnitViewModel();
 		raw.parent === undefined || (item.parent = raw.parent ? MilitaryUnitSummaryModel["$build"](raw.parent) : null)
 		raw.subunits === undefined || (item.subunits = raw.subunits ? raw.subunits.map(i => MilitaryUnitSummaryModel["$build"](i)) : null)
+		raw.facilities === undefined || (item.facilities = raw.facilities ? raw.facilities.map(i => MilitaryFacilityViewModel["$build"](i)) : null)
 		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
 		raw.code === undefined || (item.code = raw.code === null ? null : `${raw.code}`)
 		raw.created === undefined || (item.created = raw.created ? new Date(raw.created) : null)
@@ -3153,6 +3178,67 @@ export class MiliatryService {
 			}
 		});
 	}
+
+	async assignFacility(propertyId: string): Promise<MilitaryFacilityViewModel> {
+		const $data = new FormData();
+		$data.append("Vwdm5kZjRpMTdsdWNpYWZ3MmJxNmB4c2", Service.stringify(propertyId))
+
+		return await fetch(Service.toURL("B6dXczd3FkMj12YT53NmVsMXYzYWE2Z2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : MilitaryFacilityViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async updateFacility(facilityId: string, name: string, unitId: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("RnaGZ6Znd1YXE0ZHhrdjdzNWhzcGhlZm", Service.stringify(facilityId))
+		$data.append("czNzlzaTZraXJ0dDZ1NWQ2cDlkbHUxan", Service.stringify(name))
+		$data.append("w4eWx3bWI1aGE3bWgzMXljMH94czRzMj", Service.stringify(unitId))
+
+		return await fetch(Service.toURL("Rkb2JpMWJ2NG94cWliMnl1aXk2ZXM1Nz"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async closeFacility(facilityId: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("ZvN29ybmdhZTRtMGFrbXJkZW9oeXV6Z3", Service.stringify(facilityId))
+
+		return await fetch(Service.toURL("NmNzhpNjA0NWkxemZ6bWp2ZHowanBzYT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
 }
 
 export class OracleService {
@@ -4226,11 +4312,11 @@ export class TrainService {
 		});
 	}
 
-	async registerStation(id: string): Promise<TrainStationViewModel> {
+	async registerStation(id: string): Promise<PropertyTrainStationViewModel> {
 		const $data = new FormData();
-		$data.append("91eXg3MnBkejd1Z3Y3aDFveDNmdWgwaj", Service.stringify(id))
+		$data.append("U1YWt6MjY0aW02aGhjbW9scX4wYXkxbW", Service.stringify(id))
 
-		return await fetch(Service.toURL("RlMmhtd3Q2cndiYzJ2M3c2c2N6bnV6c2"), {
+		return await fetch(Service.toURL("FrcWg1YmdrMWZkaWZsMDI4YntmcHJwbX"), {
 			method: "post",
 			credentials: "include",
 			body: $data
@@ -4238,7 +4324,7 @@ export class TrainService {
 			if ("data" in r) {
 				const d = r.data;
 
-				return d === null ? null : TrainStationViewModel["$build"](d);
+				return d === null ? null : PropertyTrainStationViewModel["$build"](d);
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

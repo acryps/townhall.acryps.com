@@ -1,7 +1,7 @@
 import { Service } from "vlserver";
 import { DbContext, TrainRoute, TrainRoutePath, TrainStation, TrainStop } from "../../managed/database";
 import { TrainRouteViewModel } from "./route.view";
-import { TrainStationViewModel } from "./station.view";
+import { PropertyTrainStationViewModel, TrainStationViewModel } from "./station.view";
 import { Point } from "../../../interface/point";
 
 export class TrainService extends Service {
@@ -79,7 +79,7 @@ export class TrainService extends Service {
 
 		await station.create();
 
-		return new TrainStationViewModel(station);
+		return new PropertyTrainStationViewModel(station);
 	}
 
 	async addStop(routeId: string, stationId: string) {

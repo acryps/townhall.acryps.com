@@ -10,6 +10,8 @@ import { PropertyOwnershipStructureTab } from "./ownership-structure";
 import { PropertyUsageTab } from "./usage";
 import { PropertyHistoryTab } from "./history";
 import { PropertyStationsTab } from "./stations";
+import { PropertyCapabilitiesTab } from "./capabilities";
+import { PropertyMilitaryTab } from "./military";
 
 export class PropertyPage extends Component {
 	declare parameters: { id: string };
@@ -51,11 +53,12 @@ export class PropertyPage extends Component {
 						station => `Station ${station.name ?? ''}`.trim(),
 						station => new PropertyStationsTab(this, station)
 					)
+					.addTab('Military', () => new PropertyMilitaryTab(this), this.property.militaryFacilities.length != 0)
 					.addTab(`History (${this.property.historicListingGrade?.grade})`, () => new PropertyHistoryTab(this), this.property.historicListingGrade)
-					.addTab('Usage', () => new PropertyUsageTab(this))
+					.addTab(`Usage ${this.property.dwellings.length}/${this.property.offices.length}`, () => new PropertyUsageTab(this))
 					.addTab('Ownership', () => new PropertyOwnershipStructureTab(this))
 					.addTab('History', () => new PropertyHistoryTab(this), !this.property.historicListingGrade)
-					.addTab('Capabilities', <ui-void></ui-void>)
+					.addTab('Capabilities', () => new PropertyCapabilitiesTab(this))
 				}
 			</ui-content>}
 		</ui-property>

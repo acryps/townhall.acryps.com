@@ -101,6 +101,7 @@ export interface PropertyViewModel {
 	buildings: BuildingSummaryModel[];
 	dwellings: PropertyDwellingViewModel[];
 	historicListingModifiers: PropertyHistoricListingModifierViewModel[];
+	militaryFacilities: MilitaryFacilityViewModel[];
 	offices: OfficeViewModel[];
 	owners: PropertyOwnerViewModel[];
 	plotBoundaries: PlotBoundarySummaryModel[];
@@ -384,6 +385,15 @@ export interface BuildingShapeModel {
 	id: string;
 }
 
+export interface MilitaryFacilityViewModel {
+    property: PropertySummaryModel;
+	unit: MilitaryUnitSummaryModel;
+	closed: Date;
+	id: string;
+	name: string;
+	opened: Date;
+}
+
 export interface PlotBoundaryShapeModel {
     id: string;
 	shape: string;
@@ -645,6 +655,7 @@ export interface LawHouseSessionViewModel {
 export interface MilitaryUnitViewModel {
     parent: MilitaryUnitSummaryModel;
 	subunits: MilitaryUnitSummaryModel[];
+	facilities: MilitaryFacilityViewModel[];
 	banner: string;
 	code: string;
 	created: Date;

@@ -22,13 +22,7 @@ export class InsertTrainRouteStopAction extends Action {
 		this.segments = TrainRouteSegment.split(this.trainRoute, stations);
 		this.segment = this.segments[+this.parameters.segmentIndex];
 
-		const propertyLayer = MapLayer.fromShapeSource((x, y) => `/tile/property/${x}/${y}`, 500, 'source-over', true, async property => {
-			let station = stations.find(station => station.property.id == property.id);
-
-			if (!station) {
-				station = await new TrainService().registerStation(property.id);
-			}
-
+		const propertyLayer = MapLayer.fromShapeSource((x, y) => `/tile/train-station/${x}/${y}`, 500, 'source-over', true, async station => {
 			await new TrainService().addStop(this.trainRoute.id, station.id);
 
 			this.navigate(`/train/route/${this.trainRoute.code}`);

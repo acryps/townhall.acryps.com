@@ -1,5 +1,6 @@
 import { ViewModel } from "vlserver";
 import { MilitaryUnit } from "../../managed/database";
+import { MilitaryFacilityViewModel } from "../property/military-facility";
 
 export class MilitaryUnitSummaryModel extends ViewModel<MilitaryUnit> {
 	id;
@@ -18,4 +19,5 @@ export class MilitaryUnitViewModel extends MilitaryUnitSummaryModel {
 
 	parent: MilitaryUnitSummaryModel;
 	subunits: MilitaryUnitSummaryModel[];
+	facilities: MilitaryFacilityViewModel[];
 }

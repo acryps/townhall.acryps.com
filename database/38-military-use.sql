@@ -14,8 +14,10 @@ CREATE TABLE military_unit (
 CREATE TABLE military_facility (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 
+	name TEXT,
 	opened TIMESTAMP,
 	closed TIMESTAMP,
 
-	unit_id UUID CONSTRAINT unit__facilities REFERENCES military_unit (id)
+	unit_id UUID CONSTRAINT unit__facilities REFERENCES military_unit (id),
+	property_id UUID CONSTRAINT property__military_facilities REFERENCES property (id)
 );

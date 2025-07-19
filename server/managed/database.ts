@@ -1539,17 +1539,23 @@ export class MetricValue extends Entity<MetricValueQueryProxy> {
 }
 			
 export class MilitaryFacilityQueryProxy extends QueryProxy {
+	get property(): Partial<PropertyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get unit(): Partial<MilitaryUnitQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get closed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get opened(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get propertyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get unitId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class MilitaryFacility extends Entity<MilitaryFacilityQueryProxy> {
+	get property(): Partial<ForeignReference<Property>> { return this.$property; }
 	get unit(): Partial<ForeignReference<MilitaryUnit>> { return this.$unit; }
 	closed: Date;
 	declare id: string;
+	name: string;
 	opened: Date;
+	propertyId: string;
 	unitId: string;
 	
 	$$meta = {
@@ -1557,7 +1563,9 @@ export class MilitaryFacility extends Entity<MilitaryFacilityQueryProxy> {
 		columns: {
 			closed: { type: "timestamp", name: "closed" },
 			id: { type: "uuid", name: "id" },
+			name: { type: "text", name: "name" },
 			opened: { type: "timestamp", name: "opened" },
+			propertyId: { type: "uuid", name: "property_id" },
 			unitId: { type: "uuid", name: "unit_id" }
 		},
 		get set(): DbSet<MilitaryFacility, MilitaryFacilityQueryProxy> { 
@@ -1568,9 +1576,22 @@ export class MilitaryFacility extends Entity<MilitaryFacilityQueryProxy> {
 	constructor() {
 		super();
 		
-		this.$unit = new ForeignReference<MilitaryUnit>(this, "unitId", MilitaryUnit);
+		this.$property = new ForeignReference<Property>(this, "propertyId", Property);
+	this.$unit = new ForeignReference<MilitaryUnit>(this, "unitId", MilitaryUnit);
 	}
 	
+	private $property: ForeignReference<Property>;
+
+	set property(value: Partial<ForeignReference<Property>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.propertyId = value.id as string;
+		} else {
+			this.propertyId = null;
+		}
+	}
+
 	private $unit: ForeignReference<MilitaryUnit>;
 
 	set unit(value: Partial<ForeignReference<MilitaryUnit>>) {
@@ -2177,6 +2198,7 @@ export class Property extends Entity<PropertyQueryProxy> {
 	buildings: PrimaryReference<Building, BuildingQueryProxy>;
 		dwellings: PrimaryReference<Dwelling, DwellingQueryProxy>;
 		historicListingModifiers: PrimaryReference<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>;
+		militaryFacilities: PrimaryReference<MilitaryFacility, MilitaryFacilityQueryProxy>;
 		offices: PrimaryReference<Office, OfficeQueryProxy>;
 		owners: PrimaryReference<PropertyOwner, PropertyOwnerQueryProxy>;
 		plotBoundaries: PrimaryReference<PlotBoundary, PlotBoundaryQueryProxy>;
@@ -2232,6 +2254,7 @@ export class Property extends Entity<PropertyQueryProxy> {
 	this.buildings = new PrimaryReference<Building, BuildingQueryProxy>(this, "propertyId", Building);
 		this.dwellings = new PrimaryReference<Dwelling, DwellingQueryProxy>(this, "propertyId", Dwelling);
 		this.historicListingModifiers = new PrimaryReference<PropertyHistoricListingModifier, PropertyHistoricListingModifierQueryProxy>(this, "propertyId", PropertyHistoricListingModifier);
+		this.militaryFacilities = new PrimaryReference<MilitaryFacility, MilitaryFacilityQueryProxy>(this, "propertyId", MilitaryFacility);
 		this.offices = new PrimaryReference<Office, OfficeQueryProxy>(this, "propertyId", Office);
 		this.owners = new PrimaryReference<PropertyOwner, PropertyOwnerQueryProxy>(this, "propertyId", PropertyOwner);
 		this.plotBoundaries = new PrimaryReference<PlotBoundary, PlotBoundaryQueryProxy>(this, "propertyId", PlotBoundary);

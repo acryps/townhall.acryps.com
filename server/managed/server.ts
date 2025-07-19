@@ -77,8 +77,10 @@ import { MetricTracker } from "././../areas/metrics/tracker";
 import { MetricValueViewModel } from "././../areas/metrics/view";
 import { MetricViewModel } from "././../areas/metrics/view";
 import { MetricService } from "././../areas/metrics/service";
+import { MilitaryFacility } from "././database";
 import { MilitaryUnitSummaryModel } from "././../areas/military/unit";
 import { MilitaryUnitViewModel } from "././../areas/military/unit";
+import { MilitaryFacilityViewModel } from "././../areas/property/military-facility";
 import { MiliatryService } from "././../areas/military/index";
 import { Oracle } from "././../areas/oracle/generator";
 import { Interpreter } from "././../life/interpreter";
@@ -127,6 +129,7 @@ import { TrainRoutePath } from "././database";
 import { TrainStation } from "././database";
 import { TrainStop } from "././database";
 import { TrainRouteViewModel } from "././../areas/train/route.view";
+import { PropertyTrainStationViewModel } from "././../areas/train/station.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
 import { TrainService } from "././../areas/train/train.service";
 import { Bill } from "././database";
@@ -155,7 +158,6 @@ import { ValuationSummaryModel } from "./../areas/trade/valuation.view";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
 import { TrainRouteSummaryModel } from "./../areas/train/route.view";
 import { TrainRoutePathViewModel } from "./../areas/train/route.view";
-import { PropertyTrainStationViewModel } from "./../areas/train/station.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { StationTrainStopViewModel } from "./../areas/train/stop.view";
 import { HonestiumViewModel } from "./../areas/vote/bill";
@@ -1011,6 +1013,43 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"B6dXczd3FkMj12YT53NmVsMXYzYWE2Z2",
+			{
+			"Vwdm5kZjRpMTdsdWNpYWZ3MmJxNmB4c2": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(MiliatryService),
+			(controller, params) => controller.assignFacility(
+				params["Vwdm5kZjRpMTdsdWNpYWZ3MmJxNmB4c2"]
+			)
+		);
+
+		this.expose(
+			"Rkb2JpMWJ2NG94cWliMnl1aXk2ZXM1Nz",
+			{
+			"RnaGZ6Znd1YXE0ZHhrdjdzNWhzcGhlZm": { type: "string", isArray: false, isOptional: false },
+				"czNzlzaTZraXJ0dDZ1NWQ2cDlkbHUxan": { type: "string", isArray: false, isOptional: false },
+				"w4eWx3bWI1aGE3bWgzMXljMH94czRzMj": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(MiliatryService),
+			(controller, params) => controller.updateFacility(
+				params["RnaGZ6Znd1YXE0ZHhrdjdzNWhzcGhlZm"],
+				params["czNzlzaTZraXJ0dDZ1NWQ2cDlkbHUxan"],
+				params["w4eWx3bWI1aGE3bWgzMXljMH94czRzMj"]
+			)
+		);
+
+		this.expose(
+			"NmNzhpNjA0NWkxemZ6bWp2ZHowanBzYT",
+			{
+			"ZvN29ybmdhZTRtMGFrbXJkZW9oeXV6Z3": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(MiliatryService),
+			(controller, params) => controller.closeFacility(
+				params["ZvN29ybmdhZTRtMGFrbXJkZW9oeXV6Z3"]
+			)
+		);
+
+		this.expose(
 			"JseDtianR6Z3dkZ2RpNnFrcWdjeTFieX",
 			{},
 			inject => inject.construct(OracleService),
@@ -1630,13 +1669,13 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"RlMmhtd3Q2cndiYzJ2M3c2c2N6bnV6c2",
+			"FrcWg1YmdrMWZkaWZsMDI4YntmcHJwbX",
 			{
-			"91eXg3MnBkejd1Z3Y3aDFveDNmdWgwaj": { type: "string", isArray: false, isOptional: false }
+			"U1YWt6MjY0aW02aGhjbW9scX4wYXkxbW": { type: "string", isArray: false, isOptional: false }
 			},
 			inject => inject.construct(TrainService),
 			(controller, params) => controller.registerStation(
-				params["91eXg3MnBkejd1Z3Y3aDFveDNmdWgwaj"]
+				params["U1YWt6MjY0aW02aGhjbW9scX4wYXkxbW"]
 			)
 		);
 
@@ -2618,6 +2657,7 @@ ViewModel.mappings = {
 				buildings: (await this.$$model.buildings.includeTree(ViewModel.mappings[BuildingSummaryModel.name].items).toArray()).map(item => new BuildingSummaryModel(item)),
 				dwellings: (await this.$$model.dwellings.includeTree(ViewModel.mappings[PropertyDwellingViewModel.name].items).toArray()).map(item => new PropertyDwellingViewModel(item)),
 				historicListingModifiers: (await this.$$model.historicListingModifiers.includeTree(ViewModel.mappings[PropertyHistoricListingModifierViewModel.name].items).toArray()).map(item => new PropertyHistoricListingModifierViewModel(item)),
+				militaryFacilities: (await this.$$model.militaryFacilities.includeTree(ViewModel.mappings[MilitaryFacilityViewModel.name].items).toArray()).map(item => new MilitaryFacilityViewModel(item)),
 				offices: (await this.$$model.offices.includeTree(ViewModel.mappings[OfficeViewModel.name].items).toArray()).map(item => new OfficeViewModel(item)),
 				owners: (await this.$$model.owners.includeTree(ViewModel.mappings[PropertyOwnerViewModel.name].items).toArray()).map(item => new PropertyOwnerViewModel(item)),
 				plotBoundaries: (await this.$$model.plotBoundaries.includeTree(ViewModel.mappings[PlotBoundarySummaryModel.name].items).toArray()).map(item => new PlotBoundarySummaryModel(item)),
@@ -2688,6 +2728,12 @@ ViewModel.mappings = {
 						[...parents, "historicListingModifiers-PropertyViewModel"]
 					);
 				},
+				get militaryFacilities() {
+					return ViewModel.mappings[MilitaryFacilityViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "militaryFacilities-PropertyViewModel"]
+					);
+				},
 				get offices() {
 					return ViewModel.mappings[OfficeViewModel.name].getPrefetchingProperties(
 						level,
@@ -2734,6 +2780,7 @@ ViewModel.mappings = {
 			"buildings" in data && (item.buildings = data.buildings && [...data.buildings].map(i => ViewModel.mappings[BuildingSummaryModel.name].toViewModel(i)));
 			"dwellings" in data && (item.dwellings = data.dwellings && [...data.dwellings].map(i => ViewModel.mappings[PropertyDwellingViewModel.name].toViewModel(i)));
 			"historicListingModifiers" in data && (item.historicListingModifiers = data.historicListingModifiers && [...data.historicListingModifiers].map(i => ViewModel.mappings[PropertyHistoricListingModifierViewModel.name].toViewModel(i)));
+			"militaryFacilities" in data && (item.militaryFacilities = data.militaryFacilities && [...data.militaryFacilities].map(i => ViewModel.mappings[MilitaryFacilityViewModel.name].toViewModel(i)));
 			"offices" in data && (item.offices = data.offices && [...data.offices].map(i => ViewModel.mappings[OfficeViewModel.name].toViewModel(i)));
 			"owners" in data && (item.owners = data.owners && [...data.owners].map(i => ViewModel.mappings[PropertyOwnerViewModel.name].toViewModel(i)));
 			"plotBoundaries" in data && (item.plotBoundaries = data.plotBoundaries && [...data.plotBoundaries].map(i => ViewModel.mappings[PlotBoundarySummaryModel.name].toViewModel(i)));
@@ -2763,6 +2810,7 @@ ViewModel.mappings = {
 			"buildings" in viewModel && (null);
 			"dwellings" in viewModel && (null);
 			"historicListingModifiers" in viewModel && (null);
+			"militaryFacilities" in viewModel && (null);
 			"offices" in viewModel && (null);
 			"owners" in viewModel && (null);
 			"plotBoundaries" in viewModel && (null);
@@ -5547,6 +5595,94 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[MilitaryFacilityViewModel.name]: class ComposedMilitaryFacilityViewModel extends MilitaryFacilityViewModel {
+		async map() {
+			return {
+				property: new PropertySummaryModel(await BaseServer.unwrap(this.$$model.property)),
+				unit: new MilitaryUnitSummaryModel(await BaseServer.unwrap(this.$$model.unit)),
+				closed: this.$$model.closed,
+				id: this.$$model.id,
+				name: this.$$model.name,
+				opened: this.$$model.opened
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get property() {
+					return ViewModel.mappings[PropertySummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "property-MilitaryFacilityViewModel"]
+					);
+				},
+				get unit() {
+					return ViewModel.mappings[MilitaryUnitSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "unit-MilitaryFacilityViewModel"]
+					);
+				},
+				closed: true,
+				id: true,
+				name: true,
+				opened: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new MilitaryFacilityViewModel(null);
+			"property" in data && (item.property = data.property && ViewModel.mappings[PropertySummaryModel.name].toViewModel(data.property));
+			"unit" in data && (item.unit = data.unit && ViewModel.mappings[MilitaryUnitSummaryModel.name].toViewModel(data.unit));
+			"closed" in data && (item.closed = data.closed === null ? null : new Date(data.closed));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"opened" in data && (item.opened = data.opened === null ? null : new Date(data.opened));
+
+			return item;
+		}
+
+		static async toModel(viewModel: MilitaryFacilityViewModel) {
+			let model: MilitaryFacility;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(MilitaryFacility).find(viewModel.id)
+			} else {
+				model = new MilitaryFacility();
+			}
+			
+			"property" in viewModel && (model.property.id = viewModel.property ? viewModel.property.id : null);
+			"unit" in viewModel && (model.unit.id = viewModel.unit ? viewModel.unit.id : null);
+			"closed" in viewModel && (model.closed = viewModel.closed === null ? null : new Date(viewModel.closed));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"opened" in viewModel && (model.opened = viewModel.opened === null ? null : new Date(viewModel.opened));
+
+			return model;
+		}
+	},
 	[PlotBoundaryShapeModel.name]: class ComposedPlotBoundaryShapeModel extends PlotBoundaryShapeModel {
 		async map() {
 			return {
@@ -8114,6 +8250,7 @@ ViewModel.mappings = {
 			return {
 				parent: new MilitaryUnitSummaryModel(await BaseServer.unwrap(this.$$model.parent)),
 				subunits: (await this.$$model.subunits.includeTree(ViewModel.mappings[MilitaryUnitSummaryModel.name].items).toArray()).map(item => new MilitaryUnitSummaryModel(item)),
+				facilities: (await this.$$model.facilities.includeTree(ViewModel.mappings[MilitaryFacilityViewModel.name].items).toArray()).map(item => new MilitaryFacilityViewModel(item)),
 				banner: this.$$model.banner,
 				code: this.$$model.code,
 				created: this.$$model.created,
@@ -8163,6 +8300,12 @@ ViewModel.mappings = {
 						[...parents, "subunits-MilitaryUnitViewModel"]
 					);
 				},
+				get facilities() {
+					return ViewModel.mappings[MilitaryFacilityViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "facilities-MilitaryUnitViewModel"]
+					);
+				},
 				banner: true,
 				code: true,
 				created: true,
@@ -8178,6 +8321,7 @@ ViewModel.mappings = {
 			const item = new MilitaryUnitViewModel(null);
 			"parent" in data && (item.parent = data.parent && ViewModel.mappings[MilitaryUnitSummaryModel.name].toViewModel(data.parent));
 			"subunits" in data && (item.subunits = data.subunits && [...data.subunits].map(i => ViewModel.mappings[MilitaryUnitSummaryModel.name].toViewModel(i)));
+			"facilities" in data && (item.facilities = data.facilities && [...data.facilities].map(i => ViewModel.mappings[MilitaryFacilityViewModel.name].toViewModel(i)));
 			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
 			"code" in data && (item.code = data.code === null ? null : `${data.code}`);
 			"created" in data && (item.created = data.created === null ? null : new Date(data.created));
@@ -8201,6 +8345,7 @@ ViewModel.mappings = {
 			
 			"parent" in viewModel && (model.parent.id = viewModel.parent ? viewModel.parent.id : null);
 			"subunits" in viewModel && (null);
+			"facilities" in viewModel && (null);
 			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
 			"code" in viewModel && (model.code = viewModel.code === null ? null : `${viewModel.code}`);
 			"created" in viewModel && (model.created = viewModel.created === null ? null : new Date(viewModel.created));

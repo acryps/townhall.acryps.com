@@ -1,9 +1,11 @@
-import { alignContent, alignItems, border, child, columnGap, display, DistributedJustificationMode, height, hex, imageRendering, justifyContent, marginBottom, maxWidth, min, padding, px, rem, select, style, vh, vw, width } from "@acryps/style";
+import { alignContent, alignItems, border, child, columnGap, display, DistributedJustificationMode, height, hex, imageRendering, justifyContent, marginBottom, maxWidth, min, padding, px, rem, select, style, StyleSelectorBody, vh, vw, width } from "@acryps/style";
 
-export const bannerStyle = () => select('ui-banner',
+export const bannerStyle = (...content: StyleSelectorBody[]) => select('ui-banner',
 	child('img',
 		imageRendering('pixelated')
-	)
+	),
+
+	content
 );
 
 export const headerBannerStyle = (alignment: DistributedJustificationMode = 'center') => child('ui-banner',

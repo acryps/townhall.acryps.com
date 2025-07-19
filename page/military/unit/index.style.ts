@@ -1,6 +1,8 @@
-import { child, display, fontSize, fontWeight, marginBottom, marginTop, rem, Rem, textAlign, whiteSpace } from "@acryps/style";
+import { aspectRatio, child, display, flexDirection, fontSize, fontWeight, margin, marginBottom, marginTop, overflow, percentage, ratio, rem, Rem, textAlign, whiteSpace, width } from "@acryps/style";
 import { pageGutter } from "../../index.style";
 import { headerBannerStyle } from "../../banner/index.style";
+import { collection, collectionItem } from "../../shared/collection.style";
+import { card } from "../../shared/card.style";
 
 export const unitStyle = () => child('ui-unit',
 	display('block'),
@@ -37,6 +39,32 @@ export const unitStyle = () => child('ui-unit',
 	child('ui-date',
 		display('block'),
 		marginBottom(pageGutter)
+	),
+
+	child('ui-facilities',
+		collection(rem(10), rem(1)),
+		marginBottom(pageGutter),
+
+		child('ui-facility',
+			collectionItem(),
+			card(false),
+
+			display('flex'),
+			flexDirection('column'),
+			overflow('hidden'),
+
+			child('ui-map-container',
+				width(percentage(100)),
+				aspectRatio(ratio(4, 3))
+			),
+
+			child('ui-name',
+				display('block'),
+				margin(rem(1)),
+
+				fontWeight('bold')
+			)
+		)
 	),
 
 	child('ui-hierarchy',

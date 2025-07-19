@@ -71,24 +71,6 @@ export class PropertyStationsTab extends Component {
 
 							<input $ui-value={stop.name} placeholder={this.station.name || this.page.property.name} />
 						</ui-field>
-
-						<ui-platforms>
-							<ui-field>
-								<label>
-									Forward Platform
-								</label>
-
-								<input $ui-value={stop.upPlatform}></input>
-							</ui-field>
-
-							<ui-field>
-								<label>
-									Reverse Platform
-								</label>
-
-								<input $ui-value={stop.downPlatform}></input>
-							</ui-field>
-						</ui-platforms>
 					</ui-stop>
 				})}
 			</ui-stops>

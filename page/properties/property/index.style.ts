@@ -1,4 +1,4 @@
-import { alignContent, alignItems, alignSelf, aspectRatio, background, backgroundColor, backgroundImage, backgroundPosition, backgroundPositionX, backgroundSize, border, borderBottom, bottom, child, color, colorStop, columnGap, display, Dvi, flexDirection, flexGrow, flexWrap, fontSize, fontStyle, fontWeight, gap, height, imageRendering, justifyContent, justifyItems, left, linearGradient, LinearGradient, lineHeight, margin, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, milliseconds, min, Mm, objectFit, objectPosition, opacity, padding, percentage, position, px, ratio, rem, style, textAlign, textDecorationLine, top, turn, Variable, vh, width } from "@acryps/style";
+import { alignContent, alignItems, alignSelf, aspectRatio, background, backgroundColor, backgroundImage, backgroundPosition, backgroundPositionX, backgroundSize, border, borderBottom, borderRight, bottom, Ch, child, color, colorStop, columnGap, cursor, display, Dvi, flexBasis, flexDirection, flexGrow, flexWrap, fontSize, fontStyle, fontWeight, gap, height, imageRendering, justifyContent, justifyItems, left, linearGradient, LinearGradient, lineHeight, margin, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, milliseconds, min, Mm, objectFit, objectPosition, opacity, overflow, padding, percentage, position, px, ratio, rem, select, style, textAlign, textDecorationLine, top, turn, Variable, vh, width } from "@acryps/style";
 import { negativeColor, neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 import { fieldStyle, inputStyle } from "../../shared/field.style";
 import { buttonStyle } from "../../shared/index.style";
@@ -7,6 +7,7 @@ import { ownershipStructureStyle } from "./ownership/index.style";
 import { tabsStyle } from "../../shared/tabs/index.style";
 import { boxed } from "../../shared/boxed.style";
 import { changeFramesStyle } from "../../shared/change-frames/index.style";
+import { bannerStyle } from "../../banner/index.style";
 
 export const propertyStyle = () => child('ui-property',
 	boxed(),
@@ -192,16 +193,6 @@ export const propertyStyle = () => child('ui-property',
 							marginBottom(pageGutter)
 						),
 
-						child('ui-platforms',
-							display('flex'),
-							gap(pageGutter),
-
-							fieldStyle(
-								flexGrow(1),
-								marginBottom(0)
-							)
-						),
-
 						style(':not(:last-of-type)',
 							borderBottom(px(1), 'solid', 'currentColor')
 						)
@@ -351,6 +342,48 @@ export const propertyStyle = () => child('ui-property',
 				)
 			),
 
+			child('ui-military',
+				display('block'),
+
+				child('ui-military-facility',
+					display('flex'),
+					alignItems('stretch'),
+
+					marginBottom(rem(2)),
+
+					border(px(1), 'solid', 'currentColor'),
+
+					child('ui-unit',
+						display('flex'),
+						padding(pageGutter),
+
+						cursor('pointer'),
+						borderRight(px(1), 'dotted', 'currentColor'),
+
+						bannerStyle(
+							display('block'),
+
+							child('img',
+								height(rem(5)),
+								border(px(1), 'solid', 'currentColor'),
+							)
+						)
+					),
+
+					child('ui-detail',
+						flexGrow(1),
+						padding(pageGutter),
+						overflow('hidden'),
+
+						fieldStyle(),
+
+						select('ui-field:last-of-type',
+							marginBottom(0)
+						)
+					)
+				)
+			),
+
 			child('ui-history',
 				changeFramesStyle(),
 
@@ -405,6 +438,58 @@ export const propertyStyle = () => child('ui-property',
 						child('ui-grade',
 							display('block'),
 							fontSize(rem(0.75))
+						)
+					)
+				)
+			),
+
+			child('ui-capabilities',
+				display('block'),
+
+				child('ui-capability',
+					display('block'),
+					marginBottom(rem(2)),
+
+					border(px(1), 'solid', 'currentColor'),
+
+					child('ui-register',
+						display('block'),
+						gap(pageGutter),
+
+						padding(pageGutter),
+						borderBottom(px(1), 'dotted', 'currentColor'),
+
+						child('ui-name',
+							display('block'),
+							marginBottom(rem(0.5)),
+
+							fontWeight('bold')
+						),
+
+						child('ui-description',
+							display('block'),
+							marginBottom(pageGutter)
+						),
+
+						child('ui-actions',
+							display('flex'),
+
+							child('ui-action',
+								buttonStyle()
+							)
+						)
+					),
+
+					child('ui-registrations',
+						child('ui-registration',
+							display('flex'),
+							justifyContent('space-between'),
+							alignItems('center'),
+							padding(pageGutter),
+
+							child('ui-action',
+								buttonStyle()
+							)
 						)
 					)
 				)

@@ -45,6 +45,7 @@ import { Time } from "../interface/time";
 import { PoliticalCompassRater } from "./life/political-compass";
 import { WallpaperInterface } from "./map/wallpaper";
 import { ItemContextTracker } from "./context";
+import { StationTileServer } from "./map/layers/shape/train/stations";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -161,6 +162,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new PropertyOwnershipTileServer(app, database);
 	new TrainRouteTileServer(app, database);
 	new TrainRoutesTileServer(app, database);
+	new StationTileServer(app, database);
 	new PlanTileServer(app, database);
 	// new MovementTileServer(app, database);
 	//

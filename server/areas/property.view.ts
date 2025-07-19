@@ -13,6 +13,7 @@ import { exit } from "process";
 import { LegalEntityViewModel } from "./legal-entity";
 import { ValuationSummaryModel } from "./trade/valuation.view";
 import { PropertyTrainStationViewModel, TrainStationViewModel } from "./train/station.view";
+import { MilitaryFacilityViewModel } from "./property/military-facility";
 
 export class PropertyOverviewModel extends ViewModel<Property> {
 	id;
@@ -47,7 +48,9 @@ export class PropertyViewModel extends ViewModel<Property> {
 
 	owners: PropertyOwnerViewModel[];
 
-	trainStations: PropertyTrainStationViewModel[]
+	trainStations: PropertyTrainStationViewModel[];
+
+	militaryFacilities: MilitaryFacilityViewModel[];
 }
 
 export class PropertyOwnerViewModel extends ViewModel<PropertyOwner> {

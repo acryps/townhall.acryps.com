@@ -24,7 +24,7 @@ export class PropertyMilitaryTab extends Component {
 				const banner = new BannerComponent(this.createBanner(facility));
 
 				return <ui-military-facility>
-					<ui-unit ui-href={`/military/unit/${facility.unit.id}`}>
+					<ui-unit ui-href={`/military/unit/${facility.unit?.id}`}>
 						{banner}
 					</ui-unit>
 

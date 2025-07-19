@@ -1,9 +1,16 @@
-import { Canvas, loadImage } from "skia-canvas";
-import { DbContext, MapType } from "../managed/database";
+import { Canvas, Image, loadImage, Path2D } from "skia-canvas";
+import { DbContext, MapType, MilitaryFacility } from "../managed/database";
 import { ManagedServer } from "../managed/server";
 import { MapImporter } from "./import";
+import { getTiles, mapBaseTileSize } from "../../interface/tile";
+import { calculateDanwinstonShapePath } from "../../interface/line";
+import { Point } from "../../interface/point";
+import { writeFileSync } from "fs";
+import { get } from "http";
 
 export class BaseTileServer {
+	militaryFacilityCache = new Map<string, { image: Image, plot: Point[], top: number, left: number }>();
+
 	constructor(
 		private app: ManagedServer,
 		private database: DbContext
@@ -14,18 +21,66 @@ export class BaseTileServer {
 			const x = +request.params.x;
 			const y = +request.params.y;
 
-			const newest = await database.mapTile
-				.where(tile => tile.regionX == x)
-				.where(tile => tile.regionY == y)
-				.where(tile => tile.type == type)
-				.where(tile => tile.complete == true)
-				.orderByDescending(tile => tile.captured)
-				.first();
+			const image = await this.getTile(x, y, type);
 
-			if (newest) {
-				response.contentType('image/png');
-				response.end(newest.image);
+			if (!image) {
+				return response.status(404).end();
 			}
+
+			const canvas = new Canvas(mapBaseTileSize, mapBaseTileSize);
+			const context = canvas.getContext('2d');
+			context.drawImage(image, 0, 0);
+
+			// blur military facilities
+			const militaryFacilities = await database.militaryFacility
+				.include(facility => facility.property)
+				.toArray();
+
+			for (let facility of militaryFacilities) {
+				let blurred = this.militaryFacilityCache.get(facility.id);
+
+				if (!blurred) {
+					const property = await facility.property.fetch();
+					const boundary = await property.activePlotBoundary.fetch();
+					const plot = Point.unpack(boundary.shape);
+
+					blurred = await this.renderBlurredMilitaryFacility(facility, plot, type);
+					this.militaryFacilityCache.set(facility.id, blurred);
+
+					// refresh every day
+					setTimeout(() => this.militaryFacilityCache.delete(facility.id), 1000 * 60 * 60 * 24);
+				}
+
+				// create shape
+				for (let offset of [new Point(0, 0), new Point(0, 1), new Point(1, 0), new Point(1, 1)]) {
+					let path: Path2D;
+
+					for (let point of calculateDanwinstonShapePath(blurred.plot, true)) {
+						point = point.copy(-x * mapBaseTileSize + offset.x, -y * mapBaseTileSize + offset.y);
+
+						if (path) {
+							path.lineTo(point.x, point.y);
+						} else {
+							path = new Path2D();
+							path.moveTo(point.x, point.y);
+						}
+					}
+
+					context.save();
+
+					context.clip(path);
+					context.drawImage(
+						blurred.image,
+						blurred.left - x * mapBaseTileSize,
+						blurred.top - y * mapBaseTileSize
+					);
+
+					context.restore();
+				}
+			}
+
+			response.contentType('image/png');
+			response.end(await canvas.toBuffer('png'));
 		});
 
 		app.app.get('/map/area/:minX/:minY/:maxX/:maxY', async (request, response) => {
@@ -75,5 +130,48 @@ export class BaseTileServer {
 			response.contentType('image/png');
 			response.end(await canvas.toBuffer('png'));
 		});
+	}
+
+	async getTile(regionX: number, regionY: number, type: MapType) {
+		const newest = await this.database.mapTile
+			.where(tile => tile.regionX == regionX)
+			.where(tile => tile.regionY == regionY)
+			.where(tile => tile.type == type)
+			.where(tile => tile.complete == true)
+			.orderByDescending(tile => tile.captured)
+			.first();
+
+		if (newest) {
+			return await loadImage(newest.image);
+		}
+	}
+
+	async renderBlurredMilitaryFacility(facility: MilitaryFacility, plot: Point[], type: MapType) {
+		const blur = 10;
+
+		const bounds = Point.bounds(plot, blur);
+
+		const canvas = new Canvas(bounds.width, bounds.height);
+		const context = canvas.getContext('2d');
+
+		for (let tile of getTiles(Point.center(plot), bounds.width, bounds.height, mapBaseTileSize)) {
+			const image = await this.getTile(tile.x, tile.y, type)
+
+			context.drawImage(
+				image,
+				tile.x * mapBaseTileSize - bounds.x.min,
+				tile.y * mapBaseTileSize - bounds.y.min
+			);
+		}
+
+		context.filter = `blur(${blur}px)`;
+		context.drawCanvas(canvas, 0, 0);
+
+		return {
+			image: await loadImage(await canvas.toBuffer('png')),
+			plot,
+			top: bounds.y.min,
+			left: bounds.x.min
+		};
 	}
 }

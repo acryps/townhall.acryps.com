@@ -34,6 +34,7 @@ import { oracleStyle } from "./oracle/index.style";
 import { timeStyle } from "./time/index.style";
 import { itemContextStyle } from "./item-context/index.style";
 import { militaryStyle } from "./military/index.style";
+import { reviewStyle } from "./review/index.style";
 
 export const pageStyle = () => root(
 	boldFont,
@@ -103,6 +104,8 @@ export const pageStyle = () => root(
 			child('ui-content',
 				display('block'),
 				padding(pageGutter),
+
+				reviewStyle(),
 
 				homeStyle(),
 

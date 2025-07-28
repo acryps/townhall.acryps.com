@@ -3514,6 +3514,27 @@ export class PlanService {
 }
 
 export class PropertyService {
+	async reviewNext(): Promise<PropertyViewModel> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("B6a35iOTdxZHd0cDkxcHN4ajI5b2QzNH"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : PropertyViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async createDwellings(propertyId: string, count: number): Promise<Array<PropertyDwellingViewModel>> {
 		const $data = new FormData();
 		$data.append("9ndGVpMzF2eXQ3OWNlOGtpeHRiMml1N3", Service.stringify(propertyId))

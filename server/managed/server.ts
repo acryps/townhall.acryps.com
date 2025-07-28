@@ -1211,6 +1211,15 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"B6a35iOTdxZHd0cDkxcHN4ajI5b2QzNH",
+			{},
+			inject => inject.construct(PropertyService),
+			(controller, params) => controller.reviewNext(
+				
+			)
+		);
+
+		this.expose(
 			"55OHRoMmdoY2Q3c2Rzb3JvZGF3NWRkMG",
 			{
 			"9ndGVpMzF2eXQ3OWNlOGtpeHRiMml1N3": { type: "string", isArray: false, isOptional: false },

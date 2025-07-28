@@ -67,6 +67,7 @@ import { ItemContextPage } from "./item-context";
 import { MilitaryPage } from "./military";
 import { MilitaryUnit } from "../server/managed/database";
 import { MilitaryUnitPage } from "./military/unit";
+import { ReviewPage } from "./review";
 
 export class Application {
 	static router: Router;
@@ -92,6 +93,8 @@ export class Application {
 
 		this.router = new PathRouter(
 			PageComponent
+				.route('/review', ReviewPage)
+
 				.route('/map/:x/:y/:zoom', MapPage
 					.route('/create-building/:id', CreateBuildingAction)
 					.route('/edit-plot/:id', EditPlotAction)

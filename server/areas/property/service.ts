@@ -1,7 +1,7 @@
 import { Service } from "vlserver";
 import { Building, DbContext, Dwelling, PlotBoundary, PropertyOwner, Valuation } from "../../managed/database";
 import { DwellingViewModel } from "../life/resident";
-import { PropertyDwellingViewModel, PropertyOwnerViewModel } from "../property.view";
+import { PropertyDwellingViewModel, PropertyOwnerViewModel, PropertyViewModel } from "../property.view";
 import { BuildingSummaryModel } from "./building";
 import { PlotBoundarySummaryModel } from "./plot";
 import { Point } from "../../../interface/point";
@@ -11,6 +11,7 @@ import { PropertyManager } from "./manager";
 import { BoroughSummaryModel } from "../borough.summary";
 import { PropertyValueator } from "../trade/valuation/property";
 import { LegalEntityManager } from "../legal-entity/manager";
+import { A } from "ollama/dist/shared/ollama.7cdb1e15";
 
 export class PropertyService extends Service {
 	constructor(
@@ -20,6 +21,25 @@ export class PropertyService extends Service {
 		private legalEntityManager: LegalEntityManager
 	) {
 		super();
+	}
+
+	async reviewNext() {
+		const emptyOwnership = await this.database.propertyOwner.first(owner => owner.ownerId == null);
+
+		if (emptyOwnership) {
+			return new PropertyViewModel(await emptyOwnership.property.fetch());
+		}
+
+		for (let property of await this.database.property.include(property => property.owners).toArray()) {
+			if ((await property.owners.toArray()).length == 0) {
+				const owner = new PropertyOwner();
+				owner.share = 1;
+				owner.property = property;
+				owner.aquired = new Date();
+
+				await owner.create();
+			}
+		}
 	}
 
 	async createDwellings(propertyId: string, count: number) {

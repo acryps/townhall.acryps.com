@@ -22,6 +22,8 @@ export class ReviewPage extends Component {
 			.filter(resident => new Time(resident.birthday).age() > 25)
 			.sort(() => Math.random() - 0.5)[0];
 
+		const center = Point.center(Point.unpack(bounds.shape));
+
 		return <ui-review>
 			{new MapComponent().highlight(Point.unpack(bounds.shape))}
 			{new LegalEntitySelectorComponent().onSelect(entity => this.save(entity.id))}
@@ -31,6 +33,14 @@ export class ReviewPage extends Component {
 			</ui-name>
 
 			<ui-actions>
+				<ui-action ui-href={`/property/${this.property.id}`}>
+					View Property
+				</ui-action>
+
+				<ui-action ui-href={`/map/${center.x}/${center.y}/5`}>
+					View On Map
+				</ui-action>
+
 				<ui-action ui-click={async () => this.save((await new LegalEntityService().findById(this.property.borough.id)).id)}>
 					{boroughIcon()} Assign to {this.property.borough.name}
 				</ui-action>

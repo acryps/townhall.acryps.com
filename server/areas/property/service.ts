@@ -24,7 +24,12 @@ export class PropertyService extends Service {
 	}
 
 	async reviewNext() {
-		for (let property of await this.database.property.include(property => property.owners).toArray()) {
+		const properties = await this.database.property
+			.where(property => property.deactivated == null)
+			.include(property => property.owners)
+			.toArray();
+
+		for (let property of properties) {
 			const owners = await property.owners.toArray();
 
 			if (!owners.find(owner => owner.ownerId)) {

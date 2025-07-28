@@ -9,7 +9,10 @@ import { writeFileSync } from "fs";
 import { get } from "http";
 
 export class BaseTileServer {
-	militaryFacilityCache = new Map<string, { image: Image, plot: Point[], top: number, left: number }>();
+	militaryFacilityCache = {
+		[MapType.overworld]: new Map<string, { image: Image, plot: Point[], top: number, left: number }>(),
+		[MapType.night]: new Map<string, { image: Image, plot: Point[], top: number, left: number }>(),
+	}
 
 	constructor(
 		private app: ManagedServer,
@@ -37,7 +40,7 @@ export class BaseTileServer {
 				.toArray();
 
 			for (let facility of militaryFacilities) {
-				let blurred = this.militaryFacilityCache.get(facility.id);
+				let blurred = this.militaryFacilityCache[type].get(facility.id);
 
 				if (!blurred) {
 					const property = await facility.property.fetch();
@@ -45,10 +48,10 @@ export class BaseTileServer {
 					const plot = Point.unpack(boundary.shape);
 
 					blurred = await this.renderBlurredMilitaryFacility(facility, plot, type);
-					this.militaryFacilityCache.set(facility.id, blurred);
+					this.militaryFacilityCache[type].set(facility.id, blurred);
 
 					// refresh every day
-					setTimeout(() => this.militaryFacilityCache.delete(facility.id), 1000 * 60 * 60 * 24);
+					setTimeout(() => this.militaryFacilityCache[type].delete(facility.id), 1000 * 60 * 60 * 24);
 				}
 
 				// create shape

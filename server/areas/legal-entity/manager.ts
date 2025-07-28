@@ -20,7 +20,17 @@ export class LegalEntityManager extends Manager {
 			return await this.database.legalEntity.first(entity => entity.state == true);
 		}
 
-		return await this.database.legalEntity.first(entity => entity.boroughId == id || entity.companyId == id || entity.residentId == id);
+		if (await this.database.borough.find(id)) {
+			return await this.findBorough(id);
+		}
+
+		if (await this.database.company.find(id)) {
+			return await this.findCompany(id);
+		}
+
+		if (await this.database.resident.find(id)) {
+			return await this.findResident(id);
+		}
 	}
 
 	async findBorough(id: string) {
@@ -47,6 +57,21 @@ export class LegalEntityManager extends Manager {
 
 		entity = new LegalEntity();
 		entity.companyId = id;
+
+		await entity.create();
+
+		return entity;
+	}
+
+	async findResident(id: string) {
+		let entity = await this.database.legalEntity.first(entity => entity.residentId == id);
+
+		if (entity) {
+			return entity;
+		}
+
+		entity = new LegalEntity();
+		entity.residentId = id;
 
 		await entity.create();
 

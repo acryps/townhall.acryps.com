@@ -8,6 +8,7 @@ export type FoundItemContextLink = { rank: ItemContextLinkRank, target: string, 
 export abstract class ItemContextComposer<ItemType extends ItemContextComposeable> {
 	abstract find(id: string): Promise<ItemType>;
 	abstract title(item: ItemType): string;
+	abstract meta?: string;
 
 	async compose(item: ItemType, rank: ItemContextLinkRank) {
 		switch (rank) {

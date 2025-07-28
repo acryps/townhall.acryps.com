@@ -8,6 +8,7 @@ import { Banner } from "../../../interface/banner";
 import { AboutComponent } from "../../shared/about";
 import { Time } from "../../../interface/time";
 import { MetaOrganization } from "@acryps/metadata";
+import { itemContextIcon, priceIcon } from "../../assets/icons/managed";
 
 export class CompanyPage extends Component {
 	declare parameters: { tag };
@@ -54,7 +55,11 @@ export class CompanyPage extends Component {
 
 			<ui-actions>
 				<ui-action ui-href={`/trade/assets/${this.company.id}`}>
-					View Assets
+					{priceIcon()} View Assets
+				</ui-action>
+
+				<ui-action ui-href={`/item-context/${this.company.id}`}>
+					{itemContextIcon()} View Context
 				</ui-action>
 			</ui-actions>
 

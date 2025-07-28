@@ -1,4 +1,4 @@
-import { alignItems, alignSelf, aspectRatio, backgroundColor, child, color, display, flexDirection, flexGrow, flexWrap, fontSize, fontWeight, justifyContent, margin, marginBottom, marginInline, overflow, padding, percentage, ratio, rem, textAlign, whiteSpace, width } from "@acryps/style";
+import { alignItems, alignSelf, aspectRatio, backgroundColor, child, color, display, flexDirection, flexGrow, flexWrap, fontSize, fontWeight, gap, justifyContent, margin, marginBottom, marginInline, overflow, padding, percentage, ratio, rem, textAlign, whiteSpace, width } from "@acryps/style";
 import { card } from "../../shared/card.style";
 import { collection, collectionItem } from "../../shared/collection.style";
 import { infoColor, pageBackgroundColor, pageGutter, pageTextColor, positiveColor } from "../../index.style";
@@ -60,6 +60,7 @@ export const companyStyle = () => child('ui-company',
 		flexWrap('wrap'),
 		justifyContent('center'),
 		marginBottom(pageGutter),
+		gap(pageGutter),
 
 		child('ui-action',
 			buttonStyle()

@@ -131,7 +131,11 @@ export class Interpreter {
 				console.warn(`[interpreter] tool call failed: ${call.tool.name}`, error);
 
 				if (error instanceof ToolError) {
-					messages.push(new SystemMessage(error.issue));
+					messages.push(
+						new AssistantMessage(message),
+						new SystemMessage(error.issue),
+						new SystemMessage('Retry, calling the tools again with an improved answer')
+					);
 				}
 
 				return await this.execute(...messages);

@@ -35,9 +35,13 @@ export class ItemContextTracker {
 			const item = await type.find(id);
 
 			if (item) {
+				console.warn(`[item context] found`, type);
+
 				return await this.update(item, type, maxRank, peers);
 			}
 		}
+
+		console.warn(`[item context] no generator for ${id}`);
 	}
 
 	async update<ItemType extends ItemContextComposeable>(item: ItemType, type: ItemContextComposer<any>, maxRank: ItemContextLinkRank, peers: ItemContextComposeable[]) {

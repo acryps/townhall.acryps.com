@@ -24,20 +24,11 @@ export class PropertyService extends Service {
 	}
 
 	async reviewNext() {
-		const emptyOwnership = await this.database.propertyOwner.first(owner => owner.ownerId == null);
-
-		if (emptyOwnership) {
-			return new PropertyViewModel(await emptyOwnership.property.fetch());
-		}
-
 		for (let property of await this.database.property.include(property => property.owners).toArray()) {
-			if ((await property.owners.toArray()).length == 0) {
-				const owner = new PropertyOwner();
-				owner.share = 1;
-				owner.property = property;
-				owner.aquired = new Date();
+			const owners = await property.owners.toArray();
 
-				await owner.create();
+			if (!owners.find(owner => owner.ownerId)) {
+				return new PropertyViewModel(property);
 			}
 		}
 	}

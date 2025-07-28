@@ -46,7 +46,9 @@ export class ReviewPage extends Component {
 		</ui-review>
 	}
 
-	save(id: string) {
-		new PropertyService().assignSoleOwner(this.property.id, id);
+	async save(id: string) {
+		await new PropertyService().assignSoleOwner(this.property.id, id);
+
+		this.reload();
 	}
 }

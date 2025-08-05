@@ -2,12 +2,12 @@ import { BoroughSummaryModel } from "./models";
 import { Point } from "./point";
 
 // general scale of the minimap
-export const minimapScale = 1 / 3;
+export const minimapScale = 1 / 4;
 
 // relative margin
 //
 // map will be object-fitted in cover mode
-const margin = 0.5;
+const margin = 0.3;
 
 export const getMinimapBounds = (boroughs: BoroughSummaryModel[]) => {
 	const boroughBounds: Point[] = [];

@@ -20,7 +20,9 @@ export class MinimapComponent extends Component {
 	}
 
 	render() {
-		const cursor: HTMLElement = <ui-cursor></ui-cursor>;
+		let cursor: HTMLElement;
+		let boroughLabel: HTMLElement;
+		let position: HTMLElement;
 
 		const canvas = document.createElement('canvas');
 		canvas.width = this.bounds.width * minimapScale;
@@ -35,12 +37,14 @@ export class MinimapComponent extends Component {
 					cursor.style.top = px(event.clientY).toValueString();
 
 					const point = this.translateToMapPosition(event.clientX, event.clientY);
+					position.textContent = point.toString();
+
 					const borough = this.getBorough(point);
 
 					context.clearRect(0, 0, this.bounds.width * minimapScale, this.bounds.height * minimapScale);
 
 					if (borough) {
-						cursor.textContent = borough.name;
+						boroughLabel.textContent = borough.name;
 
 						const bounds = Point.unpack(borough.bounds);
 
@@ -59,7 +63,7 @@ export class MinimapComponent extends Component {
 						context.closePath();
 						context.fill();
 					} else {
-						cursor.textContent = point.toString();
+						boroughLabel.textContent = '';
 					}
 				};
 			}
@@ -75,7 +79,10 @@ export class MinimapComponent extends Component {
 			<img src='/minimap' />
 			{canvas}
 
-			{cursor}
+			{cursor = <ui-cursor>
+				{boroughLabel = <ui-borough></ui-borough>}
+				{position = <ui-position></ui-position>}
+			</ui-cursor>}
 
 			<ui-labels>
 				{this.cities.map(city => <ui-label style={[

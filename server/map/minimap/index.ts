@@ -2,8 +2,7 @@ import { Canvas, CanvasRenderingContext2D, loadImage } from "skia-canvas";
 import { BoundingBox, Point } from "../../../interface/point";
 import { DbContext, MapType } from "../../managed/database";
 import { getTiles, mapBaseTileSize } from "../../../interface/tile";
-import { readFileSync, writeFileSync } from "fs";
-import { calculateDanwinstonShapePath, drawDanwinstonLine } from "../../../interface/line";
+import { calculateDanwinstonShapePath } from "../../../interface/line";
 import { ManagedServer } from "../../managed/server";
 import { getMinimapBounds, minimapScale } from "../../../interface/minimap";
 import { BoroughSummaryModel } from "../../areas/borough.summary";
@@ -119,7 +118,7 @@ export class MinimapGenerator {
 			const outline = calculateDanwinstonShapePath(Point.unpack(building.boundary), true);
 
 			for (let index = 0; index < outline.length; index++) {
-				context[index ? 'lineTo' : 'moveTo'](...translate(outline[index], 0.5 / minimapScale));
+				context[index ? 'lineTo' : 'moveTo'](...translate(outline[index], -0.5 / minimapScale));
 			}
 
 			context.closePath();

@@ -42,11 +42,23 @@ export const mapStartStyle = () => child('ui-map-start',
 			whiteSpace('pre'),
 
 			opacity(0.95),
-			textAlign('center'),
 
 			color(pageTextColor),
 			backgroundColor(pageBackgroundColor),
-			boxShadow(hex('0004'), 0, rem(0.25), rem(0.5))
+			boxShadow(hex('0004'), 0, rem(0.25), rem(0.5)),
+
+			child('ui-borough',
+				display('block'),
+				marginBottom(rem(0.25))
+			)
+				.empty(display('none')),
+
+			child('ui-position',
+				display('block'),
+
+				microFont,
+				fontSize(rem(0.75))
+			)
 		)
 	),
 

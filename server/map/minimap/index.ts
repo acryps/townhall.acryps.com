@@ -65,7 +65,7 @@ export class MinimapGenerator {
 
 		// add a little bit of the base map back
 		context.save();
-		context.globalAlpha = 0.2;
+		context.globalAlpha = 0.1;
 		context.globalCompositeOperation = 'luminosity';
 		context.drawImage(baseMap, 0, 0);
 		context.restore();
@@ -76,12 +76,25 @@ export class MinimapGenerator {
 		] as [number, number];
 
 		// draw mayor roads
-		context.fillStyle = '#888';
-
 		const streets = await this.database.street
 			.where(street => street.deactivated == null)
 			.include(street => street.activeRoute)
 			.toArray();
+
+		context.fillStyle = '#444';
+
+		for (let street of streets) {
+			const path = await street.activeRoute.fetch();
+			const size = Math.ceil(street.size * minimapScale);
+
+			if (path) {
+				for (let point of calculateDanwinstonShapePath(Point.unpack(path.path), false)) {
+					context.fillRect(...translate(point, size / 2 + 1 / minimapScale), size + 2, size + 2);
+				}
+			}
+		}
+
+		context.fillStyle = '#eee';
 
 		for (let street of streets) {
 			const path = await street.activeRoute.fetch();
@@ -135,12 +148,12 @@ export class MinimapGenerator {
 		}
 
 		// draw colored lines
+		context.fillStyle = '#f00';
+
 		for (let route of trainRoutes) {
 			const path = await route.activePath.fetch();
 
 			if (path) {
-				context.fillStyle = route.color;
-
 				for (let point of calculateDanwinstonShapePath(Point.unpack(path.path), false)) {
 					context.fillRect(...translate(point), 1, 1);
 				}
@@ -194,6 +207,47 @@ export class MinimapGenerator {
 			return [0x66, 0x84, 0xd6];
 		}
 
+		const hue = this.hue(red, green, blue);
+
+		if (hue > 85 && hue < 180) {
+			if (index % 3 == 1) {
+				return [0x78, 0xe2, 0xca];
+			}
+
+			return [0x78, 0xe2, 0xa8];
+		}
+
 		return [0xff, 0xff, 0xff];
+	}
+
+	hue(red: number, green: number, blue: number) {
+		red /= 255;
+		green /= 255;
+		blue /= 255;
+
+		const max = Math.max(red, green, blue), min = Math.min(red, green, blue);
+		let hue: number;
+
+		if (max === min) {
+			hue = 0; // achromatic
+		} else {
+			const d = max - min;
+
+			switch (max) {
+				case red:
+					hue = ((green - blue) / d + (green < blue ? 6 : 0));
+					break;
+				case green:
+					hue = ((blue - red) / d + 2);
+					break;
+				case blue:
+					hue = ((red - green) / d + 4);
+					break;
+			}
+
+			hue *= 60;
+		}
+
+		return hue;
 	}
 }

@@ -2,7 +2,7 @@ import { BoroughSummaryModel } from "./models";
 import { Point } from "./point";
 
 // general scale of the minimap
-export const minimapScale = 1 / 5;
+export const minimapScale = 1 / 3;
 
 // relative margin
 //

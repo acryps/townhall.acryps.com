@@ -45,7 +45,7 @@ export class MinimapComponent extends Component {
 						const bounds = Point.unpack(borough.bounds);
 
 						context.beginPath();
-						context.fillStyle = '#fff';
+						context.fillStyle = borough.color;
 
 						for (let index = 0; index < bounds.length; index++) {
 							const point = bounds[index];

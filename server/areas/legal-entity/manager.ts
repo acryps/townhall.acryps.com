@@ -111,7 +111,7 @@ export class LegalEntityManager extends Manager {
 		}
 
 		const entities = results.flat();
-		entities.sort((a, b) => this.rank(b) - this.rank(a));
+		entities.sort((a, b) => b.referenceCount - a.referenceCount);
 
 		return entities;
 	}
@@ -146,15 +146,5 @@ export class LegalEntityManager extends Manager {
 		}
 
 		return entities;
-	}
-
-	private rank(item: LegalEntity) {
-		const index = LegalEntityReferenceCounter.active.ranked.indexOf(item);
-
-		if (index == -1) {
-			return Infinity;
-		}
-
-		return index;
 	}
 }

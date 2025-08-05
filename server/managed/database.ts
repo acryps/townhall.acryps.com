@@ -1334,6 +1334,7 @@ export class LegalEntityQueryProxy extends QueryProxy {
 	get resident(): Partial<ResidentQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get boroughId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get companyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get referenceCount(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get residentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get state(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
@@ -1347,6 +1348,7 @@ export class LegalEntity extends Entity<LegalEntityQueryProxy> {
 	boroughId: string;
 	companyId: string;
 	declare id: string;
+	referenceCount: number;
 	residentId: string;
 	state: boolean;
 	
@@ -1356,6 +1358,7 @@ export class LegalEntity extends Entity<LegalEntityQueryProxy> {
 			boroughId: { type: "uuid", name: "borough_id" },
 			companyId: { type: "uuid", name: "company_id" },
 			id: { type: "uuid", name: "id" },
+			referenceCount: { type: "int4", name: "reference_count" },
 			residentId: { type: "uuid", name: "resident_id" },
 			state: { type: "bool", name: "state" }
 		},

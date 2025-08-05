@@ -98,6 +98,10 @@ class ListComponent extends Component {
 	renderItem(entity: LegalEntityViewModel) {
 		return <ui-entity>
 			{new LegalEntityComponent(entity, () => this.onSelect(entity))}
+
+			<ui-count>
+				{entity.referenceCount ?? 0}
+			</ui-count>
 		</ui-entity>
 	}
 

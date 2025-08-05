@@ -1,8 +1,11 @@
 import { AnnotatedTextPart, AnnotatedTextType } from "../interface/annotate";
 import { convertToLegalCompanyName } from "../interface/company";
+import { Logger } from "./log";
 import { Borough, Company, DbContext, Property, Resident } from "./managed/database";
 
 export class Annotator {
+	private logger = new Logger('annotator');
+
 	static instance: Annotator;
 
 	companies: Company[];
@@ -21,6 +24,9 @@ export class Annotator {
 	}
 
 	async load() {
+		const logger = this.logger.task('index');
+		logger.log('update');
+
 		this.companies = await this.database.company
 			.toArray();
 
@@ -33,6 +39,8 @@ export class Annotator {
 		this.properties = await this.database.property
 			.where(property => property.name.length().valueOf() > 0)
 			.toArray();
+
+		logger.finish();
 
 		setTimeout(() => this.load(), 1000 * 60 * 5);
 	}

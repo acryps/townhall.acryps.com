@@ -270,6 +270,7 @@ export interface LegalEntityViewModel {
 	company: CompanySummaryModel;
 	resident: ResidentSummaryModel;
 	id: string;
+	referenceCount: number;
 	state: boolean;
 }
 

@@ -4421,6 +4421,7 @@ ViewModel.mappings = {
 				company: new CompanySummaryModel(await BaseServer.unwrap(this.$$model.company)),
 				resident: new ResidentSummaryModel(await BaseServer.unwrap(this.$$model.resident)),
 				id: this.$$model.id,
+				referenceCount: this.$$model.referenceCount,
 				state: this.$$model.state
 			}
 		};
@@ -4470,6 +4471,7 @@ ViewModel.mappings = {
 					);
 				},
 				id: true,
+				referenceCount: true,
 				state: true
 			};
 		};
@@ -4480,6 +4482,7 @@ ViewModel.mappings = {
 			"company" in data && (item.company = data.company && ViewModel.mappings[CompanySummaryModel.name].toViewModel(data.company));
 			"resident" in data && (item.resident = data.resident && ViewModel.mappings[ResidentSummaryModel.name].toViewModel(data.resident));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"referenceCount" in data && (item.referenceCount = data.referenceCount === null ? null : +data.referenceCount);
 			"state" in data && (item.state = !!data.state);
 
 			return item;
@@ -4498,6 +4501,7 @@ ViewModel.mappings = {
 			"company" in viewModel && (model.company.id = viewModel.company ? viewModel.company.id : null);
 			"resident" in viewModel && (model.resident.id = viewModel.resident ? viewModel.resident.id : null);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"referenceCount" in viewModel && (model.referenceCount = viewModel.referenceCount === null ? null : +viewModel.referenceCount);
 			"state" in viewModel && (model.state = !!viewModel.state);
 
 			return model;

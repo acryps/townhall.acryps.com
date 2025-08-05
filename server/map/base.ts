@@ -5,10 +5,11 @@ import { MapImporter } from "./import";
 import { getTiles, mapBaseTileSize } from "../../interface/tile";
 import { calculateDanwinstonShapePath } from "../../interface/line";
 import { Point } from "../../interface/point";
-import { writeFileSync } from "fs";
-import { get } from "http";
+import { Logger } from "../log";
 
 export class BaseTileServer {
+	private logger = new Logger('base tile');
+
 	militaryFacilityCache = {
 		[MapType.overworld]: new Map<string, { image: Image, plot: Point[], top: number, left: number }>(),
 		[MapType.night]: new Map<string, { image: Image, plot: Point[], top: number, left: number }>(),
@@ -27,6 +28,8 @@ export class BaseTileServer {
 			const image = await this.getTile(x, y, type);
 
 			if (!image) {
+				this.logger.warn(`no tile for ${x} ${y}`);
+
 				return response.status(404).end();
 			}
 
@@ -40,45 +43,52 @@ export class BaseTileServer {
 				.toArray();
 
 			for (let facility of militaryFacilities) {
-				let blurred = this.militaryFacilityCache[type].get(facility.id);
+				const property = await facility.property.fetch();
+				const bounds = await property.activePlotBoundary.fetch();
 
-				if (!blurred) {
-					const property = await facility.property.fetch();
-					const boundary = await property.activePlotBoundary.fetch();
-					const plot = Point.unpack(boundary.shape);
+				if (Point.touches(new Point(x * mapBaseTileSize, y * mapBaseTileSize), mapBaseTileSize, Point.unpack(bounds.shape))) {
+					let blurred = this.militaryFacilityCache[type].get(facility.id);
 
-					blurred = await this.renderBlurredMilitaryFacility(facility, plot, type);
-					this.militaryFacilityCache[type].set(facility.id, blurred);
+					if (!blurred) {
+						this.logger.log(`blur facility ${facility.id} for ${x} ${y}`);
 
-					// refresh every day
-					setTimeout(() => this.militaryFacilityCache[type].delete(facility.id), 1000 * 60 * 60 * 24);
-				}
+						const property = await facility.property.fetch();
+						const boundary = await property.activePlotBoundary.fetch();
+						const plot = Point.unpack(boundary.shape);
 
-				// create shape
-				for (let offset of [new Point(0, 0), new Point(0, 1), new Point(1, 0), new Point(1, 1)]) {
-					let path: Path2D;
+						blurred = await this.renderBlurredMilitaryFacility(facility, plot, type);
+						this.militaryFacilityCache[type].set(facility.id, blurred);
 
-					for (let point of calculateDanwinstonShapePath(blurred.plot, true)) {
-						point = point.copy(-x * mapBaseTileSize + offset.x, -y * mapBaseTileSize + offset.y);
-
-						if (path) {
-							path.lineTo(point.x, point.y);
-						} else {
-							path = new Path2D();
-							path.moveTo(point.x, point.y);
-						}
+						// refresh every day
+						setTimeout(() => this.militaryFacilityCache[type].delete(facility.id), 1000 * 60 * 60 * 24);
 					}
 
-					context.save();
+					// create shape
+					for (let offset of [new Point(0, 0), new Point(0, 1), new Point(1, 0), new Point(1, 1)]) {
+						let path: Path2D;
 
-					context.clip(path);
-					context.drawImage(
-						blurred.image,
-						blurred.left - x * mapBaseTileSize,
-						blurred.top - y * mapBaseTileSize
-					);
+						for (let point of calculateDanwinstonShapePath(blurred.plot, true)) {
+							point = point.copy(-x * mapBaseTileSize + offset.x, -y * mapBaseTileSize + offset.y);
 
-					context.restore();
+							if (path) {
+								path.lineTo(point.x, point.y);
+							} else {
+								path = new Path2D();
+								path.moveTo(point.x, point.y);
+							}
+						}
+
+						context.save();
+
+						context.clip(path);
+						context.drawImage(
+							blurred.image,
+							blurred.left - x * mapBaseTileSize,
+							blurred.top - y * mapBaseTileSize
+						);
+
+						context.restore();
+					}
 				}
 			}
 

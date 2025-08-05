@@ -7,10 +7,10 @@ import { LegalEntity } from "../../managed/database";
 export class LegalEntityViewModel extends ViewModel<LegalEntity> {
 	id;
 
+	referenceCount;
+
 	state;
 	borough: BoroughSummaryModel;
-
 	resident: ResidentSummaryModel;
-
 	company: CompanySummaryModel;
 }

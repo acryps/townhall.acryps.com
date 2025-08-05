@@ -625,6 +625,7 @@ export class LegalEntityViewModel {
 	company: CompanySummaryModel;
 	resident: ResidentSummaryModel;
 	id: string;
+	referenceCount: number;
 	state: boolean;
 
 	private static $build(raw) {
@@ -633,6 +634,7 @@ export class LegalEntityViewModel {
 		raw.company === undefined || (item.company = raw.company ? CompanySummaryModel["$build"](raw.company) : null)
 		raw.resident === undefined || (item.resident = raw.resident ? ResidentSummaryModel["$build"](raw.resident) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.referenceCount === undefined || (item.referenceCount = raw.referenceCount === null ? null : +raw.referenceCount)
 		raw.state === undefined || (item.state = !!raw.state)
 		
 		return item;

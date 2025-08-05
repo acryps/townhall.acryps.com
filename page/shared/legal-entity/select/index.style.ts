@@ -1,5 +1,6 @@
-import { alignItems, background, backgroundColor, border, borderBottom, boxShadow, child, cursor, display, flexGrow, gap, hex, inset, insetInline, lineHeight, maxHeight, overflow, paddingBlock, paddingInline, percentage, position, px, rem, select, style, top, zIndex } from "@acryps/style";
+import { alignItems, background, backgroundColor, border, borderBottom, boxShadow, child, cursor, display, flexGrow, fontSize, gap, hex, inset, insetInline, justifyContent, lineHeight, maxHeight, overflow, paddingBlock, paddingInline, percentage, position, px, rem, select, style, top, zIndex } from "@acryps/style";
 import { inputSpacingBlock, inputSpacingInline, inputStyle, inputTextColor } from "../../field.style";
+import { microFont } from "../../../assets/font/index.style";
 
 export const legalEntitySelectorStyle = () => select('ui-legal-entity-selector',
 	display('flex'),
@@ -27,13 +28,21 @@ export const legalEntitySelectorStyle = () => select('ui-legal-entity-selector',
 		boxShadow(hex('0002'), 0, rem(0.5), rem(1)),
 
 		child('ui-entity',
-			display('block'),
+			display('flex'),
+			alignItems('flex-start'),
+			justifyContent('space-between'),
+
 			paddingBlock(inputSpacingBlock.divide(1.5)),
 			paddingInline(inputSpacingInline),
 
 			cursor('pointer'),
 
-			borderBottom(px(1), 'dashed', 'currentColor')
+			borderBottom(px(1), 'dashed', 'currentColor'),
+
+			child('ui-count',
+				microFont,
+				fontSize(rem(0.75))
+			)
 		)
 	)
 )

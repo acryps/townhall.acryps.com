@@ -6,8 +6,11 @@ import { calculateDanwinstonShapePath } from "../../../interface/line";
 import { ManagedServer } from "../../managed/server";
 import { getMinimapBounds, minimapScale } from "../../../interface/minimap";
 import { BoroughSummaryModel } from "../../areas/borough.summary";
+import { Logger } from "../../log";
 
 export class MinimapGenerator {
+	private logger = new Logger('minimap');
+
 	cached: Buffer;
 
 	constructor(
@@ -28,10 +31,10 @@ export class MinimapGenerator {
 
 	schedule() {
 		const next = async () => {
-			console.log('rendering minimap...');
+			this.logger.log('render');
 			this.cached = await this.generate();
 
-			console.log('rendered minimap');
+			this.logger.log('rendered');
 			setTimeout(() => next(), 1000 * 60 * 60);
 		};
 
@@ -39,8 +42,9 @@ export class MinimapGenerator {
 	}
 
 	async generate() {
-		const boroughs = await Promise.all((await BoroughSummaryModel.from(this.database.borough) as any).map(borough => borough.resolveToJSON()));
+		const logger = this.logger.task('generator');
 
+		const boroughs = await Promise.all((await BoroughSummaryModel.from(this.database.borough) as any).map(borough => borough.resolveToJSON()));
 		const bounds = getMinimapBounds(boroughs);
 
 		const width = Math.floor(bounds.width * minimapScale);
@@ -49,11 +53,11 @@ export class MinimapGenerator {
 		const canvas = new Canvas(width, height);
 		const context = canvas.getContext('2d');
 
-		// render tiles onto map
+		logger.log('render base map');
 		await this.renderBaseMap(context, bounds);
 		const baseMap = await loadImage(await canvas.toBuffer('png'));
 
-		// abstract minimap to water
+		logger.log('abstract map');
 		const imageData = context.getImageData(0, 0, width, height);
 
 		for (let offset = 0; offset < imageData.data.length; offset += 4) {
@@ -75,6 +79,7 @@ export class MinimapGenerator {
 		] as [number, number];
 
 		// draw mayor roads
+		logger.log('render streets');
 		const streets = await this.database.street
 			.where(street => street.deactivated == null)
 			.include(street => street.activeRoute)
@@ -107,6 +112,7 @@ export class MinimapGenerator {
 		}
 
 		// fill buildings
+		logger.log('render buildings');
 		const buildings = await this.database.building
 			.where(building => building.archived == null)
 			.where(building => building.property.deactivated == null)
@@ -128,6 +134,7 @@ export class MinimapGenerator {
 		context.fill();
 
 		// draw rail lines
+		logger.log('render train routes');
 		const trainRoutes = await this.database.trainRoute
 			.where(route => route.closed == null)
 			.include(route => route.activePath)
@@ -159,6 +166,7 @@ export class MinimapGenerator {
 			}
 		}
 
+		logger.finish();
 		return await canvas.toBuffer('png');
 	}
 
@@ -171,8 +179,6 @@ export class MinimapGenerator {
 		const regions = getTiles(center, bounds.width, bounds.height, mapBaseTileSize);
 
 		for (let region of regions) {
-			console.log(region)
-
 			const capture = await this.database.mapTile
 				.where(tile => tile.complete == true)
 				.where(tile => tile.type == MapType.overworld)

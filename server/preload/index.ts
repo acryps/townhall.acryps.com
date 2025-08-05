@@ -3,11 +3,13 @@ import { PreloadRoute, RouteParameterValue } from "./route";
 import { port, updatePreloadedPages } from "..";
 import { DbContext, PreloadedPage } from "../managed/database";
 import { readFileSync } from "fs";
+import { Logger } from "../log";
 
 export class Preload {
 	static browser: Browser;
-
 	static readonly userAgent = 'Preload Indexer';
+
+	private logger = new Logger('preload');
 
 	routes: PreloadRoute<any>[] = [];
 	indexed: PreloadedPage[] = [];
@@ -73,11 +75,11 @@ export class Preload {
 	}
 
 	async update() {
-		console.log(`fetching preloaded pages...`);
+		this.logger.log('fetch existing index');
 		this.indexed = await this.database.preloadedPage.toArray();
-		console.log(`${this.indexed.length} pages already preloaded`);
+		this.logger.log(`${this.indexed.length} pages preloaded`);
 
-		console.log(`indexing preloading pages...`);
+		this.logger.log('compose required index');
 
 		const addedLinks: string[] = [];
 		const existingLinks: PreloadedPage[] = [];
@@ -110,7 +112,7 @@ export class Preload {
 				.map(page => page.link)
 		];
 
-		console.log(`found ${links.length} updateable preloading pages (${addedLinks.length} new pages), launching browser`);
+		this.logger.log(`found ${links.length} updateable preloading pages (${addedLinks.length} new pages), launching browser`);
 
 		if (!Preload.browser) {
 			Preload.browser = await launch({
@@ -133,8 +135,7 @@ export class Preload {
 					await entry.create();
 				}
 
-				console.log(`updating ${link}...`);
-
+				this.logger.log(`updating ${link}...`);
 				await page.goto(`http://localhost:${port}${link}`);
 
 				// ensure page load
@@ -148,7 +149,7 @@ export class Preload {
 				entry.updated = new Date();
 				await entry.update();
 			} catch (error) {
-				console.error(`preload of ${link} failed`, error);
+				this.logger.error(`preload of ${link} failed`, error);
 			}
 		}
 

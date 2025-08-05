@@ -47,6 +47,7 @@ import { WallpaperInterface } from "./map/wallpaper";
 import { ItemContextTracker } from "./context";
 import { StationTileServer } from "./map/layers/shape/train/stations";
 import { MinimapGenerator } from "./map/minimap";
+import { Logger } from "./log";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -56,23 +57,25 @@ export const writeItemContexts = process.env.ITEM_CONTEXT_WRITE == 'YES';
 
 export const port = +process.env.PORT || 7420;
 
-console.log("connecting to database...");
+const logger = new Logger('server');
+
+logger.log('connect database');
 DbClient.connectedClient = new DbClient({ max: 2 });
 
 DbClient.connectedClient.connect().then(async () => {
-	console.log('connected to database!');
+	logger.log('connected');
 
 	const app = new ManagedServer();
 	ws(app.app);
 
 	const database = new DbContext(new RunContext());
 
-	new MinimapGenerator(database, app).schedule();
-
 	ScheduledEpoch.import(await database.epoch.toArray());
 
 	await registerMetrics(database);
 	await MetricTracker.executeTask();
+
+	new MinimapGenerator(database, app).schedule();
 
 	const preload = new Preload(database);
 	registerPreload(preload, database);

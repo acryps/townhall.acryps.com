@@ -13,7 +13,8 @@ export enum ItemContextLinkRank {
 }
 
 export interface BoroughSummaryModel {
-    banner: string;
+    district: DistrictSummaryModel;
+	banner: string;
 	bounds: string;
 	color: string;
 	id: string;
@@ -527,10 +528,10 @@ export interface HonestiumViewModel {
 	question: string;
 }
 
-export interface DistrictViewModel {
+export interface DistrictSummaryModel {
     id: string;
+	includeInMinimap: boolean;
 	name: string;
-	parentId: string;
 }
 
 export interface OpenHonestiumViewModel {
@@ -739,4 +740,11 @@ export interface TrainRouteViewModel {
 	name: string;
 	opened: Date;
 	textColor: string;
+}
+
+export interface DistrictViewModel {
+    id: string;
+	includeInMinimap: boolean;
+	name: string;
+	parentId: string;
 }

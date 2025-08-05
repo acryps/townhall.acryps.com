@@ -13,6 +13,7 @@ export enum ItemContextLinkRank {
 }
 
 export class BoroughSummaryModel {
+	district: DistrictSummaryModel;
 	banner: string;
 	bounds: string;
 	color: string;
@@ -23,6 +24,7 @@ export class BoroughSummaryModel {
 
 	private static $build(raw) {
 		const item = new BoroughSummaryModel();
+		raw.district === undefined || (item.district = raw.district ? DistrictSummaryModel["$build"](raw.district) : null)
 		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
 		raw.bounds === undefined || (item.bounds = raw.bounds === null ? null : `${raw.bounds}`)
 		raw.color === undefined || (item.color = raw.color === null ? null : `${raw.color}`)
@@ -1249,16 +1251,16 @@ export class HonestiumViewModel {
 	}
 }
 
-export class DistrictViewModel {
+export class DistrictSummaryModel {
 	id: string;
+	includeInMinimap: boolean;
 	name: string;
-	parentId: string;
 
 	private static $build(raw) {
-		const item = new DistrictViewModel();
+		const item = new DistrictSummaryModel();
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.includeInMinimap === undefined || (item.includeInMinimap = !!raw.includeInMinimap)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
-		raw.parentId === undefined || (item.parentId = raw.parentId === null ? null : `${raw.parentId}`)
 		
 		return item;
 	}
@@ -1744,6 +1746,23 @@ export class TrainRouteViewModel {
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
 		raw.textColor === undefined || (item.textColor = raw.textColor === null ? null : `${raw.textColor}`)
+		
+		return item;
+	}
+}
+
+export class DistrictViewModel {
+	id: string;
+	includeInMinimap: boolean;
+	name: string;
+	parentId: string;
+
+	private static $build(raw) {
+		const item = new DistrictViewModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.includeInMinimap === undefined || (item.includeInMinimap = !!raw.includeInMinimap)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.parentId === undefined || (item.parentId = raw.parentId === null ? null : `${raw.parentId}`)
 		
 		return item;
 	}

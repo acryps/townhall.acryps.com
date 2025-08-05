@@ -4,10 +4,18 @@ import { Shape } from "./shape";
 export type PackedPoint = string;
 export type PackedPointArray = string;
 
+export type BoundingBox = {
+	x: { min: number, max: number },
+	y: { min: number, max: number },
+
+	width: number,
+	height: number
+};
+
 export class Point {
 	constructor(
-		public x,
-		public y
+		public x: number,
+		public y: number
 	) {}
 
 	toString() {
@@ -87,7 +95,7 @@ export class Point {
 		];
 	}
 
-	static bounds(points: Point[], offset = 0) {
+	static bounds(points: Point[], offset = 0): BoundingBox {
 		const minX = Math.min(...points.map(point => point.x)) - offset;
 		const maxX = Math.max(...points.map(point => point.x)) + offset;
 

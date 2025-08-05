@@ -738,6 +738,7 @@ export class Company extends Entity<CompanyQueryProxy> {
 export class DistrictQueryProxy extends QueryProxy {
 	get parent(): Partial<DistrictQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get billPrefix(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get includeInMinimap(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get incorporation(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get parentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -751,6 +752,7 @@ export class District extends Entity<DistrictQueryProxy> {
 		lawHouseSessions: PrimaryReference<LawHouseSession, LawHouseSessionQueryProxy>;
 		billPrefix: string;
 	declare id: string;
+	includeInMinimap: boolean;
 	incorporation: Date;
 	name: string;
 	parentId: string;
@@ -760,6 +762,7 @@ export class District extends Entity<DistrictQueryProxy> {
 		columns: {
 			billPrefix: { type: "text", name: "bill_prefix" },
 			id: { type: "uuid", name: "id" },
+			includeInMinimap: { type: "bool", name: "include_in_minimap" },
 			incorporation: { type: "timestamp", name: "incorporation" },
 			name: { type: "text", name: "name" },
 			parentId: { type: "uuid", name: "parent_id" }

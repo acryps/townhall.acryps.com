@@ -161,6 +161,7 @@ import { TrainRoutePathViewModel } from "./../areas/train/route.view";
 import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { StationTrainStopViewModel } from "./../areas/train/stop.view";
 import { HonestiumViewModel } from "./../areas/vote/bill";
+import { DistrictSummaryModel } from "./../areas/vote/district";
 import { OfficeEmployeeModel } from "./../areas/company.view";
 import { WorkOfferEmplymentModel } from "./../areas/work";
 import { WorkContractViewModel } from "./../areas/work";
@@ -1828,6 +1829,7 @@ ViewModel.mappings = {
 	[BoroughSummaryModel.name]: class ComposedBoroughSummaryModel extends BoroughSummaryModel {
 		async map() {
 			return {
+				district: new DistrictSummaryModel(await BaseServer.unwrap(this.$$model.district)),
 				banner: this.$$model.banner,
 				bounds: this.$$model.bounds,
 				color: this.$$model.color,
@@ -1864,6 +1866,12 @@ ViewModel.mappings = {
 			}
 
 			return {
+				get district() {
+					return ViewModel.mappings[DistrictSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "district-BoroughSummaryModel"]
+					);
+				},
 				banner: true,
 				bounds: true,
 				color: true,
@@ -1876,6 +1884,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new BoroughSummaryModel(null);
+			"district" in data && (item.district = data.district && ViewModel.mappings[DistrictSummaryModel.name].toViewModel(data.district));
 			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
 			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
@@ -1896,6 +1905,7 @@ ViewModel.mappings = {
 				model = new Borough();
 			}
 			
+			"district" in viewModel && (model.district.id = viewModel.district ? viewModel.district.id : null);
 			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
 			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
@@ -7035,12 +7045,12 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	[DistrictViewModel.name]: class ComposedDistrictViewModel extends DistrictViewModel {
+	[DistrictSummaryModel.name]: class ComposedDistrictSummaryModel extends DistrictSummaryModel {
 		async map() {
 			return {
 				id: this.$$model.id,
-				name: this.$$model.name,
-				parentId: this.$$model.parentId
+				includeInMinimap: this.$$model.includeInMinimap,
+				name: this.$$model.name
 			}
 		};
 
@@ -7071,21 +7081,21 @@ ViewModel.mappings = {
 
 			return {
 				id: true,
-				name: true,
-				parentId: true
+				includeInMinimap: true,
+				name: true
 			};
 		};
 
 		static toViewModel(data) {
-			const item = new DistrictViewModel(null);
+			const item = new DistrictSummaryModel(null);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"includeInMinimap" in data && (item.includeInMinimap = !!data.includeInMinimap);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"parentId" in data && (item.parentId = data.parentId === null ? null : `${data.parentId}`);
 
 			return item;
 		}
 
-		static async toModel(viewModel: DistrictViewModel) {
+		static async toModel(viewModel: DistrictSummaryModel) {
 			let model: District;
 			
 			if (viewModel.id) {
@@ -7095,8 +7105,8 @@ ViewModel.mappings = {
 			}
 			
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"includeInMinimap" in viewModel && (model.includeInMinimap = !!viewModel.includeInMinimap);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"parentId" in viewModel && (model.parentId = viewModel.parentId === null ? null : `${viewModel.parentId}`);
 
 			return model;
 		}
@@ -9064,6 +9074,76 @@ ViewModel.mappings = {
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"opened" in viewModel && (model.opened = viewModel.opened === null ? null : new Date(viewModel.opened));
 			"textColor" in viewModel && (model.textColor = viewModel.textColor === null ? null : `${viewModel.textColor}`);
+
+			return model;
+		}
+	},
+	[DistrictViewModel.name]: class ComposedDistrictViewModel extends DistrictViewModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				includeInMinimap: this.$$model.includeInMinimap,
+				name: this.$$model.name,
+				parentId: this.$$model.parentId
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				includeInMinimap: true,
+				name: true,
+				parentId: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new DistrictViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"includeInMinimap" in data && (item.includeInMinimap = !!data.includeInMinimap);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"parentId" in data && (item.parentId = data.parentId === null ? null : `${data.parentId}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: DistrictViewModel) {
+			let model: District;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(District).find(viewModel.id)
+			} else {
+				model = new District();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"includeInMinimap" in viewModel && (model.includeInMinimap = !!viewModel.includeInMinimap);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"parentId" in viewModel && (model.parentId = viewModel.parentId === null ? null : `${viewModel.parentId}`);
 
 			return model;
 		}

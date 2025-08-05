@@ -46,6 +46,7 @@ import { PoliticalCompassRater } from "./life/political-compass";
 import { WallpaperInterface } from "./map/wallpaper";
 import { ItemContextTracker } from "./context";
 import { StationTileServer } from "./map/layers/shape/train/stations";
+import { MinimapGenerator } from "./map/minimap";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -65,6 +66,8 @@ DbClient.connectedClient.connect().then(async () => {
 	ws(app.app);
 
 	const database = new DbContext(new RunContext());
+
+	new MinimapGenerator(database, app).schedule();
 
 	ScheduledEpoch.import(await database.epoch.toArray());
 
@@ -105,7 +108,7 @@ DbClient.connectedClient.connect().then(async () => {
 		new ArticleOpinionGenerator(database).schedule();
 		new PoliticalCompassRater(database).next();
 
-		lawHouse.schedule();
+		// lawHouse.schedule();
 		life.vote();
 
 		new FillLife(life, database).fillEmptyDwellings();

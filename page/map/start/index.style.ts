@@ -1,56 +1,71 @@
-import { aspectRatio, child, display, flexBasis, flexGrow, flexWrap, fontSize, fontWeight, gap, marginBottom, objectFit, padding, paddingBlock, paddingInline, percentage, ratio, rem, width } from "@acryps/style";
+import { aspectRatio, background, backgroundColor, blur, bottom, boxShadow, child, color, cursor, display, filter, flexBasis, flexGrow, flexWrap, fontSize, fontWeight, gap, height, hex, imageRendering, inset, insetInline, justifyContent, margin, marginBottom, mixBlendMode, objectFit, opacity, padding, paddingBlock, paddingInline, percentage, position, px, ratio, rem, textAlign, whiteSpace, width } from "@acryps/style";
 import { boxed } from "../../shared/boxed.style";
 import { collection, collectionItem } from "../../shared/collection.style";
-import { pageGutter } from "../../index.style";
+import { navigationBackgroundColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 import { card } from "../../shared/card.style";
 import { buttonStyle } from "../../shared/index.style";
+import { microFont } from "../../assets/font/index.style";
 
 export const mapStartStyle = () => child('ui-map-start',
-	boxed(),
+	child('ui-minimap',
+		position('fixed'),
+		inset(rem(0)),
 
-	child('ui-actions',
-		display('flex'),
-		flexWrap('wrap'),
-		gap(pageGutter),
-		marginBottom(pageGutter),
+		cursor('crosshair'),
 
-		child('ui-action',
-			buttonStyle()
+		child('img',
+			width(percentage(100)),
+			height(percentage(100)),
+
+			objectFit('cover'),
+			imageRendering('pixelated')
+		),
+
+		child('canvas',
+			position('absolute'),
+			inset(0),
+			width(percentage(100)),
+			height(percentage(100)),
+
+			objectFit('cover'),
+
+			filter(blur(px(2))),
+			opacity(0.75)
+		),
+
+		child('ui-cursor',
+			position('absolute'),
+
+			paddingInline(rem(0.5)),
+			paddingBlock(rem(0.25)),
+			margin(px(5)),
+			whiteSpace('pre'),
+
+			opacity(0.95),
+			textAlign('center'),
+
+			color(pageTextColor),
+			backgroundColor(pageBackgroundColor),
+			boxShadow(hex('0004'), 0, rem(0.25), rem(0.5))
 		)
 	),
 
-	child('ui-cities',
-		collection(rem(20), pageGutter),
+	child('ui-actions',
+		position('fixed'),
+		insetInline(0),
+		bottom(0),
 
-		child('ui-city',
-			collectionItem(),
-			card(false),
+		display('flex'),
+		flexWrap('wrap'),
+		justifyContent('center'),
+		gap(pageGutter),
+		padding(pageGutter),
 
-			child('img',
-				width(percentage(100)),
-				aspectRatio(ratio(2, 1)),
+		color(pageTextColor),
+		backgroundColor(navigationBackgroundColor),
 
-				objectFit('cover')
-			),
-
-			child('ui-detail',
-				display('block'),
-				paddingInline(pageGutter),
-				paddingBlock(pageGutter.divide(2)),
-
-				child('ui-name',
-					display('block'),
-					marginBottom(rem(0.5)),
-
-					fontWeight('bold')
-				),
-
-				child('ui-incorporation',
-					display('block'),
-
-					fontSize(rem(0.8))
-				)
-			)
+		child('ui-action',
+			buttonStyle()
 		)
 	)
 );

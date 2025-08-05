@@ -11,7 +11,7 @@ type Datapoint = {
 	area: number
 }
 
-export class PropertyValueTileServer extends GradiantHeatmapTileServer {
+export class PropertyValueTileServer extends GradiantHeatmapTileServer<Datapoint> {
 	values: Datapoint[] = [];
 
 	depth = 10;

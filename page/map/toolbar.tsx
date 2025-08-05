@@ -221,10 +221,8 @@ export class MapToolbarComponent extends Component {
 		for (let borough of Application.boroughs) {
 			const bounds = Point.unpack(borough.bounds);
 
-			if (Point.touches(cursor, new Point(1, 1), bounds)) {
-				if (Point.fill(bounds).has(packed)) {
-					return borough;
-				}
+			if (Point.contains(bounds, cursor)) {
+				return borough;
 			}
 		}
 	}

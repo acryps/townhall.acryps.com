@@ -2,8 +2,8 @@ import { Component } from "@acryps/page";
 import { Point } from "../../../interface/point";
 import { MapComponent } from "../../shared/map";
 import { LocationMarkerComponent } from "../../shared/location";
-import { boroughIcon, propertyRegisterIcon, streetIcon, trainIcon } from "../../assets/icons/managed";
-import { MapService, StreetService } from "../../managed/services";
+import { boroughIcon, propertyRegisterIcon, streetIcon, trainIcon, waterIcon } from "../../assets/icons/managed";
+import { MapService, StreetService, WaterBodyService, WaterService } from "../../managed/services";
 
 export class CreateFeaturePage extends Component {
 	declare parameters: { shape };
@@ -72,6 +72,14 @@ export class CreateFeaturePage extends Component {
 
 					<ui-name>
 						Register Train
+					</ui-name>
+				</ui-type>
+
+				<ui-type ui-href={`/water/create/${btoa(Point.pack(this.shape))}`}>
+					{waterIcon()}
+
+					<ui-name>
+						Register Water Body
 					</ui-name>
 				</ui-type>
 			</ui-types>

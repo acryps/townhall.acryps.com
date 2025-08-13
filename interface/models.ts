@@ -161,10 +161,16 @@ export interface StreetRouteSummaryModel {
 }
 
 export interface WaterBodyViewModel {
-    bounds: string;
+    areas: WaterBodyAreaViewModel[];
 	id: string;
 	name: string;
-	namePath: string;
+}
+
+export interface WaterBodyAreaViewModel {
+    archived: Date;
+	created: Date;
+	id: string;
+	shape: string;
 }
 
 export interface WorkOfferSummaryModel {

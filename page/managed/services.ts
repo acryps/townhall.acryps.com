@@ -363,17 +363,32 @@ export class StreetRouteSummaryModel {
 }
 
 export class WaterBodyViewModel {
-	bounds: string;
+	areas: WaterBodyAreaViewModel[];
 	id: string;
 	name: string;
-	namePath: string;
 
 	private static $build(raw) {
 		const item = new WaterBodyViewModel();
-		raw.bounds === undefined || (item.bounds = raw.bounds === null ? null : `${raw.bounds}`)
+		raw.areas === undefined || (item.areas = raw.areas ? raw.areas.map(i => WaterBodyAreaViewModel["$build"](i)) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
-		raw.namePath === undefined || (item.namePath = raw.namePath === null ? null : `${raw.namePath}`)
+		
+		return item;
+	}
+}
+
+export class WaterBodyAreaViewModel {
+	archived: Date;
+	created: Date;
+	id: string;
+	shape: string;
+
+	private static $build(raw) {
+		const item = new WaterBodyAreaViewModel();
+		raw.archived === undefined || (item.archived = raw.archived ? new Date(raw.archived) : null)
+		raw.created === undefined || (item.created = raw.created ? new Date(raw.created) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.shape === undefined || (item.shape = raw.shape === null ? null : `${raw.shape}`)
 		
 		return item;
 	}
@@ -4610,6 +4625,109 @@ export class VoteService {
 		$data.append("JsMjxrNWRqNGZ4ZXViaGFxaWZwOWhncG", Service.stringify(id))
 
 		return await fetch(Service.toURL("k0djR0dHRmbTN4ZzkxaWg5bzdjeXJqMT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+}
+
+export class WaterBodyService {
+	async getWaterBody(tag: string): Promise<WaterBodyViewModel> {
+		const $data = new FormData();
+		$data.append("F2enx1eWdqMGZqZGQ1eTdjbjRreGRldz", Service.stringify(tag))
+
+		return await fetch(Service.toURL("l3bm02aGUwcmZidXk1bTc2NDBjODZxcn"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : WaterBodyViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async createWaterBody(shape: string, name: string): Promise<string> {
+		const $data = new FormData();
+		$data.append("k1OHE0eWYwbWJjM2EwcTZpNTlreGd1eH", Service.stringify(shape))
+		$data.append("1pdnUwNGE4MGd0M2gxZGc0aGQ4YnF4dz", Service.stringify(name))
+
+		return await fetch(Service.toURL("c1OWgxM3cyamd5ZzNhMDRncmR5aGZjaH"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async rename(id: string, name: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("NmdGFuYzU2dnR5YTlmYz4ya2ZzMzg2bG", Service.stringify(id))
+		$data.append("gwM2JoMHZhd3Fub3Boamg3Nng2ZmlmMW", Service.stringify(name))
+
+		return await fetch(Service.toURL("lzeXBpN3ZkNzh2ZDRjcG52a2V5NGp1cm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async archive(id: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("Z4MWJvMmducnpkb2Y0ej5xMnhlaGB4NT", Service.stringify(id))
+
+		return await fetch(Service.toURL("o0bTloejIzYWlzcDc0cXBjMTwyYnc1cG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async unarchive(id: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("dpeH9sdG05MXI4Zm81dWEzaXJvcGMxOW", Service.stringify(id))
+
+		return await fetch(Service.toURL("RiMWozZ3JmNGhvN3RvMTR0bzo4Z3FpbG"), {
 			method: "post",
 			credentials: "include",
 			body: $data

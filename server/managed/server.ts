@@ -138,10 +138,14 @@ import { BillViewModel } from "././../areas/vote/bill";
 import { VoteTickerViewModel } from "././../areas/vote/vote";
 import { VoteViewModel } from "././../areas/vote/vote";
 import { VoteService } from "././../areas/vote/service";
+import { WaterBody } from "././database";
+import { WaterBodyArea } from "././database";
+import { WaterBodyService } from "././../areas/water-body/service";
 import { OfficeSummaryModel } from "./../areas/company.view";
 import { OfficeCapacityViewModel } from "./../areas/company.view";
 import { TenantViewModel } from "./../areas/property.view";
 import { StreetRouteSummaryModel } from "./../areas/street.view";
+import { WaterBodyAreaViewModel } from "./../areas/water-body.view";
 import { WorkOfferSummaryModel } from "./../areas/work";
 import { WorkContractSummaryModel } from "./../areas/work";
 import { ItemContextSummaryModel } from "./../areas/item-context/context";
@@ -172,7 +176,6 @@ import { Player } from "./../managed/database";
 import { PropertyType } from "./../managed/database";
 import { Tenancy } from "./../managed/database";
 import { Square } from "./../managed/database";
-import { WaterBody } from "./../managed/database";
 import { WorkOffer } from "./../managed/database";
 import { WorkContract } from "./../managed/database";
 import { City } from "./../managed/database";
@@ -316,6 +319,10 @@ Inject.mappings = {
 	},
 	"VoteService": {
 		objectConstructor: VoteService,
+		parameters: ["DbContext"]
+	},
+	"WaterBodyService": {
+		objectConstructor: WaterBodyService,
 		parameters: ["DbContext"]
 	}
 };
@@ -1821,6 +1828,65 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.submitHonestium(
 				params["JsMjxrNWRqNGZ4ZXViaGFxaWZwOWhncG"]
 			)
+		);
+
+		this.expose(
+			"l3bm02aGUwcmZidXk1bTc2NDBjODZxcn",
+			{
+			"F2enx1eWdqMGZqZGQ1eTdjbjRreGRldz": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(WaterBodyService),
+			(controller, params) => controller.getWaterBody(
+				params["F2enx1eWdqMGZqZGQ1eTdjbjRreGRldz"]
+			)
+		);
+
+		this.expose(
+			"c1OWgxM3cyamd5ZzNhMDRncmR5aGZjaH",
+			{
+			"k1OHE0eWYwbWJjM2EwcTZpNTlreGd1eH": { type: "string", isArray: false, isOptional: false },
+				"1pdnUwNGE4MGd0M2gxZGc0aGQ4YnF4dz": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(WaterBodyService),
+			(controller, params) => controller.createWaterBody(
+				params["k1OHE0eWYwbWJjM2EwcTZpNTlreGd1eH"],
+				params["1pdnUwNGE4MGd0M2gxZGc0aGQ4YnF4dz"]
+			)
+		);
+
+		this.expose(
+			"lzeXBpN3ZkNzh2ZDRjcG52a2V5NGp1cm",
+			{
+			"NmdGFuYzU2dnR5YTlmYz4ya2ZzMzg2bG": { type: "string", isArray: false, isOptional: false },
+				"gwM2JoMHZhd3Fub3Boamg3Nng2ZmlmMW": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(WaterBodyService),
+			(controller, params) => controller.rename(
+				params["NmdGFuYzU2dnR5YTlmYz4ya2ZzMzg2bG"],
+				params["gwM2JoMHZhd3Fub3Boamg3Nng2ZmlmMW"]
+			)
+		);
+
+		this.expose(
+			"o0bTloejIzYWlzcDc0cXBjMTwyYnc1cG",
+			{
+			"Z4MWJvMmducnpkb2Y0ej5xMnhlaGB4NT": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(WaterBodyService),
+			(controller, params) => controller.archive(
+				params["Z4MWJvMmducnpkb2Y0ej5xMnhlaGB4NT"]
+			)
+		);
+
+		this.expose(
+			"RiMWozZ3JmNGhvN3RvMTR0bzo4Z3FpbG",
+			{
+			"dpeH9sdG05MXI4Zm81dWEzaXJvcGMxOW": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(WaterBodyService),
+			(controller, params) => controller.unarchive(
+				params["dpeH9sdG05MXI4Zm81dWEzaXJvcGMxOW"]
+			)
 		)
 	}
 }
@@ -3306,10 +3372,9 @@ ViewModel.mappings = {
 	[WaterBodyViewModel.name]: class ComposedWaterBodyViewModel extends WaterBodyViewModel {
 		async map() {
 			return {
-				bounds: this.$$model.bounds,
+				areas: (await this.$$model.areas.includeTree(ViewModel.mappings[WaterBodyAreaViewModel.name].items).toArray()).map(item => new WaterBodyAreaViewModel(item)),
 				id: this.$$model.id,
-				name: this.$$model.name,
-				namePath: this.$$model.namePath
+				name: this.$$model.name
 			}
 		};
 
@@ -3339,19 +3404,22 @@ ViewModel.mappings = {
 			}
 
 			return {
-				bounds: true,
+				get areas() {
+					return ViewModel.mappings[WaterBodyAreaViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "areas-WaterBodyViewModel"]
+					);
+				},
 				id: true,
-				name: true,
-				namePath: true
+				name: true
 			};
 		};
 
 		static toViewModel(data) {
 			const item = new WaterBodyViewModel(null);
-			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
+			"areas" in data && (item.areas = data.areas && [...data.areas].map(i => ViewModel.mappings[WaterBodyAreaViewModel.name].toViewModel(i)));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
-			"namePath" in data && (item.namePath = data.namePath === null ? null : `${data.namePath}`);
 
 			return item;
 		}
@@ -3365,10 +3433,79 @@ ViewModel.mappings = {
 				model = new WaterBody();
 			}
 			
-			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
+			"areas" in viewModel && (null);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
-			"namePath" in viewModel && (model.namePath = viewModel.namePath === null ? null : `${viewModel.namePath}`);
+
+			return model;
+		}
+	},
+	[WaterBodyAreaViewModel.name]: class ComposedWaterBodyAreaViewModel extends WaterBodyAreaViewModel {
+		async map() {
+			return {
+				archived: this.$$model.archived,
+				created: this.$$model.created,
+				id: this.$$model.id,
+				shape: this.$$model.shape
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				archived: true,
+				created: true,
+				id: true,
+				shape: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new WaterBodyAreaViewModel(null);
+			"archived" in data && (item.archived = data.archived === null ? null : new Date(data.archived));
+			"created" in data && (item.created = data.created === null ? null : new Date(data.created));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"shape" in data && (item.shape = data.shape === null ? null : `${data.shape}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: WaterBodyAreaViewModel) {
+			let model: WaterBodyArea;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(WaterBodyArea).find(viewModel.id)
+			} else {
+				model = new WaterBodyArea();
+			}
+			
+			"archived" in viewModel && (model.archived = viewModel.archived === null ? null : new Date(viewModel.archived));
+			"created" in viewModel && (model.created = viewModel.created === null ? null : new Date(viewModel.created));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"shape" in viewModel && (model.shape = viewModel.shape === null ? null : `${viewModel.shape}`);
 
 			return model;
 		}

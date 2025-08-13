@@ -68,6 +68,9 @@ import { MilitaryPage } from "./military";
 import { MilitaryUnit } from "../server/managed/database";
 import { MilitaryUnitPage } from "./military/unit";
 import { ReviewPage } from "./review";
+import { CreateWaterBodyPage } from "./water/create";
+import { WaterPage } from "./water";
+import { WaterBodyPage } from "./water/water-body";
 
 export class Application {
 	static router: Router;
@@ -182,6 +185,11 @@ export class Application {
 					.route('/office/create/:id', CreateOfficePage)
 					.route('/office/:id', OfficePage)
 					.route('/work-offer/:id', WorkOfferPage)
+				)
+
+				.route('/water', WaterPage
+					.route('/create/:shape', CreateWaterBodyPage)
+					.route('/body/:tag', WaterBodyPage)
 				)
 
 				.route('/create-banner/:code', CreateBannerComponent)

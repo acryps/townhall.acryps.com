@@ -2,11 +2,11 @@ import { select, style, content, Font, fontFamily, fontWeight, fontStyle } from 
 
 
 export const iconFont = new Font('icons', fontWeight('normal'), fontStyle('normal'))
-	.addSource('/assets/icons/managed/font/index.eot?c35ef3103af3', 'embedded-opentype')
-	.addSource('/assets/icons/managed/font/index.svg?31abe6b223fb', 'svg')
-	.addSource('/assets/icons/managed/font/index.ttf?3441c9cf72ff', 'truetype')
-	.addSource('/assets/icons/managed/font/index.woff?7234a69ff8ea', 'woff')
-	.addSource('/assets/icons/managed/font/index.woff2?e8201b846ce7', 'woff2');
+	.addSource('/assets/icons/managed/font/index.eot?dd9bb093e186', 'embedded-opentype')
+	.addSource('/assets/icons/managed/font/index.svg?d7f051b0af67', 'svg')
+	.addSource('/assets/icons/managed/font/index.ttf?a4e63a44b82b', 'truetype')
+	.addSource('/assets/icons/managed/font/index.woff?f516cedbaddf', 'woff')
+	.addSource('/assets/icons/managed/font/index.woff2?cd69b7d90ea5', 'woff2');
 
 export const icons = () => select('ui-icon',
 	fontFamily(iconFont.name),
@@ -48,6 +48,7 @@ export const icons = () => select('ui-icon',
 	style('[ui-time-machine]').before('\f120'),
 	style('[ui-train]').before('\f121'),
 	style('[ui-undo]').before('\f122'),
+	style('[ui-water]').before('\f123'),
 );
 
 const createIconElement = (name: string) => {
@@ -91,3 +92,4 @@ export const streetIcon = () => createIconElement('street');
 export const timeMachineIcon = () => createIconElement('time-machine');
 export const trainIcon = () => createIconElement('train');
 export const undoIcon = () => createIconElement('undo');
+export const waterIcon = () => createIconElement('water');

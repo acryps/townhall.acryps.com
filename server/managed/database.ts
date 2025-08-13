@@ -3455,29 +3455,84 @@ export class Vote extends Entity<VoteQueryProxy> {
 }
 			
 export class WaterBodyQueryProxy extends QueryProxy {
-	get bounds(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get namePath(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class WaterBody extends Entity<WaterBodyQueryProxy> {
-	bounds: string;
-	declare id: string;
+	areas: PrimaryReference<WaterBodyArea, WaterBodyAreaQueryProxy>;
+		declare id: string;
 	name: string;
-	namePath: string;
+	tag: string;
 	
 	$$meta = {
 		source: "water_body",
 		columns: {
-			bounds: { type: "text", name: "bounds" },
 			id: { type: "uuid", name: "id" },
 			name: { type: "text", name: "name" },
-			namePath: { type: "text", name: "name_path" }
+			tag: { type: "text", name: "tag" }
 		},
 		get set(): DbSet<WaterBody, WaterBodyQueryProxy> { 
 			return new DbSet<WaterBody, WaterBodyQueryProxy>(WaterBody, null);
 		}
 	};
+	
+	constructor() {
+		super();
+		
+		this.areas = new PrimaryReference<WaterBodyArea, WaterBodyAreaQueryProxy>(this, "waterBodyId", WaterBodyArea);
+	}
+}
+			
+export class WaterBodyAreaQueryProxy extends QueryProxy {
+	get waterBody(): Partial<WaterBodyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get archived(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get shape(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get waterBodyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class WaterBodyArea extends Entity<WaterBodyAreaQueryProxy> {
+	get waterBody(): Partial<ForeignReference<WaterBody>> { return this.$waterBody; }
+	archived: Date;
+	created: Date;
+	declare id: string;
+	shape: string;
+	waterBodyId: string;
+	
+	$$meta = {
+		source: "water_body_area",
+		columns: {
+			archived: { type: "timestamp", name: "archived" },
+			created: { type: "timestamp", name: "created" },
+			id: { type: "uuid", name: "id" },
+			shape: { type: "text", name: "shape" },
+			waterBodyId: { type: "uuid", name: "water_body_id" }
+		},
+		get set(): DbSet<WaterBodyArea, WaterBodyAreaQueryProxy> { 
+			return new DbSet<WaterBodyArea, WaterBodyAreaQueryProxy>(WaterBodyArea, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$waterBody = new ForeignReference<WaterBody>(this, "waterBodyId", WaterBody);
+	}
+	
+	private $waterBody: ForeignReference<WaterBody>;
+
+	set waterBody(value: Partial<ForeignReference<WaterBody>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.waterBodyId = value.id as string;
+		} else {
+			this.waterBodyId = null;
+		}
+	}
+
+	
 }
 			
 export class WorkContractQueryProxy extends QueryProxy {
@@ -3702,6 +3757,7 @@ export class DbContext {
 	valuation: DbSet<Valuation, ValuationQueryProxy>;
 	vote: DbSet<Vote, VoteQueryProxy>;
 	waterBody: DbSet<WaterBody, WaterBodyQueryProxy>;
+	waterBodyArea: DbSet<WaterBodyArea, WaterBodyAreaQueryProxy>;
 	workContract: DbSet<WorkContract, WorkContractQueryProxy>;
 	workOffer: DbSet<WorkOffer, WorkOfferQueryProxy>;
 
@@ -3765,6 +3821,7 @@ export class DbContext {
 		this.valuation = new DbSet<Valuation, ValuationQueryProxy>(Valuation, this.runContext);
 		this.vote = new DbSet<Vote, VoteQueryProxy>(Vote, this.runContext);
 		this.waterBody = new DbSet<WaterBody, WaterBodyQueryProxy>(WaterBody, this.runContext);
+		this.waterBodyArea = new DbSet<WaterBodyArea, WaterBodyAreaQueryProxy>(WaterBodyArea, this.runContext);
 		this.workContract = new DbSet<WorkContract, WorkContractQueryProxy>(WorkContract, this.runContext);
 		this.workOffer = new DbSet<WorkOffer, WorkOfferQueryProxy>(WorkOffer, this.runContext);
 	}

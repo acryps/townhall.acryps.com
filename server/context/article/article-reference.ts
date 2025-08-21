@@ -4,7 +4,7 @@ import { ItemContextComposeable, ItemContextFragmentComposer } from "../composer
 
 export class ArticleReferenceContextFragment<ItemType extends ItemContextComposeable> extends ItemContextFragmentComposer<ItemType> {
 	constructor(
-		private rank: ItemContextLinkRank,
+		private distance: number,
 		private targetId: string
 	) {
 		super();
@@ -16,7 +16,7 @@ export class ArticleReferenceContextFragment<ItemType extends ItemContextCompose
 
 			for (let item of annotated.referencedItems) {
 				if (item.id == this.targetId) {
-					this.link(this.rank, article.id, 'Mentioned in article');
+					this.link(this.distance, article.id, 'Mentioned in article');
 				}
 			}
 		}

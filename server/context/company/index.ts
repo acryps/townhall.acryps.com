@@ -10,23 +10,19 @@ export class CompanyContextComposer extends ItemContextComposer<Company> {
 	find = id => this.database.company.find(id);
 	title = (item: Company) => convertToLegalCompanyName(item);
 
-	async primary(company: Company) {
+	async collect(company: Company) {
 		return [
-			new DescriptionFragment(company.description),
-			new MetricFragment('Founded', () => new Time(company.created).toDateString())
-		]
-	}
-
-	async near(company: Company) {
-		return [
-			new ArticleReferenceContextFragment(ItemContextLinkRank.near, company.id),
-			new CompanyOfficesFragmentComposer()
-		];
-	}
-
-	async far(company: Company) {
-		return [
-			new CompanyRolesFragmentComposer()
+			async () => [
+				new DescriptionFragment(company.description),
+				new MetricFragment('Founded', () => new Time(company.created).toDateString())
+			],
+			async () => [
+				new ArticleReferenceContextFragment(1, company.id),
+				new CompanyOfficesFragmentComposer()
+			],
+			async () => [
+				new CompanyRolesFragmentComposer()
+			]
 		]
 	}
 }

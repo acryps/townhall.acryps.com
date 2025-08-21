@@ -10,12 +10,12 @@ export class CompanyRolesFragmentComposer extends ItemContextFragmentComposer<Co
 					.include(contract => contract.worker)
 					.toArray();
 
-				this.found(ItemContextLinkRank.near, `Offers Role ${workOffer.title}`, `${contracts.length} people work in this position`);
+				this.found(`Offers Role ${workOffer.title}`, `${contracts.length} people work in this position`);
 
 				for (let contract of contracts) {
 					const worker = await contract.worker.fetch();
 
-					this.link(ItemContextLinkRank.far, contract.workerId, `${worker.givenName} ${worker.familyName} working as ${workOffer.title} at office ${office.name}`);
+					this.link(3, contract.workerId, `${worker.givenName} ${worker.familyName} working as ${workOffer.title} at office ${office.name}`);
 				}
 			}
 		}

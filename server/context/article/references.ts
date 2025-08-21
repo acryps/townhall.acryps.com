@@ -7,7 +7,7 @@ export class ArticleReferencesFragmentComposer extends ItemContextFragmentCompos
 		const annotated = Annotator.annotate(item.body);
 
 		for (let reference of annotated.referencedItems) {
-			this.link(ItemContextLinkRank.near, reference.id, `Referenced in article`);
+			this.link(1, reference.id, `Referenced in article`);
 		}
 	}
 }

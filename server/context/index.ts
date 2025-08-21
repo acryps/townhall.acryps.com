@@ -15,10 +15,14 @@ export class ItemContextTracker {
 
 	constructor(
 		private database: DbContext
-	) {}
+	) { }
 
-	async find(id: string, maxRank = ItemContextLinkRank.far, peers: ItemContextComposeable[] = []) {
-		console.log(`[item context] find ${id}`);
+	async find(id: string, depth: number = 1, peers: ItemContextComposeable[] = []) {
+		console.log(`[item context] find ${id}`, depth);
+
+		if (depth < 0) {
+			return;
+		}
 
 		const maxAge = new Date(+new Date() - this.updateRate);
 
@@ -37,14 +41,14 @@ export class ItemContextTracker {
 			if (item) {
 				console.warn(`[item context] found`, type);
 
-				return await this.update(item, type, maxRank, peers);
+				return await this.update(item, type, depth, peers);
 			}
 		}
 
 		console.warn(`[item context] no generator for ${id}`);
 	}
 
-	async update<ItemType extends ItemContextComposeable>(item: ItemType, type: ItemContextComposer<any>, maxRank: ItemContextLinkRank, peers: ItemContextComposeable[]) {
+	async update<ItemType extends ItemContextComposeable>(item: ItemType, type: ItemContextComposer<any>, depth: number, peers: ItemContextComposeable[]) {
 		if (!composeItemContexts) {
 			return;
 		}
@@ -52,8 +56,7 @@ export class ItemContextTracker {
 		peers.push(item);
 
 		const title = type.title(item);
-
-		console.log(`#### ITEM: ${item.id} ${title}`, maxRank)
+		console.log(`#### ITEM: ${item.id} ${title}`, depth);
 
 		let context = await this.database.itemContext.first(context => context.itemId == item.id);
 
@@ -65,16 +68,20 @@ export class ItemContextTracker {
 			await context.create();
 		}
 
-		const fragmentComposers = await type.compose(item, maxRank);
+		const fragmentComposers = await type.compose(item, depth);
 		const fragments: ItemContextFragment[] = [];
 		const links: FoundItemContextLink[] = [];
 
-		for (let composer of fragmentComposers) {
-			composer.database = this.database;
-			await composer.compose(item);
+		for (let layer = 0; layer < fragmentComposers.length; layer++) {
+			for (let composer of fragmentComposers[layer]) {
+				composer.database = this.database;
+				composer.layer = layer;
 
-			fragments.push(...composer.fragments);
-			links.push(...composer.links);
+				await composer.compose(item);
+
+				fragments.push(...composer.fragments);
+				links.push(...composer.links);
+			}
 		}
 
 		// remove links that are already being inspected
@@ -90,7 +97,7 @@ export class ItemContextTracker {
 		const linkedItems = [];
 
 		for (let link of newLinks) {
-			const linked = await this.find(link.target, this.nextRank(maxRank), peers);
+			const linked = await this.find(link.target, depth - link.distance, peers);
 
 			if (linked) {
 				linkedItems.push(linked);
@@ -123,7 +130,7 @@ export class ItemContextTracker {
 			if (target) {
 				const link = new ItemContextLink();
 				link.source = context;
-				link.rank = reference.rank;
+				link.distance = reference.distance;
 				link.target = target;
 				link.connection = reference.connection;
 
@@ -212,20 +219,5 @@ export class ItemContextTracker {
 
 		context.updated = new Date();
 		await context.update();
-	}
-
-	private nextRank(rank: ItemContextLinkRank) {
-		switch (rank) {
-			case ItemContextLinkRank.far: return ItemContextLinkRank.near;
-			case ItemContextLinkRank.near: return ItemContextLinkRank.primary;
-		}
-	}
-
-	rank(rank: ItemContextLinkRank) {
-		switch (rank) {
-			case ItemContextLinkRank.primary: return 1;
-			case ItemContextLinkRank.far: return 2;
-			case ItemContextLinkRank.near: return 3;
-		}
 	}
 }

@@ -983,6 +983,7 @@ export class Impression extends Entity<ImpressionQueryProxy> {
 export class ItemContextQueryProxy extends QueryProxy {
 	get context(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get dependencyComplete(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get depth(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get itemId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get summary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -995,6 +996,7 @@ export class ItemContext extends Entity<ItemContextQueryProxy> {
 		links: PrimaryReference<ItemContextLink, ItemContextLinkQueryProxy>;
 		context: string;
 	dependencyComplete: boolean;
+	depth: number;
 	declare id: string;
 	itemId: string;
 	name: string;
@@ -1007,6 +1009,7 @@ export class ItemContext extends Entity<ItemContextQueryProxy> {
 		columns: {
 			context: { type: "text", name: "context" },
 			dependencyComplete: { type: "bool", name: "dependency_complete" },
+			depth: { type: "int4", name: "depth" },
 			id: { type: "uuid", name: "id" },
 			itemId: { type: "uuid", name: "item_id" },
 			name: { type: "text", name: "name" },
@@ -1030,6 +1033,7 @@ export class ItemContext extends Entity<ItemContextQueryProxy> {
 export class ItemContextFragmentQueryProxy extends QueryProxy {
 	get item(): Partial<ItemContextQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get content(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get depth(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get itemId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get orderIndex(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get rank(): "far" | "near" | "primary" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -1039,6 +1043,7 @@ export class ItemContextFragmentQueryProxy extends QueryProxy {
 export class ItemContextFragment extends Entity<ItemContextFragmentQueryProxy> {
 	get item(): Partial<ForeignReference<ItemContext>> { return this.$item; }
 	content: string;
+	depth: number;
 	declare id: string;
 	itemId: string;
 	orderIndex: number;
@@ -1049,6 +1054,7 @@ export class ItemContextFragment extends Entity<ItemContextFragmentQueryProxy> {
 		source: "item_context_fragment",
 		columns: {
 			content: { type: "text", name: "content" },
+			depth: { type: "int4", name: "depth" },
 			id: { type: "uuid", name: "id" },
 			itemId: { type: "uuid", name: "item_id" },
 			orderIndex: { type: "int4", name: "order_index" },
@@ -1085,6 +1091,7 @@ export class ItemContextLinkQueryProxy extends QueryProxy {
 	get source(): Partial<ItemContextQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get target(): Partial<ItemContextQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get connection(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get distance(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get rank(): "far" | "near" | "primary" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get sourceId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get targetId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -1094,6 +1101,7 @@ export class ItemContextLink extends Entity<ItemContextLinkQueryProxy> {
 	get source(): Partial<ForeignReference<ItemContext>> { return this.$source; }
 	get target(): Partial<ForeignReference<ItemContext>> { return this.$target; }
 	connection: string;
+	distance: number;
 	declare id: string;
 	rank: ItemContextLinkRank;
 	sourceId: string;
@@ -1103,6 +1111,7 @@ export class ItemContextLink extends Entity<ItemContextLinkQueryProxy> {
 		source: "item_context_link",
 		columns: {
 			connection: { type: "text", name: "connection" },
+			distance: { type: "int4", name: "distance" },
 			id: { type: "uuid", name: "id" },
 			rank: { type: "item_context_link_rank", name: "rank" },
 			sourceId: { type: "uuid", name: "source_id" },

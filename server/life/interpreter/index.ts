@@ -69,6 +69,7 @@ export class Interpreter {
 
 		message.push(
 			'When calling actions, make sure to use the correct data types, encapsulated in JSON.',
+			'When using quotes, make sure to escape them.',
 			`Encapsulate each call in ${Interpreter.toolStartToken} ... ${Interpreter.toolEndToken}.`
 		);
 
@@ -117,6 +118,11 @@ export class Interpreter {
 				parameters = this.parseParameters(content.split('(').slice(1).join('('), tool.parameters);
 			} catch (error) {
 				console.warn(`[interpreter] parameter parsing failed '${toolName}': ${error.message} (${content})`);
+
+				messages.push(
+					new AssistantMessage(message),
+					new SystemMessage('Something in the formatting of your tool call is wrong. Try to write the call again.')
+				);
 
 				return await this.execute(...messages);
 			}
@@ -202,28 +208,54 @@ export class Interpreter {
 	// replaces new lines with \n as a string, making it valid JSON
 	private fixInStringNewLines(source: string) {
 		let inString = false;
+		let delimiter: "'" | '"' | null = null;
+		let escaped = false;
 		let buffer = '';
 
-		for (let characterIndex = 0; characterIndex < source.length; characterIndex++) {
-			const character = source[characterIndex];
+		for (let index = 0; index < source.length; index++) {
+			const character = source[index];
 
-			if (inString) {
-				if (character == '\n') {
-					buffer += "\\n";
+			if (!inString) {
+				if (character === '"' || character === "'") {
+					inString = true;
+					delimiter = character as "'" | '"';
+					escaped = false;
+
+					buffer += (delimiter === "'") ? '"' : '"';
 				} else {
-					if (character == '"') {
-						inString = false;
-					}
-
 					buffer += character;
 				}
-			} else {
-				if (character == '"') {
-					inString = true;
-				}
 
-				buffer += character;
+				continue;
 			}
+
+			if (escaped) {
+				buffer += character;
+				escaped = false;
+
+				continue;
+			}
+
+			if (character === '\\') {
+				buffer += character;
+				escaped = true;
+				continue;
+			}
+
+			if (character === '\n') {
+				buffer += '\\n';
+				continue;
+			}
+
+			if (character === delimiter) {
+				buffer += '"';
+				inString = false;
+				delimiter = null;
+
+				continue;
+			}
+
+			buffer += character;
 		}
 
 		return buffer.trim();

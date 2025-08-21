@@ -14,15 +14,11 @@ export abstract class ItemContextComposer<ItemType extends ItemContextComposeabl
 		const composers: ItemContextFragmentComposer<ItemType>[][] = [];
 
 		for (let layer = 0; layer <= depth; layer++) {
-			console.group(layer)
-
 			const fetcher = fetchers[layer];
 
 			if (fetcher) {
 				composers.push(await fetcher());
 			}
-
-			console.groupEnd()
 		}
 
 		return composers;

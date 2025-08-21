@@ -13,7 +13,10 @@ export class ItemContextPage extends Component {
 
 	async onload() {
 		this.context = await new ItemContextService().getContext(this.parameters.id);
-		this.annotatedContext = new AnnotatedTextComponent(await new ItemContextService().annotateContext(this.parameters.id));
+
+		if (this.context.summary) {
+			this.annotatedContext = new AnnotatedTextComponent(await new ItemContextService().annotateContext(this.parameters.id));
+		}
 	}
 
 	renderGuide() {

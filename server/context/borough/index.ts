@@ -6,7 +6,7 @@ import { BoroughPropertyFragmentComposer } from "./properties";
 
 export class BoroughContextComposer extends ItemContextComposer<Borough> {
 	find = id => this.database.borough.find(id);
-	title = (item: Borough) => item.name;
+	title = (item: Borough) => `${item.name} Borough`;
 
 	async collect(borough: Borough) {
 		return [

@@ -33,15 +33,7 @@ export class FilledTileServer<ItemType extends { id: string }> {
 			const source = fetchFilled();
 			const boundaries = [];
 
-			if (showBounds) {
-				for (let packedPoint of fetchBoundaries()) {
-					const point = Point.unpackSingle(packedPoint);
-
-					if (point.x >= offset.x && point.x <= offset.x + size && point.y >= offset.y && point.y <= offset.y + size) {
-						boundaries.push(packedPoint);
-					}
-				}
-			}
+			if (showBounds) {}
 
 			const colors = new Map<ItemType, Color>();
 

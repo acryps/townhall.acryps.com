@@ -1,5 +1,6 @@
 import { Filler } from ".";
-import { Point } from "../../../interface/point";
+import { calculateDanwinstonShapePath } from "../../../interface/line";
+import { PackedPoint, Point } from "../../../interface/point";
 import { DbContext, Street } from "../../managed/database";
 
 export class StreetFiller extends Filler<Street> {
@@ -43,12 +44,20 @@ export class StreetFiller extends Filler<Street> {
 		return b.size - a.size;
 	}
 
-	async route(source: Street) {
-		const route = await source.activeRoute.fetch();
+	async fill(source: Street) {
+		const points = [];
+		const shape = Point.unpack((await source.activeRoute.fetch()).path);
+		const searchField = Point.searchMap(source.size);
 
-		return {
-			route: Point.unpack(route.path),
-			radius: source.size
-		};
+		for (let point of calculateDanwinstonShapePath(shape, false)) {
+			for (let offset of searchField) {
+				const target = point.add(offset);
+				const packed = target.pack();
+
+				points.push(packed);
+			}
+		}
+
+		return points;
 	}
 }

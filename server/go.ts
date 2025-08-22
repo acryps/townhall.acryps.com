@@ -24,6 +24,7 @@ export class GoInterface {
 					this.find(id, database.property, (id, item) => `/property/${id}`),
 					this.find(id, database.resident, (id, item) => `/resident/${item.tag}`),
 					this.find(id, database.street, id => `/street/${id}`),
+					this.find(id, database.waterBody, (id, item) => `/water/body/${item.tag}`),
 
 					// recurse
 					this.find(id, database.vote, (id, item) => `/go/${item.residentId}`),

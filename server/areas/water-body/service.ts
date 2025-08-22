@@ -46,6 +46,14 @@ export class WaterBodyService extends Service {
 		return water.tag;
 	}
 
+	async addArea(id: string, shape: string) {
+		const area = new WaterBodyArea();
+		area.shape = Point.pack(Point.unpack(shape));
+		area.waterBodyId = id;
+
+		await area.create();
+	}
+
 	async rename(id: string, name: string) {
 		const waterBody = await this.database.waterBody.find(id);
 		waterBody.name = name;

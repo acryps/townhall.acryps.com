@@ -11,11 +11,15 @@ export class WaterBodyTileServer extends FilledTileServer<WaterBody> {
 			app,
 			'water-body',
 
-			() => WaterBodyFiller.active.cached,
+			() => WaterBodyFiller.active.cached.filled,
+			() => WaterBodyFiller.active.cached.boundaries,
+
 			item => ({
 				fill: [0x9b, 0x92, 0xf4, 0xff],
 				stroke: [0x34, 0x25, 0xdb, 0xff]
-			})
+			}),
+
+			[0x9b, 0x92, 0xf4, 0x88]
 		);
 	}
 }

@@ -164,6 +164,7 @@ export interface WaterBodyViewModel {
     areas: WaterBodyAreaViewModel[];
 	id: string;
 	name: string;
+	tag: string;
 }
 
 export interface WaterBodyAreaViewModel {

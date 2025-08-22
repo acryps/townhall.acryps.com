@@ -2,6 +2,8 @@ import { Component } from "@acryps/page";
 import { WaterBodyService, WaterBodyViewModel } from "../../managed/services";
 import { BoundaryComponent } from "../../properties/property/boundary";
 import { WaterBody } from "../../../server/managed/database";
+import { addIcon } from "../../assets/icons/managed";
+import { Point } from "../../../interface/point";
 
 export class WaterBodyPage extends Component {
 	declare parameters: { tag };
@@ -13,6 +15,11 @@ export class WaterBodyPage extends Component {
 	}
 
 	render() {
+		const center = Point.center(
+			this.waterBody.areas
+				.flatMap(area => Point.unpack(area.shape))
+		).floor();
+
 		return <ui-water-body>
 			<ui-field>
 				<input
@@ -30,6 +37,12 @@ export class WaterBodyPage extends Component {
 					Water plots will automatically be generated based on the areas.
 					Any other plot will remove are from the water body.
 				</ui-hint>
+
+				<ui-actions>
+					<ui-action ui-href={`/map/${center.x}/${center.y}/5/create-water-body/${this.waterBody.tag}`}>
+						{addIcon()} Add Area
+					</ui-action>
+				</ui-actions>
 
 				{this.waterBody.areas.map(area => <ui-area ui-archived={!!area.archived}>
 					<ui-detail>

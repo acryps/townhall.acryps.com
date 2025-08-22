@@ -3,7 +3,13 @@ import { PackedPoint, Point } from "../../../interface/point";
 import { Logger } from "../../log";
 
 export abstract class Filler<SourceType> {
-	cached = new Map<PackedPoint, SourceType>;
+	cached: {
+		filled: Map<PackedPoint, SourceType>,
+		boundaries: PackedPoint[]
+	} = {
+		filled: new Map<PackedPoint, SourceType>,
+		boundaries: []
+	};
 
 	// removes anything filled by parents
 	after: { active: Filler<any> }[] = [];
@@ -45,16 +51,20 @@ export abstract class Filler<SourceType> {
 		for (let parent of this.after) {
 			const blocked = await parent.active.update();
 
-			for (let point of blocked.keys()) {
+			for (let point of blocked.filled.keys()) {
 				map.set(point, true);
 			}
 		}
 
 		// add items
+		const boundaries = [];
+
 		for (let item of source) {
 			const points = await this.fill(item);
 
 			for (let point of points) {
+				boundaries.push(point);
+
 				if (!map.has(point)) {
 					map.set(point, item);
 				}
@@ -68,6 +78,9 @@ export abstract class Filler<SourceType> {
 			}
 		}
 
-		return map as Map<PackedPoint, SourceType>;
+		return {
+			filled: map as Map<PackedPoint, SourceType>,
+			boundaries
+		};
 	}
 }

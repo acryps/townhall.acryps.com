@@ -3,6 +3,7 @@ import { WaterBody, WaterBodyArea } from "../managed/database";
 
 export class WaterBodyViewModel extends ViewModel<WaterBody> {
 	id;
+	tag;
 
 	name;
 

@@ -71,6 +71,7 @@ import { ReviewPage } from "./review";
 import { CreateWaterBodyPage } from "./water/create";
 import { WaterPage } from "./water";
 import { WaterBodyPage } from "./water/water-body";
+import { CreateWaterBodyAction } from "./map/create-water-body-area";
 
 export class Application {
 	static router: Router;
@@ -100,6 +101,8 @@ export class Application {
 
 				.route('/map/:x/:y/:zoom', MapPage
 					.route('/create-building/:id', CreateBuildingAction)
+					.route('/create-water-body/:tag', CreateWaterBodyAction)
+
 					.route('/edit-plot/:id', EditPlotAction)
 					.route('/edit-route/:id', EditRouteAction)
 					.route('/quick-valueation', QuickValueationAction)

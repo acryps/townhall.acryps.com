@@ -366,12 +366,14 @@ export class WaterBodyViewModel {
 	areas: WaterBodyAreaViewModel[];
 	id: string;
 	name: string;
+	tag: string;
 
 	private static $build(raw) {
 		const item = new WaterBodyViewModel();
 		raw.areas === undefined || (item.areas = raw.areas ? raw.areas.map(i => WaterBodyAreaViewModel["$build"](i)) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		
 		return item;
 	}
@@ -4680,6 +4682,26 @@ export class WaterBodyService {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
 				throw new Error(r.error);
+			}
+		});
+	}
+
+	async addArea(id: string, shape: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("ByZnU3am14ZHhzMGVnb2huazhuanxrdm", Service.stringify(id))
+		$data.append("NxczV2dTQ5a2NuY3k5YzVnYWY5ejVwcG", Service.stringify(shape))
+
+		return await fetch(Service.toURL("Z2N2FlOGd4eXFxeTd6cWdxOWhrbTFqaG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
 			}
 		});
 	}

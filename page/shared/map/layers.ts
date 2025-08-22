@@ -10,8 +10,12 @@ export const propertyLayer = MapLayer.fromShapeSource((x, y) => `/tile/property/
 export const propertyOwnershipLayer = MapLayer.fromShapeSource((x, y) => `/tile/property-ownership/${x}/${y}`, 500, 'source-over', true);
 export const boroughLayer = MapLayer.fromShapeSource((x, y) => `/tile/borough/${x}/${y}`, 500, 'source-over', true);
 export const propertyUsageLayer = MapLayer.fromShapeSource((x, y) => `/tile/usage/${x}/${y}`, 500, 'source-over', true);
+
 export const streetLayer = MapLayer.fromTileSource((x, y) => `/tile/street/${x}/${y}`, 500, 'source-over', (x, y) => `/pick/street/${x}/${y}`);
+export const streetBoundaryLayer = MapLayer.fromTileSource((x, y) => `/tile/street/${x}/${y}/boundary`, 500, 'source-over', (x, y) => `/pick/street/${x}/${y}`);
+
 export const waterLayer = MapLayer.fromTileSource((x, y) => `/tile/water-body/${x}/${y}`, 500, 'source-over', (x, y) => `/pick/water-body/${x}/${y}`);
+export const waterBoundaryLayer = MapLayer.fromTileSource((x, y) => `/tile/water-body/${x}/${y}/boundary`, 500, 'source-over', (x, y) => `/pick/water-body/${x}/${y}`);
 
 export const trainRoutesLayer = MapLayer.fromShapeSource((x, y) => `/tile/train-routes/${x}/${y}`, 500, 'source-over');
 export const trainRouteLayer = (code: string) => MapLayer.fromShapeSource((x, y) => `/tile/train-route/${code}/${x}/${y}`, 500, 'source-over');

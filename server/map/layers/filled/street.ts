@@ -11,11 +11,15 @@ export class StreetTileServer extends FilledTileServer<Street> {
 			app,
 			'street',
 
-			() => StreetFiller.active.cached,
+			() => StreetFiller.active.cached.filled,
+			() => StreetFiller.active.cached.boundaries,
+
 			item => ({
 				fill: [0xbc, 0xbc, 0xbc, 0xff],
 				stroke: [0x7c, 0x7c, 0x7c, 0x7c]
-			})
+			}),
+
+			[0xbc, 0xbc, 0xbc, 0x88]
 		);
 	}
 }

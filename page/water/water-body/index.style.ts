@@ -31,6 +31,16 @@ export const waterBodyStyle = () => child('ui-water-body',
 			fontSize(rem(0.8))
 		),
 
+		child('ui-actions',
+			display('flex'),
+			marginInline(pageGutter),
+			marginBottom(pageGutter),
+
+			child('ui-action',
+				buttonStyle()
+			)
+		),
+
 		child('ui-area',
 			display('flex'),
 			padding(pageGutter),

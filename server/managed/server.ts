@@ -1855,6 +1855,19 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"Z2N2FlOGd4eXFxeTd6cWdxOWhrbTFqaG",
+			{
+			"ByZnU3am14ZHhzMGVnb2huazhuanxrdm": { type: "string", isArray: false, isOptional: false },
+				"NxczV2dTQ5a2NuY3k5YzVnYWY5ejVwcG": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(WaterBodyService),
+			(controller, params) => controller.addArea(
+				params["ByZnU3am14ZHhzMGVnb2huazhuanxrdm"],
+				params["NxczV2dTQ5a2NuY3k5YzVnYWY5ejVwcG"]
+			)
+		);
+
+		this.expose(
 			"lzeXBpN3ZkNzh2ZDRjcG52a2V5NGp1cm",
 			{
 			"NmdGFuYzU2dnR5YTlmYz4ya2ZzMzg2bG": { type: "string", isArray: false, isOptional: false },
@@ -3374,7 +3387,8 @@ ViewModel.mappings = {
 			return {
 				areas: (await this.$$model.areas.includeTree(ViewModel.mappings[WaterBodyAreaViewModel.name].items).toArray()).map(item => new WaterBodyAreaViewModel(item)),
 				id: this.$$model.id,
-				name: this.$$model.name
+				name: this.$$model.name,
+				tag: this.$$model.tag
 			}
 		};
 
@@ -3411,7 +3425,8 @@ ViewModel.mappings = {
 					);
 				},
 				id: true,
-				name: true
+				name: true,
+				tag: true
 			};
 		};
 
@@ -3420,6 +3435,7 @@ ViewModel.mappings = {
 			"areas" in data && (item.areas = data.areas && [...data.areas].map(i => ViewModel.mappings[WaterBodyAreaViewModel.name].toViewModel(i)));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 
 			return item;
 		}
@@ -3436,6 +3452,7 @@ ViewModel.mappings = {
 			"areas" in viewModel && (null);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 
 			return model;
 		}

@@ -2,11 +2,11 @@ import { select, style, content, Font, fontFamily, fontWeight, fontStyle } from 
 
 
 export const iconFont = new Font('icons', fontWeight('normal'), fontStyle('normal'))
-	.addSource('/assets/icons/managed/font/index.eot?56803e99abcd', 'embedded-opentype')
-	.addSource('/assets/icons/managed/font/index.svg?d7f051b0af67', 'svg')
-	.addSource('/assets/icons/managed/font/index.ttf?430f5b718312', 'truetype')
-	.addSource('/assets/icons/managed/font/index.woff?5ccc1d03a109', 'woff')
-	.addSource('/assets/icons/managed/font/index.woff2?4745a78ea791', 'woff2');
+	.addSource('/assets/icons/managed/font/index.eot?c9449c40a454', 'embedded-opentype')
+	.addSource('/assets/icons/managed/font/index.svg?fb304572d94a', 'svg')
+	.addSource('/assets/icons/managed/font/index.ttf?8ef0a7413221', 'truetype')
+	.addSource('/assets/icons/managed/font/index.woff?90077d80f0a1', 'woff')
+	.addSource('/assets/icons/managed/font/index.woff2?c82949201dbe', 'woff2');
 
 export const icons = () => select('ui-icon',
 	fontFamily(iconFont.name),
@@ -30,25 +30,26 @@ export const icons = () => select('ui-icon',
 	style('[ui-item-context]').before('\f10e'),
 	style('[ui-law]').before('\f10f'),
 	style('[ui-map]').before('\f110'),
-	style('[ui-metric]').before('\f111'),
-	style('[ui-military]').before('\f112'),
-	style('[ui-movement]').before('\f113'),
-	style('[ui-oracle]').before('\f114'),
-	style('[ui-plan]').before('\f115'),
-	style('[ui-price]').before('\f116'),
-	style('[ui-property-register]').before('\f117'),
-	style('[ui-publication]').before('\f118'),
-	style('[ui-relation-graph]').before('\f119'),
-	style('[ui-relation]').before('\f11a'),
-	style('[ui-resident]').before('\f11b'),
-	style('[ui-route-interchange]').before('\f11c'),
-	style('[ui-speak]').before('\f11d'),
-	style('[ui-state]').before('\f11e'),
-	style('[ui-street]').before('\f11f'),
-	style('[ui-time-machine]').before('\f120'),
-	style('[ui-train]').before('\f121'),
-	style('[ui-undo]').before('\f122'),
-	style('[ui-water]').before('\f123'),
+	style('[ui-market]').before('\f111'),
+	style('[ui-metric]').before('\f112'),
+	style('[ui-military]').before('\f113'),
+	style('[ui-movement]').before('\f114'),
+	style('[ui-oracle]').before('\f115'),
+	style('[ui-plan]').before('\f116'),
+	style('[ui-price]').before('\f117'),
+	style('[ui-property-register]').before('\f118'),
+	style('[ui-publication]').before('\f119'),
+	style('[ui-relation-graph]').before('\f11a'),
+	style('[ui-relation]').before('\f11b'),
+	style('[ui-resident]').before('\f11c'),
+	style('[ui-route-interchange]').before('\f11d'),
+	style('[ui-speak]').before('\f11e'),
+	style('[ui-state]').before('\f11f'),
+	style('[ui-street]').before('\f120'),
+	style('[ui-time-machine]').before('\f121'),
+	style('[ui-train]').before('\f122'),
+	style('[ui-undo]').before('\f123'),
+	style('[ui-water]').before('\f124'),
 );
 
 const createIconElement = (name: string) => {
@@ -74,6 +75,7 @@ export const homeIcon = () => createIconElement('home');
 export const itemContextIcon = () => createIconElement('item-context');
 export const lawIcon = () => createIconElement('law');
 export const mapIcon = () => createIconElement('map');
+export const marketIcon = () => createIconElement('market');
 export const metricIcon = () => createIconElement('metric');
 export const militaryIcon = () => createIconElement('military');
 export const movementIcon = () => createIconElement('movement');

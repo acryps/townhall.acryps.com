@@ -73,6 +73,12 @@ import { ResidentTickerModel } from "././../areas/life/ticker";
 import { NameFrequency } from "././../areas/life/name-frequency";
 import { NameFrequencyViewModel } from "././../areas/life/name-frequency";
 import { LifeService } from "././../areas/life/service";
+import { MarketManager } from "././../market/manager";
+import { MarketTracker } from "././../market/tracker";
+import { CommoditySummaryModel } from "././../areas/market/commodity";
+import { LiveCommodityTickerModel } from "././../areas/market/ticker";
+import { LiveCommodityTickerResponseModel } from "././../areas/market/ticker";
+import { MarketService } from "././../areas/market/service";
 import { MetricTracker } from "././../areas/metrics/tracker";
 import { MetricValueViewModel } from "././../areas/metrics/view";
 import { MetricViewModel } from "././../areas/metrics/view";
@@ -192,6 +198,7 @@ import { LawHouseSessionProtocol } from "./../managed/database";
 import { LegalEntity } from "./../managed/database";
 import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
+import { Commodity } from "./../managed/database";
 import { Metric } from "./../managed/database";
 import { MetricValue } from "./../managed/database";
 import { MilitaryUnit } from "./../managed/database";
@@ -267,6 +274,18 @@ Inject.mappings = {
 	},
 	"LifeService": {
 		objectConstructor: LifeService,
+		parameters: ["DbContext"]
+	},
+	"MarketService": {
+		objectConstructor: MarketService,
+		parameters: ["DbContext","MarketManager","MarketTracker"]
+	},
+	"MarketManager": {
+		objectConstructor: MarketManager,
+		parameters: ["DbContext"]
+	},
+	"MarketTracker": {
+		objectConstructor: MarketTracker,
 		parameters: ["DbContext"]
 	},
 	"MetricService": {
@@ -974,6 +993,24 @@ export class ManagedServer extends BaseServer {
 			{},
 			inject => inject.construct(LifeService),
 			(controller, params) => controller.listFamilyNameFrequencies(
+				
+			)
+		);
+
+		this.expose(
+			"lvNX91azNidWk1ZX91cW5tdmdmbjkyaG",
+			{},
+			inject => inject.construct(MarketService),
+			(controller, params) => controller.getCommodities(
+				
+			)
+		);
+
+		this.expose(
+			"ozOXR2dDVhZmxvc2RndmJqMWRuN3A5aT",
+			{},
+			inject => inject.construct(MarketService),
+			(controller, params) => controller.getTickers(
 				
 			)
 		);
@@ -5269,6 +5306,152 @@ ViewModel.mappings = {
 			"timestamp" in viewModel && (model.timestamp = viewModel.timestamp === null ? null : new Date(viewModel.timestamp));
 			"primaryResidentId" in viewModel && (model.primaryResidentId = viewModel.primaryResidentId === null ? null : `${viewModel.primaryResidentId}`);
 			"action" in viewModel && (model.action = viewModel.action === null ? null : `${viewModel.action}`);
+
+			return model;
+		}
+	},
+	[CommoditySummaryModel.name]: class ComposedCommoditySummaryModel extends CommoditySummaryModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				name: this.$$model.name
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				name: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new CommoditySummaryModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: CommoditySummaryModel) {
+			let model: Commodity;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Commodity).find(viewModel.id)
+			} else {
+				model = new Commodity();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+
+			return model;
+		}
+	},
+	[LiveCommodityTickerResponseModel.name]: class ComposedLiveCommodityTickerResponseModel extends LiveCommodityTickerResponseModel {
+		async map() {
+			return {
+				commodityId: this.$$model.commodityId,
+				askLow: this.$$model.askLow,
+				askMedian: this.$$model.askMedian,
+				askHigh: this.$$model.askHigh,
+				askVolume: this.$$model.askVolume,
+				bidLow: this.$$model.bidLow,
+				bidMedian: this.$$model.bidMedian,
+				bidHigh: this.$$model.bidHigh,
+				bidVolume: this.$$model.bidVolume
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				commodityId: true,
+				askLow: true,
+				askMedian: true,
+				askHigh: true,
+				askVolume: true,
+				bidLow: true,
+				bidMedian: true,
+				bidHigh: true,
+				bidVolume: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new LiveCommodityTickerResponseModel(null);
+			"commodityId" in data && (item.commodityId = data.commodityId === null ? null : `${data.commodityId}`);
+			"askLow" in data && (item.askLow = data.askLow === null ? null : +data.askLow);
+			"askMedian" in data && (item.askMedian = data.askMedian === null ? null : +data.askMedian);
+			"askHigh" in data && (item.askHigh = data.askHigh === null ? null : +data.askHigh);
+			"askVolume" in data && (item.askVolume = data.askVolume === null ? null : +data.askVolume);
+			"bidLow" in data && (item.bidLow = data.bidLow === null ? null : +data.bidLow);
+			"bidMedian" in data && (item.bidMedian = data.bidMedian === null ? null : +data.bidMedian);
+			"bidHigh" in data && (item.bidHigh = data.bidHigh === null ? null : +data.bidHigh);
+			"bidVolume" in data && (item.bidVolume = data.bidVolume === null ? null : +data.bidVolume);
+
+			return item;
+		}
+
+		static async toModel(viewModel: LiveCommodityTickerResponseModel) {
+			const model = new LiveCommodityTickerModel();
+			
+			"commodityId" in viewModel && (model.commodityId = viewModel.commodityId === null ? null : `${viewModel.commodityId}`);
+			"askLow" in viewModel && (model.askLow = viewModel.askLow === null ? null : +viewModel.askLow);
+			"askMedian" in viewModel && (model.askMedian = viewModel.askMedian === null ? null : +viewModel.askMedian);
+			"askHigh" in viewModel && (model.askHigh = viewModel.askHigh === null ? null : +viewModel.askHigh);
+			"askVolume" in viewModel && (model.askVolume = viewModel.askVolume === null ? null : +viewModel.askVolume);
+			"bidLow" in viewModel && (model.bidLow = viewModel.bidLow === null ? null : +viewModel.bidLow);
+			"bidMedian" in viewModel && (model.bidMedian = viewModel.bidMedian === null ? null : +viewModel.bidMedian);
+			"bidHigh" in viewModel && (model.bidHigh = viewModel.bidHigh === null ? null : +viewModel.bidHigh);
+			"bidVolume" in viewModel && (model.bidVolume = viewModel.bidVolume === null ? null : +viewModel.bidVolume);
 
 			return model;
 		}

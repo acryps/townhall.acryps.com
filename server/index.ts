@@ -50,6 +50,10 @@ import { MinimapGenerator } from "./map/minimap";
 import { Logger } from "./log";
 import { WaterBodyTileServer } from "./map/layers/filled/water";
 import { WaterBodyFiller } from "./map/fill/water";
+import { TradingEntity } from "./market/entity";
+import { MarketTracker } from "./market/tracker";
+import { MarketIterationGenerator } from "./market/iterate";
+import { advanceMarket } from "./market/iterate/cycle";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -73,6 +77,81 @@ DbClient.connectedClient.connect().then(async () => {
 	const database = new DbContext(new RunContext());
 
 	ScheduledEpoch.import(await database.epoch.toArray());
+
+	// market experiments
+
+	const marketTracker = new MarketTracker(database);
+	await marketTracker.update();
+
+	marketTracker.dump();
+
+	/*
+	// while (1) {
+		// await advanceMarket(database, marketTracker);
+		//}
+
+	let entities: string[] = [];
+
+	for (let trade of await database.trade.toArray()) {
+		entities.push(trade.buyerId);
+	}
+
+	for (let ask of await database.tradeAsk.toArray()) {
+		entities.push(ask.askerId);
+	}
+
+	for (let bid of await database.tradeBid.toArray()) {
+		entities.push(bid.bidderId);
+	}
+
+	for (let production of await database.production.toArray()) {
+		entities.push(production.producerId);
+	}
+
+	entities = [...new Set(entities)];
+
+	const commodities = await database.commodity.toArray();
+
+	for (let entityId of entities) {
+		const entity = await database.legalEntity.find(entityId);
+		const trader = await TradingEntity.from(entity, database);
+
+		const income = await trader.getIncome();
+		const expenses = await trader.getExpenses();
+
+		if (income || expenses) {
+			console.group(trader.name);
+
+			console.log(`income = ${income}`)
+			console.log(`expenses = ${expenses}`)
+
+			for (let [asset, amount] of await trader.getStock()) {
+				console.log(`asset '${asset.name}' = ${amount} ${asset.unit}`);
+			}
+
+			for (let bid of await entity.bids.toArray()) {
+				const commodity = commodities.find(commodity => commodity.id == bid.commodityId);
+
+				console.log(`bid ${commodity.name}: ${bid.price} * ${bid.quantity} ${commodity.unit} = ${bid.price * bid.quantity}`);
+			}
+
+			for (let ask of await entity.asks.toArray()) {
+				const commodity = commodities.find(commodity => commodity.id == ask.commodityId);
+
+				console.group(`ask ${commodity.name}: ${ask.price} * ${ask.quantity} ${commodity.unit} = ${ask.price * ask.quantity}`);
+
+				for (let trade of await ask.trades.toArray()) {
+					console.log(`trade ${trade.tag} = ${trade.booked?.toLocaleDateString()} ${trade.price} * ${trade.quantity} ${commodity.unit} = ${trade.price * trade.quantity}`)
+				}
+
+				console.groupEnd();
+			}
+
+			console.groupEnd();
+		}
+	}
+
+	*/
 
 	await registerMetrics(database);
 	await MetricTracker.executeTask();
@@ -202,7 +281,8 @@ DbClient.connectedClient.connect().then(async () => {
 		Context: context,
 		DbContext: database,
 		Life: life,
-		LawHouse: lawHouse
+		LawHouse: lawHouse,
+		MarketTracker: marketTracker
 	});
 
 	new GoInterface(app, database);

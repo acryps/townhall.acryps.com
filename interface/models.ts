@@ -344,6 +344,23 @@ export interface ResidentTickerModel {
 	action: string;
 }
 
+export interface CommoditySummaryModel {
+    id: string;
+	name: string;
+}
+
+export interface LiveCommodityTickerResponseModel {
+    commodityId: string;
+	askLow: number;
+	askMedian: number;
+	askHigh: number;
+	askVolume: number;
+	bidLow: number;
+	bidMedian: number;
+	bidHigh: number;
+	bidVolume: number;
+}
+
 export interface MetricViewModel {
     description: string;
 	id: string;

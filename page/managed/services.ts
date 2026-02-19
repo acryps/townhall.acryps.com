@@ -808,6 +808,46 @@ export class ResidentTickerModel {
 	}
 }
 
+export class CommoditySummaryModel {
+	id: string;
+	name: string;
+
+	private static $build(raw) {
+		const item = new CommoditySummaryModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		
+		return item;
+	}
+}
+
+export class LiveCommodityTickerResponseModel {
+	commodityId: string;
+	askLow: number;
+	askMedian: number;
+	askHigh: number;
+	askVolume: number;
+	bidLow: number;
+	bidMedian: number;
+	bidHigh: number;
+	bidVolume: number;
+
+	private static $build(raw) {
+		const item = new LiveCommodityTickerResponseModel();
+		raw.commodityId === undefined || (item.commodityId = raw.commodityId === null ? null : `${raw.commodityId}`)
+		raw.askLow === undefined || (item.askLow = raw.askLow === null ? null : +raw.askLow)
+		raw.askMedian === undefined || (item.askMedian = raw.askMedian === null ? null : +raw.askMedian)
+		raw.askHigh === undefined || (item.askHigh = raw.askHigh === null ? null : +raw.askHigh)
+		raw.askVolume === undefined || (item.askVolume = raw.askVolume === null ? null : +raw.askVolume)
+		raw.bidLow === undefined || (item.bidLow = raw.bidLow === null ? null : +raw.bidLow)
+		raw.bidMedian === undefined || (item.bidMedian = raw.bidMedian === null ? null : +raw.bidMedian)
+		raw.bidHigh === undefined || (item.bidHigh = raw.bidHigh === null ? null : +raw.bidHigh)
+		raw.bidVolume === undefined || (item.bidVolume = raw.bidVolume === null ? null : +raw.bidVolume)
+		
+		return item;
+	}
+}
+
 export class MetricViewModel {
 	description: string;
 	id: string;
@@ -3120,6 +3160,50 @@ export class LifeService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : NameFrequencyViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class MarketService {
+	async getCommodities(): Promise<Array<CommoditySummaryModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("lvNX91azNidWk1ZX91cW5tdmdmbjkyaG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : CommoditySummaryModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getTickers(): Promise<Array<LiveCommodityTickerResponseModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("ozOXR2dDVhZmxvc2RndmJqMWRuN3A5aT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : LiveCommodityTickerResponseModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

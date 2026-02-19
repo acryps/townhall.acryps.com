@@ -37,6 +37,7 @@ import { militaryStyle } from "./military/index.style";
 import { reviewStyle } from "./review/index.style";
 import { createWaterBodyStyle } from "./water/create/index.style";
 import { waterStyle } from "./water/index.style";
+import { marketStyle } from "./market/index.style";
 
 export const pageStyle = () => root(
 	boldFont,
@@ -128,6 +129,8 @@ export const pageStyle = () => root(
 				writeArticleStyle(),
 
 				oracleStyle(),
+
+				marketStyle(),
 
 				metricsStyle(),
 

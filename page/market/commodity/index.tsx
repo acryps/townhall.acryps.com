@@ -57,7 +57,26 @@ export class CommodityPage extends Component {
 		const min = Math.min(...positions.map(position => position.price * position.quantity));
 		const max = Math.max(...positions.map(position => position.price * position.quantity));
 
+		const total = positions.reduce((sum, position) => sum + position.price * position.quantity, 0);
+		const volume = positions.reduce((sum, position) => sum + position.price * position.quantity, 0);
+
+		const average = total / volume;
+
 		return <ui-positions>
+			<ui-header>
+				<ui-name>
+					{name}
+				</ui-name>
+
+				{!!volume && <ui-average>
+					ø {convertToCurrency(average)}
+				</ui-average>}
+			</ui-header>
+
+			<ui-description>
+				{description}
+			</ui-description>
+
 			{positions.map(position => <ui-position>
 				<ui-indicator
 					style={positionIntensity.provide(

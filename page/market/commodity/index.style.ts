@@ -1,4 +1,4 @@
-import { backgroundColor, ch, child, display, flexBasis, flexGrow, flexShrink, fontSize, gap, height, hsl, lineHeight, marginBottom, marginLeft, marginRight, overflow, percentage, Percentage, px, rem, rgb, textAlign, textOverflow, Variable, whiteSpace, width } from "@acryps/style";
+import { backgroundColor, ch, child, display, flexBasis, flexGrow, flexShrink, fontSize, fontWeight, gap, height, hsl, justifyContent, lineHeight, marginBottom, marginLeft, marginRight, overflow, percentage, Percentage, px, rem, rgb, textAlign, textOverflow, Variable, whiteSpace, width } from "@acryps/style";
 import { pageGutter } from "../../index.style";
 
 export const positionIntensity = new Variable<Number>('intensity');
@@ -29,6 +29,21 @@ export const commodityStyle = () => child('ui-commodity',
 
 			display('block'),
 			overflow('hidden'),
+
+			child('ui-header',
+				display('flex'),
+				justifyContent('space-between'),
+				marginBottom(rem(0.25)),
+
+				child('ui-name',
+					fontWeight('bold')
+				)
+			),
+
+			child('ui-description',
+				display('block'),
+				marginBottom(pageGutter)
+			),
 
 			child('ui-position',
 				display('flex'),

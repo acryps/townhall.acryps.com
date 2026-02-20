@@ -42,6 +42,8 @@ export class MarketInnovator extends MarketIterationGenerator {
 				}
 
 				const innovation = new Commodity();
+				innovation.tag = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
 				innovation.innovated = new Date();
 				innovation.name = name;
 				innovation.description = description;

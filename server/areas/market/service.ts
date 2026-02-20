@@ -1,8 +1,8 @@
 import { Service } from "vlserver";
-import { DbContext } from "../../managed/database";
+import { Commodity, DbContext } from "../../managed/database";
 import { MarketManager } from "../../market/manager";
 import { MarketTracker } from "../../market/tracker";
-import { CommoditySummaryModel } from "./commodity";
+import { CommoditySummaryModel, CommodityViewModel } from "./commodity";
 import { LiveCommodityTickerModel, LiveCommodityTickerResponseModel } from "./ticker";
 
 export class MarketService extends Service {
@@ -19,6 +19,12 @@ export class MarketService extends Service {
 			this.database.commodity
 				.orderByAscending(commodity => commodity.name)
 		);
+	}
+
+	async getCommodity(tag: string) {
+		return new CommodityViewModel(
+			await this.database.commodity.first(commodity => commodity.tag.valueOf() == tag)
+		)
 	}
 
 	getTickers() {

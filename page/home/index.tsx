@@ -4,7 +4,7 @@ import { OnlinePlayerComponent } from "./online";
 import { boroughColor } from "./index.style";
 import { hex } from "@acryps/style";
 import { BannerComponent } from "../banner";
-import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, metricIcon, militaryIcon, oracleIcon, planIcon, priceIcon, propertyRegisterIcon, publicationIcon, residentIcon, trainIcon } from "../assets/icons/managed";
+import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, marketIcon, metricIcon, militaryIcon, oracleIcon, planIcon, priceIcon, propertyRegisterIcon, publicationIcon, residentIcon, trainIcon } from "../assets/icons/managed";
 import { Point } from "../../interface/point";
 import { ImpressionsComponent } from "./impressions";
 import { ArticleNewstickerModel, ArticlePreviewModel, PublicationService } from "../managed/services";
@@ -86,6 +86,18 @@ export class HomePage extends Component {
 
 					<ui-description>
 						See key values and trends
+					</ui-description>
+				</ui-topic>
+
+				<ui-topic ui-href='/market'>
+					{marketIcon()}
+
+					<ui-name>
+						Market
+					</ui-name>
+
+					<ui-description>
+						View how the free market innovates to supply the demand.
 					</ui-description>
 				</ui-topic>
 

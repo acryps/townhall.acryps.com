@@ -49,7 +49,7 @@ export class CommodityTickerComponent extends Component {
 	}
 
 	render() {
-		return <ui-commodity>
+		return <ui-commodity ui-href={`commodity/${this.commodity.tag}`}>
 			<ui-detail>
 				<ui-header>
 					<ui-name>

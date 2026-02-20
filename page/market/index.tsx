@@ -74,7 +74,17 @@ export class MarketPage extends Component {
 		}
 	}
 
-	render() {
+	render(child) {
+		if (child) {
+			return <ui-market>
+				<ui-header ui-href='/market'>
+					{marketIcon()} Market
+				</ui-header>
+
+				{child}
+			</ui-market>
+		}
+
 		this.search = <input
 			type='search'
 			placeholder='Search...'
@@ -88,7 +98,7 @@ export class MarketPage extends Component {
 		})
 
 		return <ui-market>
-			<ui-header ui-href='/law-house'>
+			<ui-header ui-href='/market'>
 				{marketIcon()} Market
 			</ui-header>
 

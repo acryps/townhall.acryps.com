@@ -73,9 +73,11 @@ import { ResidentTickerModel } from "././../areas/life/ticker";
 import { NameFrequency } from "././../areas/life/name-frequency";
 import { NameFrequencyViewModel } from "././../areas/life/name-frequency";
 import { LifeService } from "././../areas/life/service";
+import { Commodity } from "././database";
 import { MarketManager } from "././../market/manager";
 import { MarketTracker } from "././../market/tracker";
 import { CommoditySummaryModel } from "././../areas/market/commodity";
+import { CommodityViewModel } from "././../areas/market/commodity";
 import { LiveCommodityTickerModel } from "././../areas/market/ticker";
 import { LiveCommodityTickerResponseModel } from "././../areas/market/ticker";
 import { MarketService } from "././../areas/market/service";
@@ -158,6 +160,9 @@ import { ItemContextSummaryModel } from "./../areas/item-context/context";
 import { LawHouseSessionaryViewModel } from "./../areas/law-house/session";
 import { LawHouseSessionProtocolViewModel } from "./../areas/law-house/session";
 import { TenancyViewModel } from "./../areas/life/resident";
+import { AskViewModel } from "./../areas/market/ask";
+import { BidViewModel } from "./../areas/market/bid";
+import { CommodityCategorySummaryModel } from "./../areas/market/commodity";
 import { OracleProposalSummaryModel } from "./../areas/oracle/proposal";
 import { PlanSummaryModel } from "./../areas/plan/plan";
 import { PlanShapeViewModel } from "./../areas/plan/plan";
@@ -198,7 +203,9 @@ import { LawHouseSessionProtocol } from "./../managed/database";
 import { LegalEntity } from "./../managed/database";
 import { Resident } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
-import { Commodity } from "./../managed/database";
+import { TradeAsk } from "./../managed/database";
+import { TradeBid } from "./../managed/database";
+import { CommodityCategory } from "./../managed/database";
 import { Metric } from "./../managed/database";
 import { MetricValue } from "./../managed/database";
 import { MilitaryUnit } from "./../managed/database";
@@ -286,7 +293,7 @@ Inject.mappings = {
 	},
 	"MarketTracker": {
 		objectConstructor: MarketTracker,
-		parameters: ["DbContext"]
+		parameters: ["Logger","DbContext"]
 	},
 	"MetricService": {
 		objectConstructor: MetricService,
@@ -1003,6 +1010,17 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(MarketService),
 			(controller, params) => controller.getCommodities(
 				
+			)
+		);
+
+		this.expose(
+			"gzZWZkbmlnMHdrYnc3OD92MGQ5N2lwNn",
+			{
+			"NrZzYyMjUyM3JrZGpkc2NtdDF6anllZH": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(MarketService),
+			(controller, params) => controller.getCommodity(
+				params["NrZzYyMjUyM3JrZGpkc2NtdDF6anllZH"]
 			)
 		);
 
@@ -5310,6 +5328,164 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[AskViewModel.name]: class ComposedAskViewModel extends AskViewModel {
+		async map() {
+			return {
+				asker: new LegalEntityViewModel(await BaseServer.unwrap(this.$$model.asker)),
+				id: this.$$model.id,
+				posted: this.$$model.posted,
+				price: this.$$model.price,
+				quantity: this.$$model.quantity
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get asker() {
+					return ViewModel.mappings[LegalEntityViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "asker-AskViewModel"]
+					);
+				},
+				id: true,
+				posted: true,
+				price: true,
+				quantity: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new AskViewModel(null);
+			"asker" in data && (item.asker = data.asker && ViewModel.mappings[LegalEntityViewModel.name].toViewModel(data.asker));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"posted" in data && (item.posted = data.posted === null ? null : new Date(data.posted));
+			"price" in data && (item.price = data.price === null ? null : +data.price);
+			"quantity" in data && (item.quantity = data.quantity === null ? null : +data.quantity);
+
+			return item;
+		}
+
+		static async toModel(viewModel: AskViewModel) {
+			let model: TradeAsk;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(TradeAsk).find(viewModel.id)
+			} else {
+				model = new TradeAsk();
+			}
+			
+			"asker" in viewModel && (model.asker.id = viewModel.asker ? viewModel.asker.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"posted" in viewModel && (model.posted = viewModel.posted === null ? null : new Date(viewModel.posted));
+			"price" in viewModel && (model.price = viewModel.price === null ? null : +viewModel.price);
+			"quantity" in viewModel && (model.quantity = viewModel.quantity === null ? null : +viewModel.quantity);
+
+			return model;
+		}
+	},
+	[BidViewModel.name]: class ComposedBidViewModel extends BidViewModel {
+		async map() {
+			return {
+				bidder: new LegalEntityViewModel(await BaseServer.unwrap(this.$$model.bidder)),
+				id: this.$$model.id,
+				posted: this.$$model.posted,
+				price: this.$$model.price,
+				quantity: this.$$model.quantity
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get bidder() {
+					return ViewModel.mappings[LegalEntityViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "bidder-BidViewModel"]
+					);
+				},
+				id: true,
+				posted: true,
+				price: true,
+				quantity: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new BidViewModel(null);
+			"bidder" in data && (item.bidder = data.bidder && ViewModel.mappings[LegalEntityViewModel.name].toViewModel(data.bidder));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"posted" in data && (item.posted = data.posted === null ? null : new Date(data.posted));
+			"price" in data && (item.price = data.price === null ? null : +data.price);
+			"quantity" in data && (item.quantity = data.quantity === null ? null : +data.quantity);
+
+			return item;
+		}
+
+		static async toModel(viewModel: BidViewModel) {
+			let model: TradeBid;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(TradeBid).find(viewModel.id)
+			} else {
+				model = new TradeBid();
+			}
+			
+			"bidder" in viewModel && (model.bidder.id = viewModel.bidder ? viewModel.bidder.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"posted" in viewModel && (model.posted = viewModel.posted === null ? null : new Date(viewModel.posted));
+			"price" in viewModel && (model.price = viewModel.price === null ? null : +viewModel.price);
+			"quantity" in viewModel && (model.quantity = viewModel.quantity === null ? null : +viewModel.quantity);
+
+			return model;
+		}
+	},
 	[CommoditySummaryModel.name]: class ComposedCommoditySummaryModel extends CommoditySummaryModel {
 		async map() {
 			return {
@@ -5376,6 +5552,68 @@ ViewModel.mappings = {
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 			"unit" in viewModel && (model.unit = viewModel.unit === null ? null : `${viewModel.unit}`);
+
+			return model;
+		}
+	},
+	[CommodityCategorySummaryModel.name]: class ComposedCommodityCategorySummaryModel extends CommodityCategorySummaryModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				name: this.$$model.name
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				name: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new CommodityCategorySummaryModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: CommodityCategorySummaryModel) {
+			let model: CommodityCategory;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(CommodityCategory).find(viewModel.id)
+			} else {
+				model = new CommodityCategory();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 
 			return model;
 		}
@@ -8609,6 +8847,107 @@ ViewModel.mappings = {
 			"ended" in viewModel && (model.ended = viewModel.ended === null ? null : new Date(viewModel.ended));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"started" in viewModel && (model.started = viewModel.started === null ? null : new Date(viewModel.started));
+
+			return model;
+		}
+	},
+	[CommodityViewModel.name]: class ComposedCommodityViewModel extends CommodityViewModel {
+		async map() {
+			return {
+				category: new CommodityCategorySummaryModel(await BaseServer.unwrap(this.$$model.category)),
+				asks: (await this.$$model.asks.includeTree(ViewModel.mappings[AskViewModel.name].items).toArray()).map(item => new AskViewModel(item)),
+				bids: (await this.$$model.bids.includeTree(ViewModel.mappings[BidViewModel.name].items).toArray()).map(item => new BidViewModel(item)),
+				id: this.$$model.id,
+				innovated: this.$$model.innovated,
+				name: this.$$model.name,
+				tag: this.$$model.tag,
+				unit: this.$$model.unit
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get category() {
+					return ViewModel.mappings[CommodityCategorySummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "category-CommodityViewModel"]
+					);
+				},
+				get asks() {
+					return ViewModel.mappings[AskViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "asks-CommodityViewModel"]
+					);
+				},
+				get bids() {
+					return ViewModel.mappings[BidViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "bids-CommodityViewModel"]
+					);
+				},
+				id: true,
+				innovated: true,
+				name: true,
+				tag: true,
+				unit: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new CommodityViewModel(null);
+			"category" in data && (item.category = data.category && ViewModel.mappings[CommodityCategorySummaryModel.name].toViewModel(data.category));
+			"asks" in data && (item.asks = data.asks && [...data.asks].map(i => ViewModel.mappings[AskViewModel.name].toViewModel(i)));
+			"bids" in data && (item.bids = data.bids && [...data.bids].map(i => ViewModel.mappings[BidViewModel.name].toViewModel(i)));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"innovated" in data && (item.innovated = data.innovated === null ? null : new Date(data.innovated));
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
+			"unit" in data && (item.unit = data.unit === null ? null : `${data.unit}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: CommodityViewModel) {
+			let model: Commodity;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Commodity).find(viewModel.id)
+			} else {
+				model = new Commodity();
+			}
+			
+			"category" in viewModel && (model.category.id = viewModel.category ? viewModel.category.id : null);
+			"asks" in viewModel && (null);
+			"bids" in viewModel && (null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"innovated" in viewModel && (model.innovated = viewModel.innovated === null ? null : new Date(viewModel.innovated));
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
+			"unit" in viewModel && (model.unit = viewModel.unit === null ? null : `${viewModel.unit}`);
 
 			return model;
 		}

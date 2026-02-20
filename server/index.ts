@@ -79,8 +79,9 @@ DbClient.connectedClient.connect().then(async () => {
 	ScheduledEpoch.import(await database.epoch.toArray());
 
 	// market experiments
+	const marketLogger = new Logger('market');
 
-	const marketTracker = new MarketTracker(database);
+	const marketTracker = new MarketTracker(new Logger('tracker', marketLogger), database);
 	await marketTracker.update();
 
 	marketTracker.dump();

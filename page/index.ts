@@ -73,6 +73,7 @@ import { WaterPage } from "./water";
 import { WaterBodyPage } from "./water/water-body";
 import { CreateWaterBodyAction } from "./map/create-water-body-area";
 import { MarketPage } from "./market";
+import { CommodityPage } from "./market/commodity";
 
 export class Application {
 	static router: Router;
@@ -145,7 +146,9 @@ export class Application {
 				.route('/news/publication/:tag', PublicationPage)
 				.route('/news', NewsPage)
 
-				.route('/market', MarketPage)
+				.route('/market', MarketPage
+					.route('/commodity/:tag', CommodityPage)
+				)
 
 				.route('/oracle', OraclePage)
 

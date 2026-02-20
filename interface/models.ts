@@ -344,11 +344,32 @@ export interface ResidentTickerModel {
 	action: string;
 }
 
+export interface AskViewModel {
+    asker: LegalEntityViewModel;
+	id: string;
+	posted: Date;
+	price: number;
+	quantity: number;
+}
+
+export interface BidViewModel {
+    bidder: LegalEntityViewModel;
+	id: string;
+	posted: Date;
+	price: number;
+	quantity: number;
+}
+
 export interface CommoditySummaryModel {
     id: string;
 	name: string;
 	tag: string;
 	unit: string;
+}
+
+export interface CommodityCategorySummaryModel {
+    id: string;
+	name: string;
 }
 
 export interface LiveCommodityTickerResponseModel {
@@ -678,6 +699,17 @@ export interface LawHouseSessionViewModel {
 	ended: Date;
 	id: string;
 	started: Date;
+}
+
+export interface CommodityViewModel {
+    category: CommodityCategorySummaryModel;
+	asks: AskViewModel[];
+	bids: BidViewModel[];
+	id: string;
+	innovated: Date;
+	name: string;
+	tag: string;
+	unit: string;
 }
 
 export interface MilitaryUnitViewModel {

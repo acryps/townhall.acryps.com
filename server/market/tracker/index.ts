@@ -4,11 +4,13 @@ import { TradeService } from "../../areas/trade/service";
 import { Time } from "../../../interface/time";
 import { MarketPriceRange } from "./price-range";
 import { CommodityPriceTracker } from "./tracker";
+import { Logger } from "../../log";
 
 export class MarketTracker {
 	trackers: CommodityPriceTracker[] = [];
 
 	constructor(
+		private logger: Logger,
 		private database: DbContext
 	) {}
 
@@ -18,6 +20,8 @@ export class MarketTracker {
 		for (let commodity of await this.database.commodity.toArray()) {
 			tasks.push(this.updateCommodity(commodity));
 		}
+
+		this.logger.log(`update ${tasks.length} trackers`);
 
 		await Promise.all(tasks);
 	}

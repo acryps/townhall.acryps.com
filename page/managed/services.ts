@@ -808,6 +808,44 @@ export class ResidentTickerModel {
 	}
 }
 
+export class AskViewModel {
+	asker: LegalEntityViewModel;
+	id: string;
+	posted: Date;
+	price: number;
+	quantity: number;
+
+	private static $build(raw) {
+		const item = new AskViewModel();
+		raw.asker === undefined || (item.asker = raw.asker ? LegalEntityViewModel["$build"](raw.asker) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.posted === undefined || (item.posted = raw.posted ? new Date(raw.posted) : null)
+		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
+		raw.quantity === undefined || (item.quantity = raw.quantity === null ? null : +raw.quantity)
+		
+		return item;
+	}
+}
+
+export class BidViewModel {
+	bidder: LegalEntityViewModel;
+	id: string;
+	posted: Date;
+	price: number;
+	quantity: number;
+
+	private static $build(raw) {
+		const item = new BidViewModel();
+		raw.bidder === undefined || (item.bidder = raw.bidder ? LegalEntityViewModel["$build"](raw.bidder) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.posted === undefined || (item.posted = raw.posted ? new Date(raw.posted) : null)
+		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
+		raw.quantity === undefined || (item.quantity = raw.quantity === null ? null : +raw.quantity)
+		
+		return item;
+	}
+}
+
 export class CommoditySummaryModel {
 	id: string;
 	name: string;
@@ -820,6 +858,19 @@ export class CommoditySummaryModel {
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		raw.unit === undefined || (item.unit = raw.unit === null ? null : `${raw.unit}`)
+		
+		return item;
+	}
+}
+
+export class CommodityCategorySummaryModel {
+	id: string;
+	name: string;
+
+	private static $build(raw) {
+		const item = new CommodityCategorySummaryModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		
 		return item;
 	}
@@ -1604,6 +1655,31 @@ export class LawHouseSessionViewModel {
 		raw.ended === undefined || (item.ended = raw.ended ? new Date(raw.ended) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.started === undefined || (item.started = raw.started ? new Date(raw.started) : null)
+		
+		return item;
+	}
+}
+
+export class CommodityViewModel {
+	category: CommodityCategorySummaryModel;
+	asks: AskViewModel[];
+	bids: BidViewModel[];
+	id: string;
+	innovated: Date;
+	name: string;
+	tag: string;
+	unit: string;
+
+	private static $build(raw) {
+		const item = new CommodityViewModel();
+		raw.category === undefined || (item.category = raw.category ? CommodityCategorySummaryModel["$build"](raw.category) : null)
+		raw.asks === undefined || (item.asks = raw.asks ? raw.asks.map(i => AskViewModel["$build"](i)) : null)
+		raw.bids === undefined || (item.bids = raw.bids ? raw.bids.map(i => BidViewModel["$build"](i)) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.innovated === undefined || (item.innovated = raw.innovated ? new Date(raw.innovated) : null)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
+		raw.unit === undefined || (item.unit = raw.unit === null ? null : `${raw.unit}`)
 		
 		return item;
 	}
@@ -3187,6 +3263,27 @@ export class MarketService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : CommoditySummaryModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getCommodity(tag: string): Promise<CommodityViewModel> {
+		const $data = new FormData();
+		$data.append("NrZzYyMjUyM3JrZGpkc2NtdDF6anllZH", Service.stringify(tag))
+
+		return await fetch(Service.toURL("gzZWZkbmlnMHdrYnc3OD92MGQ5N2lwNn"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : CommodityViewModel["$build"](d);
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

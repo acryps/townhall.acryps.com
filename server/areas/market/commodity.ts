@@ -1,6 +1,8 @@
 import { ViewModel } from "vlserver";
-import { Commodity } from "../../managed/database";
+import { Commodity, CommodityCategory } from "../../managed/database";
 import { View } from "vlquery";
+import { BidViewModel } from "./bid";
+import { AskViewModel } from "./ask";
 
 export class CommoditySummaryModel extends ViewModel<Commodity> {
 	id;
@@ -8,4 +10,17 @@ export class CommoditySummaryModel extends ViewModel<Commodity> {
 
 	name;
 	unit;
+}
+
+export class CommodityViewModel extends CommoditySummaryModel {
+	innovated;
+	category: CommodityCategorySummaryModel;
+
+	asks: AskViewModel[];
+	bids: BidViewModel[];
+}
+
+export class CommodityCategorySummaryModel extends ViewModel<CommodityCategory> {
+	id;
+	name;
 }

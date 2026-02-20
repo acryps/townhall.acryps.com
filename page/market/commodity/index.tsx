@@ -58,7 +58,7 @@ export class CommodityPage extends Component {
 		const max = Math.max(...positions.map(position => position.price * position.quantity));
 
 		const total = positions.reduce((sum, position) => sum + position.price * position.quantity, 0);
-		const volume = positions.reduce((sum, position) => sum + position.price * position.quantity, 0);
+		const volume = positions.reduce((sum, position) => sum + position.quantity, 0);
 
 		const average = total / volume;
 

@@ -71,7 +71,6 @@ export const commodityStyle = () => child('ui-commodity',
 
 				child('ui-quantity',
 					display('inline-block'),
-					width(ch(8)),
 
 					textAlign('right')
 				),

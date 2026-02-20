@@ -10,6 +10,8 @@ ALTER TABLE commodity_category ADD parent_id UUID CONSTRAINT parent__children RE
 
 CREATE TABLE commodity (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+	tag TEXT UNIQUE,
+
 	name TEXT,
 	description TEXT,
 

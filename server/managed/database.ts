@@ -828,6 +828,7 @@ export class CommodityQueryProxy extends QueryProxy {
 	get heft(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get innovated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get unit(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get whole(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
@@ -846,6 +847,7 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 	declare id: string;
 	innovated: Date;
 	name: string;
+	tag: string;
 	unit: string;
 	whole: boolean;
 	
@@ -859,6 +861,7 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 			id: { type: "uuid", name: "id" },
 			innovated: { type: "timestamp", name: "innovated" },
 			name: { type: "text", name: "name" },
+			tag: { type: "text", name: "tag" },
 			unit: { type: "text", name: "unit" },
 			whole: { type: "bool", name: "whole" }
 		},

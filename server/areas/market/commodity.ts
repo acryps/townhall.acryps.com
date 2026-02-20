@@ -4,6 +4,8 @@ import { View } from "vlquery";
 
 export class CommoditySummaryModel extends ViewModel<Commodity> {
 	id;
+	tag;
+
 	name;
 	unit;
 }

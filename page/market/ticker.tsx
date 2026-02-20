@@ -40,8 +40,16 @@ export class CommodityTickerComponent extends Component {
 		}
 	}
 
+	show() {
+		this.rootNode.removeAttribute('ui-hidden');
+	}
+
+	hide() {
+		this.rootNode.setAttribute('ui-hidden', '');
+	}
+
 	render() {
-		return <ui-commodity ui-stale>
+		return <ui-commodity>
 			<ui-detail>
 				<ui-header>
 					<ui-name>
@@ -107,6 +115,6 @@ class RangeComponent {
 		this.spreadLabel.textContent = convertToCurrency(high - low);
 
 		const volume = this.parent.ticker[`${this.propertyPrefix}Volume`] as number;
-		this.volumeLabel.textContent = convertToCurrency(median * volume);
+		this.volumeLabel.textContent = convertToCurrency(volume);
 	}
 }

@@ -8,6 +8,8 @@ export class MarketPage extends Component {
 
 	tickers: CommodityTickerComponent[];
 
+	search: HTMLInputElement;
+
 	sorters = [
 		new Sorter('Name', (a, b) => 0), // name is always applied first
 		new Sorter('Demand', (a, b) => (b.ticker?.askVolume ?? 0) - (a.ticker?.askVolume ?? 0)),
@@ -34,6 +36,8 @@ export class MarketPage extends Component {
 			this.activeSorter = this.sorters[1];
 		}
 
+		this.activeSorter.apply(this.tickers);
+
 		requestAnimationFrame(() => this.updateTicker());
 	}
 
@@ -51,12 +55,37 @@ export class MarketPage extends Component {
 		}
 	}
 
-	render() {
-		requestAnimationFrame(() => {
+	updateSearch() {
+		const normalise = (name: string) => name.toLowerCase().replace(/[^0-9a-z]/g, '');
+		const query = normalise(this.search.value);
+
+		if (!query) {
 			for (let ticker of this.tickers) {
-				ticker.update();
+				ticker.show();
 			}
-		});
+		}
+
+		for (let ticker of this.tickers) {
+			if (normalise(ticker.commodity.name).includes(query)) {
+				ticker.show();
+			} else {
+				ticker.hide();
+			}
+		}
+	}
+
+	render() {
+		this.search = <input
+			type='search'
+			placeholder='Search...'
+			value={this.search?.value ?? ''}
+		/>;
+
+		requestAnimationFrame(() => {
+			this.updateSearch();
+
+			this.search.onkeyup = () => this.updateSearch();
+		})
 
 		return <ui-market>
 			<ui-header ui-href='/law-house'>
@@ -70,6 +99,10 @@ export class MarketPage extends Component {
 			<ui-description>
 				Watch how the market develops based on demand and supply, new innovations emerge and shifts in public perception shape markets.
 			</ui-description>
+
+			<ui-search>
+				{this.search}
+			</ui-search>
 
 			<ui-sort>
 				{this.sorters.map(sorter => <ui-sorter ui-active={this.activeSorter == sorter} ui-click={() => {

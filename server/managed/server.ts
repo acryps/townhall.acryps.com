@@ -5315,6 +5315,7 @@ ViewModel.mappings = {
 			return {
 				id: this.$$model.id,
 				name: this.$$model.name,
+				tag: this.$$model.tag,
 				unit: this.$$model.unit
 			}
 		};
@@ -5347,6 +5348,7 @@ ViewModel.mappings = {
 			return {
 				id: true,
 				name: true,
+				tag: true,
 				unit: true
 			};
 		};
@@ -5355,6 +5357,7 @@ ViewModel.mappings = {
 			const item = new CommoditySummaryModel(null);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 			"unit" in data && (item.unit = data.unit === null ? null : `${data.unit}`);
 
 			return item;
@@ -5371,6 +5374,7 @@ ViewModel.mappings = {
 			
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 			"unit" in viewModel && (model.unit = viewModel.unit === null ? null : `${viewModel.unit}`);
 
 			return model;

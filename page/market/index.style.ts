@@ -5,6 +5,7 @@ import { card } from "../shared/card.style";
 import { topicHeaderStyle } from "../shared/topic-header.style";
 import { boxed } from "../shared/boxed.style";
 import { PageComponent } from "../page";
+import { inputStyle } from "../shared/field.style";
 
 export const marketStyle = () => child('ui-market',
 	display('block'),
@@ -24,6 +25,17 @@ export const marketStyle = () => child('ui-market',
 	child('ui-description',
 		display('block'),
 		marginBottom(rem(1)),
+	),
+
+	child('ui-search',
+		display('flex'),
+		marginBottom(pageGutter.divide(2)),
+
+		child('input',
+			inputStyle(),
+
+			width(percentage(100))
+		)
 	),
 
 	child('ui-sort',
@@ -111,6 +123,10 @@ export const marketStyle = () => child('ui-market',
 		)
 			.attribute('ui-changed',
 				changeAnimation.animate(seconds(0.2), 'linear')
+			)
+
+			.attribute('ui-hidden',
+				display('none')
 			)
 	)
 );

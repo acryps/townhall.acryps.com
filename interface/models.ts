@@ -347,6 +347,7 @@ export interface ResidentTickerModel {
 export interface CommoditySummaryModel {
     id: string;
 	name: string;
+	unit: string;
 }
 
 export interface LiveCommodityTickerResponseModel {

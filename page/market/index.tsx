@@ -8,8 +8,33 @@ export class MarketPage extends Component {
 
 	tickers: CommodityTickerComponent[];
 
+	sorters = [
+		new Sorter('Name', (a, b) => 0), // name is always applied first
+		new Sorter('Demand', (a, b) => (b.ticker?.askVolume ?? 0) - (a.ticker?.askVolume ?? 0)),
+		new Sorter('Supply', (a, b) => (b.ticker?.bidVolume ?? 0) - (a.ticker?.bidVolume ?? 0)),
+		new Sorter('Spread', (a, b) => Math.abs((b.ticker?.askVolume ?? 0) - (b.ticker?.bidVolume ?? 0)) - Math.abs((a.ticker?.askVolume ?? 0) - (a.ticker?.bidVolume ?? 0))),
+	];
+
+	activeSorterStorageKey = 'market-sort';
+	activeSorter: Sorter;
+
 	async onload() {
 		this.commodities = await new MarketService().getCommodities();
+
+		this.tickers = this.commodities.map(commodity => new CommodityTickerComponent(commodity))
+		await this.updateTicker();
+
+		const storedSorter = localStorage.getItem(this.activeSorterStorageKey);
+
+		if (storedSorter) {
+			this.activeSorter = this.sorters.find(sorter => sorter.name == storedSorter);
+		}
+
+		if (!this.activeSorter) {
+			this.activeSorter = this.sorters[1];
+		}
+
+		requestAnimationFrame(() => this.updateTicker());
 	}
 
 	async updateTicker() {
@@ -27,7 +52,11 @@ export class MarketPage extends Component {
 	}
 
 	render() {
-		requestAnimationFrame(() => this.updateTicker());
+		requestAnimationFrame(() => {
+			for (let ticker of this.tickers) {
+				ticker.update();
+			}
+		});
 
 		return <ui-market>
 			<ui-header ui-href='/law-house'>
@@ -42,9 +71,36 @@ export class MarketPage extends Component {
 				Watch how the market develops based on demand and supply, new innovations emerge and shifts in public perception shape markets.
 			</ui-description>
 
+			<ui-sort>
+				{this.sorters.map(sorter => <ui-sorter ui-active={this.activeSorter == sorter} ui-click={() => {
+					sorter.apply(this.tickers);
+
+					this.activeSorter = sorter;
+					localStorage.setItem(this.activeSorterStorageKey, sorter.name);
+
+					this.update();
+				}}>
+					{sorter.name}
+				</ui-sorter>)}
+			</ui-sort>
+
 			<ui-commodities>
-				{this.tickers = this.commodities.map(commodity => new CommodityTickerComponent(commodity))}
+				{this.tickers}
 			</ui-commodities>
 		</ui-market>
+	}
+}
+
+class Sorter {
+	constructor(
+		public name: string,
+		public rank: (a: CommodityTickerComponent, b: CommodityTickerComponent) => number
+	) {}
+
+	apply(tickers: CommodityTickerComponent[]) {
+		// sort by name as base
+		tickers.sort((a, b) => a.commodity.name.localeCompare(b.commodity.name));
+
+		tickers.sort((a, b) => this.rank(a, b));
 	}
 }

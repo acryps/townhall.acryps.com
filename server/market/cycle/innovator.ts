@@ -16,6 +16,10 @@ export class MarketInnovator extends MarketIterationGenerator {
 				.orderByAscending(commodity => commodity.id)
 				.toArray();
 
+			const categories = await this.database.commodityCategory
+				.where(category => category.parentId != null)
+				.toArray();
+
 			const interpreter = new Interpreter('smart');
 
 			interpreter.addTool('innovate', [
@@ -33,7 +37,7 @@ export class MarketInnovator extends MarketIterationGenerator {
 						`Commodity '${name}' already exists.`,
 						'Come up with something completely different!',
 
-						`Make something related to ${commodities[Math.floor(Math.random() * commodities.length)].name}`
+						`Make something related to ${commodities[Math.floor(Math.random() * commodities.length)].name}, ${[...categories].sort(() => Math.random() > 0.5 ? 1 : -1).slice(0, 5).map(category => category.name).join(', ')}`
 					].join('\n'));
 				}
 
@@ -95,6 +99,14 @@ export class MarketInnovator extends MarketIterationGenerator {
 
 					The following commodities cannot be invented, because they already exist:
 					${commodities.map(commodity => `- ${commodity.name}`).join('\n')}
+				`),
+
+				new SystemMessage(`
+					Here are some pointers, just a selection of random products and categories where you CAN base your invention on.
+					${[...commodities].sort(() => Math.random() > 0.5 ? 1 : -1).slice(0, 5).map(commodity => commodity.name).join(', ')}
+					${[...categories].sort(() => Math.random() > 0.5 ? 1 : -1).slice(0, 5).map(category => category.name).join(', ')}
+
+					The world is not just pretty, people might want some twisted stuff too.
 				`),
 
 				new SystemMessage(`

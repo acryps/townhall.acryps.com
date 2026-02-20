@@ -39,7 +39,8 @@ export class Interpreter {
 	}
 
 	constructor(
-		public mode: 'smart' | 'fast' = 'smart'
+		public mode: 'smart' | 'fast' = 'smart',
+		public stop = 10
 	) {}
 
 	get modelName() {
@@ -94,6 +95,11 @@ export class Interpreter {
 
 		if (!message.includes(Interpreter.toolStartToken)) {
 			console.warn(`[interpreter] no tools called.`);
+
+			messages.push(
+				new AssistantMessage(message),
+				new SystemMessage(`You did not call the method, or did not wrap it in ${Interpreter.toolStartToken}. Try to write the call again.`)
+			);
 
 			return await this.execute(...messages);
 		}

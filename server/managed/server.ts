@@ -5314,7 +5314,8 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				id: this.$$model.id,
-				name: this.$$model.name
+				name: this.$$model.name,
+				unit: this.$$model.unit
 			}
 		};
 
@@ -5345,7 +5346,8 @@ ViewModel.mappings = {
 
 			return {
 				id: true,
-				name: true
+				name: true,
+				unit: true
 			};
 		};
 
@@ -5353,6 +5355,7 @@ ViewModel.mappings = {
 			const item = new CommoditySummaryModel(null);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"unit" in data && (item.unit = data.unit === null ? null : `${data.unit}`);
 
 			return item;
 		}
@@ -5368,6 +5371,7 @@ ViewModel.mappings = {
 			
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"unit" in viewModel && (model.unit = viewModel.unit === null ? null : `${viewModel.unit}`);
 
 			return model;
 		}

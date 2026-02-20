@@ -811,11 +811,13 @@ export class ResidentTickerModel {
 export class CommoditySummaryModel {
 	id: string;
 	name: string;
+	unit: string;
 
 	private static $build(raw) {
 		const item = new CommoditySummaryModel();
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.unit === undefined || (item.unit = raw.unit === null ? null : `${raw.unit}`)
 		
 		return item;
 	}

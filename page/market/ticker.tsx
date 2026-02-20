@@ -1,6 +1,8 @@
 import { Component } from "@acryps/page";
 import { MarketPage } from ".";
 import { CommoditySummaryModel, LiveCommodityTickerResponseModel } from "../managed/services";
+import { ContentAppendable } from "@acryps/style";
+import { convertToCurrency } from "../../interface/currency";
 
 export class CommodityTickerComponent extends Component {
 	declare rootNode: HTMLElement;
@@ -9,8 +11,8 @@ export class CommodityTickerComponent extends Component {
 
 	ticker: LiveCommodityTickerResponseModel;
 
-	ask = new RangeComponent('ask');
-	bid = new RangeComponent('bid');
+	ask = new RangeComponent(this, 'ask');
+	bid = new RangeComponent(this, 'bid');
 
 	constructor(
 		public commodity: CommoditySummaryModel
@@ -27,72 +29,84 @@ export class CommodityTickerComponent extends Component {
 
 		this.ticker = ticker;
 
-		this.ask.update();
-		this.bid.update();
+		if (this.rootNode) {
+			this.ask.update();
+			this.bid.update();
 
-		this.last = updated;
+			this.last = updated;
 
-		this.rootNode.removeAttribute('ui-changed');
-		requestAnimationFrame(() => this.rootNode.setAttribute('ui-changed', ''));
-
-		this.rootNode.removeAttribute('ui-stale');
+			this.rootNode.removeAttribute('ui-changed');
+			requestAnimationFrame(() => this.rootNode.setAttribute('ui-changed', ''));
+		}
 	}
 
 	render() {
 		return <ui-commodity ui-stale>
-			<ui-name>
-				{this.commodity.name}
-			</ui-name>
+			<ui-detail>
+				<ui-header>
+					<ui-name>
+						{this.commodity.name}
+					</ui-name>
+
+					<ui-unit>
+						{this.commodity.unit}
+					</ui-unit>
+				</ui-header>
+
+				<ui-volume>
+					{this.ask.volumeLabel} / {this.bid.volumeLabel}
+				</ui-volume>
+			</ui-detail>
 
 			<ui-price>
 				<ui-ask>
-					{this.ask}
+					<ui-median>
+						{this.ask.medianLabel}
+					</ui-median>
+
+					<ui-spread>
+						±{this.ask.spreadLabel}
+					</ui-spread>
 				</ui-ask>
 
 				<ui-bid>
-					{this.bid}
+					<ui-median>
+						{this.bid.medianLabel}
+					</ui-median>
+
+					<ui-spread>
+						±{this.bid.spreadLabel}
+					</ui-spread>
 				</ui-bid>
 			</ui-price>
 		</ui-commodity>;
 	}
 }
 
-class RangeComponent extends Component {
-	declare parent: CommodityTickerComponent;
+class RangeComponent {
+	medianLabel = document.createTextNode('**');
+	spreadLabel = document.createTextNode('**');
+	volumeLabel = document.createTextNode('0');
 
 	constructor(
+		private parent: CommodityTickerComponent,
 		private propertyPrefix: string
-	) {
-		super();
-	}
+	) {}
 
-	render() {
+	update() {
 		if (!this.parent.ticker || !this.parent.ticker[`${this.propertyPrefix}Median`]) {
-			return <ui-range>
-				**
-			</ui-range>
+			return;
 		}
 
-		let volume = this.parent.ticker[`${this.propertyPrefix}Volume`];
+		const median = this.parent.ticker[`${this.propertyPrefix}Median`] as number;
+		this.medianLabel.textContent = convertToCurrency(median);
 
-		return <ui-range>
-			<ui-median>
-				{this.parent.ticker[`${this.propertyPrefix}Median`].toFixed(2)}
-			</ui-median>
+		const low = this.parent.ticker[`${this.propertyPrefix}Low`] as number;
+		const high = this.parent.ticker[`${this.propertyPrefix}High`] as number;
 
-			<ui-spread>
-				<ui-low>
-					{this.parent.ticker[`${this.propertyPrefix}Low`].toFixed(2)}
-				</ui-low>
+		this.spreadLabel.textContent = convertToCurrency(high - low);
 
-				<ui-high>
-					{this.parent.ticker[`${this.propertyPrefix}High`].toFixed(2)}
-				</ui-high>
-			</ui-spread>
-
-			<ui-volume>
-				{volume}
-			</ui-volume>
-		</ui-range>
+		const volume = this.parent.ticker[`${this.propertyPrefix}Volume`] as number;
+		this.volumeLabel.textContent = convertToCurrency(median * volume);
 	}
 }

@@ -62,7 +62,7 @@ export class CommodityTickerComponent extends Component {
 				</ui-header>
 
 				<ui-volume>
-					{this.ask.volumeLabel} / {this.bid.volumeLabel}
+					{this.ask.capitalizationLabel} / {this.bid.capitalizationLabel}
 				</ui-volume>
 			</ui-detail>
 
@@ -94,7 +94,7 @@ export class CommodityTickerComponent extends Component {
 class RangeComponent {
 	priceLabel = document.createTextNode('**');
 	spreadLabel = document.createTextNode('**');
-	volumeLabel = document.createTextNode('0');
+	capitalizationLabel = document.createTextNode('0');
 
 	constructor(
 		private parent: CommodityTickerComponent,
@@ -106,17 +106,16 @@ class RangeComponent {
 			return;
 		}
 
-		const volume = this.parent.ticker[`${this.propertyPrefix}Volume`] as number;
 		const capitalization = this.parent.ticker[`${this.propertyPrefix}Capitalization`] as number;
+		this.capitalizationLabel.textContent = convertToCurrency(capitalization);
 
+		const volume = this.parent.ticker[`${this.propertyPrefix}Volume`] as number;
+		const price = capitalization / volume;
 		this.priceLabel.textContent = convertToCurrency(price);
 
 		const low = this.parent.ticker[`${this.propertyPrefix}Low`] as number;
 		const high = this.parent.ticker[`${this.propertyPrefix}High`] as number;
 
 		this.spreadLabel.textContent = convertToCurrency(high - low);
-
-		const volume = this.parent.ticker[`${this.propertyPrefix}Volume`] as number;
-		this.volumeLabel.textContent = convertToCurrency(volume);
 	}
 }

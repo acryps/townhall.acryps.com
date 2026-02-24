@@ -36,7 +36,9 @@ CREATE TABLE trade_bid (
 	expires TIMESTAMP,
 
 	location_x INT,
-	location_y INT
+	location_y INT,
+
+	reason TEXT
 );
 
 CREATE TABLE trade_ask (
@@ -51,7 +53,9 @@ CREATE TABLE trade_ask (
 	expires TIMESTAMP,
 
 	location_x INT,
-	location_y INT
+	location_y INT,
+
+	reason TEXT
 );
 
 CREATE TABLE trade (

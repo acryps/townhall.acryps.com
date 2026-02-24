@@ -69,7 +69,7 @@ export class CommodityTickerComponent extends Component {
 			<ui-price>
 				<ui-ask>
 					<ui-median>
-						{this.ask.medianLabel}
+						{this.ask.priceLabel}
 					</ui-median>
 
 					<ui-spread>
@@ -79,7 +79,7 @@ export class CommodityTickerComponent extends Component {
 
 				<ui-bid>
 					<ui-median>
-						{this.bid.medianLabel}
+						{this.bid.priceLabel}
 					</ui-median>
 
 					<ui-spread>
@@ -92,7 +92,7 @@ export class CommodityTickerComponent extends Component {
 }
 
 class RangeComponent {
-	medianLabel = document.createTextNode('**');
+	priceLabel = document.createTextNode('**');
 	spreadLabel = document.createTextNode('**');
 	volumeLabel = document.createTextNode('0');
 
@@ -106,8 +106,10 @@ class RangeComponent {
 			return;
 		}
 
-		const median = this.parent.ticker[`${this.propertyPrefix}Median`] as number;
-		this.medianLabel.textContent = convertToCurrency(median);
+		const volume = this.parent.ticker[`${this.propertyPrefix}Volume`] as number;
+		const capitalization = this.parent.ticker[`${this.propertyPrefix}Capitalization`] as number;
+
+		this.priceLabel.textContent = convertToCurrency(price);
 
 		const low = this.parent.ticker[`${this.propertyPrefix}Low`] as number;
 		const high = this.parent.ticker[`${this.propertyPrefix}High`] as number;

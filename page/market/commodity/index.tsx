@@ -30,16 +30,16 @@ export class CommodityPage extends Component {
 			<ui-positions>
 				{this.renderPositions(
 					'asks',
-					(a, b) => b.price - a.price,
+					(a, b) => a.price - b.price,
 					'Asks',
-					'Requested items from the market (demand).'
+					'Currently offered on the market (supply).'
 				)}
 
 				{this.renderPositions(
 					'bids',
-					(a, b) => a.price - b.price,
+					(a, b) => b.price - a.price,
 					'Bids',
-					'Currently offered on the market (supply).'
+					'Requested items from the market (demand).'
 				)}
 			</ui-positions>
 		</ui-commodity>

@@ -378,10 +378,12 @@ export interface LiveCommodityTickerResponseModel {
 	askMedian: number;
 	askHigh: number;
 	askVolume: number;
+	askCapitalization: number;
 	bidLow: number;
 	bidMedian: number;
 	bidHigh: number;
 	bidVolume: number;
+	bidCapitalization: number;
 }
 
 export interface MetricViewModel {

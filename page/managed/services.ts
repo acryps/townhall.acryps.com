@@ -882,10 +882,12 @@ export class LiveCommodityTickerResponseModel {
 	askMedian: number;
 	askHigh: number;
 	askVolume: number;
+	askCapitalization: number;
 	bidLow: number;
 	bidMedian: number;
 	bidHigh: number;
 	bidVolume: number;
+	bidCapitalization: number;
 
 	private static $build(raw) {
 		const item = new LiveCommodityTickerResponseModel();
@@ -894,10 +896,12 @@ export class LiveCommodityTickerResponseModel {
 		raw.askMedian === undefined || (item.askMedian = raw.askMedian === null ? null : +raw.askMedian)
 		raw.askHigh === undefined || (item.askHigh = raw.askHigh === null ? null : +raw.askHigh)
 		raw.askVolume === undefined || (item.askVolume = raw.askVolume === null ? null : +raw.askVolume)
+		raw.askCapitalization === undefined || (item.askCapitalization = raw.askCapitalization === null ? null : +raw.askCapitalization)
 		raw.bidLow === undefined || (item.bidLow = raw.bidLow === null ? null : +raw.bidLow)
 		raw.bidMedian === undefined || (item.bidMedian = raw.bidMedian === null ? null : +raw.bidMedian)
 		raw.bidHigh === undefined || (item.bidHigh = raw.bidHigh === null ? null : +raw.bidHigh)
 		raw.bidVolume === undefined || (item.bidVolume = raw.bidVolume === null ? null : +raw.bidVolume)
+		raw.bidCapitalization === undefined || (item.bidCapitalization = raw.bidCapitalization === null ? null : +raw.bidCapitalization)
 		
 		return item;
 	}

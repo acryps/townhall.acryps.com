@@ -39,11 +39,13 @@ export class MarketService extends Service {
 					askMedian: ticker.ask.median,
 					askHigh: ticker.ask.high,
 					askVolume: ticker.ask.volume,
+					askCapitalization: ticker.ask.capitalization,
 
 					bidLow: ticker.bid.low,
 					bidMedian: ticker.bid.median,
 					bidHigh: ticker.bid.high,
-					bidVolume: ticker.bid.volume
+					bidVolume: ticker.bid.volume,
+					bidCapitalization: ticker.bid.capitalization
 				});
 			}
 		}

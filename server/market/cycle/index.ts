@@ -20,11 +20,6 @@ export abstract class MarketIterationGenerator {
 			// any item
 			query = () => this.database.legalEntity
 				.where(entity => entity.state == null);
-		} else if (Math.random() < 0.1) {
-			// a borough
-			query = () => this.database.legalEntity
-				.where(entity => entity.state == null)
-				.where(entity => entity.boroughId != null);
 		} else {
 			// a company
 			query = () => this.database.legalEntity
@@ -128,7 +123,7 @@ export abstract class MarketIterationGenerator {
 		const commodities = await this.database.commodity.toArray();
 
 		while (commodities.length > 50) {
-			commodities.splice(Math.floor(Math.random() * commodities.length));
+			commodities.splice(Math.floor(Math.random() * commodities.length), 1);
 		}
 
 		return commodities;

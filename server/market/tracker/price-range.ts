@@ -8,6 +8,7 @@ export class MarketPriceRange {
 	spread: number;
 
 	volume: number;
+	capitalization: number;
 
 	trades: { unitPrice: number, quantity: number }[] = [];
 
@@ -39,7 +40,9 @@ export class MarketPriceRange {
 			this.median = this.trades[Math.round(this.trades.length / 2)].unitPrice;
 		}
 
-		this.volume = this.trades.reduce((sum, trade) => sum + trade.quantity * trade.unitPrice, 0);
+		this.volume = this.trades.reduce((sum, trade) => sum + trade.quantity, 0);
+		this.capitalization = this.trades.reduce((sum, trade) => sum + trade.quantity * trade.unitPrice, 0);
+
 		this.spread = this.high - this.low;
 
 		return this;
@@ -53,7 +56,7 @@ export class MarketPriceRange {
 		return [
 			this.median.toFixed(2).padStart(10, '·'),
 			`s=${this.spread.toFixed(2).padStart(8, '·')}`,
-			`v=${Math.floor(this.volume / 1000).toFixed(0).padStart(6, '·')}k`
+			`v=${Math.floor(this.capitalization / 1000).toFixed(0).padStart(6, '·')}k`
 			].join(' ');
 	}
 }

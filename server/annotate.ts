@@ -1,6 +1,6 @@
+import { Logger } from "@acryps/log";
 import { AnnotatedTextPart, AnnotatedTextType } from "../interface/annotate";
 import { convertToLegalCompanyName } from "../interface/company";
-import { Logger } from "./log";
 import { Borough, Company, DbContext, Property, Resident } from "./managed/database";
 
 export class Annotator {

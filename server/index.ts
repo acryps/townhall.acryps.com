@@ -47,13 +47,13 @@ import { WallpaperInterface } from "./map/wallpaper";
 import { ItemContextTracker } from "./context";
 import { StationTileServer } from "./map/layers/shape/train/stations";
 import { MinimapGenerator } from "./map/minimap";
-import { Logger } from "./log";
 import { WaterBodyTileServer } from "./map/layers/filled/water";
 import { WaterBodyFiller } from "./map/fill/water";
 import { TradingEntity } from "./market/entity";
 import { MarketTracker } from "./market/tracker";
 import { MarketIterationGenerator } from "./market/cycle";
 import { advanceMarket } from "./market/cycle/cycle";
+import { Logger } from "@acryps/log";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
@@ -84,12 +84,14 @@ DbClient.connectedClient.connect().then(async () => {
 	const marketTracker = new MarketTracker(new Logger('tracker', marketLogger), database);
 	await marketTracker.update();
 
+	setInterval(() => marketTracker.update(), 1000 * 60);
+
 	marketTracker.dump();
 
 
-	// while (1) {
-	//	await advanceMarket(database, marketTracker);
-	// }
+	//while (1) {
+		//await advanceMarket(database, marketTracker);
+		//}
 
 	/*
 	let entities: string[] = [];

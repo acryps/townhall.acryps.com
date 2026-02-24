@@ -3,7 +3,7 @@ import { DbContext, MapTile, MapType } from "../managed/database";
 import { Canvas, CanvasRenderingContext2D, loadImage } from "skia-canvas";
 import { Point } from "../../interface/point";
 import { mapBaseTileSize } from "../../interface/tile";
-import { Logger } from "../log";
+import { Logger } from "@acryps/log";
 
 export class MapImporter {
 	static readonly tile = mapBaseTileSize;

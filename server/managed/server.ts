@@ -5626,10 +5626,12 @@ ViewModel.mappings = {
 				askMedian: this.$$model.askMedian,
 				askHigh: this.$$model.askHigh,
 				askVolume: this.$$model.askVolume,
+				askCapitalization: this.$$model.askCapitalization,
 				bidLow: this.$$model.bidLow,
 				bidMedian: this.$$model.bidMedian,
 				bidHigh: this.$$model.bidHigh,
-				bidVolume: this.$$model.bidVolume
+				bidVolume: this.$$model.bidVolume,
+				bidCapitalization: this.$$model.bidCapitalization
 			}
 		};
 
@@ -5664,10 +5666,12 @@ ViewModel.mappings = {
 				askMedian: true,
 				askHigh: true,
 				askVolume: true,
+				askCapitalization: true,
 				bidLow: true,
 				bidMedian: true,
 				bidHigh: true,
-				bidVolume: true
+				bidVolume: true,
+				bidCapitalization: true
 			};
 		};
 
@@ -5678,10 +5682,12 @@ ViewModel.mappings = {
 			"askMedian" in data && (item.askMedian = data.askMedian === null ? null : +data.askMedian);
 			"askHigh" in data && (item.askHigh = data.askHigh === null ? null : +data.askHigh);
 			"askVolume" in data && (item.askVolume = data.askVolume === null ? null : +data.askVolume);
+			"askCapitalization" in data && (item.askCapitalization = data.askCapitalization === null ? null : +data.askCapitalization);
 			"bidLow" in data && (item.bidLow = data.bidLow === null ? null : +data.bidLow);
 			"bidMedian" in data && (item.bidMedian = data.bidMedian === null ? null : +data.bidMedian);
 			"bidHigh" in data && (item.bidHigh = data.bidHigh === null ? null : +data.bidHigh);
 			"bidVolume" in data && (item.bidVolume = data.bidVolume === null ? null : +data.bidVolume);
+			"bidCapitalization" in data && (item.bidCapitalization = data.bidCapitalization === null ? null : +data.bidCapitalization);
 
 			return item;
 		}
@@ -5694,10 +5700,12 @@ ViewModel.mappings = {
 			"askMedian" in viewModel && (model.askMedian = viewModel.askMedian === null ? null : +viewModel.askMedian);
 			"askHigh" in viewModel && (model.askHigh = viewModel.askHigh === null ? null : +viewModel.askHigh);
 			"askVolume" in viewModel && (model.askVolume = viewModel.askVolume === null ? null : +viewModel.askVolume);
+			"askCapitalization" in viewModel && (model.askCapitalization = viewModel.askCapitalization === null ? null : +viewModel.askCapitalization);
 			"bidLow" in viewModel && (model.bidLow = viewModel.bidLow === null ? null : +viewModel.bidLow);
 			"bidMedian" in viewModel && (model.bidMedian = viewModel.bidMedian === null ? null : +viewModel.bidMedian);
 			"bidHigh" in viewModel && (model.bidHigh = viewModel.bidHigh === null ? null : +viewModel.bidHigh);
 			"bidVolume" in viewModel && (model.bidVolume = viewModel.bidVolume === null ? null : +viewModel.bidVolume);
+			"bidCapitalization" in viewModel && (model.bidCapitalization = viewModel.bidCapitalization === null ? null : +viewModel.bidCapitalization);
 
 			return model;
 		}

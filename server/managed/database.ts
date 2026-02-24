@@ -3591,9 +3591,9 @@ export class Tenancy extends Entity<TenancyQueryProxy> {
 }
 			
 export class TradeQueryProxy extends QueryProxy {
-	get ask(): Partial<TradeAskQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get ask(): Partial<TradeBidQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get buyer(): Partial<LegalEntityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get askId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get bidId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get booked(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get buyerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get price(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -3602,9 +3602,9 @@ export class TradeQueryProxy extends QueryProxy {
 }
 
 export class Trade extends Entity<TradeQueryProxy> {
-	get ask(): Partial<ForeignReference<TradeAsk>> { return this.$ask; }
+	get ask(): Partial<ForeignReference<TradeBid>> { return this.$ask; }
 	get buyer(): Partial<ForeignReference<LegalEntity>> { return this.$buyer; }
-	askId: string;
+	bidId: string;
 	booked: Date;
 	buyerId: string;
 	declare id: string;
@@ -3615,7 +3615,7 @@ export class Trade extends Entity<TradeQueryProxy> {
 	$$meta = {
 		source: "trade",
 		columns: {
-			askId: { type: "uuid", name: "ask_id" },
+			bidId: { type: "uuid", name: "bid_id" },
 			booked: { type: "timestamp", name: "booked" },
 			buyerId: { type: "uuid", name: "buyer_id" },
 			id: { type: "uuid", name: "id" },
@@ -3631,19 +3631,19 @@ export class Trade extends Entity<TradeQueryProxy> {
 	constructor() {
 		super();
 		
-		this.$ask = new ForeignReference<TradeAsk>(this, "askId", TradeAsk);
+		this.$ask = new ForeignReference<TradeBid>(this, "bidId", TradeBid);
 	this.$buyer = new ForeignReference<LegalEntity>(this, "buyerId", LegalEntity);
 	}
 	
-	private $ask: ForeignReference<TradeAsk>;
+	private $ask: ForeignReference<TradeBid>;
 
-	set ask(value: Partial<ForeignReference<TradeAsk>>) {
+	set ask(value: Partial<ForeignReference<TradeBid>>) {
 		if (value) {
 			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
 
-			this.askId = value.id as string;
+			this.bidId = value.id as string;
 		} else {
-			this.askId = null;
+			this.bidId = null;
 		}
 	}
 
@@ -3673,11 +3673,11 @@ export class TradeAskQueryProxy extends QueryProxy {
 	get posted(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get price(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get quantity(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get reason(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class TradeAsk extends Entity<TradeAskQueryProxy> {
-	trades: PrimaryReference<Trade, TradeQueryProxy>;
-		get asker(): Partial<ForeignReference<LegalEntity>> { return this.$asker; }
+	get asker(): Partial<ForeignReference<LegalEntity>> { return this.$asker; }
 	get commodity(): Partial<ForeignReference<Commodity>> { return this.$commodity; }
 	askerId: string;
 	commodityId: string;
@@ -3688,6 +3688,7 @@ export class TradeAsk extends Entity<TradeAskQueryProxy> {
 	posted: Date;
 	price: number;
 	quantity: number;
+	reason: string;
 	
 	$$meta = {
 		source: "trade_ask",
@@ -3700,7 +3701,8 @@ export class TradeAsk extends Entity<TradeAskQueryProxy> {
 			locationY: { type: "int4", name: "location_y" },
 			posted: { type: "timestamp", name: "posted" },
 			price: { type: "float4", name: "price" },
-			quantity: { type: "float4", name: "quantity" }
+			quantity: { type: "float4", name: "quantity" },
+			reason: { type: "text", name: "reason" }
 		},
 		get set(): DbSet<TradeAsk, TradeAskQueryProxy> { 
 			return new DbSet<TradeAsk, TradeAskQueryProxy>(TradeAsk, null);
@@ -3710,7 +3712,6 @@ export class TradeAsk extends Entity<TradeAskQueryProxy> {
 	constructor() {
 		super();
 		
-		this.trades = new PrimaryReference<Trade, TradeQueryProxy>(this, "askId", Trade);
 		this.$asker = new ForeignReference<LegalEntity>(this, "askerId", LegalEntity);
 	this.$commodity = new ForeignReference<Commodity>(this, "commodityId", Commodity);
 	}
@@ -3753,10 +3754,12 @@ export class TradeBidQueryProxy extends QueryProxy {
 	get posted(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get price(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get quantity(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get reason(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class TradeBid extends Entity<TradeBidQueryProxy> {
-	get bidder(): Partial<ForeignReference<LegalEntity>> { return this.$bidder; }
+	trades: PrimaryReference<Trade, TradeQueryProxy>;
+		get bidder(): Partial<ForeignReference<LegalEntity>> { return this.$bidder; }
 	get commodity(): Partial<ForeignReference<Commodity>> { return this.$commodity; }
 	bidderId: string;
 	commodityId: string;
@@ -3767,6 +3770,7 @@ export class TradeBid extends Entity<TradeBidQueryProxy> {
 	posted: Date;
 	price: number;
 	quantity: number;
+	reason: string;
 	
 	$$meta = {
 		source: "trade_bid",
@@ -3779,7 +3783,8 @@ export class TradeBid extends Entity<TradeBidQueryProxy> {
 			locationY: { type: "int4", name: "location_y" },
 			posted: { type: "timestamp", name: "posted" },
 			price: { type: "float4", name: "price" },
-			quantity: { type: "float4", name: "quantity" }
+			quantity: { type: "float4", name: "quantity" },
+			reason: { type: "text", name: "reason" }
 		},
 		get set(): DbSet<TradeBid, TradeBidQueryProxy> { 
 			return new DbSet<TradeBid, TradeBidQueryProxy>(TradeBid, null);
@@ -3789,6 +3794,7 @@ export class TradeBid extends Entity<TradeBidQueryProxy> {
 	constructor() {
 		super();
 		
+		this.trades = new PrimaryReference<Trade, TradeQueryProxy>(this, "bidId", Trade);
 		this.$bidder = new ForeignReference<LegalEntity>(this, "bidderId", LegalEntity);
 	this.$commodity = new ForeignReference<Commodity>(this, "commodityId", Commodity);
 	}

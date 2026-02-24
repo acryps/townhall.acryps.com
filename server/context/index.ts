@@ -2,10 +2,10 @@ import { deepEqual } from "node:assert";
 import { composeItemContexts, writeItemContexts } from "..";
 import { Interpreter, SystemMessage, ToolError, UserMessage } from "../life/interpreter";
 import { Language } from "../life/language";
-import { Logger } from "../log";
 import { DbContext, ItemContext, ItemContextFragment, ItemContextLink, ItemContextLinkRank } from "../managed/database";
 import { ItemContextComposeable, ItemContextComposer, FoundItemContextLink } from "./composer";
 import { itemContextTypes } from "./types";
+import { Logger } from "@acryps/log";
 
 export class ItemContextTracker {
 	static instance: ItemContextTracker;

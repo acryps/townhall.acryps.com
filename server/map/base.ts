@@ -5,7 +5,7 @@ import { MapImporter } from "./import";
 import { getTiles, mapBaseTileSize } from "../../interface/tile";
 import { calculateDanwinstonShapePath } from "../../interface/line";
 import { Point } from "../../interface/point";
-import { Logger } from "../log";
+import { Logger } from "@acryps/log";
 
 export class BaseTileServer {
 	private logger = new Logger('base tile');

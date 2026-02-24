@@ -6,14 +6,14 @@ import { MarketInnovator } from "./innovator";
 
 export const advanceMarket = async (database: DbContext, tracker: MarketTracker) => {
 	// first, generate some new demand
-	for (let iteration = 0; iteration < 5; iteration++) {
-		/// await new MarketDemander(database, tracker).generate();
+	for (let iteration = 0; iteration < 6; iteration++) {
+		await new MarketDemander(database, tracker).generate();
 	}
 
 	// let the market respon to new signals
 	const innovations: Commodity[] = [];
 
-	for (let iteration = 0; iteration < 3; iteration++) {
+	for (let iteration = 0; iteration < 0; iteration++) {
 		const innovation = await new MarketInnovator(database, tracker).generate();
 
 		if (innovation) {
@@ -26,8 +26,8 @@ export const advanceMarket = async (database: DbContext, tracker: MarketTracker)
 		await new MarketDemander(database, tracker).generate(innovations);
 	}
 
-	await tracker.update();
-	tracker.dump();
+	// await tracker.update();
+	// tracker.dump();
 
 	return;
 

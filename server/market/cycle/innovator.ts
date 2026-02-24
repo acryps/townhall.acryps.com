@@ -1,7 +1,7 @@
+import { Logger } from "@acryps/log";
 import { MarketIterationGenerator } from ".";
 import { Time } from "../../../interface/time";
 import { Interpreter, SystemMessage, ToolError, UserMessage } from "../../life/interpreter";
-import { Logger } from "../../log";
 import { Commodity, TradeAsk } from "../../managed/database";
 
 export class MarketInnovator extends MarketIterationGenerator {

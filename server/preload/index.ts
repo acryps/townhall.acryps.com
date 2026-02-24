@@ -3,7 +3,7 @@ import { PreloadRoute, RouteParameterValue } from "./route";
 import { port, updatePreloadedPages } from "..";
 import { DbContext, PreloadedPage } from "../managed/database";
 import { readFileSync } from "fs";
-import { Logger } from "../log";
+import { Logger } from "@acryps/log";
 
 export class Preload {
 	static browser: Browser;

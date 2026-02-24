@@ -44,6 +44,7 @@ export class TradingEntity {
 	async getIncome() {
 		let balance = 0;
 
+		/*
 		const sales = await this.database.trade
 			.where(trade => trade.ask.askerId == this.entity.id)
 			.toArray();
@@ -59,6 +60,8 @@ export class TradingEntity {
 		for (let transport of transports) {
 			balance += transport.price;
 		}
+
+		*/
 
 		return balance;
 	}
@@ -125,6 +128,7 @@ export class TradingEntity {
 		}
 
 		// sold with trades
+		/*
 		const soldTrades = await this.database.trade
 			.where(trade => trade.ask.askerId == this.entity.id)
 			.include(trade => trade.ask)
@@ -136,6 +140,8 @@ export class TradingEntity {
 
 			this.trackAsset(stock, commodity, -trade.quantity);
 		}
+
+		*/
 
 		// used in production
 		const productionInputs = await this.database.productionInput

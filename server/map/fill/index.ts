@@ -1,6 +1,6 @@
+import { Logger } from "@acryps/log";
 import { calcualteDanwinstonLine, calculateDanwinstonShapePath, drawDanwinstonLine } from "../../../interface/line";
 import { PackedPoint, Point } from "../../../interface/point";
-import { Logger } from "../../log";
 
 export abstract class Filler<SourceType> {
 	cached: {

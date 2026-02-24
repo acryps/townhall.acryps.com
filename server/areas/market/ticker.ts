@@ -7,11 +7,13 @@ export class LiveCommodityTickerModel {
 	askMedian: number;
 	askHigh: number;
 	askVolume: number;
+	askCapitalization: number;
 
 	bidLow: number;
 	bidMedian: number;
 	bidHigh: number;
 	bidVolume: number;
+	bidCapitalization: number;
 }
 
 export class LiveCommodityTickerResponseModel extends ViewModel<LiveCommodityTickerModel> {
@@ -21,9 +23,11 @@ export class LiveCommodityTickerResponseModel extends ViewModel<LiveCommodityTic
 	askMedian;
 	askHigh;
 	askVolume;
+	askCapitalization;
 
 	bidLow;
 	bidMedian;
 	bidHigh;
 	bidVolume;
+	bidCapitalization;
 }

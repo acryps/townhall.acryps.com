@@ -1,6 +1,6 @@
 import { DbClient, DbSet, ForeignReference } from "vlquery";
 import { DbContext, LegalEntity } from "../../managed/database";
-import { Logger } from "../../log";
+import { Logger } from "@acryps/log";
 
 export class LegalEntityReferenceCounter {
 	private logger = new Logger('legal entity rank');

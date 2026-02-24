@@ -6,7 +6,7 @@ import { calculateDanwinstonShapePath } from "../../../interface/line";
 import { ManagedServer } from "../../managed/server";
 import { getMinimapBounds, minimapScale } from "../../../interface/minimap";
 import { BoroughSummaryModel } from "../../areas/borough.summary";
-import { Logger } from "../../log";
+import { Logger } from "@acryps/log";
 
 export class MinimapGenerator {
 	private logger = new Logger('minimap');

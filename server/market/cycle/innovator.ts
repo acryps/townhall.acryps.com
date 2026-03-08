@@ -20,6 +20,10 @@ export class MarketInnovator extends MarketIterationGenerator {
 				.where(category => category.parentId != null)
 				.toArray();
 
+			const openSeeds = await this.database.stockSeed
+				.where(seed => seed.commodityId == null)
+				.toArray();
+
 			const interpreter = new Interpreter('smart');
 
 			interpreter.addTool('innovate', [
@@ -70,6 +74,21 @@ export class MarketInnovator extends MarketIterationGenerator {
 				done(null);
 			});
 
+			const pointers = [
+				...openSeeds
+					.map(seed => seed.sourceName)
+					.filter((item, index, array) => array.indexOf(item) == index)
+					.slice(0, 25),
+
+				...commodities
+					.map(commodity => commodity.name)
+					.slice(0, 10),
+
+				...categories
+					.map(category => category.name)
+					.slice(0, 5)
+			].sort(() => Math.random() > 0.5 ? 1 : -1);
+
 			interpreter.execute(
 				new SystemMessage(`
 					You are acting as ${trader?.name ?? 'the clerc collecting all the basic commodities'}.
@@ -105,8 +124,7 @@ export class MarketInnovator extends MarketIterationGenerator {
 
 				new SystemMessage(`
 					Here are some pointers, just a selection of random products and categories where you CAN base your invention on.
-					${[...commodities].sort(() => Math.random() > 0.5 ? 1 : -1).slice(0, 5).map(commodity => commodity.name).join(', ')}
-					${[...categories].sort(() => Math.random() > 0.5 ? 1 : -1).slice(0, 5).map(category => category.name).join(', ')}
+					${pointers.map(name => `- ${name}`).join('\n')}
 
 					The world is not just pretty, people might want some twisted stuff too.
 				`),
@@ -120,6 +138,7 @@ export class MarketInnovator extends MarketIterationGenerator {
 					Beware that we are in the year ${Time.now().year} and not our current year, a lot of stuff will not have been invented yet!
 
 					Make sure to only invent stuff that does not already exits.
+					If you dont have anything that makes sense, just call 'skip'.
 				`)
 			);
 		});

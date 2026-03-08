@@ -13,6 +13,11 @@ export const commodityStyle = () => child('ui-commodity',
 		fontSize(rem(2))
 	),
 
+	child('ui-category',
+		display('block'),
+		marginBottom(pageGutter)
+	),
+
 	child('ui-description',
 		display('block'),
 		marginBottom(pageGutter)

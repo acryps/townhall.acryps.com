@@ -8865,6 +8865,7 @@ ViewModel.mappings = {
 				category: new CommodityCategorySummaryModel(await BaseServer.unwrap(this.$$model.category)),
 				asks: (await this.$$model.asks.includeTree(ViewModel.mappings[AskViewModel.name].items).toArray()).map(item => new AskViewModel(item)),
 				bids: (await this.$$model.bids.includeTree(ViewModel.mappings[BidViewModel.name].items).toArray()).map(item => new BidViewModel(item)),
+				description: this.$$model.description,
 				id: this.$$model.id,
 				innovated: this.$$model.innovated,
 				name: this.$$model.name,
@@ -8917,6 +8918,7 @@ ViewModel.mappings = {
 						[...parents, "bids-CommodityViewModel"]
 					);
 				},
+				description: true,
 				id: true,
 				innovated: true,
 				name: true,
@@ -8930,6 +8932,7 @@ ViewModel.mappings = {
 			"category" in data && (item.category = data.category && ViewModel.mappings[CommodityCategorySummaryModel.name].toViewModel(data.category));
 			"asks" in data && (item.asks = data.asks && [...data.asks].map(i => ViewModel.mappings[AskViewModel.name].toViewModel(i)));
 			"bids" in data && (item.bids = data.bids && [...data.bids].map(i => ViewModel.mappings[BidViewModel.name].toViewModel(i)));
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"innovated" in data && (item.innovated = data.innovated === null ? null : new Date(data.innovated));
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
@@ -8951,6 +8954,7 @@ ViewModel.mappings = {
 			"category" in viewModel && (model.category.id = viewModel.category ? viewModel.category.id : null);
 			"asks" in viewModel && (null);
 			"bids" in viewModel && (null);
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"innovated" in viewModel && (model.innovated = viewModel.innovated === null ? null : new Date(viewModel.innovated));
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);

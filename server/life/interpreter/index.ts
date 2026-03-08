@@ -29,8 +29,8 @@ export class Interpreter {
 	tools: Tool[] = [];
 	history: InterpreterMessage[] = [];
 
-	static readonly toolStartToken = '<ACTION>';
-	static readonly toolEndToken = '</ACTION>';
+	static readonly toolStartToken = 'ACTION:';
+	static readonly toolEndToken = ':ACTION';
 
 	static simulateToolReponse(tool: string, parameters: any) {
 		return new AssistantMessage(`${this.toolStartToken}${tool}({ ${
@@ -50,11 +50,10 @@ export class Interpreter {
 	get metaInitiator() {
 		let message = [
 			'You are a helpful assistant.',
-			'Do not tell me what you are doing, just respond.',
 			'Do not mention that this is all fictional, pretend that the story is real.',
 			'When mentioning dates, always use YYYY-MM-DD format.',
 
-			'You can only execute actions, but only do it when asked to.',
+			'Your final response must be a tool call, but only do it when asked to.',
 			'Wrap parameters in objects, following this example',
 			'',
 			'Function: test(name: string, value: number)',
@@ -82,16 +81,41 @@ export class Interpreter {
 	}
 
 	async execute(...messages: InterpreterMessage[]) {
+		if (this.stop < 0) {
+			throw new Error('Interpreter locked up');
+		}
+
+		const context = [
+			new SystemMessage(this.metaInitiator),
+			...this.history,
+			...messages
+		].map(message => message.toOllamaMessage());
+
+		if (process.env.LOG_INTERPRETER) {
+			console.log('-'.repeat(50));
+			console.group('Interpreter Context');
+
+			for (let message of context) {
+				console.group(message.role);
+				console.log(message.content.split('\n').map(line => line.trim()).join('\n'));
+				console.groupEnd();
+			}
+
+			console.groupEnd();
+		}
+
 		const response = await ollama.chat({
 			model: this.modelName,
-			messages: [
-				new SystemMessage(this.metaInitiator),
-				...this.history,
-				...messages
-			].map(message => message.toOllamaMessage())
+			messages: context
 		});
 
 		const message = response.message.content;
+
+		if (process.env.LOG_INTERPRETER) {
+			console.group('Interpreter Response');
+			console.log(message);
+			console.groupEnd();
+		}
 
 		if (!message.includes(Interpreter.toolStartToken)) {
 			console.warn(`[interpreter] no tools called.`);
@@ -101,6 +125,7 @@ export class Interpreter {
 				new SystemMessage(`You did not call the method, or did not wrap it in ${Interpreter.toolStartToken}. Try to write the call again.`)
 			);
 
+			this.stop--;
 			return await this.execute(...messages);
 		}
 
@@ -115,6 +140,7 @@ export class Interpreter {
 			if (!tool) {
 				console.warn(`[interpreter] no tool named '${toolName}'.`);
 
+				this.stop--;
 				return await this.execute(...messages);
 			}
 
@@ -127,9 +153,10 @@ export class Interpreter {
 
 				messages.push(
 					new AssistantMessage(message),
-					new SystemMessage('Something in the formatting of your tool call is wrong. Try to write the call again.')
+					new SystemMessage(`Something in the formatting of your tool call is wrong: ${error.message}. Try to write the call again.`)
 				);
 
+				this.stop--;
 				return await this.execute(...messages);
 			}
 
@@ -150,6 +177,7 @@ export class Interpreter {
 					);
 				}
 
+				this.stop--;
 				return await this.execute(...messages);
 			}
 		}
@@ -200,7 +228,7 @@ export class Interpreter {
 				const proxy = new parameter.type();
 
 				if (typeof value != typeof proxy.valueOf()) {
-					throw new Error(`Parameter '${parameter.name}' has an invalid type`);
+					throw new Error(`Parameter '${parameter.name}' has an invalid type (${JSON.stringify(value)}, ${typeof value} ${typeof proxy.valueOf()})`);
 				}
 
 				data.push(value);

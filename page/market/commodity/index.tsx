@@ -21,11 +21,18 @@ export class CommodityPage extends Component {
 				{this.commodity.name}
 			</ui-title>
 
+			{this.commodity.category && <ui-category>
+				Categorized as {this.commodity.category.name}
+			</ui-category>}
+
 			<ui-description>
 				{this.commodity.name} is tracked since {this.commodity.innovated ? `${new Time(this.commodity.innovated).age()} years` : 'the markets opened'}.
 				The commodity is traded in {this.commodity.unit} units.
-				{this.commodity.name} has {this.commodity.category ? `been categorized as ${this.commodity.category.name}` : 'not been categorized yet'}.
 			</ui-description>
+
+			{this.commodity.description && <ui-description>
+				{this.commodity.description}
+			</ui-description>}
 
 			<ui-positions>
 				{this.renderPositions(

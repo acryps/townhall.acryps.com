@@ -14,6 +14,7 @@ export class CommoditySummaryModel extends ViewModel<Commodity> {
 
 export class CommodityViewModel extends CommoditySummaryModel {
 	innovated;
+	description;
 	category: CommodityCategorySummaryModel;
 
 	asks: AskViewModel[];

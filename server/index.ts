@@ -89,9 +89,9 @@ DbClient.connectedClient.connect().then(async () => {
 	marketTracker.dump();
 
 
-	//while (1) {
-		//await advanceMarket(database, marketTracker);
-		//}
+	while (1) {
+		await advanceMarket(database, marketTracker);
+	}
 
 	/*
 	let entities: string[] = [];

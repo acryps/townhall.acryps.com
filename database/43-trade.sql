@@ -8,12 +8,29 @@ CREATE TABLE commodity_category (
 
 ALTER TABLE commodity_category ADD parent_id UUID CONSTRAINT parent__children REFERENCES commodity_category (id);
 
+CREATE TABLE market_cycle (
+	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+	opened TIMESTAMP,
+	closed TIMESTAMP,
+
+	-- all parameters are floating, as they can slightly adjust without having an immediate effect
+	-- the iterations will always run in integer counts
+	base_demand_iterations REAL,
+	innovation_iterations REAL,
+	innovated_demand_iterations REAL,
+	consumption_iterations REAL,
+	sock_seeding_iterations REAL,
+	liqudation_iterations REAL
+);
+
 CREATE TABLE commodity (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 	tag TEXT UNIQUE,
 
 	name TEXT,
 	description TEXT,
+	innovated TIMESTMAP,
 
 	unit TEXT,
 	whole BOOLEAN,
@@ -22,6 +39,20 @@ CREATE TABLE commodity (
 	depreciation REAL,
 
 	category_id UUID CONSTRAINT category__commodities REFERENCES commodity_category (id)
+);
+
+CREATE TABLE stock_seed (
+	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+	owner_id UUID CONSTRAINT owner__stock_seeds REFERENCES legal_entity (id),
+	indexed TIMESTAMP,
+
+	source_name TEXT,
+	source_reason TEXT,
+	source_quantity TEXT,
+
+	commodity_id UUID CONSTRAINT commodity__stock_seeds REFERENCES commodity (id),
+	quantity REAL,
+	match_reason TEXT
 );
 
 CREATE TABLE trade_bid (
@@ -34,6 +65,7 @@ CREATE TABLE trade_bid (
 
 	posted TIMESTAMP,
 	expires TIMESTAMP,
+	fulfilled TIMESTMAP,
 
 	location_x INT,
 	location_y INT,
@@ -67,7 +99,9 @@ CREATE TABLE trade (
 
 	buyer_id UUID CONSTRAINT buyer__trades REFERENCES legal_entity (id),
 	price REAL, -- final sale price might differ from asking price
-	amount REAL
+	amount REAL,
+
+	reason TEXT
 );
 
 CREATE TABLE cargo_route (

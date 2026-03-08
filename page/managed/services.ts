@@ -1668,6 +1668,7 @@ export class CommodityViewModel {
 	category: CommodityCategorySummaryModel;
 	asks: AskViewModel[];
 	bids: BidViewModel[];
+	description: string;
 	id: string;
 	innovated: Date;
 	name: string;
@@ -1679,6 +1680,7 @@ export class CommodityViewModel {
 		raw.category === undefined || (item.category = raw.category ? CommodityCategorySummaryModel["$build"](raw.category) : null)
 		raw.asks === undefined || (item.asks = raw.asks ? raw.asks.map(i => AskViewModel["$build"](i)) : null)
 		raw.bids === undefined || (item.bids = raw.bids ? raw.bids.map(i => BidViewModel["$build"](i)) : null)
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.innovated === undefined || (item.innovated = raw.innovated ? new Date(raw.innovated) : null)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)

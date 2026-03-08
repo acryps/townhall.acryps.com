@@ -41,6 +41,39 @@ export class TradingEntity {
 		);
 	}
 
+	async getCommunity() {
+		const community: TradingEntity[] = [];
+
+		if (this.entity.residentId) {
+			const resident = await this.entity.resident.fetch();
+			const mainTenancy = await resident.mainTenancy.fetch();
+
+			if (mainTenancy) {
+				const peers = await this.database.tenancy
+					.where(tenancy => tenancy.id != mainTenancy.id)
+					.where(tenancy => tenancy.dwellingId == mainTenancy.dwellingId)
+					.include(tenancy => tenancy.inhabitant)
+					.toArray();
+
+				for (let tenancy of peers) {
+					const resident = await tenancy.inhabitant.fetch();
+					let legalEntity = await this.database.legalEntity.first(entity => entity.residentId == resident.id);
+
+					if (!legalEntity) {
+						legalEntity = new LegalEntity();
+						legalEntity.residentId = resident.id;
+
+						await legalEntity.create();
+					}
+
+					community.push(await TradingEntity.from(legalEntity, this.database));
+				}
+			}
+		}
+
+		return community;
+	}
+
 	async getIncome() {
 		let balance = 0;
 

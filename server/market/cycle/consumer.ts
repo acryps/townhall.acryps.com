@@ -4,21 +4,26 @@ import { Time } from "../../../interface/time";
 import { Interpreter, SystemMessage, ToolError, UserMessage } from "../../life/interpreter";
 import { Commodity, TradeBid } from "../../managed/database";
 
-export class MarketDemander extends MarketIterationGenerator {
-	logger = new Logger('demand');
+export class MarketConsumer extends MarketIterationGenerator {
+	logger = new Logger('consume');
 
 	generate(innovations: Commodity[] = []) {
 		return new Promise<void>(async done => {
 			const trader = await this.randomEntity();
 			this.logger.log(`trading as ${trader.name}`);
 
-			const commodities = await this.getRandomCommodities();
+			const demand = await this.getOpenDemand(trader);
+
+			if (!demand.length) {
+				this.logger.log(`nothing requested from market, skipping`);
+
+				done();
+			}
 
 			const interpreter = new Interpreter('smart');
 
-			interpreter.addTool('demand', [
+			interpreter.addTool('purchase', [
 				{ name: 'id', type: String },
-				{ name: 'pricePerUnit', type: Number },
 				{ name: 'quantity', type: Number },
 				{ name: 'reason', type: String }
 			], async (id, pricePerUnit, quantity, reason) => {

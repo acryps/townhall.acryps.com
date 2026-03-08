@@ -707,6 +707,7 @@ export interface CommodityViewModel {
     category: CommodityCategorySummaryModel;
 	asks: AskViewModel[];
 	bids: BidViewModel[];
+	description: string;
 	id: string;
 	innovated: Date;
 	name: string;

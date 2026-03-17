@@ -1,14 +1,19 @@
-import { alignItems, borderBottom, borderLeft, ch, child, columnGap, display, Dvi, fontSize, fontWeight, height, justifyContent, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, maxHeight, objectFit, objectPosition, paddingLeft, percentage, px, Px, rem, textAlign, vh, whiteSpace, width } from "@acryps/style";
+import { alignItems, alignSelf, backgroundColor, backgroundImage, border, borderBottom, borderLeft, ch, child, colorStop, columnGap, display, Dvi, flexBasis, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, height, hex, insetInline, justifyContent, left, linearGradient, lineHeight, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, maxHeight, maxWidth, minWidth, Number, objectFit, objectPosition, padding, paddingLeft, paddingTop, percentage, position, px, Px, rem, textAlign, top, turn, Variable, vh, whiteSpace, width } from "@acryps/style";
 import { boxed } from "../shared/boxed.style";
 import { buttonStyle } from "../shared/index.style";
 import { ChatPage } from "./chat";
 import { chatStyle } from "./chat/index.style";
-import { navigationBorderColor, pageGutter } from "../index.style";
+import { infoColor, navigationBorderColor, negativeColor, neutralColor, pageBackgroundColor, pageGutter, positiveColor } from "../index.style";
 import { relationsStyle } from "./relations/index.style";
 import { politicalCompassStyle } from "../shared/political-compass/index.style";
+import { residentAssessmentStyle } from "./assessment/index.style";
+
+export const assessmentMarkerValue = new Variable<Number>('assessment-marker-value');
 
 export const residentStyle = () => child('ui-resident',
 	boxed(),
+
+	residentAssessmentStyle(),
 
 	child('img',
 		display('block'),
@@ -56,8 +61,9 @@ export const residentStyle = () => child('ui-resident',
 
 	child('ui-actions',
 		display('flex'),
+		flexWrap('wrap'),
 		justifyContent('center'),
-		columnGap(rem(1)),
+		gap(pageGutter),
 		marginTop(rem(1.75)),
 		marginBottom(rem(2)),
 
@@ -66,7 +72,7 @@ export const residentStyle = () => child('ui-resident',
 
 	child('ui-biography',
 		display('block'),
-		marginBottom(rem(3)),
+		marginBottom(pageGutter),
 
 		whiteSpace('pre-wrap')
 	),

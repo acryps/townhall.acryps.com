@@ -1,5 +1,5 @@
 import { Logger } from "@acryps/log";
-import { MarketIterationGenerator } from "..";
+import { MarketIterationGenerator } from "../generator";
 import { Time } from "../../../../interface/time";
 import { Interpreter, ToolError, SystemMessage, UserMessage } from "../../../life/interpreter";
 import { Commodity, StockSeed, TradeBid } from "../../../managed/database";

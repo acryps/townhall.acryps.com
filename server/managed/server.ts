@@ -64,6 +64,7 @@ import { LegalEntityViewModel } from "././../areas/legal-entity";
 import { LegalEntityReferenceCounter } from "././../areas/legal-entity/reference-counter";
 import { LegalEntityService } from "././../areas/legal-entity/service";
 import { Life } from "././../life";
+import { ResidentAssessmentMatchViewModel } from "././../areas/life/resident";
 import { ResidentEventViewModel } from "././../areas/life/resident";
 import { ResidentRelationViewModel } from "././../areas/life/resident";
 import { ResidentSummaryModel } from "././../areas/life/resident";
@@ -167,6 +168,8 @@ import { WorkContractSummaryModel } from "./../areas/work";
 import { ItemContextSummaryModel } from "./../areas/item-context/context";
 import { LawHouseSessionaryViewModel } from "./../areas/law-house/session";
 import { LawHouseSessionProtocolViewModel } from "./../areas/law-house/session";
+import { ResidentAssessmentViewModel } from "./../areas/life/resident";
+import { ResidentAssessmentParameterViewModel } from "./../areas/life/resident";
 import { TenancyViewModel } from "./../areas/life/resident";
 import { AskViewModel } from "./../areas/market/ask";
 import { BidViewModel } from "./../areas/market/bid";
@@ -210,6 +213,9 @@ import { LawHouseSessionary } from "./../managed/database";
 import { LawHouseSessionProtocol } from "./../managed/database";
 import { LegalEntity } from "./../managed/database";
 import { Resident } from "./../managed/database";
+import { ResidentAssessment } from "./../managed/database";
+import { ResidentAssessmentParameter } from "./../managed/database";
+import { ResidentAssessmentMatchView } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
 import { TradeAsk } from "./../managed/database";
 import { TradeBid } from "./../managed/database";
@@ -970,6 +976,17 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(LifeService),
 			(controller, params) => controller.getRelations(
 				params["IxaD93ajg4aWx5eWBwc3ZkOHVlejU2Zm"]
+			)
+		);
+
+		this.expose(
+			"FydmgzM3owMHdueDVvZWc1NzI5a25vaH",
+			{
+			"8yZTo2eTl5eTJsajl2bnNvYWRrbDRkbD": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LifeService),
+			(controller, params) => controller.getAssessmentMatches(
+				params["8yZTo2eTl5eTJsajl2bnNvYWRrbDRkbD"]
 			)
 		);
 
@@ -4903,6 +4920,7 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				mainTenancy: new TenancyViewModel(await BaseServer.unwrap(this.$$model.mainTenancy)),
+				assessments: (await this.$$model.assessments.includeTree(ViewModel.mappings[ResidentAssessmentViewModel.name].items).toArray()).map(item => new ResidentAssessmentViewModel(item)),
 				workContracts: (await this.$$model.workContracts.includeTree(ViewModel.mappings[WorkContractEmploymentModel.name].items).toArray()).map(item => new WorkContractEmploymentModel(item)),
 				biography: this.$$model.biography,
 				birthday: this.$$model.birthday,
@@ -4947,6 +4965,12 @@ ViewModel.mappings = {
 						[...parents, "mainTenancy-ResidentViewModel"]
 					);
 				},
+				get assessments() {
+					return ViewModel.mappings[ResidentAssessmentViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "assessments-ResidentViewModel"]
+					);
+				},
 				get workContracts() {
 					return ViewModel.mappings[WorkContractEmploymentModel.name].getPrefetchingProperties(
 						level,
@@ -4967,6 +4991,7 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new ResidentViewModel(null);
 			"mainTenancy" in data && (item.mainTenancy = data.mainTenancy && ViewModel.mappings[TenancyViewModel.name].toViewModel(data.mainTenancy));
+			"assessments" in data && (item.assessments = data.assessments && [...data.assessments].map(i => ViewModel.mappings[ResidentAssessmentViewModel.name].toViewModel(i)));
 			"workContracts" in data && (item.workContracts = data.workContracts && [...data.workContracts].map(i => ViewModel.mappings[WorkContractEmploymentModel.name].toViewModel(i)));
 			"biography" in data && (item.biography = data.biography === null ? null : `${data.biography}`);
 			"birthday" in data && (item.birthday = data.birthday === null ? null : new Date(data.birthday));
@@ -4990,6 +5015,7 @@ ViewModel.mappings = {
 			}
 			
 			"mainTenancy" in viewModel && (model.mainTenancy.id = viewModel.mainTenancy ? viewModel.mainTenancy.id : null);
+			"assessments" in viewModel && (null);
 			"workContracts" in viewModel && (null);
 			"biography" in viewModel && (model.biography = viewModel.biography === null ? null : `${viewModel.biography}`);
 			"birthday" in viewModel && (model.birthday = viewModel.birthday === null ? null : new Date(viewModel.birthday));
@@ -4999,6 +5025,239 @@ ViewModel.mappings = {
 			"givenName" in viewModel && (model.givenName = viewModel.givenName === null ? null : `${viewModel.givenName}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
+
+			return model;
+		}
+	},
+	[ResidentAssessmentViewModel.name]: class ComposedResidentAssessmentViewModel extends ResidentAssessmentViewModel {
+		async map() {
+			return {
+				parameter: new ResidentAssessmentParameterViewModel(await BaseServer.unwrap(this.$$model.parameter)),
+				confidence: this.$$model.confidence,
+				id: this.$$model.id,
+				value: this.$$model.value
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get parameter() {
+					return ViewModel.mappings[ResidentAssessmentParameterViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "parameter-ResidentAssessmentViewModel"]
+					);
+				},
+				confidence: true,
+				id: true,
+				value: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ResidentAssessmentViewModel(null);
+			"parameter" in data && (item.parameter = data.parameter && ViewModel.mappings[ResidentAssessmentParameterViewModel.name].toViewModel(data.parameter));
+			"confidence" in data && (item.confidence = data.confidence === null ? null : +data.confidence);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"value" in data && (item.value = data.value === null ? null : +data.value);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ResidentAssessmentViewModel) {
+			let model: ResidentAssessment;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ResidentAssessment).find(viewModel.id)
+			} else {
+				model = new ResidentAssessment();
+			}
+			
+			"parameter" in viewModel && (model.parameter.id = viewModel.parameter ? viewModel.parameter.id : null);
+			"confidence" in viewModel && (model.confidence = viewModel.confidence === null ? null : +viewModel.confidence);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"value" in viewModel && (model.value = viewModel.value === null ? null : +viewModel.value);
+
+			return model;
+		}
+	},
+	[ResidentAssessmentParameterViewModel.name]: class ComposedResidentAssessmentParameterViewModel extends ResidentAssessmentParameterViewModel {
+		async map() {
+			return {
+				high: this.$$model.high,
+				id: this.$$model.id,
+				low: this.$$model.low,
+				prompt: this.$$model.prompt
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				high: true,
+				id: true,
+				low: true,
+				prompt: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ResidentAssessmentParameterViewModel(null);
+			"high" in data && (item.high = data.high === null ? null : `${data.high}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"low" in data && (item.low = data.low === null ? null : `${data.low}`);
+			"prompt" in data && (item.prompt = data.prompt === null ? null : `${data.prompt}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ResidentAssessmentParameterViewModel) {
+			let model: ResidentAssessmentParameter;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ResidentAssessmentParameter).find(viewModel.id)
+			} else {
+				model = new ResidentAssessmentParameter();
+			}
+			
+			"high" in viewModel && (model.high = viewModel.high === null ? null : `${viewModel.high}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"low" in viewModel && (model.low = viewModel.low === null ? null : `${viewModel.low}`);
+			"prompt" in viewModel && (model.prompt = viewModel.prompt === null ? null : `${viewModel.prompt}`);
+
+			return model;
+		}
+	},
+	[ResidentAssessmentMatchViewModel.name]: class ComposedResidentAssessmentMatchViewModel extends ResidentAssessmentMatchViewModel {
+		async map() {
+			return {
+				sourceResidentId: this.$$model.sourceResidentId,
+				targetResidentId: this.$$model.targetResidentId,
+				sharedParameters: this.$$model.sharedParameters,
+				distance: this.$$model.distance,
+				targetResidentFamilyName: this.$$model.targetResidentFamilyName,
+				targetResidentTag: this.$$model.targetResidentTag,
+				targetResidentGivenName: this.$$model.targetResidentGivenName,
+				sourceResidentTag: this.$$model.sourceResidentTag,
+				sourceResidentGivenName: this.$$model.sourceResidentGivenName,
+				sourceResidentFamilyName: this.$$model.sourceResidentFamilyName
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				sourceResidentId: true,
+				targetResidentId: true,
+				sharedParameters: true,
+				distance: true,
+				targetResidentFamilyName: true,
+				targetResidentTag: true,
+				targetResidentGivenName: true,
+				sourceResidentTag: true,
+				sourceResidentGivenName: true,
+				sourceResidentFamilyName: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ResidentAssessmentMatchViewModel(null);
+			"sourceResidentId" in data && (item.sourceResidentId = data.sourceResidentId === null ? null : `${data.sourceResidentId}`);
+			"targetResidentId" in data && (item.targetResidentId = data.targetResidentId === null ? null : `${data.targetResidentId}`);
+			"sharedParameters" in data && (item.sharedParameters = data.sharedParameters === null ? null : +data.sharedParameters);
+			"distance" in data && (item.distance = data.distance === null ? null : +data.distance);
+			"targetResidentFamilyName" in data && (item.targetResidentFamilyName = data.targetResidentFamilyName === null ? null : `${data.targetResidentFamilyName}`);
+			"targetResidentTag" in data && (item.targetResidentTag = data.targetResidentTag === null ? null : `${data.targetResidentTag}`);
+			"targetResidentGivenName" in data && (item.targetResidentGivenName = data.targetResidentGivenName === null ? null : `${data.targetResidentGivenName}`);
+			"sourceResidentTag" in data && (item.sourceResidentTag = data.sourceResidentTag === null ? null : `${data.sourceResidentTag}`);
+			"sourceResidentGivenName" in data && (item.sourceResidentGivenName = data.sourceResidentGivenName === null ? null : `${data.sourceResidentGivenName}`);
+			"sourceResidentFamilyName" in data && (item.sourceResidentFamilyName = data.sourceResidentFamilyName === null ? null : `${data.sourceResidentFamilyName}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ResidentAssessmentMatchViewModel) {
+			const model = new ResidentAssessmentMatchView();
+			
+			"sourceResidentId" in viewModel && (model.sourceResidentId = viewModel.sourceResidentId === null ? null : `${viewModel.sourceResidentId}`);
+			"targetResidentId" in viewModel && (model.targetResidentId = viewModel.targetResidentId === null ? null : `${viewModel.targetResidentId}`);
+			"sharedParameters" in viewModel && (model.sharedParameters = viewModel.sharedParameters === null ? null : +viewModel.sharedParameters);
+			"distance" in viewModel && (model.distance = viewModel.distance === null ? null : +viewModel.distance);
+			"targetResidentFamilyName" in viewModel && (model.targetResidentFamilyName = viewModel.targetResidentFamilyName === null ? null : `${viewModel.targetResidentFamilyName}`);
+			"targetResidentTag" in viewModel && (model.targetResidentTag = viewModel.targetResidentTag === null ? null : `${viewModel.targetResidentTag}`);
+			"targetResidentGivenName" in viewModel && (model.targetResidentGivenName = viewModel.targetResidentGivenName === null ? null : `${viewModel.targetResidentGivenName}`);
+			"sourceResidentTag" in viewModel && (model.sourceResidentTag = viewModel.sourceResidentTag === null ? null : `${viewModel.sourceResidentTag}`);
+			"sourceResidentGivenName" in viewModel && (model.sourceResidentGivenName = viewModel.sourceResidentGivenName === null ? null : `${viewModel.sourceResidentGivenName}`);
+			"sourceResidentFamilyName" in viewModel && (model.sourceResidentFamilyName = viewModel.sourceResidentFamilyName === null ? null : `${viewModel.sourceResidentFamilyName}`);
 
 			return model;
 		}

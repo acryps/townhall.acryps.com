@@ -1,5 +1,5 @@
 import { Logger } from "@acryps/log";
-import { MarketIterationGenerator } from "..";
+import { MarketIterationGenerator } from "../generator";
 import { Time } from "../../../../interface/time";
 import { Interpreter, SystemMessage, ToolError, UserMessage } from "../../../life/interpreter";
 import { Commodity, StockSeed, TradeAsk } from "../../../managed/database";
@@ -21,6 +21,8 @@ export class MarketSeedSourcers extends MarketIterationGenerator {
 				{ name: 'reason', type: String }
 			], async (name: string, quantity: string, reason: string) => {
 				const seed = new StockSeed();
+				seed.seedingCycle = this.cycle;
+
 				seed.owner = trader.entity;
 				seed.indexed = new Date();
 

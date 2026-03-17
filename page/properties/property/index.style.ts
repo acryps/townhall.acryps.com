@@ -99,7 +99,6 @@ export const propertyStyle = () => child('ui-property',
 					)
 				),
 
-
 				child('ui-plot-boundaries',
 					display('block'),
 					marginBottom(rem(2)),

@@ -296,6 +296,7 @@ export interface ResidentSummaryModel {
 
 export interface ResidentViewModel {
     mainTenancy: TenancyViewModel;
+	assessments: ResidentAssessmentViewModel[];
 	workContracts: WorkContractEmploymentModel[];
 	biography: string;
 	birthday: Date;
@@ -305,6 +306,33 @@ export interface ResidentViewModel {
 	givenName: string;
 	id: string;
 	tag: string;
+}
+
+export interface ResidentAssessmentViewModel {
+    parameter: ResidentAssessmentParameterViewModel;
+	confidence: number;
+	id: string;
+	value: number;
+}
+
+export interface ResidentAssessmentParameterViewModel {
+    high: string;
+	id: string;
+	low: string;
+	prompt: string;
+}
+
+export interface ResidentAssessmentMatchViewModel {
+    sourceResidentId: string;
+	targetResidentId: string;
+	sharedParameters: number;
+	distance: number;
+	targetResidentFamilyName: string;
+	targetResidentTag: string;
+	targetResidentGivenName: string;
+	sourceResidentTag: string;
+	sourceResidentGivenName: string;
+	sourceResidentFamilyName: string;
 }
 
 export interface ResidentRelationViewModel {
@@ -345,16 +373,14 @@ export interface ResidentTickerModel {
 }
 
 export interface AskViewModel {
-    asker: LegalEntityViewModel;
-	id: string;
+    id: string;
 	posted: Date;
 	price: number;
 	quantity: number;
 }
 
 export interface BidViewModel {
-    bidder: LegalEntityViewModel;
-	id: string;
+    id: string;
 	posted: Date;
 	price: number;
 	quantity: number;
@@ -370,6 +396,19 @@ export interface CommoditySummaryModel {
 export interface CommodityCategorySummaryModel {
     id: string;
 	name: string;
+}
+
+export interface StockViewModel {
+    commodity: CommoditySummaryModel;
+	quantity: number;
+}
+
+export interface StockSeedViewModel {
+    commodity: CommoditySummaryModel;
+	quantity: number;
+	sourceName: string;
+	sourceQuantity: string;
+	sourceReason: string;
 }
 
 export interface LiveCommodityTickerResponseModel {
@@ -703,10 +742,42 @@ export interface LawHouseSessionViewModel {
 	started: Date;
 }
 
+export interface CommodityAskViewModel {
+    asker: LegalEntityViewModel;
+	id: string;
+	posted: Date;
+	price: number;
+	quantity: number;
+}
+
+export interface TraderAskViewModel {
+    commodity: CommoditySummaryModel;
+	id: string;
+	posted: Date;
+	price: number;
+	quantity: number;
+}
+
+export interface CommodityBidViewModel {
+    bidder: LegalEntityViewModel;
+	id: string;
+	posted: Date;
+	price: number;
+	quantity: number;
+}
+
+export interface TraderBidViewModel {
+    commodity: CommoditySummaryModel;
+	id: string;
+	posted: Date;
+	price: number;
+	quantity: number;
+}
+
 export interface CommodityViewModel {
     category: CommodityCategorySummaryModel;
-	asks: AskViewModel[];
-	bids: BidViewModel[];
+	asks: CommodityAskViewModel[];
+	bids: CommodityBidViewModel[];
 	description: string;
 	id: string;
 	innovated: Date;

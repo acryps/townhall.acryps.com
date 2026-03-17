@@ -1,477 +1,105 @@
-import { Queryable } from "vlquery";
-import { Article, Borough, Commodity, DbContext, Epoch, LegalEntity, LegalEntityQueryProxy, StockSeed, TradeAsk, TradeBid } from "../../managed/database";
-import { TradingEntity } from "../entity";
-import { convertToLegalCompanyName } from "../../../interface/company";
-import { Time } from "../../../interface/time";
+import { Logger } from "@acryps/log";
+import { MarketIterationGenerator } from "./generator";
+import { Commodity, DbContext, MarketCycle } from "../../managed/database";
 import { MarketTracker } from "../tracker";
-import { time } from "node:console";
-import { convertToCurrency } from "../../../interface/currency";
+import { MarketDemander } from "./demander";
+import { MarketInnovator } from "./innovator";
+import { MarketSeedMatcher } from "./seed/matcher";
+import { MarketSeedSourcers } from "./seed/sourcer";
+import { MarketReporter } from "./report";
+import { MarketCycleConfiguration } from "./configuration";
 
-export abstract class MarketIterationGenerator {
-	constructor(
-		public database: DbContext,
-		public tracker: MarketTracker
-	) {}
+export const advanceMarket = async (database: DbContext, tracker: MarketTracker) => {
+	const logger = new Logger('market').task('cycle');
 
-	abstract generate(): Promise<any>;
+	const lastCycle = await database.marketCycle
+		.orderByDescending(cycle => cycle.opened)
+		.first();
 
-	async randomEntity(tradeVolumeAdjusted = true) {
-		let query: () => Queryable<LegalEntity, LegalEntityQueryProxy>;
+	const marketCycle = new MarketCycle();
+	marketCycle.opened = new Date();
 
-		if (tradeVolumeAdjusted) {
-			if (Math.random() < 0.2) {
-				// any item
-				query = () => this.database.legalEntity
-					.where(entity => entity.state == null);
-			} else {
-				// a company
-				query = () => this.database.legalEntity
-					.where(entity => entity.state == null)
-					.where(entity => entity.companyId != null);
-			}
-		} else {
-			query = () => this.database.legalEntity
-				.where(entity => entity.state == null);
-		}
+	const configuration = MarketCycleConfiguration.load(lastCycle.configuration);
+	marketCycle.configuration = MarketCycleConfiguration.save(configuration);
 
-		const entityCount = await query().count() - 1;
-		const entity = await query()
-			.skip(Math.floor(Math.random() * entityCount))
-			.first();
+	await marketCycle.create();
 
-		return await TradingEntity.from(entity, this.database);
-	}
+	logger.log(`opened ${marketCycle.id.split('-')[0]}`);
 
-	async compileContext(trader: TradingEntity) {
-		const lines: string[] = [];
+	try {
+		// people had stuff before they had a market tracking system
+		// fill up their stocks with belongings from the past (stock seeding)
+		// the items will later be matched to commodities, this just indexes their stock
+		for (let iteration = 0; iteration < configuration.stockSeedingIterations; iteration++) {
+			// list what they had, without matching to commodities
+			const seedCount = await new MarketSeedSourcers(database, tracker, marketCycle).generate();
 
-		if (trader.entity.companyId) {
-			const company = await trader.entity.company.fetch();
-
-			const offices = await company.offices
-				.where(office => office.closed == null)
-				.include(office => office.property)
-				.include(office => office.workOffers)
-				.toArray();
-
-			lines.push(
-				`# Company ${company.name}`,
-				`legally operating under the name '${convertToLegalCompanyName(company)}'`,
-				`founded ${new Time(company.created).age()} years ago`,
-				`about: ${company.description}`
-			);
-
-			const contracts = await this.database.workContract
-				.where(contract => contract.offer.office.companyId == company.id)
-				.where(contract => contract.canceled == null)
-				.include(contract => contract.worker)
-				.toArray();
-
-			for (let office of offices) {
-				const propery = await office.property.fetch();
-				const borough = await propery.borough.fetch();
-
-				lines.push(
-					'',
-					`## Office '${office.name}' located in ${borough.name}`,
-					`opened ${new Time(office.opened).age()} years ago`,
-					'',
-					`jobs & workers working for ${company.name} at ${office.name}:`
-				);
-
-				for (let offer of await office.workOffers.toArray()) {
-					const signedContracts = contracts.filter(contract => contract.offerId == offer.id);
-
-					if (signedContracts.length) {
-						const workers = [];
-
-						for (let contract of signedContracts) {
-							const worker = await contract.worker.fetch();
-
-							workers.push(`${worker.givenName} ${worker.familyName}`);
-						}
-
-						lines.push(
-							`${offer.title}: ${workers.join(', ')}`
-						);
-					}
-				}
+			// match the seeds to commodities, actually generating stock
+			for (let iteration = 0; iteration < seedCount; iteration++) {
+				await new MarketSeedMatcher(database, tracker, marketCycle).generate();
 			}
 		}
 
-		if (trader.entity.boroughId) {
-			const borough = await trader.entity.borough.fetch();
-
-			lines.push(
-				`# Borough ${borough.name}`,
-				borough.description
-			);
+		// first, generate some new demand
+		for (let iteration = 0; iteration < configuration.baseDemandIterations; iteration++) {
+			await new MarketDemander(database, tracker, marketCycle).generate();
 		}
 
-		if (trader.entity.residentId) {
-			const resident = await trader.entity.resident.fetch();
+		// let the market respond to new signals
+		const innovations: Commodity[] = [];
 
-			const relatedBoroughs = new Map<Borough, string>();
+		for (let iteration = 0; iteration < configuration.innovationIterations; iteration++) {
+			const innovation = await new MarketInnovator(database, tracker, marketCycle).generate();
 
-			lines.push(
-				`# Resident ${resident.givenName} ${resident.familyName}`,
-				`age: ${new Time(resident.birthday).age()} years old`
-			);
-
-			lines.push(
-				`## Biography of ${resident.givenName}`,
-				 resident.biography
-			);
-
-			const home = await resident.mainTenancy.fetch();
-
-			if (home) {
-				const dwelling = await home.dwelling.fetch();
-				const property = await dwelling.property.fetch();
-				const borough = await property.borough.fetch();
-
-				relatedBoroughs.set(borough, 'lives');
-
-				lines.push(
-					'',
-					'## Home',
-					`lives in ${borough.name} since ${new Time(home.start).age()} years`
-				);
-
-				const peers = await dwelling.tenants
-					.where(tenant => tenant.id != home.id)
-					.include(tenant => tenant.inhabitant)
-					.toArray();
-
-				if (peers.length) {
-					for (let peer of peers) {
-						const inhabitant = await peer.inhabitant.fetch();
-
-						lines.push(`lives with ${inhabitant.givenName} ${inhabitant.familyName}, aged ${new Time(inhabitant.birthday).age()}`);
-					}
-				} else {
-					lines.push('lives alone');
-				}
-			}
-
-			const currentJob = await resident.workContracts
-				.where(contract => contract.canceled == null)
-				.orderByDescending(contract => contract.signed)
-				.first();
-
-			if (currentJob) {
-				const offer = await currentJob.offer.fetch();
-
-				const office = await offer.office.fetch();
-				const property = await office.property.fetch();
-				const borough = await property.borough.fetch();
-				relatedBoroughs.set(borough, 'works');
-
-				const company = await office.company.fetch();
-
-				lines.push(
-					'',
-					'## Work',
-					`working as ${offer.title} for ${company.name} at ${office.name} in ${borough.name} since ${new Time(currentJob.signed).age()} years`,
-					'',
-					`about ${convertToLegalCompanyName(company)}:`,
-					company.description
-				);
-			}
-
-			const relations = await this.database.residentRelationship
-				.where(relation => relation.initiatorId == resident.id || relation.peerId == resident.id)
-				.where(relation => relation.conflict == null)
-				.include(relation => relation.initiator)
-				.include(relation => relation.peer)
-				.toArray();
-
-			if (relations.length) {
-				lines.push('', '## Relations to other people');
-
-				for (let relation of relations) {
-					const peer = relation.initiatorId == resident.id ? await relation.peer.fetch() : await relation.initiator.fetch();
-
-					lines.push(`${resident.givenName} is connected to ${peer.givenName} ${peer.familyName} (${relation.purpose})`);
-
-					if (relation.summary) {
-						lines.push(`connection: ${relation.summary}`);
-					}
-
-					lines.push('');
-				}
-			}
-
-			if (relatedBoroughs.size) {
-				lines.push('', '## Regional Context');
-
-				const elaboratedBoroughs: string[] = [];
-
-				for (let [borough, relation] of relatedBoroughs) {
-					if (!elaboratedBoroughs.includes(borough.id)) {
-						lines.push(`about ${borough.name}, where ${resident.givenName} ${relation}:`);
-						lines.push(borough.description);
-
-						elaboratedBoroughs.push(borough.id);
-					}
-				}
+			if (innovation) {
+				innovations.push(innovation);
 			}
 		}
 
-		return lines.join('\n');
-	}
+		// some people might already have this
+		// lets find some matches from open seeding calls
+		for (let iteration = 0; iteration < innovations.length; iteration++) {
+			await new MarketSeedMatcher(database, tracker, marketCycle).generate(innovations);
+		}
 
-	async compileMarketSituation(title: string) {
-		const commodities = await this.database.commodity
-			.include(commodity => commodity.bids)
-			.include(commodity => commodity.asks)
+		// let the market respond to the new demands
+		for (let iteration = 0; iteration < configuration.innovatedDemandIterations; iteration++) {
+			await new MarketDemander(database, tracker, marketCycle).generate(innovations);
+		}
+
+		// write articles about the shifts on the market
+		const marketPublications = await database.publication
+			.where(publication => publication.marketReportStandpoint != null)
 			.toArray();
 
-		const analysis = [
-			`# ${title}`,
-			'Beware that we only see public bids and asks, so even if a commodity is listed as not having any asks/bids, there will still be demand and supply',
-			`Current date: ${Time.now().toDateString()}`
-		];
+		const articles = [];
 
-		for (let commoditiy of commodities) {
-			analysis.push(
-				'',
-				`## ${commoditiy.name}`,
-				`${commoditiy.name} is traded in '${commoditiy.unit}' units`,
-				`${commoditiy.description}`,
-				''
-			);
+		for (let publication of marketPublications) {
+			const article = await new MarketReporter(publication, innovations, database, tracker, marketCycle).generate();
 
-			const bids = await commoditiy.bids.toArray();
-			const openBids = bids.filter(bid => bid.purchaseId == null);
-			openBids.sort((a, b) => b.quantity * b.price - a.quantity * a.price);
-
-			const bidCapitalization = openBids.reduce((sum, bid) => sum + bid.quantity * bid.price, 0);
-
-			if (bidCapitalization) {
-				const bidVolume = openBids.reduce((sum, bid) => sum + bid.quantity, 0);
-				const bidPrice = bidCapitalization / bidVolume;
-
-				analysis.push(`Total bids sum to ${convertToCurrency(bidCapitalization)}, with an average price of ${convertToCurrency(bidPrice)} per ${commoditiy.unit}.`);
-
-				analysis.push('Biggest bids');
-				for (let top of openBids.slice(0, 5)) {
-					analysis.push(`- ${top.quantity} ${commoditiy.unit}, posted ${new Time(top.posted).age()} years ago`);
-				}
-			} else {
-				analysis.push('There are currently no public bids out');
-			}
-
-			const asks = await commoditiy.asks.toArray();
-			const openAsks = asks.filter(ask => ask.saleId == null);
-			openAsks.sort((a, b) => b.quantity * b.price - a.quantity * a.price);
-
-			const askCapitalization = openAsks.reduce((sum, ask) => sum + ask.quantity * ask.price, 0);
-
-			if (askCapitalization) {
-				const askVolume = openAsks.reduce((sum, ask) => sum + ask.quantity, 0);
-				const askPrice = askCapitalization / askVolume;
-
-				analysis.push(`Total asks sum to ${convertToCurrency(askCapitalization)}, with an average price of ${convertToCurrency(askPrice)} per ${commoditiy.unit}.`);
-
-				analysis.push('Biggest asks');
-				for (let top of openAsks.slice(0, 5)) {
-					analysis.push(`- ${top.quantity} ${commoditiy.unit}, posted ${new Time(top.posted).age()} years ago`);
-				}
-			} else {
-				analysis.push('There are currently no public asks out');
-			}
-
-			analysis.push('');
-
-			let date = new Date();
-
-			for (let iteration = 0; iteration < 7; iteration++) {
-				date.setDate(date.getDate() - 1);
-
-				analysis.push(this.compileHistoricMaketPrice([...bids, ...asks], date));
+			if (article) {
+				articles.push(article);
 			}
 		}
 
-		return analysis.join('\n');
+		// let the market buy stuff
+		// plan new productions
+		// work on productions
+		// sell stock
+	} catch (error) {
+		logger.error(`failed ${marketCycle.id.split('-')[0]}: ${error}`);
 	}
 
-	compileHistoricMaketPrice(positions: (TradeAsk | TradeBid)[], cutoff: Date) {
-		// TODO filter for open bids
-		const filteredPositions = positions.filter(position => position.posted < cutoff);
+	await tracker.update();
+	tracker.dump();
 
-		const capitalization = filteredPositions.reduce((sum, position) => sum + position.quantity * position.price, 0);
-		const volume = filteredPositions.reduce((sum, position) => sum + position.quantity, 0);
-		const price = capitalization / volume;
+	marketCycle.closed = new Date();
+	await marketCycle.update();
 
-		return `Average price at ${new Time(cutoff).toDateString()}: ${convertToCurrency(price)}, capitalization ${convertToCurrency(capitalization)}`;
-	}
+	logger.log(`closed ${marketCycle.id.split('-')[0]}`);
 
-	async getNews() {
-		const articles = await this.database.article
-			.where(article => article.published != null)
-			.orderByDescending(article => article.published)
-			.toArray();
+	return;
 
-		const selection = [];
-		let cursor = Math.floor(Math.random() * 3);
-
-		while (articles[cursor]) {
-			selection.push(articles[cursor]);
-
-			// make spacing grow with each article
-			cursor += Math.ceil(Math.random() * selection.length * 4);
-		}
-
-		return selection;
-	}
-
-	// only expands some articles, uses summary for most
-	async compileNews(title: string, articles: Article[]) {
-		return [
-			`# ${title}`,
-
-			articles.filter(article => article.generatedSummary).map(article => [
-				`## ${article.title}`,
-				`published ${new Time(article.published).toDateString()}`,
-				article.generatedSummary ?? article.body.split(/\s+/g).join(' ')
-			].join('\n')).join('\n\n')
-		].join('\n');
-	}
-
-	async compileStock(title: string, trader: TradingEntity) {
-		const stock = await trader.getStock();
-
-		return [
-			`# ${title}`,
-			...this.pricePointers,
-
-			stock.map(
-				item => `- ${item.commodity.name}: ${item.quantity} ${item.commodity.unit}, price ~${this.tracker.buyingPrice(item.commodity)}/${item.commodity.unit}`
-			).join('\n')
-		].join('\n');
-	}
-
-	async getOpenSeedStock(trader: TradingEntity) {
-		return await trader.entity.stockSeeds
-			.where(seed => seed.commodityId == null) // already listed in stock if fulfilled
-			.toArray();
-	}
-
-	async getOpenCommunitySeedStock(trader: TradingEntity) {
-		const traders = [trader, ...(await trader.getCommunity())];
-		const stock: StockSeed[] = [];
-
-		for (let trader of traders) {
-			stock.push(...(await this.getOpenSeedStock(trader)));
-		}
-
-		return stock;
-	}
-
-	async compileSeedStock(title: string, seeds: StockSeed[]) {
-		return [
-			`# ${title}`,
-
-			...seeds.map(seed => `- id=${seed.id.split('-')[0]} ${seed.sourceName}: ${seed.sourceQuantity}`)
-		].join('\n');
-	}
-
-	async getRandomCommodities(count = 50) {
-		const commodities = await this.database.commodity.toArray();
-
-		while (commodities.length > count) {
-			commodities.splice(Math.floor(Math.random() * commodities.length), 1);
-		}
-
-		return commodities;
-	}
-
-	async compileCompactCommoditiesList(title: string, commodities: Commodity[]) {
-		return await this.compileCommoditiesList(title, commodities, 0);
-	}
-
-	async compileCommoditiesList(title: string, commodities: Commodity[], expandedCount = 50) {
-		const list = [];
-
-		// only show descriptions for first 50 items
-		for (let commodity of commodities.slice(0, expandedCount)) {
-			const price = this.tracker.buyingPrice(commodity);
-
-			list.push(
-				`id=${commodity.id.split('-')[0]} ${commodity.name} (unit: ${commodity.unit})`,
-				`price: ${isNaN(price) ? 'not enough data' : `~${price}/${commodity.unit}`}`,
-				`description: ${commodity.description}`,
-				''
-			);
-		}
-
-		for (let commodity of commodities.slice(expandedCount)) {
-			const price = this.tracker.buyingPrice(commodity);
-
-			list.push(
-				`id=${commodity.id.split('-')[0]} ${commodity.name} (unit: ${commodity.unit}, price: ${isNaN(price) ? 'not enough data' : `~${price}/${commodity.unit}`})`,
-			);
-		}
-
-		return [
-			`# ${title}`,
-			...this.pricePointers,
-
-			...list
-		].join('\n');
-	}
-
-	async getDemand() {
-		const bids = await this.database.tradeBid
-			.where(bid => bid.fulfilled == null)
-			.include(bid => bid.commodity)
-			.toArray();
-
-		while (bids.length > 50) {
-			bids.splice(Math.floor(Math.random() * bids.length), 1);
-		}
-
-		return bids;
-	}
-
-	async getOpenDemand(trader: TradingEntity) {
-		const bids = await trader.entity.bids
-			.where(bid => bid.fulfilled == null)
-			.include(bid => bid.commodity)
-			.include(bid => bid)
-			.toArray();
-
-		while (bids.length > 50) {
-			bids.splice(Math.floor(Math.random() * bids.length), 1);
-		}
-
-		return bids;
-	}
-
-	async compileDemand(title: string, demand: TradeBid[]) {
-		const list = [];
-
-		for (let bid of demand) {
-			const commodity = await bid.commodity.fetch();
-
-			list.push(
-				`#${bid.id.split('-')[0]} ${commodity.name} (unit: ${commodity.unit})`, /// TODO COMPLETE
-				''
-			);
-		}
-
-		return [
-			`# ${title}`,
-			...this.pricePointers,
-
-			...list
-		].join('\n');
-	}
-
-	private readonly pricePointers = [
-		'prices are all average asking prices.',
-		'some commodities do not have enough data to show a average price yet',
-		'they are just as valid of an option as any other commodity'
-	];
+	// let entities produce somethings
+	/// await Produce
 }

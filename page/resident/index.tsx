@@ -1,10 +1,11 @@
 import { Component } from "@acryps/page";
 import { ChatService, LifeService, ResidentEventViewModel, ResidentViewModel } from "../managed/services";
 import { Time } from "../../interface/time";
-import { chatIcon, electionIcon, homeIcon, relationGraphIcon } from "../assets/icons/managed";
+import { chatIcon, electionIcon, homeIcon, marketIcon, relationGraphIcon } from "../assets/icons/managed";
 import { MetaPerson } from "@acryps/metadata";
 import { convertToLegalCompanyName } from "../../interface/company";
 import { PoliticalCompassComponent } from "../shared/political-compass";
+import { assessmentMarkerValue } from "./index.style";
 
 export class ResidentPage extends Component {
 	declare parameters: { tag };
@@ -63,16 +64,20 @@ export class ResidentPage extends Component {
 			</ui-work>}
 
 			<ui-actions>
-				<ui-action ui-click={async () => this.navigate(`chat/${await new ChatService().start(this.resident.tag)}`)}>
-					{chatIcon()}
-				</ui-action>
-
 				{this.resident.mainTenancy && <ui-action ui-href={`/property/${this.resident.mainTenancy.dwelling.property.id}`}>
-					{homeIcon()}
+					{homeIcon()} Home
 				</ui-action>}
 
+				<ui-action ui-href={`/market/entity/${this.resident.id}`}>
+					{marketIcon()} Market
+				</ui-action>
+
 				<ui-action ui-href='relations'>
-					{relationGraphIcon()}
+					{relationGraphIcon()} Relations
+				</ui-action>
+
+				<ui-action ui-href='assessment'>
+					Assessment
 				</ui-action>
 			</ui-actions>
 

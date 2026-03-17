@@ -7,6 +7,7 @@ import { boxed } from "../shared/boxed.style";
 import { PageComponent } from "../page";
 import { inputStyle } from "../shared/field.style";
 import { commodityStyle } from "./commodity/index.style";
+import { marketEntityStyle } from "./entity/index.style";
 
 export const marketStyle = () => child('ui-market',
 	display('block'),
@@ -14,6 +15,7 @@ export const marketStyle = () => child('ui-market',
 	topicHeaderStyle(),
 
 	commodityStyle(),
+	marketEntityStyle(),
 
 	changeAnimation,
 

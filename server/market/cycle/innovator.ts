@@ -1,5 +1,5 @@
 import { Logger } from "@acryps/log";
-import { MarketIterationGenerator } from ".";
+import { MarketIterationGenerator } from "./generator";
 import { Time } from "../../../interface/time";
 import { Interpreter, SystemMessage, ToolError, UserMessage } from "../../life/interpreter";
 import { Commodity, TradeAsk } from "../../managed/database";
@@ -46,6 +46,7 @@ export class MarketInnovator extends MarketIterationGenerator {
 				}
 
 				const innovation = new Commodity();
+				innovation.innovationCycle = this.cycle;
 				innovation.tag = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
 				innovation.innovated = new Date();

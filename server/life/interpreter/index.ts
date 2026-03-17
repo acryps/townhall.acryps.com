@@ -29,8 +29,8 @@ export class Interpreter {
 	tools: Tool[] = [];
 	history: InterpreterMessage[] = [];
 
-	static readonly toolStartToken = 'ACTION:';
-	static readonly toolEndToken = ':ACTION';
+	static readonly toolStartToken = '<tool_call:';
+	static readonly toolEndToken = ':tool_call>';
 
 	static simulateToolReponse(tool: string, parameters: any) {
 		return new AssistantMessage(`${this.toolStartToken}${tool}({ ${
@@ -64,7 +64,7 @@ export class Interpreter {
 		];
 
 		for (let tool of this.tools) {
-			message.push(`- ${tool.name}(${tool.parameters.map(parameter => `${parameter.name}: ${parameter.type.name}${parameter.optional ? ' (optional)' : ''}`).join(', ')})`);
+			message.push(`- ${tool.name}({ ${tool.parameters.map(parameter => `${parameter.name}: ${parameter.type.name}${parameter.optional ? ' (optional)' : ''}`).join(', ')} })`);
 		}
 
 		message.push(

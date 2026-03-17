@@ -1,7 +1,7 @@
 import { Logger } from "@acryps/log";
-import { MarketIterationGenerator } from ".";
+import { MarketIterationGenerator } from "./generator";
 import { Interpreter, InterpreterMessage, SystemMessage, ToolError, UserMessage } from "../../life/interpreter";
-import { Publication, Commodity, StockSeed, Article, DbContext } from "../../managed/database";
+import { Publication, Commodity, StockSeed, Article, DbContext, MarketCycle } from "../../managed/database";
 import { TradingEntity } from "../entity";
 import { Language } from "../../life/language";
 import { MarketTracker } from "../tracker";
@@ -15,8 +15,9 @@ export class MarketReporter extends MarketIterationGenerator {
 
 		public database: DbContext,
 		public tracker: MarketTracker,
+		public cycle: MarketCycle
 	) {
-		super(database, tracker);
+		super(database, tracker, cycle);
 	}
 
 	async generate() {
@@ -37,6 +38,7 @@ export class MarketReporter extends MarketIterationGenerator {
 		}
 
 		const article = await this.writeArticle(context);
+		article.marketCycle = this.cycle;
 
 		await this.summarize(article);
 		article.published = new Date();

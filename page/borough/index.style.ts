@@ -34,6 +34,15 @@ export const boroughStyle = () => child('ui-borough',
 		textAlign('center')
 	),
 
+	child('ui-actions',
+		display('flex'),
+		marginBottom(rem(1)),
+
+		child('ui-action',
+			buttonStyle()
+		)
+	),
+
 	child('ui-description',
 		display('block'),
 		marginBottom(rem(2)),
@@ -65,13 +74,5 @@ export const boroughStyle = () => child('ui-borough',
 		width(percentage(100)),
 		aspectRatio(ratio(1, 1)),
 		marginBottom(pageGutter)
-	),
-
-	child('ui-actions',
-		display('flex'),
-
-		child('ui-action',
-			buttonStyle()
-		)
 	)
 )

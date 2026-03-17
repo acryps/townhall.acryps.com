@@ -51,9 +51,10 @@ import { WaterBodyTileServer } from "./map/layers/filled/water";
 import { WaterBodyFiller } from "./map/fill/water";
 import { TradingEntity } from "./market/entity";
 import { MarketTracker } from "./market/tracker";
-import { MarketIterationGenerator } from "./market/cycle";
-import { advanceMarket } from "./market/cycle/cycle";
+import { MarketIterationGenerator } from "./market/cycle/generator";
+import { advanceMarket } from "./market/cycle";
 import { Logger } from "@acryps/log";
+import { ResidentAssessor } from "./life/assess";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const runMarket = process.env.RUN_MARKET == 'YES';
@@ -83,9 +84,14 @@ DbClient.connectedClient.connect().then(async () => {
 	const marketLogger = new Logger('market');
 
 	const marketTracker = new MarketTracker(new Logger('tracker', marketLogger), database);
-	await marketTracker.update();
+	// await marketTracker.update();
 
-	setInterval(() => marketTracker.update(), 1000 * 60);
+	// setInterval(() => marketTracker.update(), 1000 * 60);
+
+
+	new ResidentAssessor(database).next();
+
+
 
 	if (runMarket) {
 		marketTracker.dump();

@@ -1,5 +1,5 @@
 import { ViewModel } from "vlserver";
-import { Dwelling, Resident, ResidentEventView, ResidentRelationship, Tenancy } from "../../managed/database";
+import { Dwelling, Resident, ResidentAssessment, ResidentAssessmentMatchView, ResidentAssessmentParameter, ResidentEventView, ResidentRelationship, Tenancy } from "../../managed/database";
 import { PropertySummaryModel } from "../property.summary";
 import { WorkContractEmploymentModel, WorkContractViewModel } from "../work";
 
@@ -27,6 +27,38 @@ export class ResidentViewModel extends ViewModel<Resident> {
 
 	compassSocial;
 	compassEconomic;
+
+	assessments: ResidentAssessmentViewModel[];
+}
+
+export class ResidentAssessmentViewModel extends ViewModel<ResidentAssessment> {
+	id;
+	value;
+	confidence;
+
+	parameter: ResidentAssessmentParameterViewModel;
+}
+
+export class ResidentAssessmentParameterViewModel extends ViewModel<ResidentAssessmentParameter> {
+	id;
+	prompt;
+	low;
+	high;
+}
+
+export class ResidentAssessmentMatchViewModel extends ViewModel<ResidentAssessmentMatchView> {
+	sourceResidentId;
+	sourceResidentTag;
+	sourceResidentGivenName;
+	sourceResidentFamilyName;
+
+	targetResidentId;
+	targetResidentTag;
+	targetResidentFamilyName;
+	targetResidentGivenName;
+
+	sharedParameters;
+	distance;
 }
 
 export class ResidentRelationViewModel extends ViewModel<ResidentRelationship> {

@@ -8,7 +8,7 @@ import { Banner } from "../../../interface/banner";
 import { AboutComponent } from "../../shared/about";
 import { Time } from "../../../interface/time";
 import { MetaOrganization } from "@acryps/metadata";
-import { itemContextIcon, priceIcon } from "../../assets/icons/managed";
+import { itemContextIcon, marketIcon, priceIcon } from "../../assets/icons/managed";
 
 export class CompanyPage extends Component {
 	declare parameters: { tag };
@@ -54,6 +54,10 @@ export class CompanyPage extends Component {
 			</ui-description>
 
 			<ui-actions>
+				<ui-action ui-href={`/market/entity/${this.company.id}`}>
+					{marketIcon()} Market
+				</ui-action>
+
 				<ui-action ui-href={`/trade/assets/${this.company.id}`}>
 					{priceIcon()} View Assets
 				</ui-action>

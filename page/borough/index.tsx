@@ -8,7 +8,7 @@ import { MapComponent } from "../shared/map";
 import { Banner } from "../../interface/banner";
 import { BoroughMetric } from "./metric";
 import { Time } from "../../interface/time";
-import { itemContextIcon } from "../assets/icons/managed";
+import { itemContextIcon, marketIcon } from "../assets/icons/managed";
 
 export class BoroughPage extends Component {
 	declare parameters: { tag };
@@ -47,6 +47,16 @@ export class BoroughPage extends Component {
 				{this.borough.district.name} legal district
 			</ui-district>}
 
+			<ui-actions>
+				<ui-action ui-href={`/market/entity/${this.borough.id}`}>
+					{marketIcon()} Market
+				</ui-action>
+
+				<ui-action ui-href={`/item-context/${this.borough.id}`}>
+					{itemContextIcon()} View Context
+				</ui-action>
+			</ui-actions>
+
 			<ui-description>
 				{linkText(this.borough.description)}
 			</ui-description>
@@ -84,12 +94,6 @@ export class BoroughPage extends Component {
 			</ui-metrics>
 
 			{new MapComponent().highlight(Point.unpack(this.borough.bounds))}
-
-			<ui-actions>
-				<ui-action ui-href={`/item-context/${this.borough.id}`}>
-					{itemContextIcon()} View Context
-				</ui-action>
-			</ui-actions>
 		</ui-borough>;
 	}
 }

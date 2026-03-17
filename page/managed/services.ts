@@ -692,6 +692,7 @@ export class ResidentSummaryModel {
 
 export class ResidentViewModel {
 	mainTenancy: TenancyViewModel;
+	assessments: ResidentAssessmentViewModel[];
 	workContracts: WorkContractEmploymentModel[];
 	biography: string;
 	birthday: Date;
@@ -705,6 +706,7 @@ export class ResidentViewModel {
 	private static $build(raw) {
 		const item = new ResidentViewModel();
 		raw.mainTenancy === undefined || (item.mainTenancy = raw.mainTenancy ? TenancyViewModel["$build"](raw.mainTenancy) : null)
+		raw.assessments === undefined || (item.assessments = raw.assessments ? raw.assessments.map(i => ResidentAssessmentViewModel["$build"](i)) : null)
 		raw.workContracts === undefined || (item.workContracts = raw.workContracts ? raw.workContracts.map(i => WorkContractEmploymentModel["$build"](i)) : null)
 		raw.biography === undefined || (item.biography = raw.biography === null ? null : `${raw.biography}`)
 		raw.birthday === undefined || (item.birthday = raw.birthday ? new Date(raw.birthday) : null)
@@ -714,6 +716,69 @@ export class ResidentViewModel {
 		raw.givenName === undefined || (item.givenName = raw.givenName === null ? null : `${raw.givenName}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
+		
+		return item;
+	}
+}
+
+export class ResidentAssessmentViewModel {
+	parameter: ResidentAssessmentParameterViewModel;
+	confidence: number;
+	id: string;
+	value: number;
+
+	private static $build(raw) {
+		const item = new ResidentAssessmentViewModel();
+		raw.parameter === undefined || (item.parameter = raw.parameter ? ResidentAssessmentParameterViewModel["$build"](raw.parameter) : null)
+		raw.confidence === undefined || (item.confidence = raw.confidence === null ? null : +raw.confidence)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.value === undefined || (item.value = raw.value === null ? null : +raw.value)
+		
+		return item;
+	}
+}
+
+export class ResidentAssessmentParameterViewModel {
+	high: string;
+	id: string;
+	low: string;
+	prompt: string;
+
+	private static $build(raw) {
+		const item = new ResidentAssessmentParameterViewModel();
+		raw.high === undefined || (item.high = raw.high === null ? null : `${raw.high}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.low === undefined || (item.low = raw.low === null ? null : `${raw.low}`)
+		raw.prompt === undefined || (item.prompt = raw.prompt === null ? null : `${raw.prompt}`)
+		
+		return item;
+	}
+}
+
+export class ResidentAssessmentMatchViewModel {
+	sourceResidentId: string;
+	targetResidentId: string;
+	sharedParameters: number;
+	distance: number;
+	targetResidentFamilyName: string;
+	targetResidentTag: string;
+	targetResidentGivenName: string;
+	sourceResidentTag: string;
+	sourceResidentGivenName: string;
+	sourceResidentFamilyName: string;
+
+	private static $build(raw) {
+		const item = new ResidentAssessmentMatchViewModel();
+		raw.sourceResidentId === undefined || (item.sourceResidentId = raw.sourceResidentId === null ? null : `${raw.sourceResidentId}`)
+		raw.targetResidentId === undefined || (item.targetResidentId = raw.targetResidentId === null ? null : `${raw.targetResidentId}`)
+		raw.sharedParameters === undefined || (item.sharedParameters = raw.sharedParameters === null ? null : +raw.sharedParameters)
+		raw.distance === undefined || (item.distance = raw.distance === null ? null : +raw.distance)
+		raw.targetResidentFamilyName === undefined || (item.targetResidentFamilyName = raw.targetResidentFamilyName === null ? null : `${raw.targetResidentFamilyName}`)
+		raw.targetResidentTag === undefined || (item.targetResidentTag = raw.targetResidentTag === null ? null : `${raw.targetResidentTag}`)
+		raw.targetResidentGivenName === undefined || (item.targetResidentGivenName = raw.targetResidentGivenName === null ? null : `${raw.targetResidentGivenName}`)
+		raw.sourceResidentTag === undefined || (item.sourceResidentTag = raw.sourceResidentTag === null ? null : `${raw.sourceResidentTag}`)
+		raw.sourceResidentGivenName === undefined || (item.sourceResidentGivenName = raw.sourceResidentGivenName === null ? null : `${raw.sourceResidentGivenName}`)
+		raw.sourceResidentFamilyName === undefined || (item.sourceResidentFamilyName = raw.sourceResidentFamilyName === null ? null : `${raw.sourceResidentFamilyName}`)
 		
 		return item;
 	}
@@ -809,7 +874,6 @@ export class ResidentTickerModel {
 }
 
 export class AskViewModel {
-	asker: LegalEntityViewModel;
 	id: string;
 	posted: Date;
 	price: number;
@@ -817,7 +881,6 @@ export class AskViewModel {
 
 	private static $build(raw) {
 		const item = new AskViewModel();
-		raw.asker === undefined || (item.asker = raw.asker ? LegalEntityViewModel["$build"](raw.asker) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.posted === undefined || (item.posted = raw.posted ? new Date(raw.posted) : null)
 		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
@@ -828,7 +891,6 @@ export class AskViewModel {
 }
 
 export class BidViewModel {
-	bidder: LegalEntityViewModel;
 	id: string;
 	posted: Date;
 	price: number;
@@ -836,7 +898,6 @@ export class BidViewModel {
 
 	private static $build(raw) {
 		const item = new BidViewModel();
-		raw.bidder === undefined || (item.bidder = raw.bidder ? LegalEntityViewModel["$build"](raw.bidder) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.posted === undefined || (item.posted = raw.posted ? new Date(raw.posted) : null)
 		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
@@ -871,6 +932,38 @@ export class CommodityCategorySummaryModel {
 		const item = new CommodityCategorySummaryModel();
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		
+		return item;
+	}
+}
+
+export class StockViewModel {
+	commodity: CommoditySummaryModel;
+	quantity: number;
+
+	private static $build(raw) {
+		const item = new StockViewModel();
+		raw.commodity === undefined || (item.commodity = raw.commodity ? CommoditySummaryModel["$build"](raw.commodity) : null)
+		raw.quantity === undefined || (item.quantity = raw.quantity === null ? null : +raw.quantity)
+		
+		return item;
+	}
+}
+
+export class StockSeedViewModel {
+	commodity: CommoditySummaryModel;
+	quantity: number;
+	sourceName: string;
+	sourceQuantity: string;
+	sourceReason: string;
+
+	private static $build(raw) {
+		const item = new StockSeedViewModel();
+		raw.commodity === undefined || (item.commodity = raw.commodity ? CommoditySummaryModel["$build"](raw.commodity) : null)
+		raw.quantity === undefined || (item.quantity = raw.quantity === null ? null : +raw.quantity)
+		raw.sourceName === undefined || (item.sourceName = raw.sourceName === null ? null : `${raw.sourceName}`)
+		raw.sourceQuantity === undefined || (item.sourceQuantity = raw.sourceQuantity === null ? null : `${raw.sourceQuantity}`)
+		raw.sourceReason === undefined || (item.sourceReason = raw.sourceReason === null ? null : `${raw.sourceReason}`)
 		
 		return item;
 	}
@@ -1664,10 +1757,86 @@ export class LawHouseSessionViewModel {
 	}
 }
 
+export class CommodityAskViewModel {
+	asker: LegalEntityViewModel;
+	id: string;
+	posted: Date;
+	price: number;
+	quantity: number;
+
+	private static $build(raw) {
+		const item = new CommodityAskViewModel();
+		raw.asker === undefined || (item.asker = raw.asker ? LegalEntityViewModel["$build"](raw.asker) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.posted === undefined || (item.posted = raw.posted ? new Date(raw.posted) : null)
+		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
+		raw.quantity === undefined || (item.quantity = raw.quantity === null ? null : +raw.quantity)
+		
+		return item;
+	}
+}
+
+export class TraderAskViewModel {
+	commodity: CommoditySummaryModel;
+	id: string;
+	posted: Date;
+	price: number;
+	quantity: number;
+
+	private static $build(raw) {
+		const item = new TraderAskViewModel();
+		raw.commodity === undefined || (item.commodity = raw.commodity ? CommoditySummaryModel["$build"](raw.commodity) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.posted === undefined || (item.posted = raw.posted ? new Date(raw.posted) : null)
+		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
+		raw.quantity === undefined || (item.quantity = raw.quantity === null ? null : +raw.quantity)
+		
+		return item;
+	}
+}
+
+export class CommodityBidViewModel {
+	bidder: LegalEntityViewModel;
+	id: string;
+	posted: Date;
+	price: number;
+	quantity: number;
+
+	private static $build(raw) {
+		const item = new CommodityBidViewModel();
+		raw.bidder === undefined || (item.bidder = raw.bidder ? LegalEntityViewModel["$build"](raw.bidder) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.posted === undefined || (item.posted = raw.posted ? new Date(raw.posted) : null)
+		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
+		raw.quantity === undefined || (item.quantity = raw.quantity === null ? null : +raw.quantity)
+		
+		return item;
+	}
+}
+
+export class TraderBidViewModel {
+	commodity: CommoditySummaryModel;
+	id: string;
+	posted: Date;
+	price: number;
+	quantity: number;
+
+	private static $build(raw) {
+		const item = new TraderBidViewModel();
+		raw.commodity === undefined || (item.commodity = raw.commodity ? CommoditySummaryModel["$build"](raw.commodity) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.posted === undefined || (item.posted = raw.posted ? new Date(raw.posted) : null)
+		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
+		raw.quantity === undefined || (item.quantity = raw.quantity === null ? null : +raw.quantity)
+		
+		return item;
+	}
+}
+
 export class CommodityViewModel {
 	category: CommodityCategorySummaryModel;
-	asks: AskViewModel[];
-	bids: BidViewModel[];
+	asks: CommodityAskViewModel[];
+	bids: CommodityBidViewModel[];
 	description: string;
 	id: string;
 	innovated: Date;
@@ -1678,8 +1847,8 @@ export class CommodityViewModel {
 	private static $build(raw) {
 		const item = new CommodityViewModel();
 		raw.category === undefined || (item.category = raw.category ? CommodityCategorySummaryModel["$build"](raw.category) : null)
-		raw.asks === undefined || (item.asks = raw.asks ? raw.asks.map(i => AskViewModel["$build"](i)) : null)
-		raw.bids === undefined || (item.bids = raw.bids ? raw.bids.map(i => BidViewModel["$build"](i)) : null)
+		raw.asks === undefined || (item.asks = raw.asks ? raw.asks.map(i => CommodityAskViewModel["$build"](i)) : null)
+		raw.bids === undefined || (item.bids = raw.bids ? raw.bids.map(i => CommodityBidViewModel["$build"](i)) : null)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.innovated === undefined || (item.innovated = raw.innovated ? new Date(raw.innovated) : null)
@@ -3170,6 +3339,27 @@ export class LifeService {
 		});
 	}
 
+	async getAssessmentMatches(id: string): Promise<Array<ResidentAssessmentMatchViewModel>> {
+		const $data = new FormData();
+		$data.append("8yZTo2eTl5eTJsajl2bnNvYWRrbDRkbD", Service.stringify(id))
+
+		return await fetch(Service.toURL("FydmgzM3owMHdueDVvZWc1NzI5a25vaH"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ResidentAssessmentMatchViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async listResidents(page: number): Promise<Array<ResidentSummaryModel>> {
 		const $data = new FormData();
 		$data.append("J1aTRnbHQ4YmMxdWQwZzUycDlheHMydX", Service.stringify(page))
@@ -3311,6 +3501,90 @@ export class MarketService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : LiveCommodityTickerResponseModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getStock(entityId: string): Promise<Array<StockViewModel>> {
+		const $data = new FormData();
+		$data.append("pidzE4ZDFqd2AyaTBtMmNucGhnaTp0ND", Service.stringify(entityId))
+
+		return await fetch(Service.toURL("RhYXtoejV3ZWVhbzwzaTdoczl6b3Mxaj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : StockViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getBids(entityId: string): Promise<Array<TraderBidViewModel>> {
+		const $data = new FormData();
+		$data.append("Nyd2Q1azNqaX4yZGF4dzlwcXNneHA3bH", Service.stringify(entityId))
+
+		return await fetch(Service.toURL("9hMTg1M2d5dDg1NnJ3ZDZ5NjM0dGJhej"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : TraderBidViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getAsks(entityId: string): Promise<Array<TraderAskViewModel>> {
+		const $data = new FormData();
+		$data.append("VrMmRpNjtmNT1ra3Jwd3Fxb2Q2cmVseW", Service.stringify(entityId))
+
+		return await fetch(Service.toURL("o4M2BmZmdqaWhrbGZqcjl2M3A1cG5ydW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : TraderAskViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getOpenSeedStock(entityId: string): Promise<Array<StockSeedViewModel>> {
+		const $data = new FormData();
+		$data.append("N1cTNoYzd4c2V4MzRqNHNueXRmcXFucG", Service.stringify(entityId))
+
+		return await fetch(Service.toURL("RjcTU4Nnt1d3Z0Y3k5OTM3MnZ0Y2FlbW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : StockSeedViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

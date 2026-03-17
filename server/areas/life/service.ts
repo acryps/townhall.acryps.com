@@ -1,6 +1,6 @@
 import { Service } from "vlserver";
 import { Life } from "../../life";
-import { ResidentEventViewModel, ResidentRelationViewModel, ResidentSummaryModel, ResidentViewModel } from "./resident";
+import { ResidentAssessmentMatchViewModel, ResidentEventViewModel, ResidentRelationViewModel, ResidentSummaryModel, ResidentViewModel } from "./resident";
 import { DbContext, ResidentEventView } from "../../managed/database";
 import { ResidentTickerModel } from "./ticker";
 import { NameFrequency, NameFrequencyViewModel } from "./name-frequency";
@@ -39,6 +39,15 @@ export class LifeService extends Service {
 			this.database.residentRelationship
 				.where(relationship => relationship.initiatorId == id || relationship.peerId == id)
 				.orderByAscending(relationship => relationship.bonded)
+		);
+	}
+
+	async getAssessmentMatches(id: string) {
+		return ResidentAssessmentMatchViewModel.from(
+			this.database.views.residentAssessmentMatch
+				.where(match => match.sourceResidentId == id || match.targetResidentId == id)
+				.orderByAscending(match => match.distance)
+				.limit(100)
 		);
 	}
 

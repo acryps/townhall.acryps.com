@@ -1,8 +1,6 @@
-import { Manager } from "vlserver";
-import { Commodity, DbContext, LegalEntity } from "../managed/database";
+import { Commodity, DbContext, LegalEntity, StockSeed } from "../managed/database";
 import { convertToLegalCompanyName } from "../../interface/company";
-
-type CommodityStockList = Map<Commodity, number>;
+import { Stock } from "./stock";
 
 export class TradingEntity {
 	constructor(
@@ -93,7 +91,6 @@ export class TradingEntity {
 		for (let transport of transports) {
 			balance += transport.price;
 		}
-
 		*/
 
 		return balance;
@@ -134,7 +131,19 @@ export class TradingEntity {
 	}
 
 	async getStock() {
-		const stock = new Map<Commodity, number>();
+		const stock: Stock[] = [];
+
+		// stock owned before tracking (seeding)
+		const seeds = await this.entity.stockSeeds
+			.where(seed => seed.commodityId != null && seed.quantity != null)
+			.include(seed => seed.commodity)
+			.toArray();
+
+		for (let seed of seeds) {
+			const commodity = await seed.commodity.fetch();
+
+			this.trackAsset(stock, commodity, seed.quantity);
+		}
 
 		// bought through trades
 		const boughtTrades = await this.entity.trades
@@ -161,9 +170,8 @@ export class TradingEntity {
 		}
 
 		// sold with trades
-		/*
 		const soldTrades = await this.database.trade
-			.where(trade => trade.ask.askerId == this.entity.id)
+			.where(trade => trade.ask.bidderId == this.entity.id)
 			.include(trade => trade.ask)
 			.toArray();
 
@@ -173,8 +181,6 @@ export class TradingEntity {
 
 			this.trackAsset(stock, commodity, -trade.quantity);
 		}
-
-		*/
 
 		// used in production
 		const productionInputs = await this.database.productionInput
@@ -191,19 +197,18 @@ export class TradingEntity {
 		return stock;
 	}
 
-	private trackAsset(stock: CommodityStockList, commodity: Commodity, quantity: number) {
-		const existing = [...stock.keys()].find(existing => existing.id == commodity.id);
+	private trackAsset(stock: Stock[], commodity: Commodity, quantity: number) {
+		let item = stock.find(item => item.commodity.id == commodity.id);
 
-		if (existing) {
-			const updated = stock.get(existing) + quantity;
+		if (!item) {
+			item = new Stock(commodity);
+			stock.push(item);
+		}
 
-			if (updated) {
-				stock.set(existing, updated);
-			} else {
-				stock.delete(existing);
-			}
-		} else {
-			stock.set(commodity, quantity);
+		item.quantity += quantity;
+
+		if (item.quantity == 0) {
+			stock.splice(stock.indexOf(item), 1);
 		}
 	}
 }

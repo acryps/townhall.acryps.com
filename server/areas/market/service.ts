@@ -4,6 +4,10 @@ import { MarketManager } from "../../market/manager";
 import { MarketTracker } from "../../market/tracker";
 import { CommoditySummaryModel, CommodityViewModel } from "./commodity";
 import { LiveCommodityTickerModel, LiveCommodityTickerResponseModel } from "./ticker";
+import { TradingEntity } from "../../market/entity";
+import { StockModel, StockSeedViewModel, StockViewModel } from "./stock";
+import { CommodityBidViewModel, TraderBidViewModel } from "./bid";
+import { CommodityAskViewModel, TraderAskViewModel } from "./ask";
 
 export class MarketService extends Service {
 	constructor(
@@ -51,5 +55,39 @@ export class MarketService extends Service {
 		}
 
 		return LiveCommodityTickerResponseModel.from(tickers);
+	}
+
+	async getStock(entityId: string) {
+		const entity = await this.database.legalEntity.find(entityId);
+		const trader = await TradingEntity.from(entity, this.database);
+
+		const stock = await trader.getStock();
+
+		return StockViewModel.from(stock.map(item => StockModel.from(item)));
+	}
+
+	async getBids(entityId: string) {
+		return TraderBidViewModel.from(
+			this.database.tradeBid
+				.where(bid => bid.bidderId == entityId)
+				.orderByAscending(bid => bid.posted)
+		);
+	}
+
+	async getAsks(entityId: string) {
+		return TraderAskViewModel.from(
+			this.database.tradeAsk
+				.where(ask => ask.askerId == entityId)
+				.orderByAscending(ask => ask.posted)
+		);
+	}
+
+	async getOpenSeedStock(entityId: string) {
+		return StockSeedViewModel.from(
+			this.database.stockSeed
+				.where(seed => seed.ownerId == entityId)
+				.where(seed => seed.quantity == null)
+				.orderByAscending(seed => seed.indexed)
+		);
 	}
 }

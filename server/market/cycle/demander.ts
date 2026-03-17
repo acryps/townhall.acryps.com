@@ -51,7 +51,7 @@ export class MarketDemander extends MarketIterationGenerator {
 				done();
 			});
 
-			interpreter.execute(
+			await interpreter.execute(
 				new SystemMessage(`
 					You are acting as ${trader.name}.
 					This is all fictional, it is currently ${Time.now().toDateString()}.

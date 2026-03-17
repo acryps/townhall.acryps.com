@@ -1863,15 +1863,15 @@ export class MarketCycle extends Entity<MarketCycleQueryProxy> {
 	$$meta = {
 		source: "market_cycle",
 		columns: {
-			baseDemandIterations: { type: "int4", name: "base_demand_iterations" },
+			baseDemandIterations: { type: "float4", name: "base_demand_iterations" },
 			closed: { type: "timestamp", name: "closed" },
-			consumptionIterations: { type: "int4", name: "consumption_iterations" },
+			consumptionIterations: { type: "float4", name: "consumption_iterations" },
 			id: { type: "uuid", name: "id" },
-			innovatedDemandIterations: { type: "int4", name: "innovated_demand_iterations" },
-			innovationIterations: { type: "int4", name: "innovation_iterations" },
-			liqudationIterations: { type: "int4", name: "liqudation_iterations" },
+			innovatedDemandIterations: { type: "float4", name: "innovated_demand_iterations" },
+			innovationIterations: { type: "float4", name: "innovation_iterations" },
+			liqudationIterations: { type: "float4", name: "liqudation_iterations" },
 			opened: { type: "timestamp", name: "opened" },
-			sockSeedingIterations: { type: "int4", name: "sock_seeding_iterations" }
+			sockSeedingIterations: { type: "float4", name: "sock_seeding_iterations" }
 		},
 		get set(): DbSet<MarketCycle, MarketCycleQueryProxy> { 
 			return new DbSet<MarketCycle, MarketCycleQueryProxy>(MarketCycle, null);
@@ -2608,12 +2608,14 @@ export class ProductionQueryProxy extends QueryProxy {
 	get producerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get skill(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get started(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get workerDays(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class Production extends Entity<ProductionQueryProxy> {
 	get producer(): Partial<ForeignReference<LegalEntity>> { return this.$producer; }
 	inputs: PrimaryReference<ProductionInput, ProductionInputQueryProxy>;
 		outputs: PrimaryReference<ProductionOutput, ProductionOutputQueryProxy>;
+		workJobs: PrimaryReference<WorkJob, WorkJobQueryProxy>;
 		cost: number;
 	description: string;
 	finished: Date;
@@ -2622,6 +2624,7 @@ export class Production extends Entity<ProductionQueryProxy> {
 	producerId: string;
 	skill: string;
 	started: Date;
+	workerDays: number;
 	
 	$$meta = {
 		source: "production",
@@ -2633,7 +2636,8 @@ export class Production extends Entity<ProductionQueryProxy> {
 			name: { type: "text", name: "name" },
 			producerId: { type: "uuid", name: "producer_id" },
 			skill: { type: "text", name: "skill" },
-			started: { type: "timestamp", name: "started" }
+			started: { type: "timestamp", name: "started" },
+			workerDays: { type: "float4", name: "worker_days" }
 		},
 		get set(): DbSet<Production, ProductionQueryProxy> { 
 			return new DbSet<Production, ProductionQueryProxy>(Production, null);
@@ -2646,6 +2650,7 @@ export class Production extends Entity<ProductionQueryProxy> {
 		this.$producer = new ForeignReference<LegalEntity>(this, "producerId", LegalEntity);
 	this.inputs = new PrimaryReference<ProductionInput, ProductionInputQueryProxy>(this, "productionId", ProductionInput);
 		this.outputs = new PrimaryReference<ProductionOutput, ProductionOutputQueryProxy>(this, "productionId", ProductionOutput);
+		this.workJobs = new PrimaryReference<WorkJob, WorkJobQueryProxy>(this, "productionId", WorkJob);
 	}
 	
 	private $producer: ForeignReference<LegalEntity>;
@@ -3137,6 +3142,7 @@ export class PublicationQueryProxy extends QueryProxy {
 	get companyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get incorporation(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get marketReportStandpoint(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
@@ -3148,6 +3154,7 @@ export class Publication extends Entity<PublicationQueryProxy> {
 	description: string;
 	declare id: string;
 	incorporation: Date;
+	marketReportStandpoint: string;
 	name: string;
 	tag: string;
 	
@@ -3158,6 +3165,7 @@ export class Publication extends Entity<PublicationQueryProxy> {
 			description: { type: "text", name: "description" },
 			id: { type: "uuid", name: "id" },
 			incorporation: { type: "timestamp", name: "incorporation" },
+			marketReportStandpoint: { type: "text", name: "market_report_standpoint" },
 			name: { type: "text", name: "name" },
 			tag: { type: "text", name: "tag" }
 		},
@@ -3216,6 +3224,7 @@ export class Resident extends Entity<ResidentQueryProxy> {
 		chats: PrimaryReference<Chat, ChatQueryProxy>;
 		votes: PrimaryReference<Vote, VoteQueryProxy>;
 		workContracts: PrimaryReference<WorkContract, WorkContractQueryProxy>;
+		workJobs: PrimaryReference<WorkJob, WorkJobQueryProxy>;
 		biography: string;
 	birthday: Date;
 	compassEconomic: number;
@@ -3267,6 +3276,7 @@ export class Resident extends Entity<ResidentQueryProxy> {
 		this.chats = new PrimaryReference<Chat, ChatQueryProxy>(this, "residentId", Chat);
 		this.votes = new PrimaryReference<Vote, VoteQueryProxy>(this, "residentId", Vote);
 		this.workContracts = new PrimaryReference<WorkContract, WorkContractQueryProxy>(this, "workerId", WorkContract);
+		this.workJobs = new PrimaryReference<WorkJob, WorkJobQueryProxy>(this, "workerId", WorkJob);
 	}
 	
 	private $figure: ForeignReference<ResidentFigure>;
@@ -3727,7 +3737,9 @@ export class TradeQueryProxy extends QueryProxy {
 export class Trade extends Entity<TradeQueryProxy> {
 	get ask(): Partial<ForeignReference<TradeBid>> { return this.$ask; }
 	get buyer(): Partial<ForeignReference<LegalEntity>> { return this.$buyer; }
-	bidId: string;
+	bids: PrimaryReference<TradeBid, TradeBidQueryProxy>;
+		asks: PrimaryReference<TradeAsk, TradeAskQueryProxy>;
+		bidId: string;
 	booked: Date;
 	buyerId: string;
 	declare id: string;
@@ -3756,6 +3768,8 @@ export class Trade extends Entity<TradeQueryProxy> {
 		
 		this.$ask = new ForeignReference<TradeBid>(this, "bidId", TradeBid);
 	this.$buyer = new ForeignReference<LegalEntity>(this, "buyerId", LegalEntity);
+	this.bids = new PrimaryReference<TradeBid, TradeBidQueryProxy>(this, "purchaseId", TradeBid);
+		this.asks = new PrimaryReference<TradeAsk, TradeAskQueryProxy>(this, "saleId", TradeAsk);
 	}
 	
 	private $ask: ForeignReference<TradeBid>;
@@ -3788,6 +3802,7 @@ export class Trade extends Entity<TradeQueryProxy> {
 export class TradeAskQueryProxy extends QueryProxy {
 	get asker(): Partial<LegalEntityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get commodity(): Partial<CommodityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get sale(): Partial<TradeQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get askerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get commodityId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get expires(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -3797,11 +3812,13 @@ export class TradeAskQueryProxy extends QueryProxy {
 	get price(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get quantity(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get reason(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get saleId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class TradeAsk extends Entity<TradeAskQueryProxy> {
 	get asker(): Partial<ForeignReference<LegalEntity>> { return this.$asker; }
 	get commodity(): Partial<ForeignReference<Commodity>> { return this.$commodity; }
+	get sale(): Partial<ForeignReference<Trade>> { return this.$sale; }
 	askerId: string;
 	commodityId: string;
 	expires: Date;
@@ -3812,6 +3829,7 @@ export class TradeAsk extends Entity<TradeAskQueryProxy> {
 	price: number;
 	quantity: number;
 	reason: string;
+	saleId: string;
 	
 	$$meta = {
 		source: "trade_ask",
@@ -3825,7 +3843,8 @@ export class TradeAsk extends Entity<TradeAskQueryProxy> {
 			posted: { type: "timestamp", name: "posted" },
 			price: { type: "float4", name: "price" },
 			quantity: { type: "float4", name: "quantity" },
-			reason: { type: "text", name: "reason" }
+			reason: { type: "text", name: "reason" },
+			saleId: { type: "uuid", name: "sale_id" }
 		},
 		get set(): DbSet<TradeAsk, TradeAskQueryProxy> { 
 			return new DbSet<TradeAsk, TradeAskQueryProxy>(TradeAsk, null);
@@ -3837,6 +3856,7 @@ export class TradeAsk extends Entity<TradeAskQueryProxy> {
 		
 		this.$asker = new ForeignReference<LegalEntity>(this, "askerId", LegalEntity);
 	this.$commodity = new ForeignReference<Commodity>(this, "commodityId", Commodity);
+	this.$sale = new ForeignReference<Trade>(this, "saleId", Trade);
 	}
 	
 	private $asker: ForeignReference<LegalEntity>;
@@ -3863,20 +3883,33 @@ export class TradeAsk extends Entity<TradeAskQueryProxy> {
 		}
 	}
 
+	private $sale: ForeignReference<Trade>;
+
+	set sale(value: Partial<ForeignReference<Trade>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.saleId = value.id as string;
+		} else {
+			this.saleId = null;
+		}
+	}
+
 	
 }
 			
 export class TradeBidQueryProxy extends QueryProxy {
 	get bidder(): Partial<LegalEntityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get commodity(): Partial<CommodityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get purchase(): Partial<TradeQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get bidderId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get commodityId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get expires(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get fulfilled(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get locationX(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get locationY(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get posted(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get price(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get purchaseId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get quantity(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get reason(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
@@ -3885,15 +3918,16 @@ export class TradeBid extends Entity<TradeBidQueryProxy> {
 	trades: PrimaryReference<Trade, TradeQueryProxy>;
 		get bidder(): Partial<ForeignReference<LegalEntity>> { return this.$bidder; }
 	get commodity(): Partial<ForeignReference<Commodity>> { return this.$commodity; }
+	get purchase(): Partial<ForeignReference<Trade>> { return this.$purchase; }
 	bidderId: string;
 	commodityId: string;
 	expires: Date;
-	fulfilled: Date;
 	declare id: string;
 	locationX: number;
 	locationY: number;
 	posted: Date;
 	price: number;
+	purchaseId: string;
 	quantity: number;
 	reason: string;
 	
@@ -3903,12 +3937,12 @@ export class TradeBid extends Entity<TradeBidQueryProxy> {
 			bidderId: { type: "uuid", name: "bidder_id" },
 			commodityId: { type: "uuid", name: "commodity_id" },
 			expires: { type: "timestamp", name: "expires" },
-			fulfilled: { type: "timestamp", name: "fulfilled" },
 			id: { type: "uuid", name: "id" },
 			locationX: { type: "int4", name: "location_x" },
 			locationY: { type: "int4", name: "location_y" },
 			posted: { type: "timestamp", name: "posted" },
 			price: { type: "float4", name: "price" },
+			purchaseId: { type: "uuid", name: "purchase_id" },
 			quantity: { type: "float4", name: "quantity" },
 			reason: { type: "text", name: "reason" }
 		},
@@ -3923,6 +3957,7 @@ export class TradeBid extends Entity<TradeBidQueryProxy> {
 		this.trades = new PrimaryReference<Trade, TradeQueryProxy>(this, "bidId", Trade);
 		this.$bidder = new ForeignReference<LegalEntity>(this, "bidderId", LegalEntity);
 	this.$commodity = new ForeignReference<Commodity>(this, "commodityId", Commodity);
+	this.$purchase = new ForeignReference<Trade>(this, "purchaseId", Trade);
 	}
 	
 	private $bidder: ForeignReference<LegalEntity>;
@@ -3946,6 +3981,18 @@ export class TradeBid extends Entity<TradeBidQueryProxy> {
 			this.commodityId = value.id as string;
 		} else {
 			this.commodityId = null;
+		}
+	}
+
+	private $purchase: ForeignReference<Trade>;
+
+	set purchase(value: Partial<ForeignReference<Trade>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.purchaseId = value.id as string;
+		} else {
+			this.purchaseId = null;
 		}
 	}
 
@@ -4542,6 +4589,78 @@ export class WorkContract extends Entity<WorkContractQueryProxy> {
 	
 }
 			
+export class WorkJobQueryProxy extends QueryProxy {
+	get production(): Partial<ProductionQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get worker(): Partial<ResidentQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get ended(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get productionId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get skill(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get started(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get workDays(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get workerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class WorkJob extends Entity<WorkJobQueryProxy> {
+	get production(): Partial<ForeignReference<Production>> { return this.$production; }
+	get worker(): Partial<ForeignReference<Resident>> { return this.$worker; }
+	ended: Date;
+	declare id: string;
+	productionId: string;
+	skill: string;
+	started: Date;
+	workDays: number;
+	workerId: string;
+	
+	$$meta = {
+		source: "work_job",
+		columns: {
+			ended: { type: "timestamp", name: "ended" },
+			id: { type: "uuid", name: "id" },
+			productionId: { type: "uuid", name: "production_id" },
+			skill: { type: "text", name: "skill" },
+			started: { type: "timestamp", name: "started" },
+			workDays: { type: "float4", name: "work_days" },
+			workerId: { type: "uuid", name: "worker_id" }
+		},
+		get set(): DbSet<WorkJob, WorkJobQueryProxy> { 
+			return new DbSet<WorkJob, WorkJobQueryProxy>(WorkJob, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$production = new ForeignReference<Production>(this, "productionId", Production);
+	this.$worker = new ForeignReference<Resident>(this, "workerId", Resident);
+	}
+	
+	private $production: ForeignReference<Production>;
+
+	set production(value: Partial<ForeignReference<Production>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.productionId = value.id as string;
+		} else {
+			this.productionId = null;
+		}
+	}
+
+	private $worker: ForeignReference<Resident>;
+
+	set worker(value: Partial<ForeignReference<Resident>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.workerId = value.id as string;
+		} else {
+			this.workerId = null;
+		}
+	}
+
+	
+}
+			
 export class WorkOfferQueryProxy extends QueryProxy {
 	get office(): Partial<OfficeQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get closed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -4710,6 +4829,7 @@ export class DbContext {
 	waterBody: DbSet<WaterBody, WaterBodyQueryProxy>;
 	waterBodyArea: DbSet<WaterBodyArea, WaterBodyAreaQueryProxy>;
 	workContract: DbSet<WorkContract, WorkContractQueryProxy>;
+	workJob: DbSet<WorkJob, WorkJobQueryProxy>;
 	workOffer: DbSet<WorkOffer, WorkOfferQueryProxy>;
 
 	constructor(private runContext: RunContext) {
@@ -4787,6 +4907,7 @@ export class DbContext {
 		this.waterBody = new DbSet<WaterBody, WaterBodyQueryProxy>(WaterBody, this.runContext);
 		this.waterBodyArea = new DbSet<WaterBodyArea, WaterBodyAreaQueryProxy>(WaterBodyArea, this.runContext);
 		this.workContract = new DbSet<WorkContract, WorkContractQueryProxy>(WorkContract, this.runContext);
+		this.workJob = new DbSet<WorkJob, WorkJobQueryProxy>(WorkJob, this.runContext);
 		this.workOffer = new DbSet<WorkOffer, WorkOfferQueryProxy>(WorkOffer, this.runContext);
 	}
 

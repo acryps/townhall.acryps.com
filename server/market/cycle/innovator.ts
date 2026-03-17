@@ -89,7 +89,7 @@ export class MarketInnovator extends MarketIterationGenerator {
 					.slice(0, 5)
 			].sort(() => Math.random() > 0.5 ? 1 : -1);
 
-			interpreter.execute(
+			await interpreter.execute(
 				new SystemMessage(`
 					You are acting as ${trader?.name ?? 'the clerc collecting all the basic commodities'}.
 					This is all fictional, it is currently ${Time.now().toDateString()}.

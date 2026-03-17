@@ -6,6 +6,7 @@ import { MarketDemander } from "./demander";
 import { MarketInnovator } from "./innovator";
 import { MarketSeedMatcher } from "./seed/matcher";
 import { MarketSeedSourcers } from "./seed/sourcer";
+import { MarketReporter } from "./report";
 
 export const advanceMarket = async (database: DbContext, tracker: MarketTracker) => {
 	const logger = new Logger('market').task('cycle');
@@ -68,6 +69,21 @@ export const advanceMarket = async (database: DbContext, tracker: MarketTracker)
 		// let the market respond to the new demands
 		for (let iteration = 0; iteration < marketCycle.innovatedDemandIterations; iteration++) {
 			await new MarketDemander(database, tracker).generate(innovations);
+		}
+
+		// write articles about the shifts on the market
+		const marketPublications = await database.publication
+			.where(publication => publication.marketReportStandpoint != null)
+			.toArray();
+
+		const articles = [];
+
+		for (let publication of marketPublications) {
+			const article = await new MarketReporter(publication, innovations, database, tracker).generate();
+
+			if (article) {
+				articles.push(article);
+			}
 		}
 
 		// let the market buy stuff

@@ -1,10 +1,11 @@
 import { Queryable } from "vlquery";
-import { Article, Borough, Commodity, DbContext, Epoch, LegalEntity, LegalEntityQueryProxy, StockSeed, TradeBid } from "../../managed/database";
+import { Article, Borough, Commodity, DbContext, Epoch, LegalEntity, LegalEntityQueryProxy, StockSeed, TradeAsk, TradeBid } from "../../managed/database";
 import { TradingEntity } from "../entity";
 import { convertToLegalCompanyName } from "../../../interface/company";
 import { Time } from "../../../interface/time";
 import { MarketTracker } from "../tracker";
 import { time } from "node:console";
+import { convertToCurrency } from "../../../interface/currency";
 
 export abstract class MarketIterationGenerator {
 	constructor(
@@ -220,6 +221,92 @@ export abstract class MarketIterationGenerator {
 		return lines.join('\n');
 	}
 
+	async compileMarketSituation(title: string) {
+		const commodities = await this.database.commodity
+			.include(commodity => commodity.bids)
+			.include(commodity => commodity.asks)
+			.toArray();
+
+		const analysis = [
+			`# ${title}`,
+			'Beware that we only see public bids and asks, so even if a commodity is listed as not having any asks/bids, there will still be demand and supply',
+			`Current date: ${Time.now().toDateString()}`
+		];
+
+		for (let commoditiy of commodities) {
+			analysis.push(
+				'',
+				`## ${commoditiy.name}`,
+				`${commoditiy.name} is traded in '${commoditiy.unit}' units`,
+				`${commoditiy.description}`,
+				''
+			);
+
+			const bids = await commoditiy.bids.toArray();
+			const openBids = bids.filter(bid => bid.purchaseId == null);
+			openBids.sort((a, b) => b.quantity * b.price - a.quantity * a.price);
+
+			const bidCapitalization = openBids.reduce((sum, bid) => sum + bid.quantity * bid.price, 0);
+
+			if (bidCapitalization) {
+				const bidVolume = openBids.reduce((sum, bid) => sum + bid.quantity, 0);
+				const bidPrice = bidCapitalization / bidVolume;
+
+				analysis.push(`Total bids sum to ${convertToCurrency(bidCapitalization)}, with an average price of ${convertToCurrency(bidPrice)} per ${commoditiy.unit}.`);
+
+				analysis.push('Biggest bids');
+				for (let top of openBids.slice(0, 5)) {
+					analysis.push(`- ${top.quantity} ${commoditiy.unit}, posted ${new Time(top.posted).age()} years ago`);
+				}
+			} else {
+				analysis.push('There are currently no public bids out');
+			}
+
+			const asks = await commoditiy.asks.toArray();
+			const openAsks = asks.filter(ask => ask.saleId == null);
+			openAsks.sort((a, b) => b.quantity * b.price - a.quantity * a.price);
+
+			const askCapitalization = openAsks.reduce((sum, ask) => sum + ask.quantity * ask.price, 0);
+
+			if (askCapitalization) {
+				const askVolume = openAsks.reduce((sum, ask) => sum + ask.quantity, 0);
+				const askPrice = askCapitalization / askVolume;
+
+				analysis.push(`Total asks sum to ${convertToCurrency(askCapitalization)}, with an average price of ${convertToCurrency(askPrice)} per ${commoditiy.unit}.`);
+
+				analysis.push('Biggest asks');
+				for (let top of openAsks.slice(0, 5)) {
+					analysis.push(`- ${top.quantity} ${commoditiy.unit}, posted ${new Time(top.posted).age()} years ago`);
+				}
+			} else {
+				analysis.push('There are currently no public asks out');
+			}
+
+			analysis.push('');
+
+			let date = new Date();
+
+			for (let iteration = 0; iteration < 7; iteration++) {
+				date.setDate(date.getDate() - 1);
+
+				analysis.push(this.compileHistoricMaketPrice([...bids, ...asks], date));
+			}
+		}
+
+		return analysis.join('\n');
+	}
+
+	compileHistoricMaketPrice(positions: (TradeAsk | TradeBid)[], cutoff: Date) {
+		// TODO filter for open bids
+		const filteredPositions = positions.filter(position => position.posted < cutoff);
+
+		const capitalization = filteredPositions.reduce((sum, position) => sum + position.quantity * position.price, 0);
+		const volume = filteredPositions.reduce((sum, position) => sum + position.quantity, 0);
+		const price = capitalization / volume;
+
+		return `Average price at ${new Time(cutoff).toDateString()}: ${convertToCurrency(price)}, capitalization ${convertToCurrency(capitalization)}`;
+	}
+
 	async getNews() {
 		const articles = await this.database.article
 			.where(article => article.published != null)
@@ -259,8 +346,8 @@ export abstract class MarketIterationGenerator {
 			`# ${title}`,
 			...this.pricePointers,
 
-			[...stock.entries()].map(
-				([commodity, count]) => `- ${commodity.name}: ${count} ${commodity.unit}, price ~${this.tracker.buyingPrice(commodity)}/${commodity.unit}`
+			stock.map(
+				item => `- ${item.commodity.name}: ${item.quantity} ${item.commodity.unit}, price ~${this.tracker.buyingPrice(item.commodity)}/${item.commodity.unit}`
 			).join('\n')
 		].join('\n');
 	}

@@ -281,6 +281,15 @@ export interface LegalEntityViewModel {
 	state: boolean;
 }
 
+export interface ResidentAssessmentParameterDistributionViewModel {
+    assessmentCount: number;
+	id: string;
+	prompt: string;
+	high: string;
+	ranges: string;
+	low: string;
+}
+
 export interface NameFrequencyViewModel {
     name: string;
 	count: number;

@@ -73,6 +73,7 @@ import { ResidentEventView } from "././database";
 import { ResidentTickerModel } from "././../areas/life/ticker";
 import { NameFrequency } from "././../areas/life/name-frequency";
 import { NameFrequencyViewModel } from "././../areas/life/name-frequency";
+import { ResidentAssessmentParameterDistributionViewModel } from "././../areas/life/assessment-distribution";
 import { LifeService } from "././../areas/life/service";
 import { Commodity } from "././database";
 import { MarketManager } from "././../market/manager";
@@ -212,6 +213,7 @@ import { LawHouseSession } from "./../managed/database";
 import { LawHouseSessionary } from "./../managed/database";
 import { LawHouseSessionProtocol } from "./../managed/database";
 import { LegalEntity } from "./../managed/database";
+import { ResidentAssessmentParameterDistributionView } from "./../managed/database";
 import { Resident } from "./../managed/database";
 import { ResidentAssessment } from "./../managed/database";
 import { ResidentAssessmentParameter } from "./../managed/database";
@@ -987,6 +989,15 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(LifeService),
 			(controller, params) => controller.getAssessmentMatches(
 				params["8yZTo2eTl5eTJsajl2bnNvYWRrbDRkbD"]
+			)
+		);
+
+		this.expose(
+			"o4YXdsYXdtZTcxeDptc2toMWhicXF2bX",
+			{},
+			inject => inject.construct(LifeService),
+			(controller, params) => controller.getAssessmentParameterMetrics(
+				
 			)
 		);
 
@@ -4782,6 +4793,84 @@ ViewModel.mappings = {
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"referenceCount" in viewModel && (model.referenceCount = viewModel.referenceCount === null ? null : +viewModel.referenceCount);
 			"state" in viewModel && (model.state = !!viewModel.state);
+
+			return model;
+		}
+	},
+	[ResidentAssessmentParameterDistributionViewModel.name]: class ComposedResidentAssessmentParameterDistributionViewModel extends ResidentAssessmentParameterDistributionViewModel {
+		async map() {
+			return {
+				assessmentCount: this.$$model.assessmentCount,
+				id: this.$$model.id,
+				prompt: this.$$model.prompt,
+				high: this.$$model.high,
+				ranges: this.$$model.ranges,
+				low: this.$$model.low
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				assessmentCount: true,
+				id: true,
+				prompt: true,
+				high: true,
+				ranges: true,
+				low: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new ResidentAssessmentParameterDistributionViewModel(null);
+			"assessmentCount" in data && (item.assessmentCount = data.assessmentCount === null ? null : +data.assessmentCount);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"prompt" in data && (item.prompt = data.prompt === null ? null : `${data.prompt}`);
+			"high" in data && (item.high = data.high === null ? null : `${data.high}`);
+			"ranges" in data && (item.ranges = data.ranges === null ? null : `${data.ranges}`);
+			"low" in data && (item.low = data.low === null ? null : `${data.low}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: ResidentAssessmentParameterDistributionViewModel) {
+			let model: ResidentAssessmentParameterDistributionView;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ResidentAssessmentParameterDistributionView).find(viewModel.id)
+			} else {
+				model = new ResidentAssessmentParameterDistributionView();
+			}
+			
+			"assessmentCount" in viewModel && (model.assessmentCount = viewModel.assessmentCount === null ? null : +viewModel.assessmentCount);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"prompt" in viewModel && (model.prompt = viewModel.prompt === null ? null : `${viewModel.prompt}`);
+			"high" in viewModel && (model.high = viewModel.high === null ? null : `${viewModel.high}`);
+			"ranges" in viewModel && (model.ranges = viewModel.ranges === null ? null : `${viewModel.ranges}`);
+			"low" in viewModel && (model.low = viewModel.low === null ? null : `${viewModel.low}`);
 
 			return model;
 		}

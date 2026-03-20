@@ -34,6 +34,12 @@ export class ResidentAssessmentPage extends Component {
 					Sorted by confidence.
 				</ui-description>
 
+				<ui-actions>
+					<ui-action ui-href='/market/assessment/distribution'>
+						View distribution
+					</ui-action>
+				</ui-actions>
+
 				<ui-assessments>
 					{this.parent.resident.assessments.toSorted((a, b) => a.confidence > b.confidence ? -1 : 1).map(assessment => <ui-assessment>
 						<ui-prompt>

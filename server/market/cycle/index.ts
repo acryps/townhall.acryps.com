@@ -11,6 +11,7 @@ import { MarketCycleConfiguration } from "./configuration";
 
 export const advanceMarket = async (database: DbContext, tracker: MarketTracker) => {
 	const logger = new Logger('market').task('cycle');
+	await tracker.update();
 
 	const lastCycle = await database.marketCycle
 		.orderByDescending(cycle => cycle.opened)

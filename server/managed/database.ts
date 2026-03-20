@@ -5075,6 +5075,42 @@ export class ResidentAssessmentMatchView extends View<ResidentAssessmentMatchVie
 	sourceResidentFamilyName: string;
 }
 			
+class ResidentAssessmentParameterDistributionViewProxy extends QueryProxy {
+	get assessmentCount(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get prompt(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get high(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get ranges(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get low(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class ResidentAssessmentParameterDistributionView extends View<ResidentAssessmentParameterDistributionViewProxy> {
+	$$meta = {
+		source: "resident_assessment_parameter_distribution",
+		get set(): ViewSet<ResidentAssessmentParameterDistributionView, ResidentAssessmentParameterDistributionViewProxy> { 
+			return new ViewSet<ResidentAssessmentParameterDistributionView, ResidentAssessmentParameterDistributionViewProxy>(ResidentAssessmentParameterDistributionView, null);
+		},
+
+		columns: {
+			assessmentCount: { type: "int4", name: "assessment_count" },
+			id: { type: "uuid", name: "id" },
+			prompt: { type: "text", name: "prompt" },
+			high: { type: "text", name: "high" },
+			ranges: { type: "text", name: "ranges" },
+			low: { type: "text", name: "low" },
+			name: { type: "text", name: "name" }
+		}
+	};
+
+	assessmentCount: number;
+	id: string;
+	prompt: string;
+	high: string;
+	ranges: string;
+	low: string;
+	name: string;
+}
+			
 
 export class DbContext {
 	article: DbSet<Article, ArticleQueryProxy>;
@@ -5251,6 +5287,7 @@ export class DbContext {
 
 	views = {
 		residentEvent: new ViewSet<ResidentEventView, ResidentEventViewProxy>(ResidentEventView),
-		residentAssessmentMatch: new ViewSet<ResidentAssessmentMatchView, ResidentAssessmentMatchViewProxy>(ResidentAssessmentMatchView)
+		residentAssessmentMatch: new ViewSet<ResidentAssessmentMatchView, ResidentAssessmentMatchViewProxy>(ResidentAssessmentMatchView),
+		residentAssessmentParameterDistribution: new ViewSet<ResidentAssessmentParameterDistributionView, ResidentAssessmentParameterDistributionViewProxy>(ResidentAssessmentParameterDistributionView)
 	}
 };

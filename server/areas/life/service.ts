@@ -4,6 +4,7 @@ import { ResidentAssessmentMatchViewModel, ResidentEventViewModel, ResidentRelat
 import { DbContext, ResidentEventView } from "../../managed/database";
 import { ResidentTickerModel } from "./ticker";
 import { NameFrequency, NameFrequencyViewModel } from "./name-frequency";
+import { ResidentAssessmentParameterDistributionViewModel } from "./assessment-distribution";
 
 export class LifeService extends Service {
 	constructor(
@@ -49,6 +50,13 @@ export class LifeService extends Service {
 				.orderByAscending(match => match.distance)
 				.limit(100)
 		);
+	}
+
+	async getAssessmentParameterMetrics() {
+		return ResidentAssessmentParameterDistributionViewModel.from(
+			this.database.views.residentAssessmentParameterDistribution
+				.orderByAscending(metric => metric.name)
+		)
 	}
 
 	listResidents(page: number) {

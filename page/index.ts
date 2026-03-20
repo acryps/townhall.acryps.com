@@ -76,6 +76,7 @@ import { MarketPage } from "./market";
 import { CommodityPage } from "./market/commodity";
 import { MarketEntityPage } from "./market/entity";
 import { ResidentAssessmentPage } from "./resident/assessment";
+import { AssessmentParameterDistributionPage } from "./market/assessment/distribution";
 
 export class Application {
 	static router: Router;
@@ -151,6 +152,8 @@ export class Application {
 				.route('/market', MarketPage
 					.route('/commodity/:tag', CommodityPage)
 					.route('/entity/:id', MarketEntityPage)
+
+					.route('/assessment/distribution', AssessmentParameterDistributionPage)
 				)
 
 				.route('/oracle', OraclePage)

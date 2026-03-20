@@ -84,14 +84,9 @@ DbClient.connectedClient.connect().then(async () => {
 	const marketLogger = new Logger('market');
 
 	const marketTracker = new MarketTracker(new Logger('tracker', marketLogger), database);
-	// await marketTracker.update();
+	marketTracker.update();
 
 	// setInterval(() => marketTracker.update(), 1000 * 60);
-
-
-	new ResidentAssessor(database).next();
-
-
 
 	if (runMarket) {
 		marketTracker.dump();
@@ -138,7 +133,9 @@ DbClient.connectedClient.connect().then(async () => {
 	if (runLife) {
 		new Oracle(database, new LegalEntityManager(database)).schedule();
 		new ArticleOpinionGenerator(database).schedule();
+
 		new PoliticalCompassRater(database).next();
+		new ResidentAssessor(database).next();
 
 		// lawHouse.schedule();
 		life.vote();

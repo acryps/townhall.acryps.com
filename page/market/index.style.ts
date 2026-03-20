@@ -8,6 +8,7 @@ import { PageComponent } from "../page";
 import { inputStyle } from "../shared/field.style";
 import { commodityStyle } from "./commodity/index.style";
 import { marketEntityStyle } from "./entity/index.style";
+import { residentAsessmentDistributionStyle } from "./assessment/distribution/index.style";
 
 export const marketStyle = () => child('ui-market',
 	display('block'),
@@ -16,6 +17,7 @@ export const marketStyle = () => child('ui-market',
 
 	commodityStyle(),
 	marketEntityStyle(),
+	residentAsessmentDistributionStyle(),
 
 	changeAnimation,
 

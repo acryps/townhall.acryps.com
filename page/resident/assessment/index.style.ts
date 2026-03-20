@@ -1,7 +1,8 @@
-import { alignItems, alignSelf, backgroundColor, backgroundImage, border, borderBottom, ch, child, colorStop, cursor, display, flexGrow, flexShrink, fontSize, gap, height, insetInline, justifyContent, left, linearGradient, marginBottom, marginRight, padding, paddingTop, percentage, position, px, rem, textAlign, top, turn, width } from "@acryps/style";
+import { alignItems, alignSelf, backgroundColor, backgroundImage, border, borderBottom, ch, child, colorStop, cursor, display, flexGrow, flexShrink, flexWrap, fontSize, gap, height, insetInline, justifyContent, left, linearGradient, marginBottom, marginRight, padding, paddingTop, percentage, position, px, rem, textAlign, top, turn, width } from "@acryps/style";
 import { boxed } from "../../shared/boxed.style";
 import { pageGutter, negativeColor, neutralColor, positiveColor } from "../../index.style";
 import { assessmentMarkerValue } from "../index.style";
+import { buttonStyle } from "../../shared/index.style";
 
 export const residentAssessmentStyle = () => child('ui-assessment',
 	display('block'),
@@ -31,6 +32,17 @@ export const residentAssessmentStyle = () => child('ui-assessment',
 		child('ui-description',
 			display('block'),
 			marginBottom(pageGutter)
+		),
+
+		child('ui-actions',
+			display('flex'),
+			flexWrap('wrap'),
+			gap(pageGutter),
+			marginBottom(pageGutter),
+
+			child('ui-action',
+				buttonStyle()
+			)
 		),
 
 		child('ui-assessments',

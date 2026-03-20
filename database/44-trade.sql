@@ -6,51 +6,6 @@ CREATE TABLE commodity_category (
 	harmonized_system_code INT
 );
 
-CREATE TABLE resident_assessment_parameter (
-	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-	name TEXT,
-
-	prompt TEXT,
-	low TEXT,
-	high TEXT
-);
-
-CREATE TABLE resident_assessment (
-	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-	assessed TIMESTAMP,
-
-	resident_id UUID CONSTRAINT resident__assessments REFERENCES resident (id),
-	parameter_id UUID CONSTRAINT parameter__assessments REFERENCES resident_assessment_parameter (id),
-
-	value REAL,
-	confidence REAL
-);
-
-ALTER TABLE resident ADD assessed TIMESTAMP;
-
-CREATE VIEW resident_assessment_match AS
-	SELECT
-		source_resident.id AS source_resident_id,
-		source_resident.tag AS source_resident_tag,
-		source_resident.given_name AS source_resident_given_name,
-		source_resident.family_name AS source_resident_family_name,
-
-		target_resident.id AS target_resident_id,
-		target_resident.tag AS target_resident_tag,
-		target_resident.given_name AS target_resident_given_name,
-		target_resident.family_name AS target_resident_family_name,
-
-		COUNT(*)::INTEGER AS shared_parameters,
-		SUM(SQRT(POWER(source_assessment.value - target_assessment.value, 2))) / COUNT(*) AS distance
-	FROM resident_assessment source_assessment
-		JOIN resident_assessment target_assessment
-			ON source_assessment.parameter_id = target_assessment.parameter_id
-			AND source_assessment.resident_id < target_assessment.resident_id
-		INNER JOIN resident AS source_resident ON source_resident.id = source_assessment.resident_id
-		INNER JOIN resident AS target_resident ON target_resident.id = target_assessment.resident_id
-	GROUP BY source_resident.id, target_resident.id
-	ORDER BY distance ASC;
-
 ALTER TABLE commodity_category ADD parent_id UUID CONSTRAINT parent__children REFERENCES commodity_category (id);
 
 CREATE TABLE token_sponsor (

@@ -658,6 +658,27 @@ export class LegalEntityViewModel {
 	}
 }
 
+export class ResidentAssessmentParameterDistributionViewModel {
+	assessmentCount: number;
+	id: string;
+	prompt: string;
+	high: string;
+	ranges: string;
+	low: string;
+
+	private static $build(raw) {
+		const item = new ResidentAssessmentParameterDistributionViewModel();
+		raw.assessmentCount === undefined || (item.assessmentCount = raw.assessmentCount === null ? null : +raw.assessmentCount)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.prompt === undefined || (item.prompt = raw.prompt === null ? null : `${raw.prompt}`)
+		raw.high === undefined || (item.high = raw.high === null ? null : `${raw.high}`)
+		raw.ranges === undefined || (item.ranges = raw.ranges === null ? null : `${raw.ranges}`)
+		raw.low === undefined || (item.low = raw.low === null ? null : `${raw.low}`)
+		
+		return item;
+	}
+}
+
 export class NameFrequencyViewModel {
 	name: string;
 	count: number;
@@ -3352,6 +3373,27 @@ export class LifeService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : ResidentAssessmentMatchViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getAssessmentParameterMetrics(): Promise<Array<ResidentAssessmentParameterDistributionViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("o4YXdsYXdtZTcxeDptc2toMWhicXF2bX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : ResidentAssessmentParameterDistributionViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

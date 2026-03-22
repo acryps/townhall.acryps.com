@@ -1,20 +1,35 @@
 import { Queryable } from "vlquery";
-import { Article, Borough, Commodity, DbContext, Epoch, LegalEntity, LegalEntityQueryProxy, MarketCycle, StockSeed, TradeAsk, TradeBid } from "../../managed/database";
+import { Article, Borough, Commodity, DbContext, Epoch, LegalEntity, LegalEntityQueryProxy, MarketCycle, Resident, StockSeed, TradeAsk, TradeBid } from "../../managed/database";
 import { TradingEntity } from "../entity";
 import { convertToLegalCompanyName } from "../../../interface/company";
 import { Time } from "../../../interface/time";
 import { MarketTracker } from "../tracker";
 import { time } from "node:console";
 import { convertToCurrency } from "../../../interface/currency";
+import { MarketCycleConfiguration } from "./configuration";
+import { LegalEntityManager } from "../../areas/legal-entity/manager";
+import { Interpreter } from "../../life/interpreter";
+import { OpenAiInterpreterProvider } from "../../life/interpreter/provider/openai";
 
 export abstract class MarketIterationGenerator {
 	constructor(
 		public database: DbContext,
 		public tracker: MarketTracker,
-		public cycle: MarketCycle
+		public cycle: MarketCycle,
+		public configuration: MarketCycleConfiguration
 	) {}
 
 	abstract generate(): Promise<any>;
+
+	async getSponsoredInterpreter() {
+		const sponsor = await this.cycle.sponsor.fetch();
+
+		if (!sponsor) {
+			throw new Error(`No sponsor for cycle ${this.cycle.id}`);
+		}
+
+		return new Interpreter(new OpenAiInterpreterProvider(sponsor));
+	}
 
 	async randomEntity(tradeVolumeAdjusted = true) {
 		let query: () => Queryable<LegalEntity, LegalEntityQueryProxy>;
@@ -41,6 +56,45 @@ export abstract class MarketIterationGenerator {
 			.first();
 
 		return await TradingEntity.from(entity, this.database);
+	}
+
+	async randomPrivateEntity() {
+		const query = () => this.database.legalEntity
+			.where(entity => entity.residentId != null)
+			.where(entity => entity.resident.assessed != null);
+
+		const entityCount = await query().count() - 1;
+		const entity = await query()
+			.skip(Math.floor(Math.random() * entityCount))
+			.first();
+
+		return await TradingEntity.from(entity, this.database);
+	}
+
+	async pool(source: TradingEntity, pool: number, picks: number) {
+		if (!source.entity.residentId) {
+			throw new Error('Cannot pool non-resident trader');
+		}
+
+		const closest = await this.database.views.residentAssessmentMatch
+			.where(match => match.sourceResidentId == source.entity.residentId || match.targetResidentId == source.entity.residentId)
+			.limit(pool)
+			.toArray();
+
+		const traders: TradingEntity[] = [];
+
+		while (closest.length > picks) {
+			closest.splice(Math.floor(Math.random() * closest.length), 1);
+		}
+
+		for (let pick of closest) {
+			const id = pick.sourceResidentId == source.entity.residentId ? pick.targetResidentId : pick.sourceResidentId;
+			const entity = await new LegalEntityManager(this.database).findResident(id);
+
+			traders.push(await TradingEntity.from(entity, this.database));
+		}
+
+		return traders;
 	}
 
 	async compileContext(trader: TradingEntity) {
@@ -311,6 +365,7 @@ export abstract class MarketIterationGenerator {
 	async getNews() {
 		const articles = await this.database.article
 			.where(article => article.published != null)
+			.where(article => article.generatedSummary != null)
 			.orderByDescending(article => article.published)
 			.toArray();
 
@@ -321,7 +376,7 @@ export abstract class MarketIterationGenerator {
 			selection.push(articles[cursor]);
 
 			// make spacing grow with each article
-			cursor += Math.ceil(Math.random() * selection.length * 4);
+			cursor += Math.ceil(Math.random() * selection.length * 10 + Math.random() * 5);
 		}
 
 		return selection;
@@ -335,7 +390,7 @@ export abstract class MarketIterationGenerator {
 			articles.filter(article => article.generatedSummary).map(article => [
 				`## ${article.title}`,
 				`published ${new Time(article.published).toDateString()}`,
-				article.generatedSummary ?? article.body.split(/\s+/g).join(' ')
+				article.generatedSummary
 			].join('\n')).join('\n\n')
 		].join('\n');
 	}
@@ -378,7 +433,11 @@ export abstract class MarketIterationGenerator {
 		].join('\n');
 	}
 
-	async getRandomCommodities(count = 50) {
+	async getTradeableCommodities() {
+		return await this.database.commodity.toArray();
+	}
+
+	async getRandomCommodities(count = 75) {
 		const commodities = await this.database.commodity.toArray();
 
 		while (commodities.length > count) {
@@ -401,7 +460,7 @@ export abstract class MarketIterationGenerator {
 
 			list.push(
 				`id=${commodity.id.split('-')[0]} ${commodity.name} (unit: ${commodity.unit})`,
-				`price: ${isNaN(price) ? 'not enough data' : `~${price}/${commodity.unit}`}`,
+				`price: ${isNaN(price) ? 'not enough data' : `~${convertToCurrency(price)}/${commodity.unit}`}`,
 				`description: ${commodity.description}`,
 				''
 			);
@@ -411,7 +470,7 @@ export abstract class MarketIterationGenerator {
 			const price = this.tracker.buyingPrice(commodity);
 
 			list.push(
-				`id=${commodity.id.split('-')[0]} ${commodity.name} (unit: ${commodity.unit}, price: ${isNaN(price) ? 'not enough data' : `~${price}/${commodity.unit}`})`,
+				`id=${commodity.id.split('-')[0]} ${commodity.name} (unit: ${commodity.unit}${isNaN(price) ? '' : `, price: ~${convertToCurrency(price)}/${commodity.unit}`})`,
 			);
 		}
 

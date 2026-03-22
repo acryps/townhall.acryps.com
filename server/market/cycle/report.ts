@@ -5,6 +5,7 @@ import { Publication, Commodity, StockSeed, Article, DbContext, MarketCycle } fr
 import { TradingEntity } from "../entity";
 import { Language } from "../../life/language";
 import { MarketTracker } from "../tracker";
+import { MarketCycleConfiguration } from "./configuration";
 
 export class MarketReporter extends MarketIterationGenerator {
 	logger = new Logger('report');
@@ -15,9 +16,10 @@ export class MarketReporter extends MarketIterationGenerator {
 
 		public database: DbContext,
 		public tracker: MarketTracker,
-		public cycle: MarketCycle
+		public cycle: MarketCycle,
+		public configuration: MarketCycleConfiguration
 	) {
-		super(database, tracker, cycle);
+		super(database, tracker, cycle, configuration);
 	}
 
 	async generate() {

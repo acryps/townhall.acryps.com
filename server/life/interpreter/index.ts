@@ -1,5 +1,7 @@
 import { writeFileSync } from "fs";
 import { Ollama } from "ollama";
+import { InterpreterProvider } from "./provider";
+import { LocalOllamaInterpreterProvider } from "./provider/local-ollama";
 
 export type Tool = {
 	name: string,
@@ -13,10 +15,6 @@ export type ToolParameter = {
 	optional?: true
 };
 
-const ollama = new Ollama({
-	host: process.env.LANGUAGE_MODEL_HOST // default: http://127.0.0.1:11434
-});
-
 export class ToolError extends Error {
 	constructor(
 		public issue: string
@@ -26,6 +24,8 @@ export class ToolError extends Error {
 }
 
 export class Interpreter {
+	provider: InterpreterProvider;
+
 	tools: Tool[] = [];
 	history: InterpreterMessage[] = [];
 
@@ -39,12 +39,16 @@ export class Interpreter {
 	}
 
 	constructor(
-		public mode: 'smart' | 'fast' = 'smart',
+		provider: InterpreterProvider | 'smart' | 'fast' = 'smart',
 		public stop = 10
-	) {}
-
-	get modelName() {
-		return this.mode == 'smart' ? process.env.LANGUAGE_MODEL_MODEL_SMART : process.env.LANGUAGE_MODEL_MODEL_FAST;
+	) {
+		if (provider == 'smart') {
+			this.provider = new LocalOllamaInterpreterProvider(process.env.LANGUAGE_MODEL_MODEL_SMART);
+		} else if (provider == 'fast') {
+			this.provider = new LocalOllamaInterpreterProvider(process.env.LANGUAGE_MODEL_MODEL_FAST);
+		} else {
+			this.provider = provider;
+		}
 	}
 
 	get metaInitiator() {
@@ -89,7 +93,7 @@ export class Interpreter {
 			new SystemMessage(this.metaInitiator),
 			...this.history,
 			...messages
-		].map(message => message.toOllamaMessage());
+		];
 
 		if (process.env.LOG_INTERPRETER) {
 			console.log('-'.repeat(50));
@@ -97,19 +101,14 @@ export class Interpreter {
 
 			for (let message of context) {
 				console.group(message.role);
-				console.log(message.content.split('\n').map(line => line.trim()).join('\n'));
+				console.log(message.message.split('\n').map(line => line.trim()).join('\n'));
 				console.groupEnd();
 			}
 
 			console.groupEnd();
 		}
 
-		const response = await ollama.chat({
-			model: this.modelName,
-			messages: context
-		});
-
-		const message = response.message.content;
+		const message = await this.provider.request(context);
 
 		if (process.env.LOG_INTERPRETER) {
 			console.group('Interpreter Response');

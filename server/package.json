@@ -1,7 +1,7 @@
 {
 	"name": "server-townhall",
 	"scripts": {
-		"build": "npx vlserver compile && esbuild index.ts --bundle --outfile=.built/index.js --platform=node --target=es2018 --external:express-ws --external:sharp --external:skia-canvas --external:pg --external:puppeteer-core --external:ollama && vlquery compile",
+		"build": "npx vlserver compile && esbuild index.ts --bundle --outfile=.built/index.js --platform=node --target=es2018 --external:express-ws --external:openai --external:sharp --external:skia-canvas --external:pg --external:puppeteer-core --external:ollama && vlquery compile",
 		"start": "npm run build && RUST_BACKTRACE=1 environment node --max-old-space-size=8192 .built/index.js",
 		"typecheck": "npx vlserver compile && tsc --noEmit",
 		"database:update": "environment vlquery create-context"
@@ -37,6 +37,7 @@
 		"js-md5": "^0.7.3",
 		"node-fetch": "^2.6.6",
 		"ollama": "^0.5.10",
+		"openai": "^6.32.0",
 		"puppeteer-core": "^24.11.1",
 		"sharp": "^0.30.2",
 		"skia-canvas": "^2.0.1",

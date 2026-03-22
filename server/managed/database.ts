@@ -3910,28 +3910,26 @@ export class Tenancy extends Entity<TenancyQueryProxy> {
 }
 			
 export class TokenSponsorQueryProxy extends QueryProxy {
-	get fastModel(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get key(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get model(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get smartModel(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class TokenSponsor extends Entity<TokenSponsorQueryProxy> {
 	marketCycles: PrimaryReference<MarketCycle, MarketCycleQueryProxy>;
-		fastModel: string;
-	declare id: string;
+		uses: PrimaryReference<TokenUse, TokenUseQueryProxy>;
+		declare id: string;
 	key: string;
+	model: string;
 	name: string;
-	smartModel: string;
 	
 	$$meta = {
 		source: "token_sponsor",
 		columns: {
-			fastModel: { type: "text", name: "fast_model" },
 			id: { type: "uuid", name: "id" },
 			key: { type: "text", name: "key" },
-			name: { type: "text", name: "name" },
-			smartModel: { type: "text", name: "smart_model" }
+			model: { type: "text", name: "model" },
+			name: { type: "text", name: "name" }
 		},
 		get set(): DbSet<TokenSponsor, TokenSponsorQueryProxy> { 
 			return new DbSet<TokenSponsor, TokenSponsorQueryProxy>(TokenSponsor, null);
@@ -3942,7 +3940,59 @@ export class TokenSponsor extends Entity<TokenSponsorQueryProxy> {
 		super();
 		
 		this.marketCycles = new PrimaryReference<MarketCycle, MarketCycleQueryProxy>(this, "sponsorId", MarketCycle);
+		this.uses = new PrimaryReference<TokenUse, TokenUseQueryProxy>(this, "sponsorId", TokenUse);
 	}
+}
+			
+export class TokenUseQueryProxy extends QueryProxy {
+	get sponsor(): Partial<TokenSponsorQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get billed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get input(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get output(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get sponsorId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class TokenUse extends Entity<TokenUseQueryProxy> {
+	get sponsor(): Partial<ForeignReference<TokenSponsor>> { return this.$sponsor; }
+	billed: Date;
+	declare id: string;
+	input: number;
+	output: number;
+	sponsorId: string;
+	
+	$$meta = {
+		source: "token_use",
+		columns: {
+			billed: { type: "timestamp", name: "billed" },
+			id: { type: "uuid", name: "id" },
+			input: { type: "int4", name: "input" },
+			output: { type: "int4", name: "output" },
+			sponsorId: { type: "uuid", name: "sponsor_id" }
+		},
+		get set(): DbSet<TokenUse, TokenUseQueryProxy> { 
+			return new DbSet<TokenUse, TokenUseQueryProxy>(TokenUse, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$sponsor = new ForeignReference<TokenSponsor>(this, "sponsorId", TokenSponsor);
+	}
+	
+	private $sponsor: ForeignReference<TokenSponsor>;
+
+	set sponsor(value: Partial<ForeignReference<TokenSponsor>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.sponsorId = value.id as string;
+		} else {
+			this.sponsorId = null;
+		}
+	}
+
+	
 }
 			
 export class TradeQueryProxy extends QueryProxy {
@@ -5177,6 +5227,7 @@ export class DbContext {
 	streetRoute: DbSet<StreetRoute, StreetRouteQueryProxy>;
 	tenancy: DbSet<Tenancy, TenancyQueryProxy>;
 	tokenSponsor: DbSet<TokenSponsor, TokenSponsorQueryProxy>;
+	tokenUse: DbSet<TokenUse, TokenUseQueryProxy>;
 	trade: DbSet<Trade, TradeQueryProxy>;
 	tradeAsk: DbSet<TradeAsk, TradeAskQueryProxy>;
 	tradeBid: DbSet<TradeBid, TradeBidQueryProxy>;
@@ -5258,6 +5309,7 @@ export class DbContext {
 		this.streetRoute = new DbSet<StreetRoute, StreetRouteQueryProxy>(StreetRoute, this.runContext);
 		this.tenancy = new DbSet<Tenancy, TenancyQueryProxy>(Tenancy, this.runContext);
 		this.tokenSponsor = new DbSet<TokenSponsor, TokenSponsorQueryProxy>(TokenSponsor, this.runContext);
+		this.tokenUse = new DbSet<TokenUse, TokenUseQueryProxy>(TokenUse, this.runContext);
 		this.trade = new DbSet<Trade, TradeQueryProxy>(Trade, this.runContext);
 		this.tradeAsk = new DbSet<TradeAsk, TradeAskQueryProxy>(TradeAsk, this.runContext);
 		this.tradeBid = new DbSet<TradeBid, TradeBidQueryProxy>(TradeBid, this.runContext);

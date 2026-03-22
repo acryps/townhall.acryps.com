@@ -1,6 +1,12 @@
 export class MarketCycleConfiguration {
-	baseDemandIterations = 5;
-	innovatedDemandIterations = 2;
+	basePrivateDemandIterations = 5;
+	innovatedPrivateDemandIterations = 2;
+
+	demandSetSize = 20;
+	demandReplicationSetSize = 10;
+
+	demandReplicationPoolSize = 2000;
+	demandReplicationSize = 100;
 
 	innovationIterations = 2;
 

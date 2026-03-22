@@ -12,9 +12,18 @@ CREATE TABLE token_sponsor (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 	name TEXT,
 
-	smart_model TEXT,
-	fast_model TEXT,
-	key TEXT
+	key TEXT,
+	model TEXT
+);
+
+CREATE TABLE token_use (
+	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+	billed TIMESTAMP,
+
+	input INT,
+	output INT,
+
+	sponsor_id UUID CONSTRAINT sponsor__uses REFERENCES token_sponsor (id)
 );
 
 CREATE TABLE market_cycle (

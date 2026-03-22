@@ -111,6 +111,8 @@ DbClient.connectedClient.connect().then(async () => {
 	const annotator = new Annotator(database);
 	await annotator.load();
 
+	// new ResidentAssessor(database).next();
+
 	ItemContextTracker.instance = new ItemContextTracker(database);
 
 	new LegalEntityReferenceCounter(database).schedule();

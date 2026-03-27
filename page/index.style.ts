@@ -6,11 +6,14 @@ export const navigationBorderColor = hex('050811');
 export const pageTextColor = hex('000');
 export const pageBackgroundColor = hex('fafafa');
 
-export const pageGutter = rem(1);
-
 export const positiveColor = hex('37c91a');
 export const negativeColor = hex('c91a4b');
 export const neutralColor = hex('eee');
+
+export const areaColor = neutralColor;
+export const areaContrastColor = pageTextColor;
+
+export const pageGutter = rem(1);
 
 export const infoColor = hex('fb5');
 

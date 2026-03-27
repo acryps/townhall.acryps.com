@@ -2070,6 +2070,7 @@ ViewModel.mappings = {
 				banner: this.$$model.banner,
 				bounds: this.$$model.bounds,
 				color: this.$$model.color,
+				contextTagline: this.$$model.contextTagline,
 				id: this.$$model.id,
 				incorporation: this.$$model.incorporation,
 				name: this.$$model.name,
@@ -2112,6 +2113,7 @@ ViewModel.mappings = {
 				banner: true,
 				bounds: true,
 				color: true,
+				contextTagline: true,
 				id: true,
 				incorporation: true,
 				name: true,
@@ -2125,6 +2127,7 @@ ViewModel.mappings = {
 			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
 			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
+			"contextTagline" in data && (item.contextTagline = data.contextTagline === null ? null : `${data.contextTagline}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"incorporation" in data && (item.incorporation = data.incorporation === null ? null : new Date(data.incorporation));
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
@@ -2146,6 +2149,7 @@ ViewModel.mappings = {
 			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
 			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
+			"contextTagline" in viewModel && (model.contextTagline = viewModel.contextTagline === null ? null : `${viewModel.contextTagline}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"incorporation" in viewModel && (model.incorporation = viewModel.incorporation === null ? null : new Date(viewModel.incorporation));
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);

@@ -17,6 +17,7 @@ export interface BoroughSummaryModel {
 	banner: string;
 	bounds: string;
 	color: string;
+	contextTagline: string;
 	id: string;
 	incorporation: Date;
 	name: string;

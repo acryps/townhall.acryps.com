@@ -1,9 +1,17 @@
-import { alignContent, alignItems, animationIterationCount, aspectRatio, backdropFilter, background, backgroundColor, border, bottom, boxShadow, brightness, child, color, ColorValue, contrast, cursor, display, flexDirection, flexWrap, fontSize, fontStyle, fontWeight, gap, grayscale, height, hex, Hex, inset, insetInline, invert, justifyContent, Keyframe, Keyframes, left, lineHeight, margin, marginBlock, marginBottom, marginInline, marginRight, marginTop, maxHeight, Mm, objectFit, overflow, padding, paddingBlock, paddingInline, percentage, position, px, ratio, rem, seconds, style, textAlign, top, transform, translateX, Variable, vh, whiteSpace, width, zIndex } from "@acryps/style";
+import { alignContent, alignItems, animationIterationCount, aspectRatio, backdropFilter, background, backgroundColor, border, bottom, boxShadow, brightness, child, color, ColorValue, contrast, cursor, display, flexDirection, flexGrow, flexWrap, fontSize, fontStyle, fontWeight, gap, grayscale, gridTemplateColumns, height, hex, Hex, imageRendering, inset, insetInline, invert, justifyContent, Keyframe, Keyframes, left, lineHeight, margin, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, maxHeight, minWidth, Mm, objectFit, overflow, padding, paddingBlock, paddingInline, percentage, position, px, Rad, ratio, rem, rotate, seconds, style, textAlign, top, transform, translateX, turn, Variable, vh, whiteSpace, width, zIndex } from "@acryps/style";
 import { buttonStyle } from "../shared/index.style";
 import { collection, collectionItem } from "../shared/collection.style";
-import { card } from "../shared/card.style";
-import { neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../index.style";
+import { card, cardSpacingBlock, cardSpacingInline } from "../shared/card.style";
+import { areaColor, areaContrastColor, neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../index.style";
 import { headlineFont } from "../assets/font/index.style";
+import { Banner } from "../../interface/banner";
+
+export const boroughMapBaseColor = hex('999');
+export const boroughMapItemColor = pageTextColor;
+
+export const boroughMapCompassDirection = new Variable<Rad>('direction');
+
+const boroughBannerWidth = rem(1.5);
 
 export const homeStyle = () => child('ui-home',
 	display('block'),
@@ -16,7 +24,8 @@ export const homeStyle = () => child('ui-home',
 		overflow('hidden'),
 
 		position('relative'),
-		backgroundColor(neutralColor),
+		color(areaContrastColor),
+		backgroundColor(areaColor),
 
 		child('ui-scroller',
 			position('absolute'),
@@ -203,27 +212,44 @@ export const homeStyle = () => child('ui-home',
 
 			child('ui-borough',
 				collectionItem(),
-				card(),
+				card(false),
 
-				display('flex'),
-				alignItems('center'),
+				display('grid'),
+				gridTemplateColumns('min-content', 'auto', 'min-content'),
 
 				child('ui-banner',
-					marginRight(rem(1)),
+					marginBlock(cardSpacingBlock),
+					marginLeft(cardSpacingInline),
 					fontSize(0),
 
 					child('img',
-						height(rem(3)),
+						width(boroughBannerWidth),
 
 						border(px(1), 'solid', hex('000'))
 					)
 				),
 
+				child('ui-banner-placeholder',
+					width(boroughBannerWidth.add(cardSpacingInline))
+				),
+
 				child('ui-detail',
+					display('flex'),
+					flexDirection('column'),
+
+					marginBlock(cardSpacingBlock),
+					marginInline(cardSpacingInline),
+
 					child('ui-name',
 						display('block'),
 
 						fontWeight('bold')
+					),
+
+					child('ui-tagline',
+						display('block'),
+
+						flexGrow(1)
 					),
 
 					child('ui-incorporation',
@@ -236,6 +262,42 @@ export const homeStyle = () => child('ui-home',
 						display('block'),
 
 						fontSize(rem(0.8))
+					)
+				),
+
+				child('ui-map',
+					display('flex'),
+					overflow('hidden'),
+					position('relative'),
+					height(percentage(100)),
+
+					backgroundColor(pageBackgroundColor),
+
+					child('img',
+						display('block'),
+						height(percentage(100)),
+
+						imageRendering('pixelated')
+					),
+
+					child('ui-compass',
+						position('absolute'),
+						inset(percentage(5)),
+
+						display('flex'),
+						alignItems('center'),
+						justifyContent('flex-end'),
+
+						transform(rotate(boroughMapCompassDirection)),
+
+						fontSize(rem(0.8)),
+
+						child('ui-icon',
+							padding(rem(0.2)),
+
+							color(pageBackgroundColor),
+							backgroundColor(pageTextColor)
+						)
 					)
 				)
 			)

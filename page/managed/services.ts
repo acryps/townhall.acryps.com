@@ -17,6 +17,7 @@ export class BoroughSummaryModel {
 	banner: string;
 	bounds: string;
 	color: string;
+	contextTagline: string;
 	id: string;
 	incorporation: Date;
 	name: string;
@@ -28,6 +29,7 @@ export class BoroughSummaryModel {
 		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
 		raw.bounds === undefined || (item.bounds = raw.bounds === null ? null : `${raw.bounds}`)
 		raw.color === undefined || (item.color = raw.color === null ? null : `${raw.color}`)
+		raw.contextTagline === undefined || (item.contextTagline = raw.contextTagline === null ? null : `${raw.contextTagline}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.incorporation === undefined || (item.incorporation = raw.incorporation ? new Date(raw.incorporation) : null)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)

@@ -7,6 +7,8 @@ export class BoroughSummaryModel extends ViewModel<Borough> {
 	tag;
 
 	name;
+	contextTagline;
+
 	color;
 	banner;
 	bounds;

@@ -11,6 +11,7 @@ import { ArticleNewstickerModel, ArticlePreviewModel, PublicationService } from 
 import { NewstickerComponent } from "./newsticker";
 import { Banner } from "../../interface/banner";
 import { Time } from "../../interface/time";
+import { HomeBoroughListComponent } from "./boroughs";
 
 export class HomePage extends Component {
 	render() {
@@ -216,27 +217,7 @@ export class HomePage extends Component {
 					Each borough has its own administration, rules and history.
 				</ui-description>
 
-				<ui-boroughs>
-					{Application.boroughs.toOrdered(borough => Point.center(Point.unpack(borough.bounds)).distance(Application.center)).map(borough => <ui-borough ui-href={`/borough/${borough.tag}`} style={boroughColor.provide(hex(borough.color))}>
-						{borough.banner && new BannerComponent(Banner.unpack(borough.banner))}
-
-						<ui-detail>
-							<ui-name>
-								{borough.name}
-							</ui-name>
-
-							{borough.incorporation ? <ui-incorporation>
-								Incorporated: {borough.incorporation.toLocaleDateString()}
-							</ui-incorporation> : <ui-incorporation ui-none>
-								Not officially incorporated
-							</ui-incorporation>}
-
-							<ui-area>
-								Area: {Point.area(Point.unpack(borough.bounds)).toLocaleString()} b²
-							</ui-area>
-						</ui-detail>
-					</ui-borough>)}
-				</ui-boroughs>
+				{new HomeBoroughListComponent()}
 			</ui-section>
 
 			<ui-about>

@@ -358,6 +358,9 @@ export class BoroughQueryProxy extends QueryProxy {
 	get banner(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get bounds(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get color(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextReport(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextSummary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextTagline(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get districtId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get incorporation(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -378,6 +381,9 @@ export class Borough extends Entity<BoroughQueryProxy> {
 	banner: string;
 	bounds: string;
 	color: string;
+	contextReport: string;
+	contextSummary: string;
+	contextTagline: string;
 	description: string;
 	districtId: string;
 	declare id: string;
@@ -397,6 +403,9 @@ export class Borough extends Entity<BoroughQueryProxy> {
 			banner: { type: "text", name: "banner" },
 			bounds: { type: "text", name: "bounds" },
 			color: { type: "text", name: "color" },
+			contextReport: { type: "text", name: "context_report" },
+			contextSummary: { type: "text", name: "context_summary" },
+			contextTagline: { type: "text", name: "context_tagline" },
 			description: { type: "text", name: "description" },
 			districtId: { type: "uuid", name: "district_id" },
 			id: { type: "uuid", name: "id" },

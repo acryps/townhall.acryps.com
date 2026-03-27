@@ -4,6 +4,9 @@ import { Borough, DbContext } from "../../managed/database";
 import { BoroughSummaryModel } from "../borough.summary";
 import { Point } from "../../../interface/point";
 import { DistrictViewModel } from "../vote/district";
+import { PropertyViewModel } from "../property.view";
+import { PropertySummaryModel } from "../property.summary";
+import { OfficeViewModel } from "../company.view";
 
 export class BoroughService extends Service {
 	constructor(
@@ -63,10 +66,24 @@ export class BoroughService extends Service {
 			.count();
 	}
 
+	listOffices(id: string) {
+		return OfficeViewModel.from(
+			this.database.office
+				.where(office => office.property.boroughId == id)
+		);
+	}
+
 	async propertyCount(id: string) {
 		return await this.database.property
 			.where(property => property.deactivated == null)
 			.where(property => property.boroughId == id)
 			.count()
+	}
+
+	listProperties(id: string) {
+		return PropertySummaryModel.from(
+			this.database.property
+				.where(property => property.boroughId == id)
+		);
 	}
 }

@@ -9,6 +9,8 @@ export class PropertySummaryModel extends ViewModel<Property> {
 	id;
 
 	name;
+	created;
+	deactivated;
 
 	type: PropertyTypeViewModel;
 	borough: BoroughSummaryModel;

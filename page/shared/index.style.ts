@@ -1,4 +1,5 @@
-import { alignItems, backgroundColor, border, boxShadow, color, columnGap, cursor, display, hex, paddingBlock, paddingInline, px, rem, style, textAlign } from "@acryps/style";
+import { alignItems, backgroundColor, border, boxShadow, color, columnGap, cursor, display, flexWrap, gap, hex, paddingBlock, paddingInline, px, rem, style, textAlign } from "@acryps/style";
+import { pageGutter } from "../index.style";
 
 export const buttonStyle = () => [
 	display('flex'),
@@ -19,4 +20,10 @@ export const buttonStyle = () => [
 
 		boxShadow(hex('0006'), 0, 0, 0, px(2), 'inset')
 	)
+];
+
+export const buttonGroupStyle = () => [
+	display('flex'),
+	gap(pageGutter),
+	flexWrap('wrap')
 ];

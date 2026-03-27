@@ -21,6 +21,7 @@ import { mapBaseTileSize } from "././../../interface/tile";
 import { MapService } from "././../areas/map.service";
 import { BoroughSummaryModel } from "././../areas/borough.summary";
 import { DistrictViewModel } from "././../areas/vote/district";
+import { OfficeViewModel } from "././../areas/company.view";
 import { BoroughService } from "././../areas/borough/service";
 import { MapType } from "././database";
 import { ChangeFrame } from "././../areas/change/frame";
@@ -34,7 +35,6 @@ import { Office } from "././database";
 import { OfficeCapacity } from "././database";
 import { CompanySummaryModel } from "././../areas/company.view";
 import { CompanyViewModel } from "././../areas/company.view";
-import { OfficeViewModel } from "././../areas/company.view";
 import { WorkOfferViewModel } from "././../areas/work";
 import { CompanyOfficeService } from "././../areas/company-office/service";
 import { EpochTimelineModel } from "././../areas/epoch/epoch";
@@ -630,6 +630,17 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"hrYXVjYmZtaWRxYXN4ajd3ajlhc2Z3cG",
+			{
+			"E1b2ZvbWk2bWh3M3IwcX5lMnZ1cmh6ND": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(BoroughService),
+			(controller, params) => controller.listOffices(
+				params["E1b2ZvbWk2bWh3M3IwcX5lMnZ1cmh6ND"]
+			)
+		);
+
+		this.expose(
 			"ZhY2Jia2JwZnQweWl0cTNoN2hzajJscW",
 			{
 			"hoY3FwZXBtcnJvcDRsNmdlY2c3N2x6ZD": { type: "string", isArray: false, isOptional: false }
@@ -637,6 +648,17 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(BoroughService),
 			(controller, params) => controller.propertyCount(
 				params["hoY3FwZXBtcnJvcDRsNmdlY2c3N2x6ZD"]
+			)
+		);
+
+		this.expose(
+			"k4NmZqaWFqbTFxMjVmYXhjNGNrNW41cW",
+			{
+			"A3eHMyejg2ejQxZX1vM2Z3a2A0bGpjen": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(BoroughService),
+			(controller, params) => controller.listProperties(
+				params["A3eHMyejg2ejQxZX1vM2Z3a2A0bGpjen"]
 			)
 		);
 
@@ -2703,6 +2725,8 @@ ViewModel.mappings = {
 				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.$$model.borough)),
 				historicListingGrade: new HistoricListingGradeViewModel(await BaseServer.unwrap(this.$$model.historicListingGrade)),
 				type: new PropertyTypeViewModel(await BaseServer.unwrap(this.$$model.type)),
+				created: this.$$model.created,
+				deactivated: this.$$model.deactivated,
 				id: this.$$model.id,
 				name: this.$$model.name
 			}
@@ -2758,6 +2782,8 @@ ViewModel.mappings = {
 						[...parents, "type-PropertySummaryModel"]
 					);
 				},
+				created: true,
+				deactivated: true,
 				id: true,
 				name: true
 			};
@@ -2769,6 +2795,8 @@ ViewModel.mappings = {
 			"borough" in data && (item.borough = data.borough && ViewModel.mappings[BoroughSummaryModel.name].toViewModel(data.borough));
 			"historicListingGrade" in data && (item.historicListingGrade = data.historicListingGrade && ViewModel.mappings[HistoricListingGradeViewModel.name].toViewModel(data.historicListingGrade));
 			"type" in data && (item.type = data.type && ViewModel.mappings[PropertyTypeViewModel.name].toViewModel(data.type));
+			"created" in data && (item.created = data.created === null ? null : new Date(data.created));
+			"deactivated" in data && (item.deactivated = data.deactivated === null ? null : new Date(data.deactivated));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 
@@ -2788,6 +2816,8 @@ ViewModel.mappings = {
 			"borough" in viewModel && (model.borough.id = viewModel.borough ? viewModel.borough.id : null);
 			"historicListingGrade" in viewModel && (model.historicListingGrade.id = viewModel.historicListingGrade ? viewModel.historicListingGrade.id : null);
 			"type" in viewModel && (model.type.id = viewModel.type ? viewModel.type.id : null);
+			"created" in viewModel && (model.created = viewModel.created === null ? null : new Date(viewModel.created));
+			"deactivated" in viewModel && (model.deactivated = viewModel.deactivated === null ? null : new Date(viewModel.deactivated));
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 

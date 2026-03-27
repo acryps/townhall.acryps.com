@@ -8,6 +8,8 @@ export const bannerStyle = (...content: StyleSelectorBody[]) => select('ui-banne
 	content
 );
 
+export const bannerBorder = () => border(px(1), 'solid', hex('000'));
+
 export const headerBannerStyle = (alignment: DistributedJustificationMode = 'center') => child('ui-banner',
 	display('flex'),
 	justifyContent(alignment),
@@ -16,7 +18,7 @@ export const headerBannerStyle = (alignment: DistributedJustificationMode = 'cen
 	child('img',
 		height(min(vh(20), rem(10))),
 
-		border(px(1), 'solid', hex('000'))
+		bannerBorder()
 	)
 );
 

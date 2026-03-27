@@ -178,6 +178,8 @@ export class PropertySummaryModel {
 	borough: BoroughSummaryModel;
 	historicListingGrade: HistoricListingGradeViewModel;
 	type: PropertyTypeViewModel;
+	created: Date;
+	deactivated: Date;
 	id: string;
 	name: string;
 
@@ -187,6 +189,8 @@ export class PropertySummaryModel {
 		raw.borough === undefined || (item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null)
 		raw.historicListingGrade === undefined || (item.historicListingGrade = raw.historicListingGrade ? HistoricListingGradeViewModel["$build"](raw.historicListingGrade) : null)
 		raw.type === undefined || (item.type = raw.type ? PropertyTypeViewModel["$build"](raw.type) : null)
+		raw.created === undefined || (item.created = raw.created ? new Date(raw.created) : null)
+		raw.deactivated === undefined || (item.deactivated = raw.deactivated ? new Date(raw.deactivated) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		
@@ -2658,6 +2662,27 @@ export class BoroughService {
 		});
 	}
 
+	async listOffices(id: string): Promise<Array<OfficeViewModel>> {
+		const $data = new FormData();
+		$data.append("E1b2ZvbWk2bWh3M3IwcX5lMnZ1cmh6ND", Service.stringify(id))
+
+		return await fetch(Service.toURL("hrYXVjYmZtaWRxYXN4ajd3ajlhc2Z3cG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : OfficeViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async propertyCount(id: string): Promise<number> {
 		const $data = new FormData();
 		$data.append("hoY3FwZXBtcnJvcDRsNmdlY2c3N2x6ZD", Service.stringify(id))
@@ -2671,6 +2696,27 @@ export class BoroughService {
 				const d = r.data;
 
 				return d === null ? null : +d;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async listProperties(id: string): Promise<Array<PropertySummaryModel>> {
+		const $data = new FormData();
+		$data.append("A3eHMyejg2ejQxZX1vM2Z3a2A0bGpjen", Service.stringify(id))
+
+		return await fetch(Service.toURL("k4NmZqaWFqbTFxMjVmYXhjNGNrNW41cW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : PropertySummaryModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

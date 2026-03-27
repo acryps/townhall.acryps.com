@@ -84,6 +84,8 @@ export interface PropertySummaryModel {
 	borough: BoroughSummaryModel;
 	historicListingGrade: HistoricListingGradeViewModel;
 	type: PropertyTypeViewModel;
+	created: Date;
+	deactivated: Date;
 	id: string;
 	name: string;
 }

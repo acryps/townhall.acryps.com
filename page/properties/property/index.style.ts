@@ -1,5 +1,5 @@
-import { alignContent, alignItems, alignSelf, aspectRatio, background, backgroundColor, backgroundImage, backgroundPosition, backgroundPositionX, backgroundSize, border, borderBottom, borderRight, bottom, Ch, child, color, colorStop, columnGap, cursor, display, Dvi, flexBasis, flexDirection, flexGrow, flexWrap, fontSize, fontStyle, fontWeight, gap, height, imageRendering, justifyContent, justifyItems, left, linearGradient, LinearGradient, lineHeight, margin, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, milliseconds, min, Mm, objectFit, objectPosition, opacity, overflow, padding, percentage, position, px, ratio, rem, select, style, textAlign, textDecorationLine, top, turn, Variable, vh, width } from "@acryps/style";
-import { negativeColor, neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
+import { alignContent, alignItems, alignSelf, aspectRatio, background, backgroundColor, backgroundImage, backgroundPosition, backgroundPositionX, backgroundSize, border, borderBottom, borderRight, bottom, Ch, child, color, colorStop, columnGap, cursor, display, Dvi, flexBasis, flexDirection, flexGrow, flexWrap, fontSize, fontStyle, fontWeight, gap, height, imageRendering, justifyContent, justifyItems, left, linearGradient, LinearGradient, lineHeight, margin, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, milliseconds, min, Mm, objectFit, objectPosition, opacity, overflow, padding, paddingBlock, paddingInline, percentage, position, px, ratio, rem, select, style, textAlign, textDecorationLine, top, turn, Variable, vh, width } from "@acryps/style";
+import { infoColor, negativeColor, neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 import { fieldStyle, inputStyle } from "../../shared/field.style";
 import { buttonStyle } from "../../shared/index.style";
 import { buildingStyle } from "./building/index.style";
@@ -39,6 +39,15 @@ export const propertyStyle = () => child('ui-property',
 
 			marginInline(pageGutter.invert()),
 			marginBlock(pageGutter)
+		),
+
+		child('ui-deactivated',
+			display('block'),
+			paddingInline(pageGutter),
+			paddingBlock(pageGutter.divide(2)),
+			marginBottom(pageGutter),
+
+			backgroundColor(infoColor)
 		),
 
 		tabsStyle(

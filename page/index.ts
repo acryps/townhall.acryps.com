@@ -77,6 +77,12 @@ import { CommodityPage } from "./market/commodity";
 import { MarketEntityPage } from "./market/entity";
 import { ResidentAssessmentPage } from "./resident/assessment";
 import { AssessmentParameterDistributionPage } from "./market/assessment/distribution";
+import { LorePage } from "./lore";
+import { LoreQueryPage } from "./lore/query";
+import { LoreItemPage } from "./lore/item";
+import { WriteLoreProposalPage } from "./lore/propose/write";
+import { LoreProposalReviewPage } from "./lore/propose/review";
+import { ExpandLorePage } from "./lore/item/expand";
 
 export class Application {
 	static router: Router;
@@ -103,6 +109,17 @@ export class Application {
 		this.router = new PathRouter(
 			PageComponent
 				.route('/review', ReviewPage)
+
+				.route('/lore', LorePage
+					.route('/query/:id', LoreQueryPage)
+
+					.route('/proposal/write', WriteLoreProposalPage)
+					.route('/proposal/:id', LoreProposalReviewPage)
+
+					.route('/:id', LoreItemPage
+						.route('/expand', ExpandLorePage)
+					)
+				)
 
 				.route('/map/:x/:y/:zoom', MapPage
 					.route('/create-building/:id', CreateBuildingAction)

@@ -655,6 +655,35 @@ export interface VoteTickerViewModel {
 	submitted: Date;
 }
 
+export interface LoreSummaryViewModel {
+    facts: string;
+	id: string;
+	source: string;
+	timestamp: Date;
+	title: string;
+}
+
+export interface LoreProposalViewModel {
+    context: string;
+	id: string;
+	title: string;
+	valid: boolean;
+	validation: string;
+}
+
+export interface LoreQueryViewModel {
+    sources: LoreQuerySourceViewModel[];
+	answer: string;
+	id: string;
+	question: string;
+}
+
+export interface LoreQuerySourceViewModel {
+    lore: LoreSummaryViewModel;
+	id: string;
+	relation: string;
+}
+
 export interface CompanyViewModel {
     offices: OfficeSummaryModel[];
 	banner: string;
@@ -892,4 +921,13 @@ export interface DistrictViewModel {
 	includeInMinimap: boolean;
 	name: string;
 	parentId: string;
+}
+
+export interface LoreViewModel {
+    context: string;
+	facts: string;
+	id: string;
+	source: string;
+	timestamp: Date;
+	title: string;
 }

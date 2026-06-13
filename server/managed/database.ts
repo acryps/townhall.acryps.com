@@ -1095,6 +1095,9 @@ export class CommodityTransport extends Entity<CommodityTransportQueryProxy> {
 			
 export class CompanyQueryProxy extends QueryProxy {
 	get banner(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextReport(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextSummary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextTagline(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get incorporated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -1107,6 +1110,9 @@ export class CompanyQueryProxy extends QueryProxy {
 export class Company extends Entity<CompanyQueryProxy> {
 	offices: PrimaryReference<Office, OfficeQueryProxy>;
 		banner: string;
+	contextReport: string;
+	contextSummary: string;
+	contextTagline: string;
 	created: Date;
 	description: string;
 	declare id: string;
@@ -1120,6 +1126,9 @@ export class Company extends Entity<CompanyQueryProxy> {
 		source: "company",
 		columns: {
 			banner: { type: "text", name: "banner" },
+			contextReport: { type: "text", name: "context_report" },
+			contextSummary: { type: "text", name: "context_summary" },
+			contextTagline: { type: "text", name: "context_tagline" },
 			created: { type: "timestamp", name: "created" },
 			description: { type: "text", name: "description" },
 			id: { type: "uuid", name: "id" },
@@ -1205,6 +1214,9 @@ export class District extends Entity<DistrictQueryProxy> {
 			
 export class DwellingQueryProxy extends QueryProxy {
 	get property(): Partial<PropertyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextReport(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextSummary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextTagline(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get propertyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
@@ -1212,6 +1224,9 @@ export class DwellingQueryProxy extends QueryProxy {
 export class Dwelling extends Entity<DwellingQueryProxy> {
 	tenants: PrimaryReference<Tenancy, TenancyQueryProxy>;
 		get property(): Partial<ForeignReference<Property>> { return this.$property; }
+	contextReport: string;
+	contextSummary: string;
+	contextTagline: string;
 	created: Date;
 	declare id: string;
 	propertyId: string;
@@ -1219,6 +1234,9 @@ export class Dwelling extends Entity<DwellingQueryProxy> {
 	$$meta = {
 		source: "dwelling",
 		columns: {
+			contextReport: { type: "text", name: "context_report" },
+			contextSummary: { type: "text", name: "context_summary" },
+			contextTagline: { type: "text", name: "context_tagline" },
 			created: { type: "timestamp", name: "created" },
 			id: { type: "uuid", name: "id" },
 			propertyId: { type: "uuid", name: "property_id" }
@@ -1845,6 +1863,220 @@ export class LegalEntity extends Entity<LegalEntityQueryProxy> {
 	
 }
 			
+export class LoreQueryProxy extends QueryProxy {
+	get proposal(): Partial<LoreProposalQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get context(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get facts(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get proposalId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get source(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get timestamp(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get title(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Lore extends Entity<LoreQueryProxy> {
+	proposals: PrimaryReference<LoreProposal, LoreProposalQueryProxy>;
+		queryReferences: PrimaryReference<LoreQuerySource, LoreQuerySourceQueryProxy>;
+		get proposal(): Partial<ForeignReference<LoreProposal>> { return this.$proposal; }
+	context: string;
+	facts: string;
+	declare id: string;
+	proposalId: string;
+	source: string;
+	timestamp: Date;
+	title: string;
+	
+	$$meta = {
+		source: "lore",
+		columns: {
+			context: { type: "text", name: "context" },
+			facts: { type: "text", name: "facts" },
+			id: { type: "uuid", name: "id" },
+			proposalId: { type: "uuid", name: "proposal_id" },
+			source: { type: "uuid", name: "source" },
+			timestamp: { type: "timestamp", name: "timestamp" },
+			title: { type: "text", name: "title" }
+		},
+		get set(): DbSet<Lore, LoreQueryProxy> { 
+			return new DbSet<Lore, LoreQueryProxy>(Lore, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.proposals = new PrimaryReference<LoreProposal, LoreProposalQueryProxy>(this, "baseLoreId", LoreProposal);
+		this.queryReferences = new PrimaryReference<LoreQuerySource, LoreQuerySourceQueryProxy>(this, "sourceId", LoreQuerySource);
+		this.$proposal = new ForeignReference<LoreProposal>(this, "proposalId", LoreProposal);
+	}
+	
+	private $proposal: ForeignReference<LoreProposal>;
+
+	set proposal(value: Partial<ForeignReference<LoreProposal>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.proposalId = value.id as string;
+		} else {
+			this.proposalId = null;
+		}
+	}
+
+	
+}
+			
+export class LoreProposalQueryProxy extends QueryProxy {
+	get baseLore(): Partial<LoreQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get baseLoreId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get context(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get submitted(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get title(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get valid(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get validation(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class LoreProposal extends Entity<LoreProposalQueryProxy> {
+	get baseLore(): Partial<ForeignReference<Lore>> { return this.$baseLore; }
+	baseLoreId: string;
+	context: string;
+	declare id: string;
+	submitted: Date;
+	title: string;
+	valid: boolean;
+	validation: string;
+	
+	$$meta = {
+		source: "lore_proposal",
+		columns: {
+			baseLoreId: { type: "uuid", name: "base_lore_id" },
+			context: { type: "text", name: "context" },
+			id: { type: "uuid", name: "id" },
+			submitted: { type: "timestamp", name: "submitted" },
+			title: { type: "text", name: "title" },
+			valid: { type: "bool", name: "valid" },
+			validation: { type: "text", name: "validation" }
+		},
+		get set(): DbSet<LoreProposal, LoreProposalQueryProxy> { 
+			return new DbSet<LoreProposal, LoreProposalQueryProxy>(LoreProposal, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$baseLore = new ForeignReference<Lore>(this, "baseLoreId", Lore);
+	}
+	
+	private $baseLore: ForeignReference<Lore>;
+
+	set baseLore(value: Partial<ForeignReference<Lore>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.baseLoreId = value.id as string;
+		} else {
+			this.baseLoreId = null;
+		}
+	}
+
+	
+}
+			
+export class LoreQueryQueryProxy extends QueryProxy {
+	get answer(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get asked(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get question(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class LoreQuery extends Entity<LoreQueryQueryProxy> {
+	sources: PrimaryReference<LoreQuerySource, LoreQuerySourceQueryProxy>;
+		answer: string;
+	asked: Date;
+	declare id: string;
+	question: string;
+	
+	$$meta = {
+		source: "lore_query",
+		columns: {
+			answer: { type: "text", name: "answer" },
+			asked: { type: "timestamp", name: "asked" },
+			id: { type: "uuid", name: "id" },
+			question: { type: "text", name: "question" }
+		},
+		get set(): DbSet<LoreQuery, LoreQueryQueryProxy> { 
+			return new DbSet<LoreQuery, LoreQueryQueryProxy>(LoreQuery, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.sources = new PrimaryReference<LoreQuerySource, LoreQuerySourceQueryProxy>(this, "queryId", LoreQuerySource);
+	}
+}
+			
+export class LoreQuerySourceQueryProxy extends QueryProxy {
+	get lore(): Partial<LoreQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get query(): Partial<LoreQueryQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get queryId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get relation(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get sourceId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class LoreQuerySource extends Entity<LoreQuerySourceQueryProxy> {
+	get lore(): Partial<ForeignReference<Lore>> { return this.$lore; }
+	get query(): Partial<ForeignReference<LoreQuery>> { return this.$query; }
+	declare id: string;
+	queryId: string;
+	relation: string;
+	sourceId: string;
+	
+	$$meta = {
+		source: "lore_query_source",
+		columns: {
+			id: { type: "uuid", name: "id" },
+			queryId: { type: "uuid", name: "query_id" },
+			relation: { type: "text", name: "relation" },
+			sourceId: { type: "uuid", name: "source_id" }
+		},
+		get set(): DbSet<LoreQuerySource, LoreQuerySourceQueryProxy> { 
+			return new DbSet<LoreQuerySource, LoreQuerySourceQueryProxy>(LoreQuerySource, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$lore = new ForeignReference<Lore>(this, "sourceId", Lore);
+	this.$query = new ForeignReference<LoreQuery>(this, "queryId", LoreQuery);
+	}
+	
+	private $lore: ForeignReference<Lore>;
+
+	set lore(value: Partial<ForeignReference<Lore>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.sourceId = value.id as string;
+		} else {
+			this.sourceId = null;
+		}
+	}
+
+	private $query: ForeignReference<LoreQuery>;
+
+	set query(value: Partial<ForeignReference<LoreQuery>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.queryId = value.id as string;
+		} else {
+			this.queryId = null;
+		}
+	}
+
+	
+}
+			
 export class MapTileQueryProxy extends QueryProxy {
 	get captured(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get complete(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -2228,6 +2460,9 @@ export class OfficeQueryProxy extends QueryProxy {
 	get property(): Partial<PropertyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get closed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get companyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextReport(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextSummary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextTagline(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get opened(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get propertyId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -2240,6 +2475,9 @@ export class Office extends Entity<OfficeQueryProxy> {
 		get property(): Partial<ForeignReference<Property>> { return this.$property; }
 	closed: Date;
 	companyId: string;
+	contextReport: string;
+	contextSummary: string;
+	contextTagline: string;
 	declare id: string;
 	name: string;
 	opened: Date;
@@ -2250,6 +2488,9 @@ export class Office extends Entity<OfficeQueryProxy> {
 		columns: {
 			closed: { type: "timestamp", name: "closed" },
 			companyId: { type: "uuid", name: "company_id" },
+			contextReport: { type: "text", name: "context_report" },
+			contextSummary: { type: "text", name: "context_summary" },
+			contextTagline: { type: "text", name: "context_tagline" },
 			id: { type: "uuid", name: "id" },
 			name: { type: "text", name: "name" },
 			opened: { type: "timestamp", name: "opened" },
@@ -3271,6 +3512,9 @@ export class ResidentQueryProxy extends QueryProxy {
 	get birthday(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get compassEconomic(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get compassSocial(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextReport(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextSummary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get contextTagline(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get coreValues(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get deceased(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get familyName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -3299,6 +3543,9 @@ export class Resident extends Entity<ResidentQueryProxy> {
 	birthday: Date;
 	compassEconomic: number;
 	compassSocial: number;
+	contextReport: string;
+	contextSummary: string;
+	contextTagline: string;
 	coreValues: string;
 	deceased: Date;
 	familyName: string;
@@ -3319,6 +3566,9 @@ export class Resident extends Entity<ResidentQueryProxy> {
 			birthday: { type: "timestamp", name: "birthday" },
 			compassEconomic: { type: "float4", name: "compass_economic" },
 			compassSocial: { type: "float4", name: "compass_social" },
+			contextReport: { type: "text", name: "context_report" },
+			contextSummary: { type: "text", name: "context_summary" },
+			contextTagline: { type: "text", name: "context_tagline" },
 			coreValues: { type: "text", name: "core_values" },
 			deceased: { type: "timestamp", name: "deceased" },
 			familyName: { type: "text", name: "family_name" },
@@ -5202,6 +5452,10 @@ export class DbContext {
 	lawHouseSessionProtocol: DbSet<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy>;
 	lawHouseSessionary: DbSet<LawHouseSessionary, LawHouseSessionaryQueryProxy>;
 	legalEntity: DbSet<LegalEntity, LegalEntityQueryProxy>;
+	lore: DbSet<Lore, LoreQueryProxy>;
+	loreProposal: DbSet<LoreProposal, LoreProposalQueryProxy>;
+	loreQuery: DbSet<LoreQuery, LoreQueryQueryProxy>;
+	loreQuerySource: DbSet<LoreQuerySource, LoreQuerySourceQueryProxy>;
 	mapTile: DbSet<MapTile, MapTileQueryProxy>;
 	marketCycle: DbSet<MarketCycle, MarketCycleQueryProxy>;
 	metric: DbSet<Metric, MetricQueryProxy>;
@@ -5284,6 +5538,10 @@ export class DbContext {
 		this.lawHouseSessionProtocol = new DbSet<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy>(LawHouseSessionProtocol, this.runContext);
 		this.lawHouseSessionary = new DbSet<LawHouseSessionary, LawHouseSessionaryQueryProxy>(LawHouseSessionary, this.runContext);
 		this.legalEntity = new DbSet<LegalEntity, LegalEntityQueryProxy>(LegalEntity, this.runContext);
+		this.lore = new DbSet<Lore, LoreQueryProxy>(Lore, this.runContext);
+		this.loreProposal = new DbSet<LoreProposal, LoreProposalQueryProxy>(LoreProposal, this.runContext);
+		this.loreQuery = new DbSet<LoreQuery, LoreQueryQueryProxy>(LoreQuery, this.runContext);
+		this.loreQuerySource = new DbSet<LoreQuerySource, LoreQuerySourceQueryProxy>(LoreQuerySource, this.runContext);
 		this.mapTile = new DbSet<MapTile, MapTileQueryProxy>(MapTile, this.runContext);
 		this.marketCycle = new DbSet<MarketCycle, MarketCycleQueryProxy>(MarketCycle, this.runContext);
 		this.metric = new DbSet<Metric, MetricQueryProxy>(Metric, this.runContext);

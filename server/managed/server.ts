@@ -159,6 +159,19 @@ import { VoteService } from "././../areas/vote/service";
 import { WaterBody } from "././database";
 import { WaterBodyArea } from "././database";
 import { WaterBodyService } from "././../areas/water-body/service";
+import { Lore } from "././database";
+import { LoreProposal } from "././database";
+import { LoreQuery } from "././database";
+import { LoreQuerySource } from "././database";
+import { ToolError } from "././../life/interpreter";
+import { UserMessage } from "././../life/interpreter";
+import { Time } from "././../../interface/time";
+import { OpenAiInterpreterProvider } from "././../life/interpreter/provider/openai";
+import { LoreSummaryViewModel } from "././../lore/lore";
+import { LoreViewModel } from "././../lore/lore";
+import { LoreQueryViewModel } from "././../lore/query";
+import { LoreProposalViewModel } from "././../lore/proposal";
+import { LoreService } from "././../lore/index";
 import { OfficeSummaryModel } from "./../areas/company.view";
 import { OfficeCapacityViewModel } from "./../areas/company.view";
 import { TenantViewModel } from "./../areas/property.view";
@@ -189,6 +202,7 @@ import { TrainStopViewModel } from "./../areas/train/stop.view";
 import { StationTrainStopViewModel } from "./../areas/train/stop.view";
 import { HonestiumViewModel } from "./../areas/vote/bill";
 import { DistrictSummaryModel } from "./../areas/vote/district";
+import { LoreQuerySourceViewModel } from "./../lore/query";
 import { OfficeEmployeeModel } from "./../areas/company.view";
 import { WorkOfferEmplymentModel } from "./../areas/work";
 import { WorkContractViewModel } from "./../areas/work";
@@ -366,6 +380,10 @@ Inject.mappings = {
 	},
 	"WaterBodyService": {
 		objectConstructor: WaterBodyService,
+		parameters: ["DbContext"]
+	},
+	"LoreService": {
+		objectConstructor: LoreService,
 		parameters: ["DbContext"]
 	}
 };
@@ -2057,6 +2075,105 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(WaterBodyService),
 			(controller, params) => controller.unarchive(
 				params["dpeH9sdG05MXI4Zm81dWEzaXJvcGMxOW"]
+			)
+		);
+
+		this.expose(
+			"QzcWc0dDR4cmllb3dseWFkenE5cTJ3cG",
+			{
+			"V5NWMycmM3aHV4Z2J3ZGFwdHhzazt4Nm": { type: "date", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LoreService),
+			(controller, params) => controller.getTimeline(
+				params["V5NWMycmM3aHV4Z2J3ZGFwdHhzazt4Nm"]
+			)
+		);
+
+		this.expose(
+			"drb380dnZ0N2c0OHE1dnNoZzdpYTh6Zm",
+			{
+			"QyOTxjZHRzc3Y5OTEwZnk3YXo5ZTh5cG": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LoreService),
+			(controller, params) => controller.getLore(
+				params["QyOTxjZHRzc3Y5OTEwZnk3YXo5ZTh5cG"]
+			)
+		);
+
+		this.expose(
+			"RzdX82MnVxd3l4OW52M2k5NWFwZDVlc3",
+			{
+			"Uzd2B5aG15Zjg1OW5xOHYyc3JmYzExbW": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LoreService),
+			(controller, params) => controller.getAnswer(
+				params["Uzd2B5aG15Zjg1OW5xOHYyc3JmYzExbW"]
+			)
+		);
+
+		this.expose(
+			"JndGZxdHNheXxmNjNjY2J2Z3FsczR0cj",
+			{
+			"luNWpodDB3OGRqNDEzN2kzOWYwMnJtaz": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LoreService),
+			(controller, params) => controller.getProposal(
+				params["luNWpodDB3OGRqNDEzN2kzOWYwMnJtaz"]
+			)
+		);
+
+		this.expose(
+			"llNXV4ZmRyZzA5bGNkeHkwNzNraHB1NW",
+			{},
+			inject => inject.construct(LoreService),
+			(controller, params) => controller.prepareNext(
+				
+			)
+		);
+
+		this.expose(
+			"Q4cH9zc2V6ZWc4ZzI3eWg1cXowdjlodz",
+			{
+			"lqZTE4ajphOXZsYWRkY2djeWBiYTpmZW": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LoreService),
+			(controller, params) => controller.answer(
+				params["lqZTE4ajphOXZsYWRkY2djeWBiYTpmZW"]
+			)
+		);
+
+		this.expose(
+			"Zhbnt5a3dsZjJydzRpMHBuamJ3dHBpeT",
+			{
+			"Ntc2Mxbm8zMThnNXtxbGJibH9yaXlhNH": { type: "string", isArray: false, isOptional: false },
+				"dsdHEyY2hpdDY0cmk5MzFibDFqOXpvdT": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LoreService),
+			(controller, params) => controller.propose(
+				params["Ntc2Mxbm8zMThnNXtxbGJibH9yaXlhNH"],
+				params["dsdHEyY2hpdDY0cmk5MzFibDFqOXpvdT"]
+			)
+		);
+
+		this.expose(
+			"Znc2k2MnNrdDA1MnlwbmJtMjQzaHlrOX",
+			{
+			"ZtZnRmN3lxbWN2NXhza3Q3ZmNhaGJyNm": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LoreService),
+			(controller, params) => controller.expand(
+				params["ZtZnRmN3lxbWN2NXhza3Q3ZmNhaGJyNm"]
+			)
+		);
+
+		this.expose(
+			"5sMndnOXxqM29zcGRqM2dzanNrbTg2Mz",
+			{
+			"dsaWxsbXI3NDVyMHV2cHcxb3hzdGIwaW": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(LoreService),
+			(controller, params) => controller.acceptProposal(
+				params["dsaWxsbXI3NDVyMHV2cHcxb3hzdGIwaW"]
 			)
 		)
 	}
@@ -8457,6 +8574,300 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[LoreSummaryViewModel.name]: class ComposedLoreSummaryViewModel extends LoreSummaryViewModel {
+		async map() {
+			return {
+				facts: this.$$model.facts,
+				id: this.$$model.id,
+				source: this.$$model.source,
+				timestamp: this.$$model.timestamp,
+				title: this.$$model.title
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				facts: true,
+				id: true,
+				source: true,
+				timestamp: true,
+				title: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new LoreSummaryViewModel(null);
+			"facts" in data && (item.facts = data.facts === null ? null : `${data.facts}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"source" in data && (item.source = data.source === null ? null : `${data.source}`);
+			"timestamp" in data && (item.timestamp = data.timestamp === null ? null : new Date(data.timestamp));
+			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: LoreSummaryViewModel) {
+			let model: Lore;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Lore).find(viewModel.id)
+			} else {
+				model = new Lore();
+			}
+			
+			"facts" in viewModel && (model.facts = viewModel.facts === null ? null : `${viewModel.facts}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"source" in viewModel && (model.source = viewModel.source === null ? null : `${viewModel.source}`);
+			"timestamp" in viewModel && (model.timestamp = viewModel.timestamp === null ? null : new Date(viewModel.timestamp));
+			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
+
+			return model;
+		}
+	},
+	[LoreProposalViewModel.name]: class ComposedLoreProposalViewModel extends LoreProposalViewModel {
+		async map() {
+			return {
+				context: this.$$model.context,
+				id: this.$$model.id,
+				title: this.$$model.title,
+				valid: this.$$model.valid,
+				validation: this.$$model.validation
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				context: true,
+				id: true,
+				title: true,
+				valid: true,
+				validation: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new LoreProposalViewModel(null);
+			"context" in data && (item.context = data.context === null ? null : `${data.context}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
+			"valid" in data && (item.valid = !!data.valid);
+			"validation" in data && (item.validation = data.validation === null ? null : `${data.validation}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: LoreProposalViewModel) {
+			let model: LoreProposal;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(LoreProposal).find(viewModel.id)
+			} else {
+				model = new LoreProposal();
+			}
+			
+			"context" in viewModel && (model.context = viewModel.context === null ? null : `${viewModel.context}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
+			"valid" in viewModel && (model.valid = !!viewModel.valid);
+			"validation" in viewModel && (model.validation = viewModel.validation === null ? null : `${viewModel.validation}`);
+
+			return model;
+		}
+	},
+	[LoreQueryViewModel.name]: class ComposedLoreQueryViewModel extends LoreQueryViewModel {
+		async map() {
+			return {
+				sources: (await this.$$model.sources.includeTree(ViewModel.mappings[LoreQuerySourceViewModel.name].items).toArray()).map(item => new LoreQuerySourceViewModel(item)),
+				answer: this.$$model.answer,
+				id: this.$$model.id,
+				question: this.$$model.question
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get sources() {
+					return ViewModel.mappings[LoreQuerySourceViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "sources-LoreQueryViewModel"]
+					);
+				},
+				answer: true,
+				id: true,
+				question: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new LoreQueryViewModel(null);
+			"sources" in data && (item.sources = data.sources && [...data.sources].map(i => ViewModel.mappings[LoreQuerySourceViewModel.name].toViewModel(i)));
+			"answer" in data && (item.answer = data.answer === null ? null : `${data.answer}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"question" in data && (item.question = data.question === null ? null : `${data.question}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: LoreQueryViewModel) {
+			let model: LoreQuery;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(LoreQuery).find(viewModel.id)
+			} else {
+				model = new LoreQuery();
+			}
+			
+			"sources" in viewModel && (null);
+			"answer" in viewModel && (model.answer = viewModel.answer === null ? null : `${viewModel.answer}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"question" in viewModel && (model.question = viewModel.question === null ? null : `${viewModel.question}`);
+
+			return model;
+		}
+	},
+	[LoreQuerySourceViewModel.name]: class ComposedLoreQuerySourceViewModel extends LoreQuerySourceViewModel {
+		async map() {
+			return {
+				lore: new LoreSummaryViewModel(await BaseServer.unwrap(this.$$model.lore)),
+				id: this.$$model.id,
+				relation: this.$$model.relation
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get lore() {
+					return ViewModel.mappings[LoreSummaryViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "lore-LoreQuerySourceViewModel"]
+					);
+				},
+				id: true,
+				relation: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new LoreQuerySourceViewModel(null);
+			"lore" in data && (item.lore = data.lore && ViewModel.mappings[LoreSummaryViewModel.name].toViewModel(data.lore));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"relation" in data && (item.relation = data.relation === null ? null : `${data.relation}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: LoreQuerySourceViewModel) {
+			let model: LoreQuerySource;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(LoreQuerySource).find(viewModel.id)
+			} else {
+				model = new LoreQuerySource();
+			}
+			
+			"lore" in viewModel && (model.lore.id = viewModel.lore ? viewModel.lore.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"relation" in viewModel && (model.relation = viewModel.relation === null ? null : `${viewModel.relation}`);
+
+			return model;
+		}
+	},
 	[CompanyViewModel.name]: class ComposedCompanyViewModel extends CompanyViewModel {
 		async map() {
 			return {
@@ -10706,6 +11117,84 @@ ViewModel.mappings = {
 			"includeInMinimap" in viewModel && (model.includeInMinimap = !!viewModel.includeInMinimap);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"parentId" in viewModel && (model.parentId = viewModel.parentId === null ? null : `${viewModel.parentId}`);
+
+			return model;
+		}
+	},
+	[LoreViewModel.name]: class ComposedLoreViewModel extends LoreViewModel {
+		async map() {
+			return {
+				context: this.$$model.context,
+				facts: this.$$model.facts,
+				id: this.$$model.id,
+				source: this.$$model.source,
+				timestamp: this.$$model.timestamp,
+				title: this.$$model.title
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				context: true,
+				facts: true,
+				id: true,
+				source: true,
+				timestamp: true,
+				title: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new LoreViewModel(null);
+			"context" in data && (item.context = data.context === null ? null : `${data.context}`);
+			"facts" in data && (item.facts = data.facts === null ? null : `${data.facts}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"source" in data && (item.source = data.source === null ? null : `${data.source}`);
+			"timestamp" in data && (item.timestamp = data.timestamp === null ? null : new Date(data.timestamp));
+			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: LoreViewModel) {
+			let model: Lore;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Lore).find(viewModel.id)
+			} else {
+				model = new Lore();
+			}
+			
+			"context" in viewModel && (model.context = viewModel.context === null ? null : `${viewModel.context}`);
+			"facts" in viewModel && (model.facts = viewModel.facts === null ? null : `${viewModel.facts}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"source" in viewModel && (model.source = viewModel.source === null ? null : `${viewModel.source}`);
+			"timestamp" in viewModel && (model.timestamp = viewModel.timestamp === null ? null : new Date(viewModel.timestamp));
+			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
 
 			return model;
 		}

@@ -38,6 +38,7 @@ import { reviewStyle } from "./review/index.style";
 import { createWaterBodyStyle } from "./water/create/index.style";
 import { waterStyle } from "./water/index.style";
 import { marketStyle } from "./market/index.style";
+import { loreStyle } from "./lore/index.style";
 
 export const pageStyle = () => root(
 	boldFont,
@@ -111,6 +112,8 @@ export const pageStyle = () => root(
 				reviewStyle(),
 
 				homeStyle(),
+
+				loreStyle(),
 
 				mapPageStyle(),
 				mapStartStyle(),

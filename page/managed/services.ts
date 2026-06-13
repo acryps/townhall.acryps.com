@@ -1553,6 +1553,76 @@ export class VoteTickerViewModel {
 	}
 }
 
+export class LoreSummaryViewModel {
+	facts: string;
+	id: string;
+	source: string;
+	timestamp: Date;
+	title: string;
+
+	private static $build(raw) {
+		const item = new LoreSummaryViewModel();
+		raw.facts === undefined || (item.facts = raw.facts === null ? null : `${raw.facts}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.source === undefined || (item.source = raw.source === null ? null : `${raw.source}`)
+		raw.timestamp === undefined || (item.timestamp = raw.timestamp ? new Date(raw.timestamp) : null)
+		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
+		
+		return item;
+	}
+}
+
+export class LoreProposalViewModel {
+	context: string;
+	id: string;
+	title: string;
+	valid: boolean;
+	validation: string;
+
+	private static $build(raw) {
+		const item = new LoreProposalViewModel();
+		raw.context === undefined || (item.context = raw.context === null ? null : `${raw.context}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
+		raw.valid === undefined || (item.valid = !!raw.valid)
+		raw.validation === undefined || (item.validation = raw.validation === null ? null : `${raw.validation}`)
+		
+		return item;
+	}
+}
+
+export class LoreQueryViewModel {
+	sources: LoreQuerySourceViewModel[];
+	answer: string;
+	id: string;
+	question: string;
+
+	private static $build(raw) {
+		const item = new LoreQueryViewModel();
+		raw.sources === undefined || (item.sources = raw.sources ? raw.sources.map(i => LoreQuerySourceViewModel["$build"](i)) : null)
+		raw.answer === undefined || (item.answer = raw.answer === null ? null : `${raw.answer}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.question === undefined || (item.question = raw.question === null ? null : `${raw.question}`)
+		
+		return item;
+	}
+}
+
+export class LoreQuerySourceViewModel {
+	lore: LoreSummaryViewModel;
+	id: string;
+	relation: string;
+
+	private static $build(raw) {
+		const item = new LoreQuerySourceViewModel();
+		raw.lore === undefined || (item.lore = raw.lore ? LoreSummaryViewModel["$build"](raw.lore) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.relation === undefined || (item.relation = raw.relation === null ? null : `${raw.relation}`)
+		
+		return item;
+	}
+}
+
 export class CompanyViewModel {
 	offices: OfficeSummaryModel[];
 	banner: string;
@@ -2104,6 +2174,27 @@ export class DistrictViewModel {
 		raw.includeInMinimap === undefined || (item.includeInMinimap = !!raw.includeInMinimap)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.parentId === undefined || (item.parentId = raw.parentId === null ? null : `${raw.parentId}`)
+		
+		return item;
+	}
+}
+
+export class LoreViewModel {
+	context: string;
+	facts: string;
+	id: string;
+	source: string;
+	timestamp: Date;
+	title: string;
+
+	private static $build(raw) {
+		const item = new LoreViewModel();
+		raw.context === undefined || (item.context = raw.context === null ? null : `${raw.context}`)
+		raw.facts === undefined || (item.facts = raw.facts === null ? null : `${raw.facts}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.source === undefined || (item.source = raw.source === null ? null : `${raw.source}`)
+		raw.timestamp === undefined || (item.timestamp = raw.timestamp ? new Date(raw.timestamp) : null)
+		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
 		
 		return item;
 	}
@@ -5315,6 +5406,198 @@ export class WaterBodyService {
 
 			if ("aborted" in r) {
 				throw new Error("request aborted by server");
+			}
+		});
+	}
+}
+
+export class LoreService {
+	async getTimeline(cutoff: Date): Promise<Array<LoreSummaryViewModel>> {
+		const $data = new FormData();
+		$data.append("V5NWMycmM3aHV4Z2J3ZGFwdHhzazt4Nm", Service.stringify(cutoff))
+
+		return await fetch(Service.toURL("QzcWc0dDR4cmllb3dseWFkenE5cTJ3cG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : LoreSummaryViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getLore(id: string): Promise<LoreViewModel> {
+		const $data = new FormData();
+		$data.append("QyOTxjZHRzc3Y5OTEwZnk3YXo5ZTh5cG", Service.stringify(id))
+
+		return await fetch(Service.toURL("drb380dnZ0N2c0OHE1dnNoZzdpYTh6Zm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : LoreViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getAnswer(id: string): Promise<LoreQueryViewModel> {
+		const $data = new FormData();
+		$data.append("Uzd2B5aG15Zjg1OW5xOHYyc3JmYzExbW", Service.stringify(id))
+
+		return await fetch(Service.toURL("RzdX82MnVxd3l4OW52M2k5NWFwZDVlc3"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : LoreQueryViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getProposal(id: string): Promise<LoreProposalViewModel> {
+		const $data = new FormData();
+		$data.append("luNWpodDB3OGRqNDEzN2kzOWYwMnJtaz", Service.stringify(id))
+
+		return await fetch(Service.toURL("JndGZxdHNheXxmNjNjY2J2Z3FsczR0cj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : LoreProposalViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async prepareNext(): Promise<string> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("llNXV4ZmRyZzA5bGNkeHkwNzNraHB1NW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async answer(question: string): Promise<string> {
+		const $data = new FormData();
+		$data.append("lqZTE4ajphOXZsYWRkY2djeWBiYTpmZW", Service.stringify(question))
+
+		return await fetch(Service.toURL("Q4cH9zc2V6ZWc4ZzI3eWg1cXowdjlodz"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async propose(title: string, context: string): Promise<string> {
+		const $data = new FormData();
+		$data.append("Ntc2Mxbm8zMThnNXtxbGJibH9yaXlhNH", Service.stringify(title))
+		$data.append("dsdHEyY2hpdDY0cmk5MzFibDFqOXpvdT", Service.stringify(context))
+
+		return await fetch(Service.toURL("Zhbnt5a3dsZjJydzRpMHBuamJ3dHBpeT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async expand(baseId: string): Promise<Array<LoreProposalViewModel>> {
+		const $data = new FormData();
+		$data.append("ZtZnRmN3lxbWN2NXhza3Q3ZmNhaGJyNm", Service.stringify(baseId))
+
+		return await fetch(Service.toURL("Znc2k2MnNrdDA1MnlwbmJtMjQzaHlrOX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : LoreProposalViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async acceptProposal(id: string): Promise<string> {
+		const $data = new FormData();
+		$data.append("dsaWxsbXI3NDVyMHV2cHcxb3hzdGIwaW", Service.stringify(id))
+
+		return await fetch(Service.toURL("5sMndnOXxqM29zcGRqM2dzanNrbTg2Mz"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
 			}
 		});
 	}

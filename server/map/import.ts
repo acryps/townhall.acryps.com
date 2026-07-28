@@ -50,7 +50,7 @@ export class MapImporter {
 	async update(region: Point) {
 		const logger = this.logger.task(`update region ${region.x} ${region.y}`);
 
-		for (let type of [MapType.overworld, MapType.night]) {
+		for (let type of [MapType.overworld]) {
 			logger.log(`fetch ${type}`);
 
 			const source = Buffer.from(

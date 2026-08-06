@@ -9,6 +9,7 @@ export class CommoditySummaryModel extends ViewModel<Commodity> {
 	id;
 	tag;
 	iconId;
+	symbol;
 
 	name;
 	unit;

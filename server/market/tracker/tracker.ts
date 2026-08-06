@@ -6,4 +6,6 @@ export class CommodityPriceTracker {
 
 	bid: MarketPriceRange;
 	ask: MarketPriceRange;
+
+	estimatedStockSize: number;
 }

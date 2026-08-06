@@ -872,6 +872,7 @@ export class CommodityQueryProxy extends QueryProxy {
 	get innovationCycleId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get seedRulesCreated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get symbol(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get tradingUnitCommercialBaseline(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get tradingUnitId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -902,6 +903,7 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 	innovationCycleId: string;
 	name: string;
 	seedRulesCreated: Date;
+	symbol: string;
 	tag: string;
 	tradingUnitCommercialBaseline: number;
 	tradingUnitId: string;
@@ -922,6 +924,7 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 			innovationCycleId: { type: "uuid", name: "innovation_cycle_id" },
 			name: { type: "text", name: "name" },
 			seedRulesCreated: { type: "timestamp", name: "seed_rules_created" },
+			symbol: { type: "text", name: "symbol" },
 			tag: { type: "text", name: "tag" },
 			tradingUnitCommercialBaseline: { type: "int4", name: "trading_unit_commercial_baseline" },
 			tradingUnitId: { type: "uuid", name: "trading_unit_id" },

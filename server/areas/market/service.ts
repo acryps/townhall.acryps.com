@@ -49,7 +49,9 @@ export class MarketService extends Service {
 					bidMedian: ticker.bid.median,
 					bidHigh: ticker.bid.high,
 					bidVolume: ticker.bid.volume,
-					bidCapitalization: ticker.bid.capitalization
+					bidCapitalization: ticker.bid.capitalization,
+
+					estimatedStockSize: ticker.estimatedStockSize
 				});
 			}
 		}

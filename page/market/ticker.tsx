@@ -3,6 +3,7 @@ import { MarketPage } from ".";
 import { CommoditySummaryModel, LiveCommodityTickerResponseModel } from "../managed/services";
 import { ContentAppendable } from "@acryps/style";
 import { convertToCurrency } from "../../interface/currency";
+import { formatTradingUnit } from "../../interface/trading-unit";
 
 export class CommodityTickerComponent extends Component {
 	declare rootNode: HTMLElement;
@@ -14,10 +15,16 @@ export class CommodityTickerComponent extends Component {
 	ask = new RangeComponent(this, 'ask');
 	bid = new RangeComponent(this, 'bid');
 
+	estimatedStockSize = document.createTextNode('?');
+
 	constructor(
 		public commodity: CommoditySummaryModel
 	) {
 		super();
+
+		if (this.commodity.tradingUnit) {
+			this.estimatedStockSize.textContent = formatTradingUnit(this.commodity.tradingUnit, 0);
+		}
 	}
 
 	tick(ticker: LiveCommodityTickerResponseModel) {
@@ -32,6 +39,10 @@ export class CommodityTickerComponent extends Component {
 		if (this.rootNode) {
 			this.ask.update();
 			this.bid.update();
+
+			if (this.commodity.tradingUnit) {
+				this.estimatedStockSize.textContent = formatTradingUnit(this.commodity.tradingUnit, this.ticker.estimatedStockSize);
+			}
 
 			this.last = updated;
 
@@ -49,7 +60,7 @@ export class CommodityTickerComponent extends Component {
 	}
 
 	render() {
-		return <ui-commodity ui-href={`commodity/${this.commodity.tag}`}>
+		return <ui-commodity ui-href={`commodity/${this.commodity.tag}`} ui-highlight={!!this.commodity.symbol}>
 			<img src={`/commodity/icon/${this.commodity.iconId}`} />
 
 			<ui-detail>
@@ -64,7 +75,7 @@ export class CommodityTickerComponent extends Component {
 				</ui-header>
 
 				<ui-volume>
-					{this.ask.capitalizationLabel} / {this.bid.capitalizationLabel}
+					{this.estimatedStockSize} / {this.ask.capitalizationLabel} / {this.bid.capitalizationLabel}
 				</ui-volume>
 			</ui-detail>
 

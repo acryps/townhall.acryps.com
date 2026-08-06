@@ -6029,6 +6029,7 @@ ViewModel.mappings = {
 				iconId: this.$$model.iconId,
 				id: this.$$model.id,
 				name: this.$$model.name,
+				symbol: this.$$model.symbol,
 				tag: this.$$model.tag,
 				unit: this.$$model.unit
 			}
@@ -6069,6 +6070,7 @@ ViewModel.mappings = {
 				iconId: true,
 				id: true,
 				name: true,
+				symbol: true,
 				tag: true,
 				unit: true
 			};
@@ -6080,6 +6082,7 @@ ViewModel.mappings = {
 			"iconId" in data && (item.iconId = data.iconId === null ? null : `${data.iconId}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"symbol" in data && (item.symbol = data.symbol === null ? null : `${data.symbol}`);
 			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 			"unit" in data && (item.unit = data.unit === null ? null : `${data.unit}`);
 
@@ -6099,6 +6102,7 @@ ViewModel.mappings = {
 			"iconId" in viewModel && (model.iconId = viewModel.iconId === null ? null : `${viewModel.iconId}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"symbol" in viewModel && (model.symbol = viewModel.symbol === null ? null : `${viewModel.symbol}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 			"unit" in viewModel && (model.unit = viewModel.unit === null ? null : `${viewModel.unit}`);
 
@@ -6317,7 +6321,8 @@ ViewModel.mappings = {
 				bidMedian: this.$$model.bidMedian,
 				bidHigh: this.$$model.bidHigh,
 				bidVolume: this.$$model.bidVolume,
-				bidCapitalization: this.$$model.bidCapitalization
+				bidCapitalization: this.$$model.bidCapitalization,
+				estimatedStockSize: this.$$model.estimatedStockSize
 			}
 		};
 
@@ -6357,7 +6362,8 @@ ViewModel.mappings = {
 				bidMedian: true,
 				bidHigh: true,
 				bidVolume: true,
-				bidCapitalization: true
+				bidCapitalization: true,
+				estimatedStockSize: true
 			};
 		};
 
@@ -6374,6 +6380,7 @@ ViewModel.mappings = {
 			"bidHigh" in data && (item.bidHigh = data.bidHigh === null ? null : +data.bidHigh);
 			"bidVolume" in data && (item.bidVolume = data.bidVolume === null ? null : +data.bidVolume);
 			"bidCapitalization" in data && (item.bidCapitalization = data.bidCapitalization === null ? null : +data.bidCapitalization);
+			"estimatedStockSize" in data && (item.estimatedStockSize = data.estimatedStockSize === null ? null : +data.estimatedStockSize);
 
 			return item;
 		}
@@ -6392,6 +6399,7 @@ ViewModel.mappings = {
 			"bidHigh" in viewModel && (model.bidHigh = viewModel.bidHigh === null ? null : +viewModel.bidHigh);
 			"bidVolume" in viewModel && (model.bidVolume = viewModel.bidVolume === null ? null : +viewModel.bidVolume);
 			"bidCapitalization" in viewModel && (model.bidCapitalization = viewModel.bidCapitalization === null ? null : +viewModel.bidCapitalization);
+			"estimatedStockSize" in viewModel && (model.estimatedStockSize = viewModel.estimatedStockSize === null ? null : +viewModel.estimatedStockSize);
 
 			return model;
 		}
@@ -10245,6 +10253,7 @@ ViewModel.mappings = {
 				id: this.$$model.id,
 				innovated: this.$$model.innovated,
 				name: this.$$model.name,
+				symbol: this.$$model.symbol,
 				tag: this.$$model.tag,
 				unit: this.$$model.unit
 			}
@@ -10305,6 +10314,7 @@ ViewModel.mappings = {
 				id: true,
 				innovated: true,
 				name: true,
+				symbol: true,
 				tag: true,
 				unit: true
 			};
@@ -10321,6 +10331,7 @@ ViewModel.mappings = {
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"innovated" in data && (item.innovated = data.innovated === null ? null : new Date(data.innovated));
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"symbol" in data && (item.symbol = data.symbol === null ? null : `${data.symbol}`);
 			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 			"unit" in data && (item.unit = data.unit === null ? null : `${data.unit}`);
 
@@ -10345,6 +10356,7 @@ ViewModel.mappings = {
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"innovated" in viewModel && (model.innovated = viewModel.innovated === null ? null : new Date(viewModel.innovated));
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"symbol" in viewModel && (model.symbol = viewModel.symbol === null ? null : `${viewModel.symbol}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 			"unit" in viewModel && (model.unit = viewModel.unit === null ? null : `${viewModel.unit}`);
 

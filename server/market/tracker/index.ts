@@ -1,5 +1,5 @@
 import { toASCII } from "node:punycode";
-import { Commodity, DbContext } from "../../managed/database";
+import { Commodity, DbContext, StockSeedRuleOperation, StockSeedRuleProperty } from "../../managed/database";
 import { TradeService } from "../../areas/trade/service";
 import { Time } from "../../../interface/time";
 import { MarketPriceRange } from "./price-range";
@@ -99,5 +99,50 @@ export class MarketTracker {
 
 		tracker.bid = bidRange;
 		bidRange.calculate();
+
+		tracker.estimatedStockSize = await this.estimateStockSize(commodity);
+	}
+
+	// estimate the stock size of the commodity across the entire population
+	// tends to over-estimate
+	//
+	// uses 50% average on all rules
+	// ignores multi-assigns (overestimate source)
+	private async estimateStockSize(commodity: Commodity) {
+		const rules = await commodity.stockSeedRules
+			.include(rule => rule.parameter)
+			.where(rule => rule.property == StockSeedRuleProperty.quantity)
+			.toArray();
+
+		let volume = 0;
+
+		for (let rule of rules) {
+			const parameter = await rule.parameter.fetch();
+
+			const assessmentCount = await parameter.assessments
+				.where(assessment => assessment.value.valueOf() >= rule.parameterMinimum && assessment.value.valueOf() < rule.parameterMaximum)
+				.count();
+
+			const size = assessmentCount * (rule.valueMaximum + rule.valueMinimum) / 2;
+
+			console.log(rule.id, rule.operation, volume, assessmentCount, size);
+
+			switch (rule.operation) {
+				case StockSeedRuleOperation.add:
+				case StockSeedRuleOperation.apply: {
+					volume += size;
+
+					break;
+				}
+
+				case StockSeedRuleOperation.subtract: {
+					volume -= size;
+
+					break;
+				}
+			}
+		}
+
+		return volume;
 	}
 }

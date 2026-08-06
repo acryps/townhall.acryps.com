@@ -403,6 +403,7 @@ export interface CommoditySummaryModel {
 	iconId: string;
 	id: string;
 	name: string;
+	symbol: string;
 	tag: string;
 	unit: string;
 }
@@ -439,6 +440,7 @@ export interface LiveCommodityTickerResponseModel {
 	bidHigh: number;
 	bidVolume: number;
 	bidCapitalization: number;
+	estimatedStockSize: number;
 }
 
 export interface TradingUnitViewModel {
@@ -838,6 +840,7 @@ export interface CommodityViewModel {
 	id: string;
 	innovated: Date;
 	name: string;
+	symbol: string;
 	tag: string;
 	unit: string;
 }

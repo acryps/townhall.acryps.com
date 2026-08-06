@@ -37,3 +37,5 @@ ALTER TABLE commodity ADD trading_unit_id UUID CONSTRAINT trading_unit__ REFEREN
 
 ALTER TABLE commodity ADD trading_unit_commercial_baseline INTEGER DEFAULT 0;
 ALTER TABLE commodity ADD trading_unit_retail_baseline INTEGER DEFAULT 0;
+
+ALTER TABLE commodity ADD symbol TEXT;

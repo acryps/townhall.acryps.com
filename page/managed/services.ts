@@ -939,6 +939,7 @@ export class CommoditySummaryModel {
 	iconId: string;
 	id: string;
 	name: string;
+	symbol: string;
 	tag: string;
 	unit: string;
 
@@ -948,6 +949,7 @@ export class CommoditySummaryModel {
 		raw.iconId === undefined || (item.iconId = raw.iconId === null ? null : `${raw.iconId}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.symbol === undefined || (item.symbol = raw.symbol === null ? null : `${raw.symbol}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		raw.unit === undefined || (item.unit = raw.unit === null ? null : `${raw.unit}`)
 		
@@ -1016,6 +1018,7 @@ export class LiveCommodityTickerResponseModel {
 	bidHigh: number;
 	bidVolume: number;
 	bidCapitalization: number;
+	estimatedStockSize: number;
 
 	private static $build(raw) {
 		const item = new LiveCommodityTickerResponseModel();
@@ -1030,6 +1033,7 @@ export class LiveCommodityTickerResponseModel {
 		raw.bidHigh === undefined || (item.bidHigh = raw.bidHigh === null ? null : +raw.bidHigh)
 		raw.bidVolume === undefined || (item.bidVolume = raw.bidVolume === null ? null : +raw.bidVolume)
 		raw.bidCapitalization === undefined || (item.bidCapitalization = raw.bidCapitalization === null ? null : +raw.bidCapitalization)
+		raw.estimatedStockSize === undefined || (item.estimatedStockSize = raw.estimatedStockSize === null ? null : +raw.estimatedStockSize)
 		
 		return item;
 	}
@@ -1969,6 +1973,7 @@ export class CommodityViewModel {
 	id: string;
 	innovated: Date;
 	name: string;
+	symbol: string;
 	tag: string;
 	unit: string;
 
@@ -1983,6 +1988,7 @@ export class CommodityViewModel {
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.innovated === undefined || (item.innovated = raw.innovated ? new Date(raw.innovated) : null)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.symbol === undefined || (item.symbol = raw.symbol === null ? null : `${raw.symbol}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		raw.unit === undefined || (item.unit = raw.unit === null ? null : `${raw.unit}`)
 		

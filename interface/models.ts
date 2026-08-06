@@ -399,7 +399,8 @@ export interface BidViewModel {
 }
 
 export interface CommoditySummaryModel {
-    id: string;
+    iconId: string;
+	id: string;
 	name: string;
 	tag: string;
 	unit: string;
@@ -413,6 +414,7 @@ export interface CommodityCategorySummaryModel {
 export interface StockViewModel {
     commodity: CommoditySummaryModel;
 	quantity: number;
+	quality: number;
 }
 
 export interface StockSeedViewModel {
@@ -820,6 +822,7 @@ export interface CommodityViewModel {
 	asks: CommodityAskViewModel[];
 	bids: CommodityBidViewModel[];
 	description: string;
+	iconId: string;
 	id: string;
 	innovated: Date;
 	name: string;

@@ -6023,6 +6023,7 @@ ViewModel.mappings = {
 	[CommoditySummaryModel.name]: class ComposedCommoditySummaryModel extends CommoditySummaryModel {
 		async map() {
 			return {
+				iconId: this.$$model.iconId,
 				id: this.$$model.id,
 				name: this.$$model.name,
 				tag: this.$$model.tag,
@@ -6056,6 +6057,7 @@ ViewModel.mappings = {
 			}
 
 			return {
+				iconId: true,
 				id: true,
 				name: true,
 				tag: true,
@@ -6065,6 +6067,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new CommoditySummaryModel(null);
+			"iconId" in data && (item.iconId = data.iconId === null ? null : `${data.iconId}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
@@ -6082,6 +6085,7 @@ ViewModel.mappings = {
 				model = new Commodity();
 			}
 			
+			"iconId" in viewModel && (model.iconId = viewModel.iconId === null ? null : `${viewModel.iconId}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
@@ -6156,7 +6160,8 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				commodity: this.$$model.commodity,
-				quantity: this.$$model.quantity
+				quantity: this.$$model.quantity,
+				quality: this.$$model.quality
 			}
 		};
 
@@ -6187,7 +6192,8 @@ ViewModel.mappings = {
 
 			return {
 				commodity: true,
-				quantity: true
+				quantity: true,
+				quality: true
 			};
 		};
 
@@ -6195,6 +6201,7 @@ ViewModel.mappings = {
 			const item = new StockViewModel(null);
 			"commodity" in data && (undefined);
 			"quantity" in data && (item.quantity = data.quantity === null ? null : +data.quantity);
+			"quality" in data && (item.quality = data.quality === null ? null : +data.quality);
 
 			return item;
 		}
@@ -6204,6 +6211,7 @@ ViewModel.mappings = {
 			
 			"commodity" in viewModel && (undefined);
 			"quantity" in viewModel && (model.quantity = viewModel.quantity === null ? null : +viewModel.quantity);
+			"quality" in viewModel && (model.quality = viewModel.quality === null ? null : +viewModel.quality);
 
 			return model;
 		}
@@ -10139,6 +10147,7 @@ ViewModel.mappings = {
 				asks: (await this.$$model.asks.includeTree(ViewModel.mappings[CommodityAskViewModel.name].items).toArray()).map(item => new CommodityAskViewModel(item)),
 				bids: (await this.$$model.bids.includeTree(ViewModel.mappings[CommodityBidViewModel.name].items).toArray()).map(item => new CommodityBidViewModel(item)),
 				description: this.$$model.description,
+				iconId: this.$$model.iconId,
 				id: this.$$model.id,
 				innovated: this.$$model.innovated,
 				name: this.$$model.name,
@@ -10192,6 +10201,7 @@ ViewModel.mappings = {
 					);
 				},
 				description: true,
+				iconId: true,
 				id: true,
 				innovated: true,
 				name: true,
@@ -10206,6 +10216,7 @@ ViewModel.mappings = {
 			"asks" in data && (item.asks = data.asks && [...data.asks].map(i => ViewModel.mappings[CommodityAskViewModel.name].toViewModel(i)));
 			"bids" in data && (item.bids = data.bids && [...data.bids].map(i => ViewModel.mappings[CommodityBidViewModel.name].toViewModel(i)));
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			"iconId" in data && (item.iconId = data.iconId === null ? null : `${data.iconId}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"innovated" in data && (item.innovated = data.innovated === null ? null : new Date(data.innovated));
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
@@ -10228,6 +10239,7 @@ ViewModel.mappings = {
 			"asks" in viewModel && (null);
 			"bids" in viewModel && (null);
 			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+			"iconId" in viewModel && (model.iconId = viewModel.iconId === null ? null : `${viewModel.iconId}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"innovated" in viewModel && (model.innovated = viewModel.innovated === null ? null : new Date(viewModel.innovated));
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);

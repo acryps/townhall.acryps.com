@@ -935,6 +935,7 @@ export class BidViewModel {
 }
 
 export class CommoditySummaryModel {
+	iconId: string;
 	id: string;
 	name: string;
 	tag: string;
@@ -942,6 +943,7 @@ export class CommoditySummaryModel {
 
 	private static $build(raw) {
 		const item = new CommoditySummaryModel();
+		raw.iconId === undefined || (item.iconId = raw.iconId === null ? null : `${raw.iconId}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
@@ -967,11 +969,13 @@ export class CommodityCategorySummaryModel {
 export class StockViewModel {
 	commodity: CommoditySummaryModel;
 	quantity: number;
+	quality: number;
 
 	private static $build(raw) {
 		const item = new StockViewModel();
 		raw.commodity === undefined || (item.commodity = raw.commodity ? CommoditySummaryModel["$build"](raw.commodity) : null)
 		raw.quantity === undefined || (item.quantity = raw.quantity === null ? null : +raw.quantity)
+		raw.quality === undefined || (item.quality = raw.quality === null ? null : +raw.quality)
 		
 		return item;
 	}
@@ -1935,6 +1939,7 @@ export class CommodityViewModel {
 	asks: CommodityAskViewModel[];
 	bids: CommodityBidViewModel[];
 	description: string;
+	iconId: string;
 	id: string;
 	innovated: Date;
 	name: string;
@@ -1947,6 +1952,7 @@ export class CommodityViewModel {
 		raw.asks === undefined || (item.asks = raw.asks ? raw.asks.map(i => CommodityAskViewModel["$build"](i)) : null)
 		raw.bids === undefined || (item.bids = raw.bids ? raw.bids.map(i => CommodityBidViewModel["$build"](i)) : null)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
+		raw.iconId === undefined || (item.iconId = raw.iconId === null ? null : `${raw.iconId}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.innovated === undefined || (item.innovated = raw.innovated ? new Date(raw.innovated) : null)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)

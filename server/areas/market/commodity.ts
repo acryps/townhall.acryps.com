@@ -7,6 +7,7 @@ import { CommodityAskViewModel } from "./ask";
 export class CommoditySummaryModel extends ViewModel<Commodity> {
 	id;
 	tag;
+	iconId;
 
 	name;
 	unit;

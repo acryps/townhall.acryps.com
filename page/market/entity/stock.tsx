@@ -25,10 +25,16 @@ export class StockComponent extends Component {
 
 			<ui-list>
 				{this.stock.map(item => <ui-item>
+					<img src={`/commodity/icon/${item.commodity.iconId}`} />
+
 					<ui-commodity>
 						<ui-name ui-href={`/market/commodity/${item.commodity.tag}`}>
 							{item.commodity.name}
 						</ui-name>
+
+						<ui-quality>
+							Q{item.quality}
+						</ui-quality>
 					</ui-commodity>
 
 					<ui-quantity>

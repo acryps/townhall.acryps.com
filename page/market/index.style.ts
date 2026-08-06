@@ -1,4 +1,4 @@
-import { alignItems, backgroundColor, border, borderTop, ch, child, color, cursor, display, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, height, justifyContent, Keyframes, margin, marginBottom, marginInline, marginLeft, marginRight, marginTop, maxHeight, minWidth, objectFit, padding, paddingBlock, PaddingBlockStyleProperty, paddingInline, percentage, pointerEvents, px, rem, seconds, textAlign, textDecoration, textDecorationLine, vh, width } from "@acryps/style";
+import { alignItems, aspectRatio, backgroundColor, border, borderTop, ch, child, color, cursor, display, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, height, justifyContent, Keyframes, margin, marginBottom, marginInline, marginLeft, marginRight, marginTop, maxHeight, minWidth, objectFit, objectPosition, padding, paddingBlock, PaddingBlockStyleProperty, paddingInline, percentage, pointerEvents, px, ratio, rem, seconds, textAlign, textDecoration, textDecorationLine, vh, width } from "@acryps/style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { pageBackgroundColor, pageGutter, pageTextColor } from "../index.style";
 import { card } from "../shared/card.style";
@@ -65,7 +65,7 @@ export const marketStyle = () => child('ui-market',
 	),
 
 	child('ui-commodities',
-		collection(rem(15), pageGutter),
+		collection(rem(20), pageGutter),
 
 		child('ui-commodity',
 			collectionItem(),
@@ -77,6 +77,15 @@ export const marketStyle = () => child('ui-market',
 			marginBottom(pageGutter.divide(2)),
 
 			cursor('pointer'),
+
+			child('img',
+				flexShrink(1),
+				width(rem(2)),
+				aspectRatio(ratio(1, 1)),
+
+				objectFit('contain'),
+				objectPosition('top')
+			),
 
 			child('ui-detail',
 				flexShrink(1),

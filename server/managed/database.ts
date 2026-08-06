@@ -1,8 +1,19 @@
 import { Entity, DbSet, RunContext, QueryUUID, QueryProxy, QueryString, QueryJSON, QueryTimeStamp, QueryNumber, QueryTime, QueryDate, QueryBoolean, QueryBuffer, QueryEnum, ForeignReference, PrimaryReference, View, ViewSet } from 'vlquery';
 
+export class StockSeedRuleProperty extends QueryEnum {
+	static readonly quality = "quality";
+	static readonly quantity = "quantity";
+}
+
 export class MapType extends QueryEnum {
 	static readonly night = "night";
 	static readonly overworld = "overworld";
+}
+
+export class StockSeedRuleOperation extends QueryEnum {
+	static readonly add = "add";
+	static readonly apply = "apply";
+	static readonly subtract = "subtract";
 }
 
 export class CompanyType extends QueryEnum {
@@ -849,14 +860,17 @@ export class City extends Entity<CityQueryProxy> {
 			
 export class CommodityQueryProxy extends QueryProxy {
 	get category(): Partial<CommodityCategoryQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get icon(): Partial<CommodityIconQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get innovationCycle(): Partial<MarketCycleQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get categoryId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get depreciation(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get heft(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get iconId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get innovated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get innovationCycleId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get seedRulesCreated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get unit(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get whole(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -868,17 +882,21 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 		bids: PrimaryReference<TradeBid, TradeBidQueryProxy>;
 		productionInputs: PrimaryReference<ProductionInput, ProductionInputQueryProxy>;
 		productionOutputs: PrimaryReference<ProductionOutput, ProductionOutputQueryProxy>;
+		stockSeedRules: PrimaryReference<StockSeedRule, StockSeedRuleQueryProxy>;
 		stockSeeds: PrimaryReference<StockSeed, StockSeedQueryProxy>;
 		transports: PrimaryReference<CommodityTransport, CommodityTransportQueryProxy>;
-		get innovationCycle(): Partial<ForeignReference<MarketCycle>> { return this.$innovationCycle; }
+		get icon(): Partial<ForeignReference<CommodityIcon>> { return this.$icon; }
+	get innovationCycle(): Partial<ForeignReference<MarketCycle>> { return this.$innovationCycle; }
 	categoryId: string;
 	depreciation: number;
 	description: string;
 	heft: number;
+	iconId: string;
 	declare id: string;
 	innovated: Date;
 	innovationCycleId: string;
 	name: string;
+	seedRulesCreated: Date;
 	tag: string;
 	unit: string;
 	whole: boolean;
@@ -890,10 +908,12 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 			depreciation: { type: "float4", name: "depreciation" },
 			description: { type: "text", name: "description" },
 			heft: { type: "float4", name: "heft" },
+			iconId: { type: "uuid", name: "icon_id" },
 			id: { type: "uuid", name: "id" },
 			innovated: { type: "timestamp", name: "innovated" },
 			innovationCycleId: { type: "uuid", name: "innovation_cycle_id" },
 			name: { type: "text", name: "name" },
+			seedRulesCreated: { type: "timestamp", name: "seed_rules_created" },
 			tag: { type: "text", name: "tag" },
 			unit: { type: "text", name: "unit" },
 			whole: { type: "bool", name: "whole" }
@@ -911,9 +931,11 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 		this.bids = new PrimaryReference<TradeBid, TradeBidQueryProxy>(this, "commodityId", TradeBid);
 		this.productionInputs = new PrimaryReference<ProductionInput, ProductionInputQueryProxy>(this, "commodityId", ProductionInput);
 		this.productionOutputs = new PrimaryReference<ProductionOutput, ProductionOutputQueryProxy>(this, "commodityId", ProductionOutput);
+		this.stockSeedRules = new PrimaryReference<StockSeedRule, StockSeedRuleQueryProxy>(this, "commodityId", StockSeedRule);
 		this.stockSeeds = new PrimaryReference<StockSeed, StockSeedQueryProxy>(this, "commodityId", StockSeed);
 		this.transports = new PrimaryReference<CommodityTransport, CommodityTransportQueryProxy>(this, "commodityId", CommodityTransport);
-		this.$innovationCycle = new ForeignReference<MarketCycle>(this, "innovationCycleId", MarketCycle);
+		this.$icon = new ForeignReference<CommodityIcon>(this, "iconId", CommodityIcon);
+	this.$innovationCycle = new ForeignReference<MarketCycle>(this, "innovationCycleId", MarketCycle);
 	}
 	
 	private $category: ForeignReference<CommodityCategory>;
@@ -925,6 +947,18 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 			this.categoryId = value.id as string;
 		} else {
 			this.categoryId = null;
+		}
+	}
+
+	private $icon: ForeignReference<CommodityIcon>;
+
+	set icon(value: Partial<ForeignReference<CommodityIcon>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.iconId = value.id as string;
+		} else {
+			this.iconId = null;
 		}
 	}
 
@@ -998,6 +1032,29 @@ export class CommodityCategory extends Entity<CommodityCategoryQueryProxy> {
 	}
 
 	
+}
+			
+export class CommodityIconQueryProxy extends QueryProxy {
+	get icon(): Partial<QueryBuffer> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class CommodityIcon extends Entity<CommodityIconQueryProxy> {
+	icon: Buffer;
+	declare id: string;
+	tag: string;
+	
+	$$meta = {
+		source: "commodity_icon",
+		columns: {
+			icon: { type: "bytea", name: "icon" },
+			id: { type: "uuid", name: "id" },
+			tag: { type: "text", name: "tag" }
+		},
+		get set(): DbSet<CommodityIcon, CommodityIconQueryProxy> { 
+			return new DbSet<CommodityIcon, CommodityIconQueryProxy>(CommodityIcon, null);
+		}
+	};
 }
 			
 export class CommodityTransportQueryProxy extends QueryProxy {
@@ -1150,25 +1207,366 @@ export class Company extends Entity<CompanyQueryProxy> {
 	}
 }
 			
+export class CourtCaseQueryProxy extends QueryProxy {
+	get claimant(): Partial<LegalEntityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get defendant(): Partial<LegalEntityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get jurisdiction(): Partial<DistrictQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get verdict(): Partial<JuryVerdictQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get claimantId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get defendantId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get filed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get identifier(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get judged(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get jurisdictionId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get submittedClaim(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get submittedDefense(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get verdictId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class CourtCase extends Entity<CourtCaseQueryProxy> {
+	get claimant(): Partial<ForeignReference<LegalEntity>> { return this.$claimant; }
+	claims: PrimaryReference<CourtCaseClaim, CourtCaseClaimQueryProxy>;
+		defenses: PrimaryReference<CourtCaseDefense, CourtCaseDefenseQueryProxy>;
+		jury: PrimaryReference<Juror, JurorQueryProxy>;
+		referencedDefinitions: PrimaryReference<CourtCaseReferenceDefinition, CourtCaseReferenceDefinitionQueryProxy>;
+		referencedLaws: PrimaryReference<CourtCaseReferenceLaw, CourtCaseReferenceLawQueryProxy>;
+		get defendant(): Partial<ForeignReference<LegalEntity>> { return this.$defendant; }
+	get jurisdiction(): Partial<ForeignReference<District>> { return this.$jurisdiction; }
+	get verdict(): Partial<ForeignReference<JuryVerdict>> { return this.$verdict; }
+	claimantId: string;
+	defendantId: string;
+	filed: Date;
+	declare id: string;
+	identifier: string;
+	judged: Date;
+	jurisdictionId: string;
+	submittedClaim: string;
+	submittedDefense: string;
+	verdictId: string;
+	
+	$$meta = {
+		source: "court_case",
+		columns: {
+			claimantId: { type: "uuid", name: "claimant_id" },
+			defendantId: { type: "uuid", name: "defendant_id" },
+			filed: { type: "timestamp", name: "filed" },
+			id: { type: "uuid", name: "id" },
+			identifier: { type: "text", name: "identifier" },
+			judged: { type: "timestamp", name: "judged" },
+			jurisdictionId: { type: "uuid", name: "jurisdiction_id" },
+			submittedClaim: { type: "text", name: "submitted_claim" },
+			submittedDefense: { type: "text", name: "submitted_defense" },
+			verdictId: { type: "uuid", name: "verdict_id" }
+		},
+		get set(): DbSet<CourtCase, CourtCaseQueryProxy> { 
+			return new DbSet<CourtCase, CourtCaseQueryProxy>(CourtCase, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$claimant = new ForeignReference<LegalEntity>(this, "claimantId", LegalEntity);
+	this.claims = new PrimaryReference<CourtCaseClaim, CourtCaseClaimQueryProxy>(this, "courtCaseId", CourtCaseClaim);
+		this.defenses = new PrimaryReference<CourtCaseDefense, CourtCaseDefenseQueryProxy>(this, "courtCaseId", CourtCaseDefense);
+		this.jury = new PrimaryReference<Juror, JurorQueryProxy>(this, "courtCaseId", Juror);
+		this.referencedDefinitions = new PrimaryReference<CourtCaseReferenceDefinition, CourtCaseReferenceDefinitionQueryProxy>(this, "courtCaseId", CourtCaseReferenceDefinition);
+		this.referencedLaws = new PrimaryReference<CourtCaseReferenceLaw, CourtCaseReferenceLawQueryProxy>(this, "courtCaseId", CourtCaseReferenceLaw);
+		this.$defendant = new ForeignReference<LegalEntity>(this, "defendantId", LegalEntity);
+	this.$jurisdiction = new ForeignReference<District>(this, "jurisdictionId", District);
+	this.$verdict = new ForeignReference<JuryVerdict>(this, "verdictId", JuryVerdict);
+	}
+	
+	private $claimant: ForeignReference<LegalEntity>;
+
+	set claimant(value: Partial<ForeignReference<LegalEntity>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.claimantId = value.id as string;
+		} else {
+			this.claimantId = null;
+		}
+	}
+
+	private $defendant: ForeignReference<LegalEntity>;
+
+	set defendant(value: Partial<ForeignReference<LegalEntity>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.defendantId = value.id as string;
+		} else {
+			this.defendantId = null;
+		}
+	}
+
+	private $jurisdiction: ForeignReference<District>;
+
+	set jurisdiction(value: Partial<ForeignReference<District>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.jurisdictionId = value.id as string;
+		} else {
+			this.jurisdictionId = null;
+		}
+	}
+
+	private $verdict: ForeignReference<JuryVerdict>;
+
+	set verdict(value: Partial<ForeignReference<JuryVerdict>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.verdictId = value.id as string;
+		} else {
+			this.verdictId = null;
+		}
+	}
+
+	
+}
+			
+export class CourtCaseClaimQueryProxy extends QueryProxy {
+	get courtCase(): Partial<CourtCaseQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get content(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get courtCaseId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class CourtCaseClaim extends Entity<CourtCaseClaimQueryProxy> {
+	get courtCase(): Partial<ForeignReference<CourtCase>> { return this.$courtCase; }
+	content: string;
+	courtCaseId: string;
+	declare id: string;
+	
+	$$meta = {
+		source: "court_case_claim",
+		columns: {
+			content: { type: "text", name: "content" },
+			courtCaseId: { type: "uuid", name: "court_case_id" },
+			id: { type: "uuid", name: "id" }
+		},
+		get set(): DbSet<CourtCaseClaim, CourtCaseClaimQueryProxy> { 
+			return new DbSet<CourtCaseClaim, CourtCaseClaimQueryProxy>(CourtCaseClaim, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$courtCase = new ForeignReference<CourtCase>(this, "courtCaseId", CourtCase);
+	}
+	
+	private $courtCase: ForeignReference<CourtCase>;
+
+	set courtCase(value: Partial<ForeignReference<CourtCase>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.courtCaseId = value.id as string;
+		} else {
+			this.courtCaseId = null;
+		}
+	}
+
+	
+}
+			
+export class CourtCaseDefenseQueryProxy extends QueryProxy {
+	get courtCase(): Partial<CourtCaseQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get content(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get courtCaseId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class CourtCaseDefense extends Entity<CourtCaseDefenseQueryProxy> {
+	get courtCase(): Partial<ForeignReference<CourtCase>> { return this.$courtCase; }
+	content: string;
+	courtCaseId: string;
+	declare id: string;
+	
+	$$meta = {
+		source: "court_case_defense",
+		columns: {
+			content: { type: "text", name: "content" },
+			courtCaseId: { type: "uuid", name: "court_case_id" },
+			id: { type: "uuid", name: "id" }
+		},
+		get set(): DbSet<CourtCaseDefense, CourtCaseDefenseQueryProxy> { 
+			return new DbSet<CourtCaseDefense, CourtCaseDefenseQueryProxy>(CourtCaseDefense, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$courtCase = new ForeignReference<CourtCase>(this, "courtCaseId", CourtCase);
+	}
+	
+	private $courtCase: ForeignReference<CourtCase>;
+
+	set courtCase(value: Partial<ForeignReference<CourtCase>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.courtCaseId = value.id as string;
+		} else {
+			this.courtCaseId = null;
+		}
+	}
+
+	
+}
+			
+export class CourtCaseReferenceDefinitionQueryProxy extends QueryProxy {
+	get courtCase(): Partial<CourtCaseQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get definition(): Partial<LegalDefinitionQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get courtCaseId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get definitionId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class CourtCaseReferenceDefinition extends Entity<CourtCaseReferenceDefinitionQueryProxy> {
+	get courtCase(): Partial<ForeignReference<CourtCase>> { return this.$courtCase; }
+	get definition(): Partial<ForeignReference<LegalDefinition>> { return this.$definition; }
+	courtCaseId: string;
+	definitionId: string;
+	declare id: string;
+	
+	$$meta = {
+		source: "court_case_reference_definition",
+		columns: {
+			courtCaseId: { type: "uuid", name: "court_case_id" },
+			definitionId: { type: "uuid", name: "definition_id" },
+			id: { type: "uuid", name: "id" }
+		},
+		get set(): DbSet<CourtCaseReferenceDefinition, CourtCaseReferenceDefinitionQueryProxy> { 
+			return new DbSet<CourtCaseReferenceDefinition, CourtCaseReferenceDefinitionQueryProxy>(CourtCaseReferenceDefinition, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$courtCase = new ForeignReference<CourtCase>(this, "courtCaseId", CourtCase);
+	this.$definition = new ForeignReference<LegalDefinition>(this, "definitionId", LegalDefinition);
+	}
+	
+	private $courtCase: ForeignReference<CourtCase>;
+
+	set courtCase(value: Partial<ForeignReference<CourtCase>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.courtCaseId = value.id as string;
+		} else {
+			this.courtCaseId = null;
+		}
+	}
+
+	private $definition: ForeignReference<LegalDefinition>;
+
+	set definition(value: Partial<ForeignReference<LegalDefinition>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.definitionId = value.id as string;
+		} else {
+			this.definitionId = null;
+		}
+	}
+
+	
+}
+			
+export class CourtCaseReferenceLawQueryProxy extends QueryProxy {
+	get courtCase(): Partial<CourtCaseQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get law(): Partial<LawQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get courtCaseId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get lawId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class CourtCaseReferenceLaw extends Entity<CourtCaseReferenceLawQueryProxy> {
+	get courtCase(): Partial<ForeignReference<CourtCase>> { return this.$courtCase; }
+	get law(): Partial<ForeignReference<Law>> { return this.$law; }
+	courtCaseId: string;
+	declare id: string;
+	lawId: string;
+	
+	$$meta = {
+		source: "court_case_reference_law",
+		columns: {
+			courtCaseId: { type: "uuid", name: "court_case_id" },
+			id: { type: "uuid", name: "id" },
+			lawId: { type: "uuid", name: "law_id" }
+		},
+		get set(): DbSet<CourtCaseReferenceLaw, CourtCaseReferenceLawQueryProxy> { 
+			return new DbSet<CourtCaseReferenceLaw, CourtCaseReferenceLawQueryProxy>(CourtCaseReferenceLaw, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$courtCase = new ForeignReference<CourtCase>(this, "courtCaseId", CourtCase);
+	this.$law = new ForeignReference<Law>(this, "lawId", Law);
+	}
+	
+	private $courtCase: ForeignReference<CourtCase>;
+
+	set courtCase(value: Partial<ForeignReference<CourtCase>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.courtCaseId = value.id as string;
+		} else {
+			this.courtCaseId = null;
+		}
+	}
+
+	private $law: ForeignReference<Law>;
+
+	set law(value: Partial<ForeignReference<Law>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.lawId = value.id as string;
+		} else {
+			this.lawId = null;
+		}
+	}
+
+	
+}
+			
 export class DistrictQueryProxy extends QueryProxy {
 	get parent(): Partial<DistrictQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get billPrefix(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get courtCaseFormat(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get includeInMinimap(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get incorporation(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get jurySize(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get lawBookFormat(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get maximumJurorOpinionSubmissions(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get parentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class District extends Entity<DistrictQueryProxy> {
 	boroughs: PrimaryReference<Borough, BoroughQueryProxy>;
+		courtCases: PrimaryReference<CourtCase, CourtCaseQueryProxy>;
+		rootLawBooks: PrimaryReference<LawBook, LawBookQueryProxy>;
 		get parent(): Partial<ForeignReference<District>> { return this.$parent; }
 	children: PrimaryReference<District, DistrictQueryProxy>;
 		bills: PrimaryReference<Bill, BillQueryProxy>;
 		lawHouseSessions: PrimaryReference<LawHouseSession, LawHouseSessionQueryProxy>;
 		billPrefix: string;
+	courtCaseFormat: string;
 	declare id: string;
 	includeInMinimap: boolean;
 	incorporation: Date;
+	jurySize: number;
+	lawBookFormat: string;
+	maximumJurorOpinionSubmissions: number;
 	name: string;
 	parentId: string;
 	
@@ -1176,9 +1574,13 @@ export class District extends Entity<DistrictQueryProxy> {
 		source: "district",
 		columns: {
 			billPrefix: { type: "text", name: "bill_prefix" },
+			courtCaseFormat: { type: "text", name: "court_case_format" },
 			id: { type: "uuid", name: "id" },
 			includeInMinimap: { type: "bool", name: "include_in_minimap" },
 			incorporation: { type: "timestamp", name: "incorporation" },
+			jurySize: { type: "int4", name: "jury_size" },
+			lawBookFormat: { type: "text", name: "law_book_format" },
+			maximumJurorOpinionSubmissions: { type: "int4", name: "maximum_juror_opinion_submissions" },
 			name: { type: "text", name: "name" },
 			parentId: { type: "uuid", name: "parent_id" }
 		},
@@ -1191,6 +1593,8 @@ export class District extends Entity<DistrictQueryProxy> {
 		super();
 		
 		this.boroughs = new PrimaryReference<Borough, BoroughQueryProxy>(this, "districtId", Borough);
+		this.courtCases = new PrimaryReference<CourtCase, CourtCaseQueryProxy>(this, "jurisdictionId", CourtCase);
+		this.rootLawBooks = new PrimaryReference<LawBook, LawBookQueryProxy>(this, "jurisdictionId", LawBook);
 		this.$parent = new ForeignReference<District>(this, "parentId", District);
 	this.children = new PrimaryReference<District, DistrictQueryProxy>(this, "parentId", District);
 		this.bills = new PrimaryReference<Bill, BillQueryProxy>(this, "scopeId", Bill);
@@ -1580,6 +1984,523 @@ export class ItemContextLink extends Entity<ItemContextLinkQueryProxy> {
 	
 }
 			
+export class JurorQueryProxy extends QueryProxy {
+	get courtCase(): Partial<CourtCaseQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get resident(): Partial<ResidentQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get courtCaseId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get residentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Juror extends Entity<JurorQueryProxy> {
+	get courtCase(): Partial<ForeignReference<CourtCase>> { return this.$courtCase; }
+	thoughts: PrimaryReference<JurorThought, JurorThoughtQueryProxy>;
+		get resident(): Partial<ForeignReference<Resident>> { return this.$resident; }
+	submittedOpinions: PrimaryReference<JuryOpinion, JuryOpinionQueryProxy>;
+		submittedVerdicts: PrimaryReference<JuryVerdict, JuryVerdictQueryProxy>;
+		opinionVotes: PrimaryReference<JuryOpinionVote, JuryOpinionVoteQueryProxy>;
+		verdictVotes: PrimaryReference<JuryVerdictVote, JuryVerdictVoteQueryProxy>;
+		courtCaseId: string;
+	declare id: string;
+	residentId: string;
+	
+	$$meta = {
+		source: "juror",
+		columns: {
+			courtCaseId: { type: "uuid", name: "court_case_id" },
+			id: { type: "uuid", name: "id" },
+			residentId: { type: "uuid", name: "resident_id" }
+		},
+		get set(): DbSet<Juror, JurorQueryProxy> { 
+			return new DbSet<Juror, JurorQueryProxy>(Juror, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$courtCase = new ForeignReference<CourtCase>(this, "courtCaseId", CourtCase);
+	this.thoughts = new PrimaryReference<JurorThought, JurorThoughtQueryProxy>(this, "jurorId", JurorThought);
+		this.$resident = new ForeignReference<Resident>(this, "residentId", Resident);
+	this.submittedOpinions = new PrimaryReference<JuryOpinion, JuryOpinionQueryProxy>(this, "submitterId", JuryOpinion);
+		this.submittedVerdicts = new PrimaryReference<JuryVerdict, JuryVerdictQueryProxy>(this, "proposerId", JuryVerdict);
+		this.opinionVotes = new PrimaryReference<JuryOpinionVote, JuryOpinionVoteQueryProxy>(this, "voterId", JuryOpinionVote);
+		this.verdictVotes = new PrimaryReference<JuryVerdictVote, JuryVerdictVoteQueryProxy>(this, "voterId", JuryVerdictVote);
+	}
+	
+	private $courtCase: ForeignReference<CourtCase>;
+
+	set courtCase(value: Partial<ForeignReference<CourtCase>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.courtCaseId = value.id as string;
+		} else {
+			this.courtCaseId = null;
+		}
+	}
+
+	private $resident: ForeignReference<Resident>;
+
+	set resident(value: Partial<ForeignReference<Resident>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.residentId = value.id as string;
+		} else {
+			this.residentId = null;
+		}
+	}
+
+	
+}
+			
+export class JurorThoughtQueryProxy extends QueryProxy {
+	get juror(): Partial<JurorQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get content(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get jurorId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get timestamp(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class JurorThought extends Entity<JurorThoughtQueryProxy> {
+	get juror(): Partial<ForeignReference<Juror>> { return this.$juror; }
+	content: string;
+	declare id: string;
+	jurorId: string;
+	timestamp: Date;
+	
+	$$meta = {
+		source: "juror_thought",
+		columns: {
+			content: { type: "text", name: "content" },
+			id: { type: "uuid", name: "id" },
+			jurorId: { type: "uuid", name: "juror_id" },
+			timestamp: { type: "timestamp", name: "timestamp" }
+		},
+		get set(): DbSet<JurorThought, JurorThoughtQueryProxy> { 
+			return new DbSet<JurorThought, JurorThoughtQueryProxy>(JurorThought, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$juror = new ForeignReference<Juror>(this, "jurorId", Juror);
+	}
+	
+	private $juror: ForeignReference<Juror>;
+
+	set juror(value: Partial<ForeignReference<Juror>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.jurorId = value.id as string;
+		} else {
+			this.jurorId = null;
+		}
+	}
+
+	
+}
+			
+export class JuryOpinionQueryProxy extends QueryProxy {
+	get submitter(): Partial<JurorQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get content(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get submitted(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get submitterId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class JuryOpinion extends Entity<JuryOpinionQueryProxy> {
+	votes: PrimaryReference<JuryOpinionVote, JuryOpinionVoteQueryProxy>;
+		get submitter(): Partial<ForeignReference<Juror>> { return this.$submitter; }
+	content: string;
+	declare id: string;
+	submitted: Date;
+	submitterId: string;
+	
+	$$meta = {
+		source: "jury_opinion",
+		columns: {
+			content: { type: "text", name: "content" },
+			id: { type: "uuid", name: "id" },
+			submitted: { type: "timestamp", name: "submitted" },
+			submitterId: { type: "uuid", name: "submitter_id" }
+		},
+		get set(): DbSet<JuryOpinion, JuryOpinionQueryProxy> { 
+			return new DbSet<JuryOpinion, JuryOpinionQueryProxy>(JuryOpinion, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.votes = new PrimaryReference<JuryOpinionVote, JuryOpinionVoteQueryProxy>(this, "opinionId", JuryOpinionVote);
+		this.$submitter = new ForeignReference<Juror>(this, "submitterId", Juror);
+	}
+	
+	private $submitter: ForeignReference<Juror>;
+
+	set submitter(value: Partial<ForeignReference<Juror>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.submitterId = value.id as string;
+		} else {
+			this.submitterId = null;
+		}
+	}
+
+	
+}
+			
+export class JuryOpinionVoteQueryProxy extends QueryProxy {
+	get opinion(): Partial<JuryOpinionQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get voter(): Partial<JurorQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get accept(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get comment(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get opinionId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get voted(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get voterId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class JuryOpinionVote extends Entity<JuryOpinionVoteQueryProxy> {
+	get opinion(): Partial<ForeignReference<JuryOpinion>> { return this.$opinion; }
+	get voter(): Partial<ForeignReference<Juror>> { return this.$voter; }
+	accept: boolean;
+	comment: string;
+	declare id: string;
+	opinionId: string;
+	voted: Date;
+	voterId: string;
+	
+	$$meta = {
+		source: "jury_opinion_vote",
+		columns: {
+			accept: { type: "bool", name: "accept" },
+			comment: { type: "text", name: "comment" },
+			id: { type: "uuid", name: "id" },
+			opinionId: { type: "uuid", name: "opinion_id" },
+			voted: { type: "timestamp", name: "voted" },
+			voterId: { type: "uuid", name: "voter_id" }
+		},
+		get set(): DbSet<JuryOpinionVote, JuryOpinionVoteQueryProxy> { 
+			return new DbSet<JuryOpinionVote, JuryOpinionVoteQueryProxy>(JuryOpinionVote, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$opinion = new ForeignReference<JuryOpinion>(this, "opinionId", JuryOpinion);
+	this.$voter = new ForeignReference<Juror>(this, "voterId", Juror);
+	}
+	
+	private $opinion: ForeignReference<JuryOpinion>;
+
+	set opinion(value: Partial<ForeignReference<JuryOpinion>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.opinionId = value.id as string;
+		} else {
+			this.opinionId = null;
+		}
+	}
+
+	private $voter: ForeignReference<Juror>;
+
+	set voter(value: Partial<ForeignReference<Juror>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.voterId = value.id as string;
+		} else {
+			this.voterId = null;
+		}
+	}
+
+	
+}
+			
+export class JuryVerdictQueryProxy extends QueryProxy {
+	get submitter(): Partial<JurorQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get proposed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get proposerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get verdict(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class JuryVerdict extends Entity<JuryVerdictQueryProxy> {
+	get submitter(): Partial<ForeignReference<Juror>> { return this.$submitter; }
+	votes: PrimaryReference<JuryVerdictVote, JuryVerdictVoteQueryProxy>;
+		declare id: string;
+	proposed: Date;
+	proposerId: string;
+	verdict: string;
+	
+	$$meta = {
+		source: "jury_verdict",
+		columns: {
+			id: { type: "uuid", name: "id" },
+			proposed: { type: "timestamp", name: "proposed" },
+			proposerId: { type: "uuid", name: "proposer_id" },
+			verdict: { type: "text", name: "verdict" }
+		},
+		get set(): DbSet<JuryVerdict, JuryVerdictQueryProxy> { 
+			return new DbSet<JuryVerdict, JuryVerdictQueryProxy>(JuryVerdict, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$submitter = new ForeignReference<Juror>(this, "proposerId", Juror);
+	this.votes = new PrimaryReference<JuryVerdictVote, JuryVerdictVoteQueryProxy>(this, "verdictId", JuryVerdictVote);
+	}
+	
+	private $submitter: ForeignReference<Juror>;
+
+	set submitter(value: Partial<ForeignReference<Juror>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.proposerId = value.id as string;
+		} else {
+			this.proposerId = null;
+		}
+	}
+
+	
+}
+			
+export class JuryVerdictVoteQueryProxy extends QueryProxy {
+	get verdict(): Partial<JuryVerdictQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get voter(): Partial<JurorQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get accept(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get comment(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get verdictId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get voted(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get voterId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class JuryVerdictVote extends Entity<JuryVerdictVoteQueryProxy> {
+	get verdict(): Partial<ForeignReference<JuryVerdict>> { return this.$verdict; }
+	get voter(): Partial<ForeignReference<Juror>> { return this.$voter; }
+	accept: boolean;
+	comment: string;
+	declare id: string;
+	verdictId: string;
+	voted: Date;
+	voterId: string;
+	
+	$$meta = {
+		source: "jury_verdict_vote",
+		columns: {
+			accept: { type: "bool", name: "accept" },
+			comment: { type: "text", name: "comment" },
+			id: { type: "uuid", name: "id" },
+			verdictId: { type: "uuid", name: "verdict_id" },
+			voted: { type: "timestamp", name: "voted" },
+			voterId: { type: "uuid", name: "voter_id" }
+		},
+		get set(): DbSet<JuryVerdictVote, JuryVerdictVoteQueryProxy> { 
+			return new DbSet<JuryVerdictVote, JuryVerdictVoteQueryProxy>(JuryVerdictVote, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$verdict = new ForeignReference<JuryVerdict>(this, "verdictId", JuryVerdict);
+	this.$voter = new ForeignReference<Juror>(this, "voterId", Juror);
+	}
+	
+	private $verdict: ForeignReference<JuryVerdict>;
+
+	set verdict(value: Partial<ForeignReference<JuryVerdict>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.verdictId = value.id as string;
+		} else {
+			this.verdictId = null;
+		}
+	}
+
+	private $voter: ForeignReference<Juror>;
+
+	set voter(value: Partial<ForeignReference<Juror>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.voterId = value.id as string;
+		} else {
+			this.voterId = null;
+		}
+	}
+
+	
+}
+			
+export class LawQueryProxy extends QueryProxy {
+	get book(): Partial<LawBookQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get parent(): Partial<LawQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get sourceOpinion(): Partial<JuryOpinionQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get bookId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get codified(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get identifier(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get parentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get sourceOpinionId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get text(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class Law extends Entity<LawQueryProxy> {
+	get book(): Partial<ForeignReference<LawBook>> { return this.$book; }
+	courtCaseReferences: PrimaryReference<CourtCaseReferenceLaw, CourtCaseReferenceLawQueryProxy>;
+		get parent(): Partial<ForeignReference<Law>> { return this.$parent; }
+	children: PrimaryReference<Law, LawQueryProxy>;
+		get sourceOpinion(): Partial<ForeignReference<JuryOpinion>> { return this.$sourceOpinion; }
+	bookId: string;
+	codified: Date;
+	declare id: string;
+	identifier: string;
+	parentId: string;
+	sourceOpinionId: string;
+	text: string;
+	
+	$$meta = {
+		source: "law",
+		columns: {
+			bookId: { type: "uuid", name: "book_id" },
+			codified: { type: "timestamp", name: "codified" },
+			id: { type: "uuid", name: "id" },
+			identifier: { type: "text", name: "identifier" },
+			parentId: { type: "uuid", name: "parent_id" },
+			sourceOpinionId: { type: "uuid", name: "source_opinion_id" },
+			text: { type: "text", name: "text" }
+		},
+		get set(): DbSet<Law, LawQueryProxy> { 
+			return new DbSet<Law, LawQueryProxy>(Law, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$book = new ForeignReference<LawBook>(this, "bookId", LawBook);
+	this.courtCaseReferences = new PrimaryReference<CourtCaseReferenceLaw, CourtCaseReferenceLawQueryProxy>(this, "lawId", CourtCaseReferenceLaw);
+		this.$parent = new ForeignReference<Law>(this, "parentId", Law);
+	this.children = new PrimaryReference<Law, LawQueryProxy>(this, "parentId", Law);
+		this.$sourceOpinion = new ForeignReference<JuryOpinion>(this, "sourceOpinionId", JuryOpinion);
+	}
+	
+	private $book: ForeignReference<LawBook>;
+
+	set book(value: Partial<ForeignReference<LawBook>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.bookId = value.id as string;
+		} else {
+			this.bookId = null;
+		}
+	}
+
+	private $parent: ForeignReference<Law>;
+
+	set parent(value: Partial<ForeignReference<Law>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.parentId = value.id as string;
+		} else {
+			this.parentId = null;
+		}
+	}
+
+	private $sourceOpinion: ForeignReference<JuryOpinion>;
+
+	set sourceOpinion(value: Partial<ForeignReference<JuryOpinion>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.sourceOpinionId = value.id as string;
+		} else {
+			this.sourceOpinionId = null;
+		}
+	}
+
+	
+}
+			
+export class LawBookQueryProxy extends QueryProxy {
+	get jurisdiction(): Partial<DistrictQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get parentBook(): Partial<LawBookQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get identifier(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get jurisdictionId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get parentId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get title(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class LawBook extends Entity<LawBookQueryProxy> {
+	rootLaws: PrimaryReference<Law, LawQueryProxy>;
+		get jurisdiction(): Partial<ForeignReference<District>> { return this.$jurisdiction; }
+	get parentBook(): Partial<ForeignReference<LawBook>> { return this.$parentBook; }
+	childBooks: PrimaryReference<LawBook, LawBookQueryProxy>;
+		declare id: string;
+	identifier: string;
+	jurisdictionId: string;
+	parentId: string;
+	title: string;
+	
+	$$meta = {
+		source: "law_book",
+		columns: {
+			id: { type: "uuid", name: "id" },
+			identifier: { type: "text", name: "identifier" },
+			jurisdictionId: { type: "uuid", name: "jurisdiction_id" },
+			parentId: { type: "uuid", name: "parent_id" },
+			title: { type: "text", name: "title" }
+		},
+		get set(): DbSet<LawBook, LawBookQueryProxy> { 
+			return new DbSet<LawBook, LawBookQueryProxy>(LawBook, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.rootLaws = new PrimaryReference<Law, LawQueryProxy>(this, "bookId", Law);
+		this.$jurisdiction = new ForeignReference<District>(this, "jurisdictionId", District);
+	this.$parentBook = new ForeignReference<LawBook>(this, "parentId", LawBook);
+	this.childBooks = new PrimaryReference<LawBook, LawBookQueryProxy>(this, "parentId", LawBook);
+	}
+	
+	private $jurisdiction: ForeignReference<District>;
+
+	set jurisdiction(value: Partial<ForeignReference<District>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.jurisdictionId = value.id as string;
+		} else {
+			this.jurisdictionId = null;
+		}
+	}
+
+	private $parentBook: ForeignReference<LawBook>;
+
+	set parentBook(value: Partial<ForeignReference<LawBook>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.parentId = value.id as string;
+		} else {
+			this.parentId = null;
+		}
+	}
+
+	
+}
+			
 export class LawHouseSessionQueryProxy extends QueryProxy {
 	get scope(): Partial<DistrictQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get _Delete(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -1761,6 +2682,39 @@ export class LawHouseSessionary extends Entity<LawHouseSessionaryQueryProxy> {
 	
 }
 			
+export class LegalDefinitionQueryProxy extends QueryProxy {
+	get defined(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get definition(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class LegalDefinition extends Entity<LegalDefinitionQueryProxy> {
+	courtCaseReferences: PrimaryReference<CourtCaseReferenceDefinition, CourtCaseReferenceDefinitionQueryProxy>;
+		defined: Date;
+	definition: string;
+	declare id: string;
+	name: string;
+	
+	$$meta = {
+		source: "legal_definition",
+		columns: {
+			defined: { type: "timestamp", name: "defined" },
+			definition: { type: "text", name: "definition" },
+			id: { type: "uuid", name: "id" },
+			name: { type: "text", name: "name" }
+		},
+		get set(): DbSet<LegalDefinition, LegalDefinitionQueryProxy> { 
+			return new DbSet<LegalDefinition, LegalDefinitionQueryProxy>(LegalDefinition, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.courtCaseReferences = new PrimaryReference<CourtCaseReferenceDefinition, CourtCaseReferenceDefinitionQueryProxy>(this, "definitionId", CourtCaseReferenceDefinition);
+	}
+}
+			
 export class LegalEntityQueryProxy extends QueryProxy {
 	get borough(): Partial<BoroughQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get company(): Partial<CompanyQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -1874,7 +2828,7 @@ export class LoreQueryProxy extends QueryProxy {
 }
 
 export class Lore extends Entity<LoreQueryProxy> {
-	proposals: PrimaryReference<LoreProposal, LoreProposalQueryProxy>;
+	expansionProposals: PrimaryReference<LoreProposal, LoreProposalQueryProxy>;
 		queryReferences: PrimaryReference<LoreQuerySource, LoreQuerySourceQueryProxy>;
 		get proposal(): Partial<ForeignReference<LoreProposal>> { return this.$proposal; }
 	context: string;
@@ -1904,7 +2858,7 @@ export class Lore extends Entity<LoreQueryProxy> {
 	constructor() {
 		super();
 		
-		this.proposals = new PrimaryReference<LoreProposal, LoreProposalQueryProxy>(this, "baseLoreId", LoreProposal);
+		this.expansionProposals = new PrimaryReference<LoreProposal, LoreProposalQueryProxy>(this, "baseLoreId", LoreProposal);
 		this.queryReferences = new PrimaryReference<LoreQuerySource, LoreQuerySourceQueryProxy>(this, "sourceId", LoreQuerySource);
 		this.$proposal = new ForeignReference<LoreProposal>(this, "proposalId", LoreProposal);
 	}
@@ -3535,6 +4489,7 @@ export class Resident extends Entity<ResidentQueryProxy> {
 	appointedLawHouseSessions: PrimaryReference<LawHouseSessionary, LawHouseSessionaryQueryProxy>;
 		assessments: PrimaryReference<ResidentAssessment, ResidentAssessmentQueryProxy>;
 		chats: PrimaryReference<Chat, ChatQueryProxy>;
+		jurySummons: PrimaryReference<Juror, JurorQueryProxy>;
 		votes: PrimaryReference<Vote, VoteQueryProxy>;
 		workContracts: PrimaryReference<WorkContract, WorkContractQueryProxy>;
 		workJobs: PrimaryReference<WorkJob, WorkJobQueryProxy>;
@@ -3596,6 +4551,7 @@ export class Resident extends Entity<ResidentQueryProxy> {
 	this.appointedLawHouseSessions = new PrimaryReference<LawHouseSessionary, LawHouseSessionaryQueryProxy>(this, "residentId", LawHouseSessionary);
 		this.assessments = new PrimaryReference<ResidentAssessment, ResidentAssessmentQueryProxy>(this, "residentId", ResidentAssessment);
 		this.chats = new PrimaryReference<Chat, ChatQueryProxy>(this, "residentId", Chat);
+		this.jurySummons = new PrimaryReference<Juror, JurorQueryProxy>(this, "residentId", Juror);
 		this.votes = new PrimaryReference<Vote, VoteQueryProxy>(this, "residentId", Vote);
 		this.workContracts = new PrimaryReference<WorkContract, WorkContractQueryProxy>(this, "workerId", WorkContract);
 		this.workJobs = new PrimaryReference<WorkJob, WorkJobQueryProxy>(this, "workerId", WorkJob);
@@ -3899,6 +4855,7 @@ export class StockSeedQueryProxy extends QueryProxy {
 	get indexed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get matchReason(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get ownerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get quality(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get quantity(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get seedingCycleId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get sourceName(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -3915,6 +4872,7 @@ export class StockSeed extends Entity<StockSeedQueryProxy> {
 	indexed: Date;
 	matchReason: string;
 	ownerId: string;
+	quality: number;
 	quantity: number;
 	seedingCycleId: string;
 	sourceName: string;
@@ -3929,6 +4887,7 @@ export class StockSeed extends Entity<StockSeedQueryProxy> {
 			indexed: { type: "timestamp", name: "indexed" },
 			matchReason: { type: "text", name: "match_reason" },
 			ownerId: { type: "uuid", name: "owner_id" },
+			quality: { type: "int4", name: "quality" },
 			quantity: { type: "float4", name: "quantity" },
 			seedingCycleId: { type: "uuid", name: "seeding_cycle_id" },
 			sourceName: { type: "text", name: "source_name" },
@@ -3981,6 +4940,84 @@ export class StockSeed extends Entity<StockSeedQueryProxy> {
 			this.seedingCycleId = value.id as string;
 		} else {
 			this.seedingCycleId = null;
+		}
+	}
+
+	
+}
+			
+export class StockSeedRuleQueryProxy extends QueryProxy {
+	get commodity(): Partial<CommodityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get parameter(): Partial<ResidentAssessmentParameterQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get commodityId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get operation(): "add" | "apply" | "subtract" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get parameterId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get parameterMaximum(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get parameterMinimum(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get property(): "quality" | "quantity" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get valueMaximum(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get valueMinimum(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class StockSeedRule extends Entity<StockSeedRuleQueryProxy> {
+	get commodity(): Partial<ForeignReference<Commodity>> { return this.$commodity; }
+	get parameter(): Partial<ForeignReference<ResidentAssessmentParameter>> { return this.$parameter; }
+	commodityId: string;
+	declare id: string;
+	operation: StockSeedRuleOperation;
+	parameterId: string;
+	parameterMaximum: number;
+	parameterMinimum: number;
+	property: StockSeedRuleProperty;
+	valueMaximum: number;
+	valueMinimum: number;
+	
+	$$meta = {
+		source: "stock_seed_rule",
+		columns: {
+			commodityId: { type: "uuid", name: "commodity_id" },
+			id: { type: "uuid", name: "id" },
+			operation: { type: "stock_seed_rule_operation", name: "operation" },
+			parameterId: { type: "uuid", name: "parameter_id" },
+			parameterMaximum: { type: "float4", name: "parameter_maximum" },
+			parameterMinimum: { type: "float4", name: "parameter_minimum" },
+			property: { type: "stock_seed_rule_property", name: "property" },
+			valueMaximum: { type: "float4", name: "value_maximum" },
+			valueMinimum: { type: "float4", name: "value_minimum" }
+		},
+		get set(): DbSet<StockSeedRule, StockSeedRuleQueryProxy> { 
+			return new DbSet<StockSeedRule, StockSeedRuleQueryProxy>(StockSeedRule, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$commodity = new ForeignReference<Commodity>(this, "commodityId", Commodity);
+	this.$parameter = new ForeignReference<ResidentAssessmentParameter>(this, "parameterId", ResidentAssessmentParameter);
+	}
+	
+	private $commodity: ForeignReference<Commodity>;
+
+	set commodity(value: Partial<ForeignReference<Commodity>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.commodityId = value.id as string;
+		} else {
+			this.commodityId = null;
+		}
+	}
+
+	private $parameter: ForeignReference<ResidentAssessmentParameter>;
+
+	set parameter(value: Partial<ForeignReference<ResidentAssessmentParameter>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.parameterId = value.id as string;
+		} else {
+			this.parameterId = null;
 		}
 	}
 
@@ -5437,8 +6474,14 @@ export class DbContext {
 	city: DbSet<City, CityQueryProxy>;
 	commodity: DbSet<Commodity, CommodityQueryProxy>;
 	commodityCategory: DbSet<CommodityCategory, CommodityCategoryQueryProxy>;
+	commodityIcon: DbSet<CommodityIcon, CommodityIconQueryProxy>;
 	commodityTransport: DbSet<CommodityTransport, CommodityTransportQueryProxy>;
 	company: DbSet<Company, CompanyQueryProxy>;
+	courtCase: DbSet<CourtCase, CourtCaseQueryProxy>;
+	courtCaseClaim: DbSet<CourtCaseClaim, CourtCaseClaimQueryProxy>;
+	courtCaseDefense: DbSet<CourtCaseDefense, CourtCaseDefenseQueryProxy>;
+	courtCaseReferenceDefinition: DbSet<CourtCaseReferenceDefinition, CourtCaseReferenceDefinitionQueryProxy>;
+	courtCaseReferenceLaw: DbSet<CourtCaseReferenceLaw, CourtCaseReferenceLawQueryProxy>;
 	district: DbSet<District, DistrictQueryProxy>;
 	dwelling: DbSet<Dwelling, DwellingQueryProxy>;
 	epoch: DbSet<Epoch, EpochQueryProxy>;
@@ -5448,9 +6491,18 @@ export class DbContext {
 	itemContext: DbSet<ItemContext, ItemContextQueryProxy>;
 	itemContextFragment: DbSet<ItemContextFragment, ItemContextFragmentQueryProxy>;
 	itemContextLink: DbSet<ItemContextLink, ItemContextLinkQueryProxy>;
+	juror: DbSet<Juror, JurorQueryProxy>;
+	jurorThought: DbSet<JurorThought, JurorThoughtQueryProxy>;
+	juryOpinion: DbSet<JuryOpinion, JuryOpinionQueryProxy>;
+	juryOpinionVote: DbSet<JuryOpinionVote, JuryOpinionVoteQueryProxy>;
+	juryVerdict: DbSet<JuryVerdict, JuryVerdictQueryProxy>;
+	juryVerdictVote: DbSet<JuryVerdictVote, JuryVerdictVoteQueryProxy>;
+	law: DbSet<Law, LawQueryProxy>;
+	lawBook: DbSet<LawBook, LawBookQueryProxy>;
 	lawHouseSession: DbSet<LawHouseSession, LawHouseSessionQueryProxy>;
 	lawHouseSessionProtocol: DbSet<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy>;
 	lawHouseSessionary: DbSet<LawHouseSessionary, LawHouseSessionaryQueryProxy>;
+	legalDefinition: DbSet<LegalDefinition, LegalDefinitionQueryProxy>;
 	legalEntity: DbSet<LegalEntity, LegalEntityQueryProxy>;
 	lore: DbSet<Lore, LoreQueryProxy>;
 	loreProposal: DbSet<LoreProposal, LoreProposalQueryProxy>;
@@ -5486,6 +6538,7 @@ export class DbContext {
 	residentRelationship: DbSet<ResidentRelationship, ResidentRelationshipQueryProxy>;
 	square: DbSet<Square, SquareQueryProxy>;
 	stockSeed: DbSet<StockSeed, StockSeedQueryProxy>;
+	stockSeedRule: DbSet<StockSeedRule, StockSeedRuleQueryProxy>;
 	street: DbSet<Street, StreetQueryProxy>;
 	streetRoute: DbSet<StreetRoute, StreetRouteQueryProxy>;
 	tenancy: DbSet<Tenancy, TenancyQueryProxy>;
@@ -5523,8 +6576,14 @@ export class DbContext {
 		this.city = new DbSet<City, CityQueryProxy>(City, this.runContext);
 		this.commodity = new DbSet<Commodity, CommodityQueryProxy>(Commodity, this.runContext);
 		this.commodityCategory = new DbSet<CommodityCategory, CommodityCategoryQueryProxy>(CommodityCategory, this.runContext);
+		this.commodityIcon = new DbSet<CommodityIcon, CommodityIconQueryProxy>(CommodityIcon, this.runContext);
 		this.commodityTransport = new DbSet<CommodityTransport, CommodityTransportQueryProxy>(CommodityTransport, this.runContext);
 		this.company = new DbSet<Company, CompanyQueryProxy>(Company, this.runContext);
+		this.courtCase = new DbSet<CourtCase, CourtCaseQueryProxy>(CourtCase, this.runContext);
+		this.courtCaseClaim = new DbSet<CourtCaseClaim, CourtCaseClaimQueryProxy>(CourtCaseClaim, this.runContext);
+		this.courtCaseDefense = new DbSet<CourtCaseDefense, CourtCaseDefenseQueryProxy>(CourtCaseDefense, this.runContext);
+		this.courtCaseReferenceDefinition = new DbSet<CourtCaseReferenceDefinition, CourtCaseReferenceDefinitionQueryProxy>(CourtCaseReferenceDefinition, this.runContext);
+		this.courtCaseReferenceLaw = new DbSet<CourtCaseReferenceLaw, CourtCaseReferenceLawQueryProxy>(CourtCaseReferenceLaw, this.runContext);
 		this.district = new DbSet<District, DistrictQueryProxy>(District, this.runContext);
 		this.dwelling = new DbSet<Dwelling, DwellingQueryProxy>(Dwelling, this.runContext);
 		this.epoch = new DbSet<Epoch, EpochQueryProxy>(Epoch, this.runContext);
@@ -5534,9 +6593,18 @@ export class DbContext {
 		this.itemContext = new DbSet<ItemContext, ItemContextQueryProxy>(ItemContext, this.runContext);
 		this.itemContextFragment = new DbSet<ItemContextFragment, ItemContextFragmentQueryProxy>(ItemContextFragment, this.runContext);
 		this.itemContextLink = new DbSet<ItemContextLink, ItemContextLinkQueryProxy>(ItemContextLink, this.runContext);
+		this.juror = new DbSet<Juror, JurorQueryProxy>(Juror, this.runContext);
+		this.jurorThought = new DbSet<JurorThought, JurorThoughtQueryProxy>(JurorThought, this.runContext);
+		this.juryOpinion = new DbSet<JuryOpinion, JuryOpinionQueryProxy>(JuryOpinion, this.runContext);
+		this.juryOpinionVote = new DbSet<JuryOpinionVote, JuryOpinionVoteQueryProxy>(JuryOpinionVote, this.runContext);
+		this.juryVerdict = new DbSet<JuryVerdict, JuryVerdictQueryProxy>(JuryVerdict, this.runContext);
+		this.juryVerdictVote = new DbSet<JuryVerdictVote, JuryVerdictVoteQueryProxy>(JuryVerdictVote, this.runContext);
+		this.law = new DbSet<Law, LawQueryProxy>(Law, this.runContext);
+		this.lawBook = new DbSet<LawBook, LawBookQueryProxy>(LawBook, this.runContext);
 		this.lawHouseSession = new DbSet<LawHouseSession, LawHouseSessionQueryProxy>(LawHouseSession, this.runContext);
 		this.lawHouseSessionProtocol = new DbSet<LawHouseSessionProtocol, LawHouseSessionProtocolQueryProxy>(LawHouseSessionProtocol, this.runContext);
 		this.lawHouseSessionary = new DbSet<LawHouseSessionary, LawHouseSessionaryQueryProxy>(LawHouseSessionary, this.runContext);
+		this.legalDefinition = new DbSet<LegalDefinition, LegalDefinitionQueryProxy>(LegalDefinition, this.runContext);
 		this.legalEntity = new DbSet<LegalEntity, LegalEntityQueryProxy>(LegalEntity, this.runContext);
 		this.lore = new DbSet<Lore, LoreQueryProxy>(Lore, this.runContext);
 		this.loreProposal = new DbSet<LoreProposal, LoreProposalQueryProxy>(LoreProposal, this.runContext);
@@ -5572,6 +6640,7 @@ export class DbContext {
 		this.residentRelationship = new DbSet<ResidentRelationship, ResidentRelationshipQueryProxy>(ResidentRelationship, this.runContext);
 		this.square = new DbSet<Square, SquareQueryProxy>(Square, this.runContext);
 		this.stockSeed = new DbSet<StockSeed, StockSeedQueryProxy>(StockSeed, this.runContext);
+		this.stockSeedRule = new DbSet<StockSeedRule, StockSeedRuleQueryProxy>(StockSeedRule, this.runContext);
 		this.street = new DbSet<Street, StreetQueryProxy>(Street, this.runContext);
 		this.streetRoute = new DbSet<StreetRoute, StreetRouteQueryProxy>(StreetRoute, this.runContext);
 		this.tenancy = new DbSet<Tenancy, TenancyQueryProxy>(Tenancy, this.runContext);

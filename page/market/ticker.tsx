@@ -50,6 +50,8 @@ export class CommodityTickerComponent extends Component {
 
 	render() {
 		return <ui-commodity ui-href={`commodity/${this.commodity.tag}`}>
+			<img src={`/commodity/icon/${this.commodity.iconId}`} />
+
 			<ui-detail>
 				<ui-header>
 					<ui-name>

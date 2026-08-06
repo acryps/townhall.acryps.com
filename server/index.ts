@@ -1,7 +1,7 @@
 import { DbClient, RunContext } from "vlquery";
 import { Inject, StaticFileRoute, ViewModel } from "vlserver";
 import { ManagedServer } from "./managed/server";
-import { DbContext } from "./managed/database";
+import { CommodityIcon, DbContext } from "./managed/database";
 import ws from 'express-ws';
 import { join } from "path";
 import { GameBridge } from "./bridge";
@@ -52,9 +52,12 @@ import { WaterBodyFiller } from "./map/fill/water";
 import { TradingEntity } from "./market/entity";
 import { MarketTracker } from "./market/tracker";
 import { MarketIterationGenerator } from "./market/cycle/generator";
-import { advanceMarket } from "./market/cycle";
 import { Logger } from "@acryps/log";
 import { ResidentAssessor } from "./life/assess";
+import { CourtCaseSession } from "./legal/court";
+import { readdirSync, readFileSync } from "fs";
+import { CommodityIconImageInterface } from "./areas/market/icon";
+import { MarketCycle, MarketCycleGenerator } from "./market/cycle";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const runMarket = process.env.RUN_MARKET == 'YES';
@@ -92,7 +95,8 @@ DbClient.connectedClient.connect().then(async () => {
 		marketTracker.dump();
 
 		while (1) {
-			await advanceMarket(database, marketTracker);
+			const cycle = new MarketCycleGenerator(database, marketTracker);
+			await cycle.advance();
 		}
 	}
 
@@ -223,6 +227,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new ImpressionImageInterface(app, database);
 	new PlotterInterface(app, database);
 	new WallpaperInterface(app, database);
+	new CommodityIconImageInterface(app, database);
 
 	app.createInjector = context => new Inject({
 		Context: context,

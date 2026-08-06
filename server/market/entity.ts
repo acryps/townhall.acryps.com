@@ -1,6 +1,7 @@
-import { Commodity, DbContext, LegalEntity, StockSeed } from "../managed/database";
+import { Commodity, DbContext, LegalEntity, Resident, StockSeed, StockSeedRule, StockSeedRuleOperation, StockSeedRuleProperty } from "../managed/database";
 import { convertToLegalCompanyName } from "../../interface/company";
 import { Stock } from "./stock";
+import { HashRandom } from "./random";
 
 export class TradingEntity {
 	constructor(
@@ -142,72 +143,107 @@ export class TradingEntity {
 		for (let seed of seeds) {
 			const commodity = await seed.commodity.fetch();
 
-			this.trackAsset(stock, commodity, seed.quantity);
+			this.trackAsset(stock, commodity, seed.quantity, seed.quality);
 		}
 
-		// bought through trades
-		const boughtTrades = await this.entity.trades
-			.include(trade => trade.ask)
-			.toArray();
-
-		for (let trade of boughtTrades) {
-			const ask = await trade.ask.fetch();
-			const commodity = [...stock.keys()].find(commodity => commodity.id == ask.commodityId) ?? await ask.commodity.fetch();
-
-			this.trackAsset(stock, commodity, trade.quantity);
+		// generate stock for residents
+		// it would be insanely wasteful to generate full stock lists for all residents all the time
+		if (this.entity.residentId) {
+			for (let entry of await this.generateResidentSeedStock(await this.entity.resident.fetch())) {
+				this.trackAsset(stock, entry.commodity, entry.quantity, entry.quality);
+			}
 		}
 
-		// production output
-		const productionOutputs = await this.database.productionOutput
-			.where(output => output.production.producerId == this.entity.id)
-			.include(output => output.commodity)
-			.toArray();
-
-		for (let production of productionOutputs) {
-			const commodity = await production.commodity.fetch();
-
-			this.trackAsset(stock, commodity, production.quantity);
-		}
-
-		// sold with trades
-		const soldTrades = await this.database.trade
-			.where(trade => trade.ask.bidderId == this.entity.id)
-			.include(trade => trade.ask)
-			.toArray();
-
-		for (let trade of soldTrades) {
-			const ask = await trade.ask.fetch();
-			const commodity = [...stock.keys()].find(commodity => commodity.id == ask.commodityId) ?? await ask.commodity.fetch();
-
-			this.trackAsset(stock, commodity, -trade.quantity);
-		}
-
-		// used in production
-		const productionInputs = await this.database.productionInput
-			.where(output => output.production.producerId == this.entity.id)
-			.include(output => output.commodity)
-			.toArray();
-
-		for (let production of productionInputs) {
-			const commodity = await production.commodity.fetch();
-
-			this.trackAsset(stock, commodity, -production.quantity);
-		}
+		stock.sort((a, b) => a.commodity.name.localeCompare(b.commodity.name));
 
 		return stock;
 	}
 
-	private trackAsset(stock: Stock[], commodity: Commodity, quantity: number) {
-		let item = stock.find(item => item.commodity.id == commodity.id);
+	private async generateResidentSeedStock(resident: Resident) {
+		const stock: Stock[] = [];
+
+		const assessment = await resident.assessments.toArray();
+		const commodities = await this.database.commodity.toArray();
+
+		const rules = await this.database.stockSeedRule
+			.orderByAscending(rule => rule.id) // sort to have strict case for conflicts
+			.toArray();
+
+		const qualityRules: StockSeedRule[] = [];
+
+		for (let rule of rules) {
+			const parameter = assessment.find(parameter => parameter.parameterId == rule.parameterId);
+
+			if (parameter && parameter.value >= rule.parameterMinimum && parameter.value <= rule.parameterMaximum) {
+				switch (rule.property) {
+					case StockSeedRuleProperty.quality: {
+						qualityRules.push(rule);
+
+						break;
+					}
+
+					case StockSeedRuleProperty.quantity: {
+						const commodity = commodities.find(commodity => commodity.id == rule.commodityId);
+						const value = HashRandom.random([resident.id, rule.id], rule.valueMinimum, rule.valueMaximum);
+
+						let entry = stock.find(entry => entry.commodity == commodity);
+
+						if (!entry) {
+							entry = new Stock(commodity);
+							stock.push(entry);
+						}
+
+						switch (rule.operation) {
+							case StockSeedRuleOperation.apply: {
+								entry.quantity = value;
+
+								break;
+							}
+
+							case StockSeedRuleOperation.add: {
+								entry.quantity += value;
+
+								break;
+							}
+
+							case StockSeedRuleOperation.subtract: {
+								entry.quantity -= value;
+
+								break;
+							}
+						}
+
+						break;
+					}
+				}
+			}
+		}
+
+		// assign quality to given stock
+		for (let qualityRule of qualityRules) {
+			for (let entry of stock) {
+				if (entry.commodity.id == qualityRule.commodityId) {
+					const quality = HashRandom.random([resident.id, qualityRule.id], qualityRule.valueMinimum, qualityRule.valueMaximum);
+
+					entry.quality = Math.round(quality);
+				}
+			}
+		}
+
+		return stock.filter(stock => stock.quantity > 0);
+	}
+
+	private trackAsset(stock: Stock[], commodity: Commodity, quantity: number, quality: number) {
+		let item = stock.find(item => item.commodity.id == commodity.id && item.quality == quality);
 
 		if (!item) {
-			item = new Stock(commodity);
+			item = new Stock(commodity, 0, quality);
 			stock.push(item);
 		}
 
 		item.quantity += quantity;
 
-		if (item.quantity == 0) {
+		if (item.quantity <= 0) {
 			stock.splice(stock.indexOf(item), 1);
 		}
 	}

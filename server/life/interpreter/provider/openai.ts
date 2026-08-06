@@ -29,8 +29,6 @@ export class OpenAiInterpreterProvider implements InterpreterProvider {
 
 		await usage.create();
 
-		console.log(response.output_text)
-
 		return response.output_text;
 	}
 }

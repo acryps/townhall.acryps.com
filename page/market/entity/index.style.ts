@@ -1,4 +1,4 @@
-import { alignItems, aspectRatio, border, borderBottom, child, columnGap, display, flexGrow, flexShrink, fontSize, fontWeight, gap, height, imageRendering, marginBottom, marginLeft, marginRight, objectFit, objectPosition, padding, px, ratio, rem, textAlign, textDecorationLine, width } from "@acryps/style";
+import { alignItems, aspectRatio, border, borderBottom, child, columnGap, display, flexGrow, flexShrink, fontSize, fontWeight, gap, height, imageRendering, marginBottom, marginLeft, marginRight, objectFit, objectPosition, padding, px, ratio, rem, textAlign, textDecorationLine, whiteSpace, width } from "@acryps/style";
 import { pageGutter } from "../../index.style";
 import { tabsStyle } from "../../shared/tabs/index.style";
 import { boxed } from "../../shared/boxed.style";
@@ -49,13 +49,15 @@ export const marketEntityStyle = () => child('ui-entity',
 
 						child('ui-name',
 							display('block'),
+							marginBottom(rem(0.25)),
 
 							fontWeight('bold')
 						),
 
-						child('ui-seed',
+						child('ui-sources',
 							display('block'),
 
+							whiteSpace('pre-wrap'),
 							fontSize(rem(0.7))
 						)
 					),
@@ -70,6 +72,20 @@ export const marketEntityStyle = () => child('ui-entity',
 							display('inline-block'),
 
 							fontSize(rem(0.7))
+						)
+					),
+
+					child('ui-ownership',
+						child('ui-quantity',
+							display('block'),
+
+							fontWeight('bold')
+						),
+
+						child('ui-quality',
+							display('block'),
+
+							textAlign('right')
 						)
 					)
 				)

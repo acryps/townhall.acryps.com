@@ -33,14 +33,20 @@ export class StockComponent extends Component {
 							{item.commodity.name}
 						</ui-name>
 
+						<ui-sources>
+							{item.source}
+						</ui-sources>
+					</ui-commodity>
+
+					{item.commodity.tradingUnit ? <ui-ownership>
+						<ui-quantity>
+							{formatTradingUnit(item.commodity.tradingUnit, item.quantity)}
+						</ui-quantity>
+
 						<ui-quality>
 							Q{item.quality}
 						</ui-quality>
-					</ui-commodity>
-
-					{item.commodity.tradingUnit ?  <ui-quantity>
-						{formatTradingUnit(item.commodity.tradingUnit, item.quantity)}
-					</ui-quantity> : <ui-quantity>
+					</ui-ownership> : <ui-quantity>
 						<ui-number>
 							{item.quantity}
 						</ui-number>

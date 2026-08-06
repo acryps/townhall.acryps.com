@@ -6172,7 +6172,8 @@ ViewModel.mappings = {
 			return {
 				commodity: this.$$model.commodity,
 				quantity: this.$$model.quantity,
-				quality: this.$$model.quality
+				quality: this.$$model.quality,
+				source: this.$$model.source
 			}
 		};
 
@@ -6204,7 +6205,8 @@ ViewModel.mappings = {
 			return {
 				commodity: true,
 				quantity: true,
-				quality: true
+				quality: true,
+				source: true
 			};
 		};
 
@@ -6213,6 +6215,7 @@ ViewModel.mappings = {
 			"commodity" in data && (undefined);
 			"quantity" in data && (item.quantity = data.quantity === null ? null : +data.quantity);
 			"quality" in data && (item.quality = data.quality === null ? null : +data.quality);
+			"source" in data && (item.source = data.source === null ? null : `${data.source}`);
 
 			return item;
 		}
@@ -6223,6 +6226,7 @@ ViewModel.mappings = {
 			"commodity" in viewModel && (undefined);
 			"quantity" in viewModel && (model.quantity = viewModel.quantity === null ? null : +viewModel.quantity);
 			"quality" in viewModel && (model.quality = viewModel.quality === null ? null : +viewModel.quality);
+			"source" in viewModel && (model.source = viewModel.source === null ? null : `${viewModel.source}`);
 
 			return model;
 		}

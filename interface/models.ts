@@ -416,6 +416,7 @@ export interface StockViewModel {
     commodity: CommoditySummaryModel;
 	quantity: number;
 	quality: number;
+	source: string;
 }
 
 export interface StockSeedViewModel {

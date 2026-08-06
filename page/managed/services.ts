@@ -972,12 +972,14 @@ export class StockViewModel {
 	commodity: CommoditySummaryModel;
 	quantity: number;
 	quality: number;
+	source: string;
 
 	private static $build(raw) {
 		const item = new StockViewModel();
 		raw.commodity === undefined || (item.commodity = raw.commodity ? CommoditySummaryModel["$build"](raw.commodity) : null)
 		raw.quantity === undefined || (item.quantity = raw.quantity === null ? null : +raw.quantity)
 		raw.quality === undefined || (item.quality = raw.quality === null ? null : +raw.quality)
+		raw.source === undefined || (item.source = raw.source === null ? null : `${raw.source}`)
 		
 		return item;
 	}

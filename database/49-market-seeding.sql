@@ -35,5 +35,5 @@ CREATE TABLE commodity_trading_unit (
 
 ALTER TABLE commodity ADD trading_unit_id UUID CONSTRAINT trading_unit__ REFERENCES commodity_trading_unit (id);
 
-ALTER TABLE commodity ADD trading_unit_commercial_baseline INTEGER DEFAULT 1;
-ALTER TABLE commodity ADD trading_unit_retail_baseline INTEGER DEFAULT 1;
+ALTER TABLE commodity ADD trading_unit_commercial_baseline INTEGER DEFAULT 0;
+ALTER TABLE commodity ADD trading_unit_retail_baseline INTEGER DEFAULT 0;

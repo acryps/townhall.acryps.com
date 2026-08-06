@@ -8,11 +8,14 @@ export class StockModel {
 	quantity: number;
 	quality: number;
 
+	source: string;
+
 	static from(source: Stock) {
 		const model = new StockModel();
 		model.commodity = new CommoditySummaryModel(source.commodity);
 		model.quantity = source.quantity;
 		model.quality = source.quality;
+		model.source = source.sources.join('\n');
 
 		return model;
 	}
@@ -22,6 +25,7 @@ export class StockViewModel extends ViewModel<StockModel> {
 	commodity: CommoditySummaryModel;
 	quantity;
 	quality;
+	source;
 }
 
 export class StockSeedViewModel extends ViewModel<StockSeed> {

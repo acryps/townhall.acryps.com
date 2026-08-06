@@ -6,26 +6,59 @@ interface TradingUnit {
 	whole: boolean;
 }
 
-export const formatTradingUnit = (unit: TradingUnit, value: number, decimals = 2) => {
+const valueToken = '${value}';
+const unitToken = '${unit}';
+
+const collectShorthands = (unit: TradingUnit) => {
 	const units = [
-		{ exponent: 0, unit: unit.baseUnit },
-		...unit.shorthands
-			.split(',')
-			.map(shorthand => {
-				const parts = shorthand.split('=');
+		{ exponent: 0, unit: unit.baseUnit }
+	];
 
-				return {
-					exponent: +parts[0],
-					unit: parts[1],
-				};
-			}),
-	].sort((a, b) => b.exponent - a.exponent);
+	if (unit.shorthands) {
+		for (let shorthand of unit.shorthands.split(',')) {
+			const parts = shorthand.split('=');
 
+			units.push({
+				exponent: +parts[0],
+				unit: parts[1],
+			});
+		}
+	}
+
+	units.sort((a, b) => b.exponent - a.exponent);
+
+	return units;
+};
+
+export const parseTradingUnitValue = (unit: TradingUnit, source: string) => {
+	// remove separators between the template tokens
+	const separators = unit.format.split(unitToken).flatMap(part => part.split(valueToken));
+
+	for (let separator of separators) {
+		source = source.replace(separator, '');
+	}
+
+	// find longest matching shorthand
+	const shorthands = collectShorthands(unit);
+	shorthands.sort((a, b) => b.unit.length - a.unit.length);
+
+	const shorthand = shorthands.find(shorthand => source.includes(shorthand.unit));
+	const value = source.replace(shorthand.unit, '');
+
+	if (!value.match(/^[0-9\.]+$/)) {
+		throw new Error('Invalid unit format');
+	}
+
+	return +value * Math.pow(10, shorthand.exponent);
+};
+
+export const formatTradingUnit = (unit: TradingUnit, value: number, decimals = 2) => {
+	const shorthands = collectShorthands(unit);
 	const absolute = Math.abs(value);
 
 	// Choose the largest unit producing a value >= 1.
-	let selected = units[units.length - 1];
-	for (const candidate of units) {
+	let selected = shorthands[shorthands.length - 1];
+	for (const candidate of shorthands) {
 		const scaled = absolute / Math.pow(10, candidate.exponent);
 		if (scaled >= 1) {
 			selected = candidate;
@@ -39,6 +72,6 @@ export const formatTradingUnit = (unit: TradingUnit, value: number, decimals = 2
 	const formattedValue = Number(scaledValue.toFixed(unit.whole ? 0 : decimals)).toString();
 
 	return unit.format
-		.replace('${value}', formattedValue)
-		.replace('${unit}', selected.unit);
+		.replace(valueToken, formattedValue)
+		.replace(unitToken, selected.unit);
 }

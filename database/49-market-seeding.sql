@@ -20,3 +20,20 @@ CREATE TABLE stock_seed_rule (
 );
 
 ALTER TABLE stock_seed ADD quality INTEGER;
+
+CREATE TABLE commodity_trading_unit (
+	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+	name TEXT,
+	format TEXT, -- ${value} for value, ${unit} for unit
+
+	base_unit TEXT, -- g
+	shorthands TEXT, -- +4=kg, +8=t, +12=Mt, +16=Gt, -4=mg
+
+	whole BOOLEAN -- tradeable in fractions or not
+);
+
+ALTER TABLE commodity ADD trading_unit_id UUID CONSTRAINT trading_unit__ REFERENCES commodity_trading_unit (id);
+
+ALTER TABLE commodity ADD trading_unit_commercial_baseline INTEGER DEFAULT 1;
+ALTER TABLE commodity ADD trading_unit_retail_baseline INTEGER DEFAULT 1;

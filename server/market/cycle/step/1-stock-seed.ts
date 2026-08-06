@@ -1,5 +1,6 @@
 import { MarketCycleGeneratorStep } from ".";
 import { Time } from "../../../../interface/time";
+import { formatTradingUnit } from "../../../../interface/trading-unit";
 import { SystemMessage, ToolError, UserMessage } from "../../../life/interpreter";
 import { StockSeedRule, StockSeedRuleOperation, StockSeedRuleProperty } from "../../../managed/database";
 
@@ -7,6 +8,7 @@ export class StockSeedRuleMarketCycleGeneratorStep extends MarketCycleGeneratorS
 	async generate() {
 		const commodity = await this.database.commodity
 			.orderByAscending(commodity => commodity.id) // pseudo-random
+			.where(commodity => commodity.tradingUnit != null) // only with proper units
 			.first(commodity => commodity.seedRulesCreated == null);
 
 		if (!commodity) {
@@ -80,6 +82,9 @@ export class StockSeedRuleMarketCycleGeneratorStep extends MarketCycleGeneratorS
 			'+': StockSeedRuleOperation.add
 		};
 
+		const unit = await commodity.tradingUnit.fetch();
+		const unitBaseline = 10 ** commodity.tradingUnitRetailBaseline;
+
 		for (let parameter of parameters) {
 			interpreter.addTool(parameter.name, [
 				{ name: 'parameterMinimum', type: Number },
@@ -108,8 +113,22 @@ export class StockSeedRuleMarketCycleGeneratorStep extends MarketCycleGeneratorS
 				rule.parameterMaximum = parameterMaximum;
 				rule.property = property;
 				rule.operation = operations[operation];
-				rule.valueMinimum = valueMinimum;
-				rule.valueMaximum = valueMaximum;
+
+				switch (property) {
+					case StockSeedRuleProperty.quality: {
+						rule.valueMinimum = valueMinimum;
+						rule.valueMaximum = valueMaximum;
+
+						break;
+					}
+
+					case StockSeedRuleProperty.quantity: {
+						rule.valueMinimum = valueMinimum * unitBaseline;
+						rule.valueMaximum = valueMaximum * unitBaseline;
+
+						break;
+					}
+				}
 
 				rules.push(rule);
 			});
@@ -117,7 +136,7 @@ export class StockSeedRuleMarketCycleGeneratorStep extends MarketCycleGeneratorS
 
 		await interpreter.execute(new UserMessage(`
 			Commodity: ${commodity.name}
-			Traded in ${commodity.unit} units.
+			Traded in ${formatTradingUnit(unit, unitBaseline)} units.
 
 			${commodity.description}
 		`));

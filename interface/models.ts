@@ -399,7 +399,8 @@ export interface BidViewModel {
 }
 
 export interface CommoditySummaryModel {
-    iconId: string;
+    tradingUnit: TradingUnitViewModel;
+	iconId: string;
 	id: string;
 	name: string;
 	tag: string;
@@ -437,6 +438,15 @@ export interface LiveCommodityTickerResponseModel {
 	bidHigh: number;
 	bidVolume: number;
 	bidCapitalization: number;
+}
+
+export interface TradingUnitViewModel {
+    baseUnit: string;
+	format: string;
+	id: string;
+	name: string;
+	shorthands: string;
+	whole: boolean;
 }
 
 export interface MetricViewModel {
@@ -821,6 +831,7 @@ export interface CommodityViewModel {
     category: CommodityCategorySummaryModel;
 	asks: CommodityAskViewModel[];
 	bids: CommodityBidViewModel[];
+	tradingUnit: TradingUnitViewModel;
 	description: string;
 	iconId: string;
 	id: string;

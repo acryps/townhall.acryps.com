@@ -862,6 +862,7 @@ export class CommodityQueryProxy extends QueryProxy {
 	get category(): Partial<CommodityCategoryQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get icon(): Partial<CommodityIconQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get innovationCycle(): Partial<MarketCycleQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tradingUnit(): Partial<CommodityTradingUnitQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get categoryId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get depreciation(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -872,6 +873,9 @@ export class CommodityQueryProxy extends QueryProxy {
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get seedRulesCreated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tradingUnitCommercialBaseline(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tradingUnitId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tradingUnitRetailBaseline(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get unit(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get whole(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
@@ -887,6 +891,7 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 		transports: PrimaryReference<CommodityTransport, CommodityTransportQueryProxy>;
 		get icon(): Partial<ForeignReference<CommodityIcon>> { return this.$icon; }
 	get innovationCycle(): Partial<ForeignReference<MarketCycle>> { return this.$innovationCycle; }
+	get tradingUnit(): Partial<ForeignReference<CommodityTradingUnit>> { return this.$tradingUnit; }
 	categoryId: string;
 	depreciation: number;
 	description: string;
@@ -898,6 +903,9 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 	name: string;
 	seedRulesCreated: Date;
 	tag: string;
+	tradingUnitCommercialBaseline: number;
+	tradingUnitId: string;
+	tradingUnitRetailBaseline: number;
 	unit: string;
 	whole: boolean;
 	
@@ -915,6 +923,9 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 			name: { type: "text", name: "name" },
 			seedRulesCreated: { type: "timestamp", name: "seed_rules_created" },
 			tag: { type: "text", name: "tag" },
+			tradingUnitCommercialBaseline: { type: "int4", name: "trading_unit_commercial_baseline" },
+			tradingUnitId: { type: "uuid", name: "trading_unit_id" },
+			tradingUnitRetailBaseline: { type: "int4", name: "trading_unit_retail_baseline" },
 			unit: { type: "text", name: "unit" },
 			whole: { type: "bool", name: "whole" }
 		},
@@ -936,6 +947,7 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 		this.transports = new PrimaryReference<CommodityTransport, CommodityTransportQueryProxy>(this, "commodityId", CommodityTransport);
 		this.$icon = new ForeignReference<CommodityIcon>(this, "iconId", CommodityIcon);
 	this.$innovationCycle = new ForeignReference<MarketCycle>(this, "innovationCycleId", MarketCycle);
+	this.$tradingUnit = new ForeignReference<CommodityTradingUnit>(this, "tradingUnitId", CommodityTradingUnit);
 	}
 	
 	private $category: ForeignReference<CommodityCategory>;
@@ -971,6 +983,18 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 			this.innovationCycleId = value.id as string;
 		} else {
 			this.innovationCycleId = null;
+		}
+	}
+
+	private $tradingUnit: ForeignReference<CommodityTradingUnit>;
+
+	set tradingUnit(value: Partial<ForeignReference<CommodityTradingUnit>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.tradingUnitId = value.id as string;
+		} else {
+			this.tradingUnitId = null;
 		}
 	}
 
@@ -1053,6 +1077,38 @@ export class CommodityIcon extends Entity<CommodityIconQueryProxy> {
 		},
 		get set(): DbSet<CommodityIcon, CommodityIconQueryProxy> { 
 			return new DbSet<CommodityIcon, CommodityIconQueryProxy>(CommodityIcon, null);
+		}
+	};
+}
+			
+export class CommodityTradingUnitQueryProxy extends QueryProxy {
+	get baseUnit(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get format(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get shorthands(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get whole(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class CommodityTradingUnit extends Entity<CommodityTradingUnitQueryProxy> {
+	baseUnit: string;
+	format: string;
+	declare id: string;
+	name: string;
+	shorthands: string;
+	whole: boolean;
+	
+	$$meta = {
+		source: "commodity_trading_unit",
+		columns: {
+			baseUnit: { type: "text", name: "base_unit" },
+			format: { type: "text", name: "format" },
+			id: { type: "uuid", name: "id" },
+			name: { type: "text", name: "name" },
+			shorthands: { type: "text", name: "shorthands" },
+			whole: { type: "bool", name: "whole" }
+		},
+		get set(): DbSet<CommodityTradingUnit, CommodityTradingUnitQueryProxy> { 
+			return new DbSet<CommodityTradingUnit, CommodityTradingUnitQueryProxy>(CommodityTradingUnit, null);
 		}
 	};
 }
@@ -6475,6 +6531,7 @@ export class DbContext {
 	commodity: DbSet<Commodity, CommodityQueryProxy>;
 	commodityCategory: DbSet<CommodityCategory, CommodityCategoryQueryProxy>;
 	commodityIcon: DbSet<CommodityIcon, CommodityIconQueryProxy>;
+	commodityTradingUnit: DbSet<CommodityTradingUnit, CommodityTradingUnitQueryProxy>;
 	commodityTransport: DbSet<CommodityTransport, CommodityTransportQueryProxy>;
 	company: DbSet<Company, CompanyQueryProxy>;
 	courtCase: DbSet<CourtCase, CourtCaseQueryProxy>;
@@ -6577,6 +6634,7 @@ export class DbContext {
 		this.commodity = new DbSet<Commodity, CommodityQueryProxy>(Commodity, this.runContext);
 		this.commodityCategory = new DbSet<CommodityCategory, CommodityCategoryQueryProxy>(CommodityCategory, this.runContext);
 		this.commodityIcon = new DbSet<CommodityIcon, CommodityIconQueryProxy>(CommodityIcon, this.runContext);
+		this.commodityTradingUnit = new DbSet<CommodityTradingUnit, CommodityTradingUnitQueryProxy>(CommodityTradingUnit, this.runContext);
 		this.commodityTransport = new DbSet<CommodityTransport, CommodityTransportQueryProxy>(CommodityTransport, this.runContext);
 		this.company = new DbSet<Company, CompanyQueryProxy>(Company, this.runContext);
 		this.courtCase = new DbSet<CourtCase, CourtCaseQueryProxy>(CourtCase, this.runContext);

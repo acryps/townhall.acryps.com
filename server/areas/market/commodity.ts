@@ -3,6 +3,7 @@ import { Commodity, CommodityCategory } from "../../managed/database";
 import { View } from "vlquery";
 import { CommodityBidViewModel } from "./bid";
 import { CommodityAskViewModel } from "./ask";
+import { TradingUnitViewModel } from "./unit";
 
 export class CommoditySummaryModel extends ViewModel<Commodity> {
 	id;
@@ -11,6 +12,8 @@ export class CommoditySummaryModel extends ViewModel<Commodity> {
 
 	name;
 	unit;
+
+	tradingUnit: TradingUnitViewModel;
 }
 
 export class CommodityViewModel extends CommoditySummaryModel {

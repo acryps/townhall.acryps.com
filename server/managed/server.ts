@@ -188,6 +188,7 @@ import { TenancyViewModel } from "./../areas/life/resident";
 import { AskViewModel } from "./../areas/market/ask";
 import { BidViewModel } from "./../areas/market/bid";
 import { CommodityCategorySummaryModel } from "./../areas/market/commodity";
+import { TradingUnitViewModel } from "./../areas/market/unit";
 import { OracleProposalSummaryModel } from "./../areas/oracle/proposal";
 import { PlanSummaryModel } from "./../areas/plan/plan";
 import { PlanShapeViewModel } from "./../areas/plan/plan";
@@ -237,6 +238,7 @@ import { TradeAsk } from "./../managed/database";
 import { TradeBid } from "./../managed/database";
 import { CommodityCategory } from "./../managed/database";
 import { StockSeed } from "./../managed/database";
+import { CommodityTradingUnit } from "./../managed/database";
 import { Metric } from "./../managed/database";
 import { MetricValue } from "./../managed/database";
 import { MilitaryUnit } from "./../managed/database";
@@ -6023,6 +6025,7 @@ ViewModel.mappings = {
 	[CommoditySummaryModel.name]: class ComposedCommoditySummaryModel extends CommoditySummaryModel {
 		async map() {
 			return {
+				tradingUnit: new TradingUnitViewModel(await BaseServer.unwrap(this.$$model.tradingUnit)),
 				iconId: this.$$model.iconId,
 				id: this.$$model.id,
 				name: this.$$model.name,
@@ -6057,6 +6060,12 @@ ViewModel.mappings = {
 			}
 
 			return {
+				get tradingUnit() {
+					return ViewModel.mappings[TradingUnitViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "tradingUnit-CommoditySummaryModel"]
+					);
+				},
 				iconId: true,
 				id: true,
 				name: true,
@@ -6067,6 +6076,7 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new CommoditySummaryModel(null);
+			"tradingUnit" in data && (item.tradingUnit = data.tradingUnit && ViewModel.mappings[TradingUnitViewModel.name].toViewModel(data.tradingUnit));
 			"iconId" in data && (item.iconId = data.iconId === null ? null : `${data.iconId}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
@@ -6085,6 +6095,7 @@ ViewModel.mappings = {
 				model = new Commodity();
 			}
 			
+			"tradingUnit" in viewModel && (model.tradingUnit.id = viewModel.tradingUnit ? viewModel.tradingUnit.id : null);
 			"iconId" in viewModel && (model.iconId = viewModel.iconId === null ? null : `${viewModel.iconId}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
@@ -6377,6 +6388,84 @@ ViewModel.mappings = {
 			"bidHigh" in viewModel && (model.bidHigh = viewModel.bidHigh === null ? null : +viewModel.bidHigh);
 			"bidVolume" in viewModel && (model.bidVolume = viewModel.bidVolume === null ? null : +viewModel.bidVolume);
 			"bidCapitalization" in viewModel && (model.bidCapitalization = viewModel.bidCapitalization === null ? null : +viewModel.bidCapitalization);
+
+			return model;
+		}
+	},
+	[TradingUnitViewModel.name]: class ComposedTradingUnitViewModel extends TradingUnitViewModel {
+		async map() {
+			return {
+				baseUnit: this.$$model.baseUnit,
+				format: this.$$model.format,
+				id: this.$$model.id,
+				name: this.$$model.name,
+				shorthands: this.$$model.shorthands,
+				whole: this.$$model.whole
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				baseUnit: true,
+				format: true,
+				id: true,
+				name: true,
+				shorthands: true,
+				whole: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new TradingUnitViewModel(null);
+			"baseUnit" in data && (item.baseUnit = data.baseUnit === null ? null : `${data.baseUnit}`);
+			"format" in data && (item.format = data.format === null ? null : `${data.format}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"shorthands" in data && (item.shorthands = data.shorthands === null ? null : `${data.shorthands}`);
+			"whole" in data && (item.whole = !!data.whole);
+
+			return item;
+		}
+
+		static async toModel(viewModel: TradingUnitViewModel) {
+			let model: CommodityTradingUnit;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(CommodityTradingUnit).find(viewModel.id)
+			} else {
+				model = new CommodityTradingUnit();
+			}
+			
+			"baseUnit" in viewModel && (model.baseUnit = viewModel.baseUnit === null ? null : `${viewModel.baseUnit}`);
+			"format" in viewModel && (model.format = viewModel.format === null ? null : `${viewModel.format}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"shorthands" in viewModel && (model.shorthands = viewModel.shorthands === null ? null : `${viewModel.shorthands}`);
+			"whole" in viewModel && (model.whole = !!viewModel.whole);
 
 			return model;
 		}
@@ -10146,6 +10235,7 @@ ViewModel.mappings = {
 				category: new CommodityCategorySummaryModel(await BaseServer.unwrap(this.$$model.category)),
 				asks: (await this.$$model.asks.includeTree(ViewModel.mappings[CommodityAskViewModel.name].items).toArray()).map(item => new CommodityAskViewModel(item)),
 				bids: (await this.$$model.bids.includeTree(ViewModel.mappings[CommodityBidViewModel.name].items).toArray()).map(item => new CommodityBidViewModel(item)),
+				tradingUnit: new TradingUnitViewModel(await BaseServer.unwrap(this.$$model.tradingUnit)),
 				description: this.$$model.description,
 				iconId: this.$$model.iconId,
 				id: this.$$model.id,
@@ -10200,6 +10290,12 @@ ViewModel.mappings = {
 						[...parents, "bids-CommodityViewModel"]
 					);
 				},
+				get tradingUnit() {
+					return ViewModel.mappings[TradingUnitViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "tradingUnit-CommodityViewModel"]
+					);
+				},
 				description: true,
 				iconId: true,
 				id: true,
@@ -10215,6 +10311,7 @@ ViewModel.mappings = {
 			"category" in data && (item.category = data.category && ViewModel.mappings[CommodityCategorySummaryModel.name].toViewModel(data.category));
 			"asks" in data && (item.asks = data.asks && [...data.asks].map(i => ViewModel.mappings[CommodityAskViewModel.name].toViewModel(i)));
 			"bids" in data && (item.bids = data.bids && [...data.bids].map(i => ViewModel.mappings[CommodityBidViewModel.name].toViewModel(i)));
+			"tradingUnit" in data && (item.tradingUnit = data.tradingUnit && ViewModel.mappings[TradingUnitViewModel.name].toViewModel(data.tradingUnit));
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"iconId" in data && (item.iconId = data.iconId === null ? null : `${data.iconId}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
@@ -10238,6 +10335,7 @@ ViewModel.mappings = {
 			"category" in viewModel && (model.category.id = viewModel.category ? viewModel.category.id : null);
 			"asks" in viewModel && (null);
 			"bids" in viewModel && (null);
+			"tradingUnit" in viewModel && (model.tradingUnit.id = viewModel.tradingUnit ? viewModel.tradingUnit.id : null);
 			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"iconId" in viewModel && (model.iconId = viewModel.iconId === null ? null : `${viewModel.iconId}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);

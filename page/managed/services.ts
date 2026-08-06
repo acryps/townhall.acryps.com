@@ -935,6 +935,7 @@ export class BidViewModel {
 }
 
 export class CommoditySummaryModel {
+	tradingUnit: TradingUnitViewModel;
 	iconId: string;
 	id: string;
 	name: string;
@@ -943,6 +944,7 @@ export class CommoditySummaryModel {
 
 	private static $build(raw) {
 		const item = new CommoditySummaryModel();
+		raw.tradingUnit === undefined || (item.tradingUnit = raw.tradingUnit ? TradingUnitViewModel["$build"](raw.tradingUnit) : null)
 		raw.iconId === undefined || (item.iconId = raw.iconId === null ? null : `${raw.iconId}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
@@ -1026,6 +1028,27 @@ export class LiveCommodityTickerResponseModel {
 		raw.bidHigh === undefined || (item.bidHigh = raw.bidHigh === null ? null : +raw.bidHigh)
 		raw.bidVolume === undefined || (item.bidVolume = raw.bidVolume === null ? null : +raw.bidVolume)
 		raw.bidCapitalization === undefined || (item.bidCapitalization = raw.bidCapitalization === null ? null : +raw.bidCapitalization)
+		
+		return item;
+	}
+}
+
+export class TradingUnitViewModel {
+	baseUnit: string;
+	format: string;
+	id: string;
+	name: string;
+	shorthands: string;
+	whole: boolean;
+
+	private static $build(raw) {
+		const item = new TradingUnitViewModel();
+		raw.baseUnit === undefined || (item.baseUnit = raw.baseUnit === null ? null : `${raw.baseUnit}`)
+		raw.format === undefined || (item.format = raw.format === null ? null : `${raw.format}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.shorthands === undefined || (item.shorthands = raw.shorthands === null ? null : `${raw.shorthands}`)
+		raw.whole === undefined || (item.whole = !!raw.whole)
 		
 		return item;
 	}
@@ -1938,6 +1961,7 @@ export class CommodityViewModel {
 	category: CommodityCategorySummaryModel;
 	asks: CommodityAskViewModel[];
 	bids: CommodityBidViewModel[];
+	tradingUnit: TradingUnitViewModel;
 	description: string;
 	iconId: string;
 	id: string;
@@ -1951,6 +1975,7 @@ export class CommodityViewModel {
 		raw.category === undefined || (item.category = raw.category ? CommodityCategorySummaryModel["$build"](raw.category) : null)
 		raw.asks === undefined || (item.asks = raw.asks ? raw.asks.map(i => CommodityAskViewModel["$build"](i)) : null)
 		raw.bids === undefined || (item.bids = raw.bids ? raw.bids.map(i => CommodityBidViewModel["$build"](i)) : null)
+		raw.tradingUnit === undefined || (item.tradingUnit = raw.tradingUnit ? TradingUnitViewModel["$build"](raw.tradingUnit) : null)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.iconId === undefined || (item.iconId = raw.iconId === null ? null : `${raw.iconId}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)

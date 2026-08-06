@@ -1,6 +1,7 @@
 import { Component } from "@acryps/page";
 import { LegalEntityComponent } from "../../shared/legal-entity";
 import { LegalEntityViewModel, MarketService, StockSeedViewModel, StockViewModel } from "../../managed/services";
+import { formatTradingUnit } from "../../../interface/trading-unit";
 
 export class StockComponent extends Component {
 	stock: StockViewModel[];
@@ -37,15 +38,17 @@ export class StockComponent extends Component {
 						</ui-quality>
 					</ui-commodity>
 
-					<ui-quantity>
+					{item.commodity.tradingUnit ?  <ui-quantity>
+						{formatTradingUnit(item.commodity.tradingUnit, item.quantity)}
+					</ui-quantity> : <ui-quantity>
 						<ui-number>
 							{item.quantity}
 						</ui-number>
 
 						<ui-unit>
-							{item.commodity.unit}
+							{item.commodity.tradingUnit}
 						</ui-unit>
-					</ui-quantity>
+					</ui-quantity>}
 				</ui-item>)}
 
 				{this.openSeedStock.map(seed => <ui-item>

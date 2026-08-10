@@ -2,6 +2,7 @@ import { Component } from "@acryps/page";
 import { CommoditySummaryModel, LiveCommodityTickerResponseModel, MarketService } from "../managed/services";
 import { marketIcon } from "../assets/icons/managed";
 import { CommodityTickerComponent } from "./ticker";
+import { MarketSymbolsComponent } from "./symbols";
 
 export class MarketPage extends Component {
 	commodities: CommoditySummaryModel[];
@@ -9,6 +10,8 @@ export class MarketPage extends Component {
 	tickers: CommodityTickerComponent[];
 
 	search: HTMLInputElement;
+
+	symbols = new MarketSymbolsComponent(this);
 
 	sorters = [
 		new Sorter('Name', (a, b) => 0), // name is always applied first
@@ -43,6 +46,8 @@ export class MarketPage extends Component {
 
 	async updateTicker() {
 		const update = await new MarketService().getTickers();
+
+		this.symbols.updateTicker(update);
 
 		for (let ticker of update) {
 			const component = this.tickers.find(component => component.commodity.id == ticker.commodityId);
@@ -81,6 +86,8 @@ export class MarketPage extends Component {
 					{marketIcon()} Market
 				</ui-header>
 
+				{this.symbols}
+
 				{child}
 			</ui-market>
 		}
@@ -101,6 +108,8 @@ export class MarketPage extends Component {
 			<ui-header ui-href='/market'>
 				{marketIcon()} Market
 			</ui-header>
+
+			{this.symbols}
 
 			<ui-title>
 				Market

@@ -1,4 +1,4 @@
-import { alignItems, alignSelf, aspectRatio, backgroundColor, border, borderTop, ch, child, color, cursor, display, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, height, justifyContent, Keyframes, margin, marginBottom, marginInline, marginLeft, marginRight, marginTop, maxHeight, minWidth, objectFit, objectPosition, outline, padding, paddingBlock, PaddingBlockStyleProperty, paddingInline, percentage, pointerEvents, px, ratio, rem, seconds, textAlign, textDecoration, textDecorationLine, vh, width } from "@acryps/style";
+import { alignItems, alignSelf, animationDelay, animationIterationCount, aspectRatio, backgroundColor, border, borderTop, ch, child, color, cursor, display, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, height, imageRendering, justifyContent, Keyframes, margin, marginBottom, marginInline, marginLeft, marginRight, marginTop, maxHeight, minWidth, objectFit, objectPosition, outline, overflow, overflowWrap, padding, paddingBlock, PaddingBlockStyleProperty, paddingBottom, paddingInline, paddingLeft, percentage, pointerEvents, px, ratio, rem, seconds, textAlign, textDecoration, textDecorationLine, transform, translateX, Variable, vh, whiteSpace, width } from "@acryps/style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { pageBackgroundColor, pageGutter, pageTextColor } from "../index.style";
 import { card } from "../shared/card.style";
@@ -9,6 +9,7 @@ import { inputStyle } from "../shared/field.style";
 import { commodityStyle } from "./commodity/index.style";
 import { marketEntityStyle } from "./entity/index.style";
 import { residentAsessmentDistributionStyle } from "./assessment/distribution/index.style";
+import { microFont } from "../assets/font/index.style";
 
 export const marketStyle = () => child('ui-market',
 	display('block'),
@@ -20,6 +21,22 @@ export const marketStyle = () => child('ui-market',
 	residentAsessmentDistributionStyle(),
 
 	changeAnimation,
+
+	child('ui-symbols',
+		display('block'),
+		margin(pageGutter.invert()),
+		marginBottom(pageGutter),
+
+		color(pageBackgroundColor),
+		backgroundColor(pageTextColor),
+
+		child('canvas',
+			width(percentage(100)),
+			height(rem(1.5)),
+
+			imageRendering('pixelated')
+		)
+	),
 
 	child('ui-title',
 		display('block'),

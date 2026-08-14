@@ -23,6 +23,7 @@ export class MarketCycleGenerator {
 		await cycle.create();
 
 		const logger = new Logger('market cycle').child(cycle.id.split('-')[0]);
+		logger.log(`cycle opened`);
 
 		const steps = this.steps();
 
@@ -42,5 +43,7 @@ export class MarketCycleGenerator {
 
 		cycle.closed = new Date();
 		await cycle.update();
+
+		logger.log(`cycle closed`);
 	}
 }

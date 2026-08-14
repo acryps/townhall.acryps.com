@@ -1,13 +1,13 @@
 import { MarketCycleGeneratorStep } from ".";
 import { Time } from "../../../../interface/time";
 import { formatTradingUnit, parseTradingUnitValue } from "../../../../interface/trading-unit";
-import { SystemMessage, ToolError, UserMessage } from "../../../life/interpreter";
-import { StockSeedRule, StockSeedRuleOperation, StockSeedRuleProperty } from "../../../managed/database";
+import { AssistantMessage, Interpreter, SystemMessage, ToolError, UserMessage } from "../../../life/interpreter";
+import { Commodity, CommodityTradingUnit, StockSeedRule, StockSeedRuleOperation, StockSeedRuleProperty } from "../../../managed/database";
 
 export class StockSeedRuleMarketCycleGeneratorStep extends MarketCycleGeneratorStep {
 	async generate() {
 		const commodity = await this.database.commodity
-			.orderByAscending(commodity => commodity.id) // pseudo-random
+			.orderByAscending(commodity => commodity.innovated) // make the more basic items first
 			.where(commodity => commodity.tradingUnit != null) // only with proper units
 			.first(commodity => commodity.seedRulesCreated == null);
 
@@ -74,6 +74,12 @@ export class StockSeedRuleMarketCycleGeneratorStep extends MarketCycleGeneratorS
 
 			Beware that there are a lot of tradable items, even if this is a item that some people would have, you can be very restricting with your rules.
 			For example, only make people with some parameter over 0.8 own some things, and do not even define a rule for anything under that.
+
+			You must also say how likely it is for a private resident to have this commodity.
+			Call the 'ownershipLikeliness' tool with a value from 0.0 - 1.0.
+			1.0 = everyone must have this at home (a bed)
+			0.9 = most people (like milk, some people dont like it)
+			0.1 = rare (some mortar, not everyone is a builder...)
 		`)]);
 
 		// create a tool for each parameter that is available
@@ -148,13 +154,68 @@ export class StockSeedRuleMarketCycleGeneratorStep extends MarketCycleGeneratorS
 			});
 		}
 
-		await interpreter.execute(new UserMessage(`
-			Commodity: ${commodity.name}
-			Traded in ${unitBaseValue} units, example: '${formatTradingUnit(unit, unitBaseline * 2)}', '${formatTradingUnit(unit, unitBaseline * 3.14)}'.
-			All quantity rules must use this unit format!
+		interpreter.addTool('ownershipLikeliness', [{ name: 'likeliness', type: Number }], likeliness => {
+			this.logger.log(`ownership likeliness: ${likeliness}`);
 
-			${commodity.description}
-		`));
+			commodity.residentialOwnershipLikeliness = likeliness;
+		});
+
+		// show some examples
+		this.logger.log('preparing examples');
+
+		const examples = await this.database.commodity
+			.orderByAscending(commodity => commodity.id)
+			.where(commodity => commodity.seedRulesCreated != null)
+			.include(commodity => commodity.tradingUnit)
+			.include(commodity => commodity.stockSeedRules)
+			.limit(30)
+			.toArray();
+
+		examples.sort(() => Math.random() > 0.5 ? 1 : -1);
+
+		for (let example of examples.slice(0, 10)) {
+			const unit = await example.tradingUnit.fetch();
+			const unitBaseline = 10 ** example.tradingUnitRetailBaseline;
+
+			const toolCalls: string[] = [];
+
+			for (let rule of await example.stockSeedRules.toArray()) {
+				const parameter = parameters.find(parameter => parameter.id == rule.parameterId);
+
+				const convertValueBoundary = (value: number) => {
+					switch (rule.property) {
+						case StockSeedRuleProperty.quality: {
+							return value;
+						}
+
+						case StockSeedRuleProperty.quantity: {
+							return formatTradingUnit(unit, value);
+						}
+					}
+				};
+
+				toolCalls.push(Interpreter.simulateToolReponse(parameter.name, {
+					parameterMinimum: rule.parameterMinimum,
+					parameterMaximum: rule.parameterMaximum,
+					property: rule.property,
+					operation: Object.entries(operations).find(([shorthand, operation]) => rule.operation == operation)[0],
+					valueMinimum: convertValueBoundary(rule.valueMinimum),
+					valueMaximum: convertValueBoundary(rule.valueMaximum)
+				}).message);
+			}
+
+			toolCalls.push(Interpreter.simulateToolReponse('ownershipLikeliness', {
+				likeliness: example.residentialOwnershipLikeliness
+			}).message);
+
+			interpreter.remember([
+				this.commodityMessage(example, unit, unitBaseline),
+
+				new AssistantMessage(toolCalls.join('\n'))
+			]);
+		}
+
+		await interpreter.execute(this.commodityMessage(commodity, unit, unitBaseline));
 
 		for (let rule of rules) {
 			const parameter = await rule.parameter.fetch();
@@ -165,5 +226,15 @@ export class StockSeedRuleMarketCycleGeneratorStep extends MarketCycleGeneratorS
 
 		commodity.seedRulesCreated = new Date();
 		await commodity.update();
+	}
+
+	private commodityMessage(commodity: Commodity, unit: CommodityTradingUnit, unitBaseline: number) {
+		return new UserMessage(`
+			Commodity: ${commodity.name}
+			Traded in ${formatTradingUnit(unit, unitBaseline)} units, example: '${formatTradingUnit(unit, unitBaseline * 2)}', '${formatTradingUnit(unit, unitBaseline * 3.14)}'.
+			All quantity rules must use this unit format!
+
+			${commodity.description}
+		`);
 	}
 }

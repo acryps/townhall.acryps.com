@@ -235,6 +235,13 @@ export class TradingEntity {
 			}
 		}
 
+		// filter ownership likeliness
+		for (let entry of [...stock]) {
+			if (HashRandom.random([resident.id, entry.commodity.id]) < entry.commodity.residentialOwnershipLikeliness) {
+				stock.splice(stock.indexOf(entry), 1);
+			}
+		}
+
 		// assign quality to given stock
 		for (let qualityRule of qualityRules) {
 			for (let entry of stock) {

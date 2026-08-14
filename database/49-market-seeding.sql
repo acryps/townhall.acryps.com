@@ -1,4 +1,5 @@
 ALTER TABLE commodity ADD seed_rules_created TIMESTAMP;
+ALTER TABLE commodity ADD residential_ownership_likeliness REAL;
 
 CREATE TYPE stock_seed_rule_property AS ENUM ('quantity', 'quality');
 CREATE TYPE stock_seed_rule_operation AS ENUM ('apply', 'add', 'subtract');

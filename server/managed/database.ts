@@ -871,6 +871,7 @@ export class CommodityQueryProxy extends QueryProxy {
 	get innovated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get innovationCycleId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get residentialOwnershipLikeliness(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get seedRulesCreated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get symbol(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -902,6 +903,7 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 	innovated: Date;
 	innovationCycleId: string;
 	name: string;
+	residentialOwnershipLikeliness: number;
 	seedRulesCreated: Date;
 	symbol: string;
 	tag: string;
@@ -923,6 +925,7 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 			innovated: { type: "timestamp", name: "innovated" },
 			innovationCycleId: { type: "uuid", name: "innovation_cycle_id" },
 			name: { type: "text", name: "name" },
+			residentialOwnershipLikeliness: { type: "float4", name: "residential_ownership_likeliness" },
 			seedRulesCreated: { type: "timestamp", name: "seed_rules_created" },
 			symbol: { type: "text", name: "symbol" },
 			tag: { type: "text", name: "tag" },

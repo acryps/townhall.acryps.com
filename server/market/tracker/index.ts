@@ -125,8 +125,6 @@ export class MarketTracker {
 
 			const size = assessmentCount * (rule.valueMaximum + rule.valueMinimum) / 2;
 
-			console.log(rule.id, rule.operation, volume, assessmentCount, size);
-
 			switch (rule.operation) {
 				case StockSeedRuleOperation.add:
 				case StockSeedRuleOperation.apply: {
@@ -142,6 +140,9 @@ export class MarketTracker {
 				}
 			}
 		}
+
+		// averages out over the residents
+		volume *= commodity.residentialOwnershipLikeliness;
 
 		return volume;
 	}

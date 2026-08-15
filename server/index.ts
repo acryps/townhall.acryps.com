@@ -87,17 +87,22 @@ DbClient.connectedClient.connect().then(async () => {
 	const marketLogger = new Logger('market');
 
 	const marketTracker = new MarketTracker(new Logger('tracker', marketLogger), database);
-	/// marketTracker.update();
+	marketTracker.update();
 
-	// setInterval(() => marketTracker.update(), 1000 * 60);
+	setInterval(() => marketTracker.update(), 1000 * 60);
 
 	if (runMarket) {
 		marketTracker.dump();
 
-		while (1) {
-			const cycle = new MarketCycleGenerator(database, marketTracker);
+		const cycle = new MarketCycleGenerator(database, marketTracker);
+
+		const nextMarketCycle = async () => {
 			await cycle.advance();
-		}
+
+			setTimeout(() => nextMarketCycle(), 1000 * 10);
+		};
+
+		nextMarketCycle();
 	}
 
 	await registerMetrics(database);

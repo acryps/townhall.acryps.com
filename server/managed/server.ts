@@ -6030,8 +6030,7 @@ ViewModel.mappings = {
 				id: this.$$model.id,
 				name: this.$$model.name,
 				symbol: this.$$model.symbol,
-				tag: this.$$model.tag,
-				unit: this.$$model.unit
+				tag: this.$$model.tag
 			}
 		};
 
@@ -6071,8 +6070,7 @@ ViewModel.mappings = {
 				id: true,
 				name: true,
 				symbol: true,
-				tag: true,
-				unit: true
+				tag: true
 			};
 		};
 
@@ -6084,7 +6082,6 @@ ViewModel.mappings = {
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"symbol" in data && (item.symbol = data.symbol === null ? null : `${data.symbol}`);
 			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
-			"unit" in data && (item.unit = data.unit === null ? null : `${data.unit}`);
 
 			return item;
 		}
@@ -6104,7 +6101,6 @@ ViewModel.mappings = {
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"symbol" in viewModel && (model.symbol = viewModel.symbol === null ? null : `${viewModel.symbol}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
-			"unit" in viewModel && (model.unit = viewModel.unit === null ? null : `${viewModel.unit}`);
 
 			return model;
 		}
@@ -10255,7 +10251,8 @@ ViewModel.mappings = {
 				name: this.$$model.name,
 				symbol: this.$$model.symbol,
 				tag: this.$$model.tag,
-				unit: this.$$model.unit
+				tradingUnitCommercialBaseline: this.$$model.tradingUnitCommercialBaseline,
+				tradingUnitRetailBaseline: this.$$model.tradingUnitRetailBaseline
 			}
 		};
 
@@ -10316,7 +10313,8 @@ ViewModel.mappings = {
 				name: true,
 				symbol: true,
 				tag: true,
-				unit: true
+				tradingUnitCommercialBaseline: true,
+				tradingUnitRetailBaseline: true
 			};
 		};
 
@@ -10333,7 +10331,8 @@ ViewModel.mappings = {
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"symbol" in data && (item.symbol = data.symbol === null ? null : `${data.symbol}`);
 			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
-			"unit" in data && (item.unit = data.unit === null ? null : `${data.unit}`);
+			"tradingUnitCommercialBaseline" in data && (item.tradingUnitCommercialBaseline = data.tradingUnitCommercialBaseline === null ? null : +data.tradingUnitCommercialBaseline);
+			"tradingUnitRetailBaseline" in data && (item.tradingUnitRetailBaseline = data.tradingUnitRetailBaseline === null ? null : +data.tradingUnitRetailBaseline);
 
 			return item;
 		}
@@ -10358,7 +10357,8 @@ ViewModel.mappings = {
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"symbol" in viewModel && (model.symbol = viewModel.symbol === null ? null : `${viewModel.symbol}`);
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
-			"unit" in viewModel && (model.unit = viewModel.unit === null ? null : `${viewModel.unit}`);
+			"tradingUnitCommercialBaseline" in viewModel && (model.tradingUnitCommercialBaseline = viewModel.tradingUnitCommercialBaseline === null ? null : +viewModel.tradingUnitCommercialBaseline);
+			"tradingUnitRetailBaseline" in viewModel && (model.tradingUnitRetailBaseline = viewModel.tradingUnitRetailBaseline === null ? null : +viewModel.tradingUnitRetailBaseline);
 
 			return model;
 		}

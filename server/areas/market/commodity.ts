@@ -12,7 +12,6 @@ export class CommoditySummaryModel extends ViewModel<Commodity> {
 	symbol;
 
 	name;
-	unit;
 
 	tradingUnit: TradingUnitViewModel;
 }
@@ -21,6 +20,9 @@ export class CommodityViewModel extends CommoditySummaryModel {
 	innovated;
 	description;
 	category: CommodityCategorySummaryModel;
+
+	tradingUnitCommercialBaseline;
+	tradingUnitRetailBaseline;
 
 	asks: CommodityAskViewModel[];
 	bids: CommodityBidViewModel[];

@@ -29,8 +29,6 @@ export class StockSeedRuleMarketCycleGeneratorStep extends MarketCycleGeneratorS
 		const interpreter = this.getInterpreter();
 
 		interpreter.remember([new SystemMessage(`
-			We are creating a market simulation. Current year: ${new Time(new Date()).year}, our imaginary country is somewhere in Europe, a mix between Switzerland and England.
-
 			Your job is to figure out, how much of a given commodity a certain group of people owns.
 			Each commodity has a quality variable, ranging from 0 (basic / economic version) to 20 (advanced / high quality version).
 

@@ -356,7 +356,9 @@ export class InterpreterMessage {
 	constructor(
 		public role: string,
 		public message: string
-	) {}
+	) {
+		message = message.split('\n').map(line => line.trim()).join('\n');
+	}
 
 	toOllamaMessage() {
 		return {

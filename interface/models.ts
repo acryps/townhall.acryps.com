@@ -412,6 +412,12 @@ export interface CommodityCategorySummaryModel {
 	name: string;
 }
 
+export interface DemandViewModel {
+    active: boolean;
+	activates: Date;
+	target: number;
+}
+
 export interface StockViewModel {
     commodity: CommoditySummaryModel;
 	quantity: number;
@@ -440,6 +446,7 @@ export interface LiveCommodityTickerResponseModel {
 	bidVolume: number;
 	bidCapitalization: number;
 	estimatedStockSize: number;
+	estimatedDemandTarget: number;
 }
 
 export interface TradingUnitViewModel {
@@ -834,6 +841,7 @@ export interface CommodityViewModel {
 	asks: CommodityAskViewModel[];
 	bids: CommodityBidViewModel[];
 	tradingUnit: TradingUnitViewModel;
+	activeResidentialDemandId: string;
 	description: string;
 	iconId: string;
 	id: string;

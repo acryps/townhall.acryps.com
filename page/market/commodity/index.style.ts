@@ -1,5 +1,6 @@
-import { backgroundColor, ch, child, display, flexBasis, flexGrow, flexShrink, fontSize, fontWeight, gap, height, hsl, justifyContent, lineHeight, marginBottom, marginLeft, marginRight, overflow, percentage, Percentage, px, rem, rgb, textAlign, textOverflow, Variable, whiteSpace, width } from "@acryps/style";
+import { backgroundColor, border, borderBottom, ch, child, display, flexBasis, flexGrow, flexShrink, fontSize, fontWeight, gap, height, hsl, justifyContent, lineHeight, marginBottom, marginLeft, marginRight, overflow, padding, percentage, Percentage, px, rem, rgb, textAlign, textOverflow, Variable, whiteSpace, width } from "@acryps/style";
 import { pageGutter } from "../../index.style";
+import { tabsStyle } from "../../shared/tabs/index.style";
 
 export const positionIntensity = new Variable<Number>('intensity');
 
@@ -23,15 +24,32 @@ export const commodityStyle = () => child('ui-commodity',
 		marginBottom(pageGutter)
 	),
 
-	child('ui-positions',
-		display('flex'),
-		gap(pageGutter),
+	tabsStyle(
+		child('ui-demand',
+			display('block'),
 
-		overflow('hidden'),
+			child('ui-description',
+				display('block'),
+				marginBottom(pageGutter)
+			),
+
+			child('ui-timeline',
+				display('block'),
+				marginBottom(rem(2)),
+
+				border(px(1), 'solid', 'currentColor'),
+
+				child('ui-demand',
+					display('flex'),
+					justifyContent('space-between'),
+					padding(pageGutter),
+
+					borderBottom(px(1), 'dotted', 'currentColor')
+				)
+			),
+		),
 
 		child('ui-positions',
-			width(percentage(50)),
-
 			display('block'),
 			overflow('hidden'),
 

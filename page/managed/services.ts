@@ -968,6 +968,21 @@ export class CommodityCategorySummaryModel {
 	}
 }
 
+export class DemandViewModel {
+	active: boolean;
+	activates: Date;
+	target: number;
+
+	private static $build(raw) {
+		const item = new DemandViewModel();
+		raw.active === undefined || (item.active = !!raw.active)
+		raw.activates === undefined || (item.activates = raw.activates ? new Date(raw.activates) : null)
+		raw.target === undefined || (item.target = raw.target === null ? null : +raw.target)
+		
+		return item;
+	}
+}
+
 export class StockViewModel {
 	commodity: CommoditySummaryModel;
 	quantity: number;
@@ -1017,6 +1032,7 @@ export class LiveCommodityTickerResponseModel {
 	bidVolume: number;
 	bidCapitalization: number;
 	estimatedStockSize: number;
+	estimatedDemandTarget: number;
 
 	private static $build(raw) {
 		const item = new LiveCommodityTickerResponseModel();
@@ -1032,6 +1048,7 @@ export class LiveCommodityTickerResponseModel {
 		raw.bidVolume === undefined || (item.bidVolume = raw.bidVolume === null ? null : +raw.bidVolume)
 		raw.bidCapitalization === undefined || (item.bidCapitalization = raw.bidCapitalization === null ? null : +raw.bidCapitalization)
 		raw.estimatedStockSize === undefined || (item.estimatedStockSize = raw.estimatedStockSize === null ? null : +raw.estimatedStockSize)
+		raw.estimatedDemandTarget === undefined || (item.estimatedDemandTarget = raw.estimatedDemandTarget === null ? null : +raw.estimatedDemandTarget)
 		
 		return item;
 	}
@@ -1966,6 +1983,7 @@ export class CommodityViewModel {
 	asks: CommodityAskViewModel[];
 	bids: CommodityBidViewModel[];
 	tradingUnit: TradingUnitViewModel;
+	activeResidentialDemandId: string;
 	description: string;
 	iconId: string;
 	id: string;
@@ -1982,6 +2000,7 @@ export class CommodityViewModel {
 		raw.asks === undefined || (item.asks = raw.asks ? raw.asks.map(i => CommodityAskViewModel["$build"](i)) : null)
 		raw.bids === undefined || (item.bids = raw.bids ? raw.bids.map(i => CommodityBidViewModel["$build"](i)) : null)
 		raw.tradingUnit === undefined || (item.tradingUnit = raw.tradingUnit ? TradingUnitViewModel["$build"](raw.tradingUnit) : null)
+		raw.activeResidentialDemandId === undefined || (item.activeResidentialDemandId = raw.activeResidentialDemandId === null ? null : `${raw.activeResidentialDemandId}`)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.iconId === undefined || (item.iconId = raw.iconId === null ? null : `${raw.iconId}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
@@ -3742,6 +3761,27 @@ export class MarketService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : StockViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getDemand(commodityId: string): Promise<Array<DemandViewModel>> {
+		const $data = new FormData();
+		$data.append("I4aGgwOWxkMDlxMHo5M3E1YnFlbHRmcX", Service.stringify(commodityId))
+
+		return await fetch(Service.toURL("Vqc2k3aGo4emExOGlybnRqeGloemJnd3"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : DemandViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

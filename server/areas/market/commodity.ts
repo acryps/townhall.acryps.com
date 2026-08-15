@@ -17,6 +17,8 @@ export class CommoditySummaryModel extends ViewModel<Commodity> {
 }
 
 export class CommodityViewModel extends CommoditySummaryModel {
+	activeResidentialDemandId;
+
 	innovated;
 	description;
 	category: CommodityCategorySummaryModel;

@@ -5,6 +5,7 @@ import { Time } from "../../../interface/time";
 import { MarketPriceRange } from "./price-range";
 import { CommodityPriceTracker } from "./tracker";
 import { Logger } from "@acryps/log";
+import { Demand } from "./demand";
 
 export class MarketTracker {
 	trackers: CommodityPriceTracker[] = [];
@@ -36,6 +37,10 @@ export class MarketTracker {
 		this.logger.log(`update ${tasks.length} trackers`);
 
 		await Promise.all(tasks);
+	}
+
+	find(commodity: Commodity | string) {
+		return this.trackers.find(tracker => tracker.commodity.id == (typeof commodity == 'string' ? commodity : commodity.id));
 	}
 
 	// TODO fix when asks are present
@@ -113,6 +118,7 @@ export class MarketTracker {
 		bidRange.calculate();
 
 		tracker.estimatedStockSize = await this.estimateStockSize(commodity);
+		tracker.estimatedDemand = await this.estimateDemands(commodity);
 	}
 
 	// estimate the stock size of the commodity across the entire population
@@ -157,5 +163,54 @@ export class MarketTracker {
 		volume *= commodity.residentialOwnershipLikeliness;
 
 		return volume;
+	}
+
+	// calculate demands
+	private async estimateDemands(commodity: Commodity) {
+		const timeline: Demand[] = [];
+
+		for (let ruleset of await commodity.residentialDemand.toArray()) {
+			const rules = await ruleset.rules
+				.include(rule => rule.parameter)
+				.where(rule => rule.property == StockSeedRuleProperty.quantity)
+				.toArray();
+
+			const demand = new Demand();
+			demand.activates = ruleset.activates;
+			demand.active = commodity.activeResidentialDemandId == ruleset.id;
+			demand.target = 0;
+
+			timeline.push(demand);
+
+			for (let rule of rules) {
+				const parameter = await rule.parameter.fetch();
+
+				const assessmentCount = await parameter.assessments
+					.where(assessment => assessment.value.valueOf() >= rule.parameterMinimum && assessment.value.valueOf() < rule.parameterMaximum)
+					.count();
+
+				const size = assessmentCount * (rule.valueMaximum + rule.valueMinimum) / 2;
+
+				switch (rule.operation) {
+					case StockSeedRuleOperation.add:
+					case StockSeedRuleOperation.apply: {
+						demand.target += size;
+
+						break;
+					}
+
+					case StockSeedRuleOperation.subtract: {
+						demand.target -= size;
+
+						break;
+					}
+				}
+			}
+
+			// averages out over the residents
+			demand.target *= ruleset.likeliness;
+		}
+
+		return timeline;
 	}
 }

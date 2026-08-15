@@ -12,19 +12,16 @@ export class CommodityTickerComponent extends Component {
 
 	ticker: LiveCommodityTickerResponseModel;
 
-	ask = new RangeComponent(this, 'ask');
-	bid = new RangeComponent(this, 'bid');
-
 	estimatedStockSize = document.createTextNode('?');
+	estimatedDemandTarget = document.createTextNode('?');
 
 	constructor(
 		public commodity: CommoditySummaryModel
 	) {
 		super();
 
-		if (this.commodity.tradingUnit) {
-			this.estimatedStockSize.textContent = formatTradingUnit(this.commodity.tradingUnit, 0);
-		}
+		this.estimatedStockSize.textContent = formatTradingUnit(this.commodity.tradingUnit, 0);
+		this.estimatedDemandTarget.textContent = formatTradingUnit(this.commodity.tradingUnit, 0);
 	}
 
 	tick(ticker: LiveCommodityTickerResponseModel) {
@@ -37,12 +34,8 @@ export class CommodityTickerComponent extends Component {
 		this.ticker = ticker;
 
 		if (this.rootNode) {
-			this.ask.update();
-			this.bid.update();
-
-			if (this.commodity.tradingUnit) {
-				this.estimatedStockSize.textContent = formatTradingUnit(this.commodity.tradingUnit, this.ticker.estimatedStockSize);
-			}
+			this.estimatedStockSize.textContent = formatTradingUnit(this.commodity.tradingUnit, this.ticker.estimatedStockSize);
+			this.estimatedDemandTarget.textContent = formatTradingUnit(this.commodity.tradingUnit, this.ticker.estimatedDemandTarget);
 
 			this.last = updated;
 
@@ -75,31 +68,9 @@ export class CommodityTickerComponent extends Component {
 				</ui-header>
 
 				<ui-volume>
-					{this.estimatedStockSize} / {this.ask.capitalizationLabel} / {this.bid.capitalizationLabel}
+					SS={this.estimatedStockSize} / DT={this.estimatedDemandTarget}
 				</ui-volume>
 			</ui-detail>
-
-			<ui-price>
-				<ui-ask>
-					<ui-median>
-						{this.ask.priceLabel}
-					</ui-median>
-
-					<ui-spread>
-						±{this.ask.spreadLabel}
-					</ui-spread>
-				</ui-ask>
-
-				<ui-bid>
-					<ui-median>
-						{this.bid.priceLabel}
-					</ui-median>
-
-					<ui-spread>
-						±{this.bid.spreadLabel}
-					</ui-spread>
-				</ui-bid>
-			</ui-price>
 		</ui-commodity>;
 	}
 }

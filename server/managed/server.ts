@@ -90,6 +90,7 @@ import { CommodityBidViewModel } from "././../areas/market/bid";
 import { TraderBidViewModel } from "././../areas/market/bid";
 import { CommodityAskViewModel } from "././../areas/market/ask";
 import { TraderAskViewModel } from "././../areas/market/ask";
+import { DemandViewModel } from "././../areas/market/demand";
 import { MarketService } from "././../areas/market/service";
 import { MetricTracker } from "././../areas/metrics/tracker";
 import { MetricValueViewModel } from "././../areas/metrics/view";
@@ -237,6 +238,7 @@ import { ResidentRelationship } from "./../managed/database";
 import { TradeAsk } from "./../managed/database";
 import { TradeBid } from "./../managed/database";
 import { CommodityCategory } from "./../managed/database";
+import { Demand } from "./../market/tracker/demand";
 import { StockSeed } from "./../managed/database";
 import { CommodityTradingUnit } from "./../managed/database";
 import { Metric } from "./../managed/database";
@@ -1120,6 +1122,17 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(MarketService),
 			(controller, params) => controller.getStock(
 				params["pidzE4ZDFqd2AyaTBtMmNucGhnaTp0ND"]
+			)
+		);
+
+		this.expose(
+			"Vqc2k3aGo4emExOGlybnRqeGloemJnd3",
+			{
+			"I4aGgwOWxkMDlxMHo5M3E1YnFlbHRmcX": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(MarketService),
+			(controller, params) => controller.getDemand(
+				params["I4aGgwOWxkMDlxMHo5M3E1YnFlbHRmcX"]
 			)
 		);
 
@@ -6167,6 +6180,66 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[DemandViewModel.name]: class ComposedDemandViewModel extends DemandViewModel {
+		async map() {
+			return {
+				active: this.$$model.active,
+				activates: this.$$model.activates,
+				target: this.$$model.target
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				active: true,
+				activates: true,
+				target: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new DemandViewModel(null);
+			"active" in data && (item.active = !!data.active);
+			"activates" in data && (item.activates = data.activates === null ? null : new Date(data.activates));
+			"target" in data && (item.target = data.target === null ? null : +data.target);
+
+			return item;
+		}
+
+		static async toModel(viewModel: DemandViewModel) {
+			const model = new Demand();
+			
+			"active" in viewModel && (model.active = !!viewModel.active);
+			"activates" in viewModel && (model.activates = viewModel.activates === null ? null : new Date(viewModel.activates));
+			"target" in viewModel && (model.target = viewModel.target === null ? null : +viewModel.target);
+
+			return model;
+		}
+	},
 	[StockViewModel.name]: class ComposedStockViewModel extends StockViewModel {
 		async map() {
 			return {
@@ -6318,7 +6391,8 @@ ViewModel.mappings = {
 				bidHigh: this.$$model.bidHigh,
 				bidVolume: this.$$model.bidVolume,
 				bidCapitalization: this.$$model.bidCapitalization,
-				estimatedStockSize: this.$$model.estimatedStockSize
+				estimatedStockSize: this.$$model.estimatedStockSize,
+				estimatedDemandTarget: this.$$model.estimatedDemandTarget
 			}
 		};
 
@@ -6359,7 +6433,8 @@ ViewModel.mappings = {
 				bidHigh: true,
 				bidVolume: true,
 				bidCapitalization: true,
-				estimatedStockSize: true
+				estimatedStockSize: true,
+				estimatedDemandTarget: true
 			};
 		};
 
@@ -6377,6 +6452,7 @@ ViewModel.mappings = {
 			"bidVolume" in data && (item.bidVolume = data.bidVolume === null ? null : +data.bidVolume);
 			"bidCapitalization" in data && (item.bidCapitalization = data.bidCapitalization === null ? null : +data.bidCapitalization);
 			"estimatedStockSize" in data && (item.estimatedStockSize = data.estimatedStockSize === null ? null : +data.estimatedStockSize);
+			"estimatedDemandTarget" in data && (item.estimatedDemandTarget = data.estimatedDemandTarget === null ? null : +data.estimatedDemandTarget);
 
 			return item;
 		}
@@ -6396,6 +6472,7 @@ ViewModel.mappings = {
 			"bidVolume" in viewModel && (model.bidVolume = viewModel.bidVolume === null ? null : +viewModel.bidVolume);
 			"bidCapitalization" in viewModel && (model.bidCapitalization = viewModel.bidCapitalization === null ? null : +viewModel.bidCapitalization);
 			"estimatedStockSize" in viewModel && (model.estimatedStockSize = viewModel.estimatedStockSize === null ? null : +viewModel.estimatedStockSize);
+			"estimatedDemandTarget" in viewModel && (model.estimatedDemandTarget = viewModel.estimatedDemandTarget === null ? null : +viewModel.estimatedDemandTarget);
 
 			return model;
 		}
@@ -10244,6 +10321,7 @@ ViewModel.mappings = {
 				asks: (await this.$$model.asks.includeTree(ViewModel.mappings[CommodityAskViewModel.name].items).toArray()).map(item => new CommodityAskViewModel(item)),
 				bids: (await this.$$model.bids.includeTree(ViewModel.mappings[CommodityBidViewModel.name].items).toArray()).map(item => new CommodityBidViewModel(item)),
 				tradingUnit: new TradingUnitViewModel(await BaseServer.unwrap(this.$$model.tradingUnit)),
+				activeResidentialDemandId: this.$$model.activeResidentialDemandId,
 				description: this.$$model.description,
 				iconId: this.$$model.iconId,
 				id: this.$$model.id,
@@ -10306,6 +10384,7 @@ ViewModel.mappings = {
 						[...parents, "tradingUnit-CommodityViewModel"]
 					);
 				},
+				activeResidentialDemandId: true,
 				description: true,
 				iconId: true,
 				id: true,
@@ -10324,6 +10403,7 @@ ViewModel.mappings = {
 			"asks" in data && (item.asks = data.asks && [...data.asks].map(i => ViewModel.mappings[CommodityAskViewModel.name].toViewModel(i)));
 			"bids" in data && (item.bids = data.bids && [...data.bids].map(i => ViewModel.mappings[CommodityBidViewModel.name].toViewModel(i)));
 			"tradingUnit" in data && (item.tradingUnit = data.tradingUnit && ViewModel.mappings[TradingUnitViewModel.name].toViewModel(data.tradingUnit));
+			"activeResidentialDemandId" in data && (item.activeResidentialDemandId = data.activeResidentialDemandId === null ? null : `${data.activeResidentialDemandId}`);
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"iconId" in data && (item.iconId = data.iconId === null ? null : `${data.iconId}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
@@ -10350,6 +10430,7 @@ ViewModel.mappings = {
 			"asks" in viewModel && (null);
 			"bids" in viewModel && (null);
 			"tradingUnit" in viewModel && (model.tradingUnit.id = viewModel.tradingUnit ? viewModel.tradingUnit.id : null);
+			"activeResidentialDemandId" in viewModel && (model.activeResidentialDemandId = viewModel.activeResidentialDemandId === null ? null : `${viewModel.activeResidentialDemandId}`);
 			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"iconId" in viewModel && (model.iconId = viewModel.iconId === null ? null : `${viewModel.iconId}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);

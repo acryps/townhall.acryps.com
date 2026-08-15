@@ -6,6 +6,9 @@ import { positionIntensity } from "./index.style";
 import { percentage } from "@acryps/style";
 import { convertToCurrency } from "../../../interface/currency";
 import { formatTradingUnit } from "../../../interface/trading-unit";
+import { Tabs } from "../../shared/tabs";
+import { CommodityPositionsTab } from "./positions";
+import { CommodityDemandTab } from "./demand";
 
 export class CommodityPage extends Component {
 	declare parameters: { tag };
@@ -35,73 +38,23 @@ export class CommodityPage extends Component {
 				{this.commodity.description}
 			</ui-description>}
 
-			<ui-positions>
-				{this.renderPositions(
+			{new Tabs()
+				.addTab('Demand', () => new CommodityDemandTab(this.commodity))
+				.addTab('Asks', () => new CommodityPositionsTab(
+					this.commodity,
 					'asks',
 					(a, b) => a.price - b.price,
 					'Asks',
 					'Currently offered on the market (supply).'
-				)}
-
-				{this.renderPositions(
+				))
+				.addTab('Bids', () => new CommodityPositionsTab(
+					this.commodity,
 					'bids',
 					(a, b) => b.price - a.price,
 					'Bids',
 					'Requested items from the market (demand).'
-				)}
-			</ui-positions>
+				))
+			}
 		</ui-commodity>
-	}
-
-	renderPositions(
-		property: keyof CommodityViewModel,
-		sort: (a: AskViewModel | BidViewModel, b: AskViewModel | BidViewModel) => number,
-		name: string,
-		description: string
-	) {
-		const positions = [...this.commodity[property] as (AskViewModel | BidViewModel)[]]
-			.sort(sort);
-
-		const min = Math.min(...positions.map(position => position.price * position.quantity));
-		const max = Math.max(...positions.map(position => position.price * position.quantity));
-
-		const total = positions.reduce((sum, position) => sum + position.price * position.quantity, 0);
-		const volume = positions.reduce((sum, position) => sum + position.quantity, 0);
-
-		const average = total / volume;
-
-		return <ui-positions>
-			<ui-header>
-				<ui-name>
-					{name}
-				</ui-name>
-
-				{!!volume && <ui-average>
-					ø {convertToCurrency(average)}
-				</ui-average>}
-			</ui-header>
-
-			<ui-description>
-				{description}
-			</ui-description>
-
-			{positions.map(position => <ui-position>
-				<ui-indicator
-					style={positionIntensity.provide(
-						((position.price * position.quantity) - min) / (max - min)
-					)}
-				/>
-
-				{new LegalEntityComponent((position as AskViewModel).asker ?? (position as BidViewModel).bidder)}
-
-				<ui-quantity>
-					{position.quantity}
-				</ui-quantity>
-
-				<ui-price>
-					{convertToCurrency(position.price)}
-				</ui-price>
-			</ui-position>)}
-		</ui-positions>
 	}
 }

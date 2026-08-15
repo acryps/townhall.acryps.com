@@ -15,9 +15,9 @@ export class MarketPage extends Component {
 
 	sorters = [
 		new Sorter('Name', (a, b) => 0), // name is always applied first
-		new Sorter('Demand', (a, b) => (b.ticker?.askVolume ?? 0) - (a.ticker?.askVolume ?? 0)),
-		new Sorter('Supply', (a, b) => (b.ticker?.bidVolume ?? 0) - (a.ticker?.bidVolume ?? 0)),
-		new Sorter('Spread', (a, b) => Math.abs((b.ticker?.askVolume ?? 0) - (b.ticker?.bidVolume ?? 0)) - Math.abs((a.ticker?.askVolume ?? 0) - (a.ticker?.bidVolume ?? 0))),
+		new Sorter('Stock Size', (a, b) => (b.ticker?.estimatedStockSize ?? 0) - (a.ticker?.estimatedStockSize ?? 0)),
+		new Sorter('Demand', (a, b) => (b.ticker?.estimatedDemandTarget ?? 0) - (a.ticker?.estimatedDemandTarget ?? 0)),
+		new Sorter('Spread', (a, b) => Math.abs((b.ticker?.estimatedStockSize ?? 0) - (b.ticker?.estimatedDemandTarget ?? 0)) - Math.abs((a.ticker?.estimatedStockSize ?? 0) - (a.ticker?.estimatedDemandTarget ?? 0))),
 	];
 
 	activeSorterStorageKey = 'market-sort';

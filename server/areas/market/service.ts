@@ -8,6 +8,7 @@ import { TradingEntity } from "../../market/entity";
 import { StockModel, StockSeedViewModel, StockViewModel } from "./stock";
 import { CommodityBidViewModel, TraderBidViewModel } from "./bid";
 import { CommodityAskViewModel, TraderAskViewModel } from "./ask";
+import { DemandViewModel } from "./demand";
 
 export class MarketService extends Service {
 	constructor(
@@ -28,7 +29,7 @@ export class MarketService extends Service {
 	async getCommodity(tag: string) {
 		return new CommodityViewModel(
 			await this.database.commodity.first(commodity => commodity.tag.valueOf() == tag)
-		)
+		);
 	}
 
 	getTickers() {
@@ -51,7 +52,8 @@ export class MarketService extends Service {
 					bidVolume: ticker.bid.volume,
 					bidCapitalization: ticker.bid.capitalization,
 
-					estimatedStockSize: ticker.estimatedStockSize
+					estimatedStockSize: ticker.estimatedStockSize,
+					estimatedDemandTarget: ticker.estimatedDemand.find(demand => demand.active)?.target ?? 0
 				});
 			}
 		}
@@ -66,6 +68,16 @@ export class MarketService extends Service {
 		const stock = await trader.getStock();
 
 		return StockViewModel.from(stock.map(item => StockModel.from(item)));
+	}
+
+	async getDemand(commodityId: string) {
+		const tracker = this.tracker.find(commodityId);
+
+		if (tracker.estimatedDemand) {
+			return DemandViewModel.from(tracker.estimatedDemand);
+		}
+
+		return [];
 	}
 
 	async getBids(entityId: string) {

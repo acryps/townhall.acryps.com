@@ -16,6 +16,7 @@ export class LiveCommodityTickerModel {
 	bidCapitalization: number;
 
 	estimatedStockSize: number;
+	estimatedDemandTarget: number;
 }
 
 export class LiveCommodityTickerResponseModel extends ViewModel<LiveCommodityTickerModel> {
@@ -34,4 +35,5 @@ export class LiveCommodityTickerResponseModel extends ViewModel<LiveCommodityTic
 	bidCapitalization;
 
 	estimatedStockSize;
+	estimatedDemandTarget;
 }

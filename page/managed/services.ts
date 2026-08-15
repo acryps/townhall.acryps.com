@@ -941,7 +941,6 @@ export class CommoditySummaryModel {
 	name: string;
 	symbol: string;
 	tag: string;
-	unit: string;
 
 	private static $build(raw) {
 		const item = new CommoditySummaryModel();
@@ -951,7 +950,6 @@ export class CommoditySummaryModel {
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.symbol === undefined || (item.symbol = raw.symbol === null ? null : `${raw.symbol}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
-		raw.unit === undefined || (item.unit = raw.unit === null ? null : `${raw.unit}`)
 		
 		return item;
 	}
@@ -1975,7 +1973,8 @@ export class CommodityViewModel {
 	name: string;
 	symbol: string;
 	tag: string;
-	unit: string;
+	tradingUnitCommercialBaseline: number;
+	tradingUnitRetailBaseline: number;
 
 	private static $build(raw) {
 		const item = new CommodityViewModel();
@@ -1990,7 +1989,8 @@ export class CommodityViewModel {
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.symbol === undefined || (item.symbol = raw.symbol === null ? null : `${raw.symbol}`)
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
-		raw.unit === undefined || (item.unit = raw.unit === null ? null : `${raw.unit}`)
+		raw.tradingUnitCommercialBaseline === undefined || (item.tradingUnitCommercialBaseline = raw.tradingUnitCommercialBaseline === null ? null : +raw.tradingUnitCommercialBaseline)
+		raw.tradingUnitRetailBaseline === undefined || (item.tradingUnitRetailBaseline = raw.tradingUnitRetailBaseline === null ? null : +raw.tradingUnitRetailBaseline)
 		
 		return item;
 	}

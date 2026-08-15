@@ -125,18 +125,7 @@ export const marketEntityStyle = () => child('ui-entity',
 						),
 
 						child('ui-quantity',
-							flexShrink(0),
-
-							child('ui-number',
-								display('inline-block'),
-								marginRight(rem(0.25))
-							),
-
-							child('ui-unit',
-								display('inline-block'),
-
-								fontSize(rem(0.7))
-							)
+							flexShrink(0)
 						),
 
 						child('ui-price',

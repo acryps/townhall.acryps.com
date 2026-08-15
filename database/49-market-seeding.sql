@@ -40,3 +40,6 @@ ALTER TABLE commodity ADD trading_unit_commercial_baseline INTEGER DEFAULT 0;
 ALTER TABLE commodity ADD trading_unit_retail_baseline INTEGER DEFAULT 0;
 
 ALTER TABLE commodity ADD symbol TEXT;
+
+ALTER TABLE commodity DROP unit;
+ALTER TABLE commodity DROP whole;

@@ -2,6 +2,7 @@ import { Component } from "@acryps/page";
 import { AskViewModel, BidViewModel, LegalEntityViewModel, TraderAskViewModel, TraderBidViewModel } from "../../managed/services";
 import { convertToCurrency } from "../../../interface/currency";
 import { Time } from "../../../interface/time";
+import { formatTradingUnit } from "../../../interface/trading-unit";
 
 type Position = TraderBidViewModel | TraderAskViewModel;
 
@@ -47,7 +48,7 @@ export class PositionComponent extends Component {
 								</ui-number>
 
 								<ui-unit>
-									{commodity.unit}
+									{commodity.tradingUnit.baseUnit}
 								</ui-unit>
 							</ui-quantity>
 
@@ -63,13 +64,7 @@ export class PositionComponent extends Component {
 								</ui-date>
 
 								<ui-quantity>
-									<ui-number>
-										{position.quantity}
-									</ui-number>
-
-									<ui-unit>
-										{position.commodity.unit}
-									</ui-unit>
+									{formatTradingUnit(position.commodity.tradingUnit, position.quantity)}
 								</ui-quantity>
 
 								<ui-price>

@@ -5,7 +5,6 @@ import { Point } from "../../interface/point";
 import { Shape } from "../../interface/shape";
 import { calcualteDanwinstonLine } from "../../interface/line";
 import { propertyLayer } from "../shared/map/layers";
-import { StreetPlotsPage } from "./plots";
 import { RouteComponent } from "./route";
 import { addIcon, deleteIcon, drawIcon, streetIcon } from "../assets/icons/managed";
 

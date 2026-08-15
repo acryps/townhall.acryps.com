@@ -405,7 +405,6 @@ export interface CommoditySummaryModel {
 	name: string;
 	symbol: string;
 	tag: string;
-	unit: string;
 }
 
 export interface CommodityCategorySummaryModel {
@@ -842,7 +841,8 @@ export interface CommodityViewModel {
 	name: string;
 	symbol: string;
 	tag: string;
-	unit: string;
+	tradingUnitCommercialBaseline: number;
+	tradingUnitRetailBaseline: number;
 }
 
 export interface MilitaryUnitViewModel {

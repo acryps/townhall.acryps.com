@@ -322,8 +322,8 @@ export class MapComponent extends Component {
 		const topLeft = this.cursor.subtract(offset);
 
 		// label positions
-		this.rootNode.style.setProperty(mapPositionX.propertyName, topLeft.x);
-		this.rootNode.style.setProperty(mapPositionY.propertyName, topLeft.y);
+		this.rootNode.style.setProperty(mapPositionX.propertyName, `${topLeft.x}`);
+		this.rootNode.style.setProperty(mapPositionY.propertyName, `${topLeft.y}`);
 
 		const activeViews = this.activeViews;
 

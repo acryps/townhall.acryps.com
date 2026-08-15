@@ -5,6 +5,7 @@ import { LegalEntityComponent } from "../../shared/legal-entity";
 import { positionIntensity } from "./index.style";
 import { percentage } from "@acryps/style";
 import { convertToCurrency } from "../../../interface/currency";
+import { formatTradingUnit } from "../../../interface/trading-unit";
 
 export class CommodityPage extends Component {
 	declare parameters: { tag };
@@ -27,7 +28,7 @@ export class CommodityPage extends Component {
 
 			<ui-description>
 				{this.commodity.name} is tracked since {this.commodity.innovated ? `${new Time(this.commodity.innovated).age()} years` : 'the markets opened'}.
-				The commodity is traded in {this.commodity.unit} units.
+				The commodity is traded in {this.commodity.tradingUnitCommercialBaseline == this.commodity.tradingUnitRetailBaseline ? `${formatTradingUnit(this.commodity.tradingUnit, 10 ** this.commodity.tradingUnitCommercialBaseline)}.` : `${formatTradingUnit(this.commodity.tradingUnit, 10 ** this.commodity.tradingUnitCommercialBaseline)} commercially, ${formatTradingUnit(this.commodity.tradingUnit, 10 ** this.commodity.tradingUnitRetailBaseline)} in retail.`}
 			</ui-description>
 
 			{this.commodity.description && <ui-description>

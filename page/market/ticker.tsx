@@ -70,7 +70,7 @@ export class CommodityTickerComponent extends Component {
 					</ui-name>
 
 					<ui-unit>
-						{this.commodity.unit}
+						{this.commodity.tradingUnit.baseUnit}
 					</ui-unit>
 				</ui-header>
 

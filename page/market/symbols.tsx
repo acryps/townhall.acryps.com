@@ -2,7 +2,6 @@ import { Component } from "@acryps/page";
 import { MarketPage } from ".";
 import { LiveCommodityTickerResponseModel } from "../managed/services";
 import { formatTradingUnit } from "../../interface/trading-unit";
-import { symbolCount } from "./index.style";
 
 export class MarketSymbolsComponent extends Component {
 	declare rootNode: HTMLElement;

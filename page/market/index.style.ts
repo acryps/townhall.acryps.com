@@ -1,4 +1,4 @@
-import { alignItems, alignSelf, animationDelay, animationIterationCount, aspectRatio, backgroundColor, border, borderTop, ch, child, color, cursor, display, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, height, imageRendering, justifyContent, Keyframes, margin, marginBottom, marginInline, marginLeft, marginRight, marginTop, maxHeight, minWidth, objectFit, objectPosition, outline, overflow, overflowWrap, padding, paddingBlock, PaddingBlockStyleProperty, paddingBottom, paddingInline, paddingLeft, percentage, pointerEvents, px, ratio, rem, seconds, textAlign, textDecoration, textDecorationLine, transform, translateX, Variable, vh, whiteSpace, width } from "@acryps/style";
+import { alignItems, alignSelf, animationDelay, animationIterationCount, aspectRatio, backgroundColor, border, borderTop, ch, child, color, cursor, display, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, height, imageRendering, justifyContent, Keyframes, margin, marginBottom, marginInline, marginLeft, marginRight, marginTop, maxHeight, minWidth, objectFit, objectPosition, outline, overflow, overflowWrap, padding, paddingBlock, PaddingBlockStyleProperty, paddingBottom, paddingInline, paddingLeft, percentage, pointerEvents, px, ratio, rem, seconds, textAlign, textDecoration, textDecorationLine, textTransform, transform, translateX, Variable, vh, whiteSpace, width } from "@acryps/style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { pageBackgroundColor, pageGutter, pageTextColor } from "../index.style";
 import { card } from "../shared/card.style";
@@ -43,6 +43,49 @@ export const marketStyle = () => child('ui-market',
 		marginBottom(rem(1)),
 
 		fontSize(rem(2))
+	),
+
+	child('ui-cycle',
+		card(),
+
+		display('flex'),
+		gap(pageGutter),
+		marginBottom(pageGutter),
+
+		child('ui-state',
+			textTransform('uppercase')
+		),
+
+		child('ui-detail',
+			display('block'),
+			flexGrow(1),
+
+			child('ui-identifier',
+				fontWeight('bold')
+			),
+
+			child('ui-opened', display('block')),
+			child('ui-closed', display('block'))
+		),
+
+		child('ui-fear-and-greed',
+			display('block'),
+			alignSelf('center'),
+
+			textAlign('center'),
+
+			child('ui-value',
+				display('block'),
+
+				fontSize(rem(1.2))
+			),
+
+			child('ui-name',
+				display('block'),
+
+				fontSize(rem(0.8))
+			)
+		)
 	),
 
 	child('ui-description',

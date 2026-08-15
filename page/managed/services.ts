@@ -968,6 +968,23 @@ export class CommodityCategorySummaryModel {
 	}
 }
 
+export class MarketCycleViewModel {
+	closed: Date;
+	id: string;
+	opened: Date;
+	riskAppetite: number;
+
+	private static $build(raw) {
+		const item = new MarketCycleViewModel();
+		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
+		raw.riskAppetite === undefined || (item.riskAppetite = raw.riskAppetite === null ? null : +raw.riskAppetite)
+		
+		return item;
+	}
+}
+
 export class DemandViewModel {
 	active: boolean;
 	activates: Date;
@@ -3685,6 +3702,27 @@ export class LifeService {
 }
 
 export class MarketService {
+	async getCycle(): Promise<MarketCycleViewModel> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("BnbzRsZHUwaG9hazg0bnpxY28waGBqZz"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : MarketCycleViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async getCommodities(): Promise<Array<CommoditySummaryModel>> {
 		const $data = new FormData();
 		

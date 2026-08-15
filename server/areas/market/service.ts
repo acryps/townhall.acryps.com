@@ -9,6 +9,7 @@ import { StockModel, StockSeedViewModel, StockViewModel } from "./stock";
 import { CommodityBidViewModel, TraderBidViewModel } from "./bid";
 import { CommodityAskViewModel, TraderAskViewModel } from "./ask";
 import { DemandViewModel } from "./demand";
+import { MarketCycleViewModel } from "./cycle";
 
 export class MarketService extends Service {
 	constructor(
@@ -17,6 +18,14 @@ export class MarketService extends Service {
 		private tracker: MarketTracker
 	) {
 		super();
+	}
+
+	async getCycle() {
+		return new MarketCycleViewModel(
+			await this.database.marketCycle
+				.orderByDescending(cycle => cycle.opened)
+				.first()
+		);
 	}
 
 	getCommodities() {

@@ -412,6 +412,13 @@ export interface CommodityCategorySummaryModel {
 	name: string;
 }
 
+export interface MarketCycleViewModel {
+    closed: Date;
+	id: string;
+	opened: Date;
+	riskAppetite: number;
+}
+
 export interface DemandViewModel {
     active: boolean;
 	activates: Date;

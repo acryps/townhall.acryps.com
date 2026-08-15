@@ -1,13 +1,16 @@
 import { Component } from "@acryps/page";
-import { CommoditySummaryModel, LiveCommodityTickerResponseModel, MarketService } from "../managed/services";
+import { CommoditySummaryModel, LiveCommodityTickerResponseModel, MarketCycleViewModel, MarketService } from "../managed/services";
 import { marketIcon } from "../assets/icons/managed";
 import { CommodityTickerComponent } from "./ticker";
 import { MarketSymbolsComponent } from "./symbols";
+import { Time } from "../../interface/time";
 
 export class MarketPage extends Component {
 	commodities: CommoditySummaryModel[];
 
 	tickers: CommodityTickerComponent[];
+
+	cycle: MarketCycleViewModel;
 
 	search: HTMLInputElement;
 
@@ -17,13 +20,27 @@ export class MarketPage extends Component {
 		new Sorter('Name', (a, b) => 0), // name is always applied first
 		new Sorter('Stock Size', (a, b) => (b.ticker?.estimatedStockSize ?? 0) - (a.ticker?.estimatedStockSize ?? 0)),
 		new Sorter('Demand', (a, b) => (b.ticker?.estimatedDemandTarget ?? 0) - (a.ticker?.estimatedDemandTarget ?? 0)),
-		new Sorter('Spread', (a, b) => Math.abs((b.ticker?.estimatedStockSize ?? 0) - (b.ticker?.estimatedDemandTarget ?? 0)) - Math.abs((a.ticker?.estimatedStockSize ?? 0) - (a.ticker?.estimatedDemandTarget ?? 0))),
+		new Sorter('Spread', (a, b) => {
+			if (!a.ticker?.estimatedDemandTarget || !b.ticker?.estimatedDemandTarget) {
+				return -Infinity;
+			}
+
+			if (!a.ticker?.estimatedStockSize || !b.ticker?.estimatedStockSize) {
+				return -Infinity;
+			}
+
+			const spreadA = Math.abs(a.ticker?.estimatedStockSize / a.ticker?.estimatedDemandTarget);
+			const spreadB = Math.abs(b.ticker?.estimatedStockSize / b.ticker?.estimatedDemandTarget);
+
+			return spreadA > spreadB ? 1 : -1;
+		}),
 	];
 
 	activeSorterStorageKey = 'market-sort';
 	activeSorter: Sorter;
 
 	async onload() {
+		this.cycle = await new MarketService().getCycle();
 		this.commodities = await new MarketService().getCommodities();
 
 		this.tickers = this.commodities.map(commodity => new CommodityTickerComponent(commodity))
@@ -114,6 +131,36 @@ export class MarketPage extends Component {
 			<ui-title>
 				Market
 			</ui-title>
+
+			<ui-cycle>
+				<ui-state>
+					{this.cycle.closed ? 'Closed' : 'Open'}
+				</ui-state>
+
+				<ui-detail>
+					<ui-identifier>
+						Cycle #{this.cycle.id.split('-')[0]}
+					</ui-identifier>
+
+					<ui-opened>
+						Opened {new Time(this.cycle.opened).toString()}
+					</ui-opened>
+
+					{this.cycle.closed && <ui-closed>
+						Opened {new Time(this.cycle.closed).toString()}
+					</ui-closed>}
+				</ui-detail>
+
+				<ui-fear-and-greed>
+					<ui-value>
+						{Math.floor(this.cycle.riskAppetite * 100)}
+					</ui-value>
+
+					<ui-name>
+						{['Extreme Fear', 'Fear', 'Neutral', 'Greed', 'Extreme Greed'][Math.floor(this.cycle.riskAppetite * 5)]}
+					</ui-name>
+				</ui-fear-and-greed>
+			</ui-cycle>
 
 			<ui-description>
 				Watch how the market develops based on demand and supply, new innovations emerge and shifts in public perception shape markets.

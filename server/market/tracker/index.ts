@@ -14,6 +14,18 @@ export class MarketTracker {
 		private database: DbContext
 	) {}
 
+	schedule() {
+		const next = async () => {
+			const start = Date.now();
+			await this.update();
+			const end = Date.now();
+
+			setTimeout(next, 1000 * 10 + end - start);
+		};
+
+		next();
+	}
+
 	async update() {
 		const tasks = [];
 

@@ -45,6 +45,14 @@ export abstract class MarketCycleGeneratorStep {
 		return interpreter;
 	}
 
+	async randomCommodity() {
+		const count = await this.database.commodity.count();
+
+		return this.database.commodity
+			.skip(Math.floor(Math.random() * count))
+			.first();
+	}
+
 	async randomEntity(tradeVolumeAdjusted = true) {
 		let query: () => Queryable<LegalEntity, LegalEntityQueryProxy>;
 

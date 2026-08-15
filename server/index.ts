@@ -87,9 +87,7 @@ DbClient.connectedClient.connect().then(async () => {
 	const marketLogger = new Logger('market');
 
 	const marketTracker = new MarketTracker(new Logger('tracker', marketLogger), database);
-	marketTracker.update();
-
-	setInterval(() => marketTracker.update(), 1000 * 60);
+	marketTracker.schedule();
 
 	if (runMarket) {
 		marketTracker.dump();

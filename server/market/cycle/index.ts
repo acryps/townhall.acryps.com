@@ -4,10 +4,12 @@ import { MarketTracker } from "../tracker";
 import { MarketCycleGeneratorStep } from "./step";
 import { StockSeedRuleMarketCycleGeneratorStep } from "./step/1-stock-seed";
 import { Time } from "../../../interface/time";
+import { ResidentialDemandMarketCycleGeneratorStep } from "./step/2-residential-demand";
 
 export class MarketCycleGenerator {
 	steps = () => ({
-		'stock seed rule': StockSeedRuleMarketCycleGeneratorStep
+		'residential demand': ResidentialDemandMarketCycleGeneratorStep,
+		'stock seed rule': StockSeedRuleMarketCycleGeneratorStep,
 	});
 
 	situation: string[];

@@ -884,7 +884,6 @@ export class CommodityQueryProxy extends QueryProxy {
 	get innovated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get innovationCycleId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get residentialDemandLikeliness(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get residentialOwnershipLikeliness(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get seedRulesCreated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get symbol(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -918,7 +917,6 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 	innovated: Date;
 	innovationCycleId: string;
 	name: string;
-	residentialDemandLikeliness: number;
 	residentialOwnershipLikeliness: number;
 	seedRulesCreated: Date;
 	symbol: string;
@@ -940,7 +938,6 @@ export class Commodity extends Entity<CommodityQueryProxy> {
 			innovated: { type: "timestamp", name: "innovated" },
 			innovationCycleId: { type: "uuid", name: "innovation_cycle_id" },
 			name: { type: "text", name: "name" },
-			residentialDemandLikeliness: { type: "float4", name: "residential_demand_likeliness" },
 			residentialOwnershipLikeliness: { type: "float4", name: "residential_ownership_likeliness" },
 			seedRulesCreated: { type: "timestamp", name: "seed_rules_created" },
 			symbol: { type: "text", name: "symbol" },
@@ -4906,20 +4903,26 @@ export class ResidentRelationship extends Entity<ResidentRelationshipQueryProxy>
 			
 export class ResidentialDemandQueryProxy extends QueryProxy {
 	get commodity(): Partial<CommodityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get activates(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get commodityId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get likeliness(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class ResidentialDemand extends Entity<ResidentialDemandQueryProxy> {
 	get commodity(): Partial<ForeignReference<Commodity>> { return this.$commodity; }
 	rules: PrimaryReference<ResidentialDemandRule, ResidentialDemandRuleQueryProxy>;
-		commodityId: string;
+		activates: Date;
+	commodityId: string;
 	declare id: string;
+	likeliness: number;
 	
 	$$meta = {
 		source: "residential_demand",
 		columns: {
+			activates: { type: "timestamp", name: "activates" },
 			commodityId: { type: "uuid", name: "commodity_id" },
-			id: { type: "uuid", name: "id" }
+			id: { type: "uuid", name: "id" },
+			likeliness: { type: "float4", name: "likeliness" }
 		},
 		get set(): DbSet<ResidentialDemand, ResidentialDemandQueryProxy> { 
 			return new DbSet<ResidentialDemand, ResidentialDemandQueryProxy>(ResidentialDemand, null);
@@ -4957,8 +4960,8 @@ export class ResidentialDemandRuleQueryProxy extends QueryProxy {
 	get parameterMaximum(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get parameterMinimum(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get property(): "quality" | "quantity" { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get weeklyDemandMaximum(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get weeklyDemandMinimum(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get valueMaximum(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get valueMinimum(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class ResidentialDemandRule extends Entity<ResidentialDemandRuleQueryProxy> {
@@ -4971,8 +4974,8 @@ export class ResidentialDemandRule extends Entity<ResidentialDemandRuleQueryProx
 	parameterMaximum: number;
 	parameterMinimum: number;
 	property: ResidentialDemandRuleProperty;
-	weeklyDemandMaximum: number;
-	weeklyDemandMinimum: number;
+	valueMaximum: number;
+	valueMinimum: number;
 	
 	$$meta = {
 		source: "residential_demand_rule",
@@ -4984,8 +4987,8 @@ export class ResidentialDemandRule extends Entity<ResidentialDemandRuleQueryProx
 			parameterMaximum: { type: "float4", name: "parameter_maximum" },
 			parameterMinimum: { type: "float4", name: "parameter_minimum" },
 			property: { type: "residential_demand_rule_property", name: "property" },
-			weeklyDemandMaximum: { type: "float4", name: "weekly_demand_maximum" },
-			weeklyDemandMinimum: { type: "float4", name: "weekly_demand_minimum" }
+			valueMaximum: { type: "float4", name: "value_maximum" },
+			valueMinimum: { type: "float4", name: "value_minimum" }
 		},
 		get set(): DbSet<ResidentialDemandRule, ResidentialDemandRuleQueryProxy> { 
 			return new DbSet<ResidentialDemandRule, ResidentialDemandRuleQueryProxy>(ResidentialDemandRule, null);

@@ -1,10 +1,13 @@
-ALTER TABLE commodity ADD residential_demand_likeliness REAL;
+ALTER TABLE commodity DROP residential_demand_likeliness;
 
 CREATE TYPE residential_demand_rule_property AS ENUM ('quantity', 'quality');
 CREATE TYPE residential_demand_rule_operation AS ENUM ('apply', 'add', 'subtract');
 
 CREATE TABLE residential_demand (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+	activates TIMESTAMP,
+
+	likeliness REAL,
 
 	commodity_id UUID CONSTRAINT commodity__residential_demand REFERENCES commodity (id)
 );
@@ -23,6 +26,6 @@ CREATE TABLE residential_demand_rule (
 	property residential_demand_rule_property,
 	operation residential_demand_rule_operation,
 
-	weekly_demand_minimum REAL,
-	weekly_demand_maximum REAL
+	value_minimum REAL,
+	value_maximum REAL
 );

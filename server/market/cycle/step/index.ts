@@ -8,6 +8,7 @@ import { MarketTracker } from "../../tracker";
 import { Logger, TaskLogger } from "@acryps/log";
 import { TradingEntity } from "../../entity";
 import { Time } from "../../../../interface/time";
+import { MarketSituationParameter } from "../situation";
 
 export abstract class MarketCycleGeneratorStep {
 	logger: Logger;
@@ -16,7 +17,7 @@ export abstract class MarketCycleGeneratorStep {
 		public database: DbContext,
 		public tracker: MarketTracker,
 		public cycle: MarketCycle,
-		public situation: string[],
+		public situation: MarketSituationParameter[],
 
 		public sponsor: TokenSponsor,
 		logger: Logger,
@@ -38,7 +39,7 @@ export abstract class MarketCycleGeneratorStep {
 				our imaginary country is somewhere in Europe,
 				a mix between Switzerland and England.
 
-				The current market situation is ${this.situation.join(', ')}.
+				The current market situation is ${MarketSituationParameter.toSituationString(this.situation, this.cycle)}.
 				Context: ${this.cycle.context}
 			`)
 		]);

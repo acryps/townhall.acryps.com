@@ -91,6 +91,7 @@ import { TraderBidViewModel } from "././../areas/market/bid";
 import { CommodityAskViewModel } from "././../areas/market/ask";
 import { TraderAskViewModel } from "././../areas/market/ask";
 import { DemandViewModel } from "././../areas/market/demand";
+import { MarketCycleSummaryModel } from "././../areas/market/cycle";
 import { MarketCycleViewModel } from "././../areas/market/cycle";
 import { MarketService } from "././../areas/market/service";
 import { MetricTracker } from "././../areas/metrics/tracker";
@@ -1088,11 +1089,33 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"BnbzRsZHUwaG9hazg0bnpxY28waGBqZz",
+			"lwaTVkMG9wN2d1ZnRveGo5Ymc4MX95cG",
 			{},
 			inject => inject.construct(MarketService),
-			(controller, params) => controller.getCycle(
+			(controller, params) => controller.getCurrentCycle(
 				
+			)
+		);
+
+		this.expose(
+			"o1cDEyZGlvYjlud2FydXx2Z2gydnxiMG",
+			{
+			"YzZjBybWRsaGJldTRwcGgwZXY3cGhyMX": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(MarketService),
+			(controller, params) => controller.getCycle(
+				params["YzZjBybWRsaGJldTRwcGgwZXY3cGhyMX"]
+			)
+		);
+
+		this.expose(
+			"NncDV5anJndTRjbnF1MmBja3I0cWV6Mj",
+			{
+			"VscWIzOXBoaXN0MDN4ejF0NmBybThsYW": { type: "date", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(MarketService),
+			(controller, params) => controller.getCycleNeighbors(
+				params["VscWIzOXBoaXN0MDN4ejF0NmBybThsYW"]
 			)
 		);
 
@@ -6191,7 +6214,7 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	[MarketCycleViewModel.name]: class ComposedMarketCycleViewModel extends MarketCycleViewModel {
+	[MarketCycleSummaryModel.name]: class ComposedMarketCycleSummaryModel extends MarketCycleSummaryModel {
 		async map() {
 			return {
 				closed: this.$$model.closed,
@@ -6235,7 +6258,7 @@ ViewModel.mappings = {
 		};
 
 		static toViewModel(data) {
-			const item = new MarketCycleViewModel(null);
+			const item = new MarketCycleSummaryModel(null);
 			"closed" in data && (item.closed = data.closed === null ? null : new Date(data.closed));
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"opened" in data && (item.opened = data.opened === null ? null : new Date(data.opened));
@@ -6244,7 +6267,7 @@ ViewModel.mappings = {
 			return item;
 		}
 
-		static async toModel(viewModel: MarketCycleViewModel) {
+		static async toModel(viewModel: MarketCycleSummaryModel) {
 			let model: MarketCycle;
 			
 			if (viewModel.id) {
@@ -10521,6 +10544,80 @@ ViewModel.mappings = {
 			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 			"tradingUnitCommercialBaseline" in viewModel && (model.tradingUnitCommercialBaseline = viewModel.tradingUnitCommercialBaseline === null ? null : +viewModel.tradingUnitCommercialBaseline);
 			"tradingUnitRetailBaseline" in viewModel && (model.tradingUnitRetailBaseline = viewModel.tradingUnitRetailBaseline === null ? null : +viewModel.tradingUnitRetailBaseline);
+
+			return model;
+		}
+	},
+	[MarketCycleViewModel.name]: class ComposedMarketCycleViewModel extends MarketCycleViewModel {
+		async map() {
+			return {
+				closed: this.$$model.closed,
+				context: this.$$model.context,
+				id: this.$$model.id,
+				opened: this.$$model.opened,
+				riskAppetite: this.$$model.riskAppetite
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				closed: true,
+				context: true,
+				id: true,
+				opened: true,
+				riskAppetite: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new MarketCycleViewModel(null);
+			"closed" in data && (item.closed = data.closed === null ? null : new Date(data.closed));
+			"context" in data && (item.context = data.context === null ? null : `${data.context}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"opened" in data && (item.opened = data.opened === null ? null : new Date(data.opened));
+			"riskAppetite" in data && (item.riskAppetite = data.riskAppetite === null ? null : +data.riskAppetite);
+
+			return item;
+		}
+
+		static async toModel(viewModel: MarketCycleViewModel) {
+			let model: MarketCycle;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(MarketCycle).find(viewModel.id)
+			} else {
+				model = new MarketCycle();
+			}
+			
+			"closed" in viewModel && (model.closed = viewModel.closed === null ? null : new Date(viewModel.closed));
+			"context" in viewModel && (model.context = viewModel.context === null ? null : `${viewModel.context}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"opened" in viewModel && (model.opened = viewModel.opened === null ? null : new Date(viewModel.opened));
+			"riskAppetite" in viewModel && (model.riskAppetite = viewModel.riskAppetite === null ? null : +viewModel.riskAppetite);
 
 			return model;
 		}

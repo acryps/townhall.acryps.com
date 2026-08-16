@@ -83,6 +83,7 @@ import { LoreItemPage } from "./lore/item";
 import { WriteLoreProposalPage } from "./lore/propose/write";
 import { LoreProposalReviewPage } from "./lore/propose/review";
 import { ExpandLorePage } from "./lore/item/expand";
+import { MarketCyclePage } from "./market/cycle";
 
 export class Application {
 	static router: Router;
@@ -169,6 +170,7 @@ export class Application {
 				.route('/market', MarketPage
 					.route('/commodity/:tag', CommodityPage)
 					.route('/entity/:id', MarketEntityPage)
+					.route('/cycle/:id', MarketCyclePage)
 
 					.route('/assessment/distribution', AssessmentParameterDistributionPage)
 				)

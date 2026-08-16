@@ -5,10 +5,11 @@ import { MarketCycleGeneratorStep } from "./step";
 import { StockSeedRuleMarketCycleGeneratorStep } from "./step/1-stock-seed";
 import { Time } from "../../../interface/time";
 import { ResidentialDemandMarketCycleGeneratorStep } from "./step/2-residential-demand";
-import { Interpreter, SystemMessage, UserMessage } from "../../life/interpreter";
+import { Interpreter, SystemMessage, ToolError, UserMessage } from "../../life/interpreter";
 import { OpenAiInterpreterProvider } from "../../life/interpreter/provider/openai";
 import { Point } from "../../../interface/point";
 import { convertToLegalCompanyName } from "../../../interface/company";
+import { MarketSituationParameter } from "./situation";
 
 export class MarketCycleGenerator {
 	steps = () => ({
@@ -16,7 +17,13 @@ export class MarketCycleGenerator {
 		'stock seed rule': StockSeedRuleMarketCycleGeneratorStep,
 	});
 
-	situation: string[];
+	situation = [
+		new MarketSituationParameter('outlook', 'pessimistic', 'optimistic'),
+		new MarketSituationParameter('riskAppetite', 'defensive', 'risk-seeking'),
+		new MarketSituationParameter('confidence', 'unsure', 'certain'),
+		new MarketSituationParameter('uncertainty', 'predictable', 'unpredictable'),
+		new MarketSituationParameter('speculation', 'fundamental', 'speculative')
+	];
 
 	constructor(
 		public database: DbContext,
@@ -36,22 +43,9 @@ export class MarketCycleGenerator {
 		cycle.opened = new Date();
 
 		// prepare situation
-		this.situation = [];
-
-		cycle.outlook = lastCycle.outlook;
-		this.convertSituationToText(cycle.outlook, 'pessimistic', 'optimistic');
-
-		cycle.riskAppetite = lastCycle.riskAppetite;
-		this.convertSituationToText(cycle.outlook, 'defensive', 'risk-seeking');
-
-		cycle.confidence = lastCycle.confidence;
-		this.convertSituationToText(cycle.outlook, 'unsure', 'certain');
-
-		cycle.uncertainty = lastCycle.uncertainty;
-		this.convertSituationToText(cycle.outlook, 'predictable', 'unpredictable');
-
-		cycle.speculation = lastCycle.speculation;
-		this.convertSituationToText(cycle.outlook, 'fundamental', 'speculative');
+		for (let parameter of this.situation) {
+			(cycle as any)[parameter.property] = lastCycle[parameter.property];
+		}
 
 		await cycle.create();
 
@@ -85,23 +79,6 @@ export class MarketCycleGenerator {
 		logger.log(`cycle closed`);
 	}
 
-	private convertSituationToText(value: number, start: string, end: string) {
-		const expand = (label: string) => [
-			`exceptionally ${label}`,
-			`strongly ${label}`,
-			label,
-			`quite ${label}`,
-			`slightly ${label}`
-		];
-
-		const labels = [
-			...expand(start),
-			...expand(end).reverse()
-		];
-
-		this.situation.push(labels[Math.floor(labels.length * value)]);
-	}
-
 	private async compileContext(cycle: MarketCycle, sponsor: TokenSponsor) {
 		const interpreter = new Interpreter(new OpenAiInterpreterProvider(sponsor));
 
@@ -111,7 +88,6 @@ export class MarketCycleGenerator {
 				This is all fictional, events that occurred in real life did not happen in this world.
 
 				It is currently ${Time.now().toString()}.
-				Situation: ${this.situation.join(', ')}
 
 				I will provide some recent articles, note referenced companies and boroughs.
 				The context from the last few cycles will be included too.
@@ -201,6 +177,7 @@ export class MarketCycleGenerator {
 			interpreter.remember([new UserMessage(`
 				# Market Cycle ${cycle.id.split('-')[0]}
 				Opened ${new Time(cycle.opened).toString()}, closed ${new Time(cycle.closed).toString()}
+				Situation: ${MarketSituationParameter.toSituationString(this.situation, cycle)}
 
 				${cycle.context}
 			`)]);
@@ -225,6 +202,22 @@ export class MarketCycleGenerator {
 			(name, summary) => sections.push(`${name}: ${summary}`)
 		);
 
+		for (let parameter of this.situation) {
+			interpreter.addTool(
+				parameter.property,
+				[
+					{ name: 'value', type: Number }
+				],
+				value => {
+					if (value > 1 || value < 0) {
+						throw new ToolError(`Parameter ${parameter.property} out of bounds, must be between 0 - 1`);
+					}
+
+					(cycle as any)[parameter.property] = value;
+				}
+			);
+		}
+
 		await interpreter.execute(new SystemMessage(`
 			Summarize the current context from a market perspective.
 			Ignore details about unrelated events.
@@ -237,6 +230,13 @@ export class MarketCycleGenerator {
 
 			Do not list the relevant players.
 			For the items mentioned in your summary, reference them using the 'reference' tool, and give a one sentence summary.
+
+			In light of the context, do you think one of the following parameters changed?
+			Gradual changes are very welcome, be as accurate as you can.
+			If so, call the respective tool with the new value from 0.00 - 1.00.
+			${this.situation.map(
+				parameter => `${parameter.property} (0.00 = ${parameter.toSituationString(0)}, 1.00 = ${parameter.toSituationString(1)})`
+			).join('\n')}
 		`));
 
 		return sections.join('\n');

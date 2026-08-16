@@ -1,5 +1,5 @@
 import { Component } from "@acryps/page";
-import { CommoditySummaryModel, LiveCommodityTickerResponseModel, MarketCycleViewModel, MarketService } from "../managed/services";
+import { CommoditySummaryModel, LiveCommodityTickerResponseModel, MarketCycleSummaryModel, MarketCycleViewModel, MarketService } from "../managed/services";
 import { marketIcon } from "../assets/icons/managed";
 import { CommodityTickerComponent } from "./ticker";
 import { MarketSymbolsComponent } from "./symbols";
@@ -10,7 +10,7 @@ export class MarketPage extends Component {
 
 	tickers: CommodityTickerComponent[];
 
-	cycle: MarketCycleViewModel;
+	currentCycle: MarketCycleSummaryModel;
 
 	search: HTMLInputElement;
 
@@ -40,7 +40,7 @@ export class MarketPage extends Component {
 	activeSorter: Sorter;
 
 	async onload() {
-		this.cycle = await new MarketService().getCycle();
+		this.currentCycle = await new MarketService().getCurrentCycle();
 		this.commodities = await new MarketService().getCommodities();
 
 		this.tickers = this.commodities.map(commodity => new CommodityTickerComponent(commodity))
@@ -132,35 +132,35 @@ export class MarketPage extends Component {
 				Market
 			</ui-title>
 
-			<ui-cycle>
+			<ui-current-cycle ui-href={`cycle/${this.currentCycle.id}`}>
 				<ui-state>
-					{this.cycle.closed ? 'Closed' : 'Open'}
+					{this.currentCycle.closed ? 'Closed' : 'Open'}
 				</ui-state>
 
 				<ui-detail>
 					<ui-identifier>
-						Cycle #{this.cycle.id.split('-')[0]}
+						Cycle #{this.currentCycle.id.split('-')[0]}
 					</ui-identifier>
 
 					<ui-opened>
-						Opened {new Time(this.cycle.opened).toString()}
+						Opened {new Time(this.currentCycle.opened).toString()}
 					</ui-opened>
 
-					{this.cycle.closed && <ui-closed>
-						Opened {new Time(this.cycle.closed).toString()}
+					{this.currentCycle.closed && <ui-closed>
+						Opened {new Time(this.currentCycle.closed).toString()}
 					</ui-closed>}
 				</ui-detail>
 
 				<ui-fear-and-greed>
 					<ui-value>
-						{Math.floor(this.cycle.riskAppetite * 100)}
+						{Math.floor(this.currentCycle.riskAppetite * 100)}
 					</ui-value>
 
 					<ui-name>
-						{['Extreme Fear', 'Fear', 'Neutral', 'Greed', 'Extreme Greed'][Math.floor(this.cycle.riskAppetite * 5)]}
+						{['Extreme Fear', 'Fear', 'Neutral', 'Greed', 'Extreme Greed'][Math.floor(this.currentCycle.riskAppetite * 5)]}
 					</ui-name>
 				</ui-fear-and-greed>
-			</ui-cycle>
+			</ui-current-cycle>
 
 			<ui-description>
 				Watch how the market develops based on demand and supply, new innovations emerge and shifts in public perception shape markets.

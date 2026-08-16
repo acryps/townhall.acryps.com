@@ -10,6 +10,7 @@ import { commodityStyle } from "./commodity/index.style";
 import { marketEntityStyle } from "./entity/index.style";
 import { residentAsessmentDistributionStyle } from "./assessment/distribution/index.style";
 import { microFont } from "../assets/font/index.style";
+import { cycleStyle } from "./cycle/index.style";
 
 export const marketStyle = () => child('ui-market',
 	display('block'),
@@ -18,6 +19,7 @@ export const marketStyle = () => child('ui-market',
 
 	commodityStyle(),
 	marketEntityStyle(),
+	cycleStyle(),
 	residentAsessmentDistributionStyle(),
 
 	changeAnimation,
@@ -45,12 +47,14 @@ export const marketStyle = () => child('ui-market',
 		fontSize(rem(2))
 	),
 
-	child('ui-cycle',
+	child('ui-current-cycle',
 		card(),
 
 		display('flex'),
 		gap(pageGutter),
 		marginBottom(pageGutter),
+
+		cursor('pointer'),
 
 		child('ui-state',
 			textTransform('uppercase')

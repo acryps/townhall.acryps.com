@@ -9,7 +9,7 @@ import { StockModel, StockSeedViewModel, StockViewModel } from "./stock";
 import { CommodityBidViewModel, TraderBidViewModel } from "./bid";
 import { CommodityAskViewModel, TraderAskViewModel } from "./ask";
 import { DemandViewModel } from "./demand";
-import { MarketCycleViewModel } from "./cycle";
+import { MarketCycleSummaryModel, MarketCycleViewModel } from "./cycle";
 
 export class MarketService extends Service {
 	constructor(
@@ -20,12 +20,34 @@ export class MarketService extends Service {
 		super();
 	}
 
-	async getCycle() {
-		return new MarketCycleViewModel(
+	async getCurrentCycle() {
+		return new MarketCycleSummaryModel(
 			await this.database.marketCycle
 				.orderByDescending(cycle => cycle.opened)
 				.first()
 		);
+	}
+
+	async getCycle(id: string) {
+		return new MarketCycleViewModel(
+			await this.database.marketCycle.find(id)
+		);
+	}
+
+	async getCycleNeighbors(time: Date) {
+		const before = await this.database.marketCycle
+			.orderByAscending(cycle => cycle.opened)
+			.where(cycle => cycle.opened.isAfter(time))
+			.limit(3)
+			.toArray();
+
+		const after = await this.database.marketCycle
+			.orderByDescending(cycle => cycle.opened)
+			.where(cycle => cycle.opened.isBefore(time))
+			.limit(3)
+			.toArray();
+
+		return MarketCycleSummaryModel.from([...before, ...after]);
 	}
 
 	getCommodities() {

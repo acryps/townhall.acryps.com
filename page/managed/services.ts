@@ -968,14 +968,14 @@ export class CommodityCategorySummaryModel {
 	}
 }
 
-export class MarketCycleViewModel {
+export class MarketCycleSummaryModel {
 	closed: Date;
 	id: string;
 	opened: Date;
 	riskAppetite: number;
 
 	private static $build(raw) {
-		const item = new MarketCycleViewModel();
+		const item = new MarketCycleSummaryModel();
 		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
@@ -2027,6 +2027,25 @@ export class CommodityViewModel {
 		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		raw.tradingUnitCommercialBaseline === undefined || (item.tradingUnitCommercialBaseline = raw.tradingUnitCommercialBaseline === null ? null : +raw.tradingUnitCommercialBaseline)
 		raw.tradingUnitRetailBaseline === undefined || (item.tradingUnitRetailBaseline = raw.tradingUnitRetailBaseline === null ? null : +raw.tradingUnitRetailBaseline)
+		
+		return item;
+	}
+}
+
+export class MarketCycleViewModel {
+	closed: Date;
+	context: string;
+	id: string;
+	opened: Date;
+	riskAppetite: number;
+
+	private static $build(raw) {
+		const item = new MarketCycleViewModel();
+		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
+		raw.context === undefined || (item.context = raw.context === null ? null : `${raw.context}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
+		raw.riskAppetite === undefined || (item.riskAppetite = raw.riskAppetite === null ? null : +raw.riskAppetite)
 		
 		return item;
 	}
@@ -3702,11 +3721,32 @@ export class LifeService {
 }
 
 export class MarketService {
-	async getCycle(): Promise<MarketCycleViewModel> {
+	async getCurrentCycle(): Promise<MarketCycleSummaryModel> {
 		const $data = new FormData();
 		
 
-		return await fetch(Service.toURL("BnbzRsZHUwaG9hazg0bnpxY28waGBqZz"), {
+		return await fetch(Service.toURL("lwaTVkMG9wN2d1ZnRveGo5Ymc4MX95cG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : MarketCycleSummaryModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getCycle(id: string): Promise<MarketCycleViewModel> {
+		const $data = new FormData();
+		$data.append("YzZjBybWRsaGJldTRwcGgwZXY3cGhyMX", Service.stringify(id))
+
+		return await fetch(Service.toURL("o1cDEyZGlvYjlud2FydXx2Z2gydnxiMG"), {
 			method: "post",
 			credentials: "include",
 			body: $data
@@ -3715,6 +3755,27 @@ export class MarketService {
 				const d = r.data;
 
 				return d === null ? null : MarketCycleViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getCycleNeighbors(time: Date): Promise<Array<MarketCycleSummaryModel>> {
+		const $data = new FormData();
+		$data.append("VscWIzOXBoaXN0MDN4ejF0NmBybThsYW", Service.stringify(time))
+
+		return await fetch(Service.toURL("NncDV5anJndTRjbnF1MmBja3I0cWV6Mj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : MarketCycleSummaryModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

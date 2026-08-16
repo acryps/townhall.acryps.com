@@ -412,7 +412,7 @@ export interface CommodityCategorySummaryModel {
 	name: string;
 }
 
-export interface MarketCycleViewModel {
+export interface MarketCycleSummaryModel {
     closed: Date;
 	id: string;
 	opened: Date;
@@ -858,6 +858,14 @@ export interface CommodityViewModel {
 	tag: string;
 	tradingUnitCommercialBaseline: number;
 	tradingUnitRetailBaseline: number;
+}
+
+export interface MarketCycleViewModel {
+    closed: Date;
+	context: string;
+	id: string;
+	opened: Date;
+	riskAppetite: number;
 }
 
 export interface MilitaryUnitViewModel {

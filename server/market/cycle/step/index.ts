@@ -39,6 +39,7 @@ export abstract class MarketCycleGeneratorStep {
 				a mix between Switzerland and England.
 
 				The current market situation is ${this.situation.join(', ')}.
+				Context: ${this.cycle.context}
 			`)
 		]);
 

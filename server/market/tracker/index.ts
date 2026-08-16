@@ -1,5 +1,5 @@
 import { toASCII } from "node:punycode";
-import { Commodity, DbContext, StockSeedRuleOperation, StockSeedRuleProperty } from "../../managed/database";
+import { Commodity, DbContext, ResidentAssessment, ResidentialDemand, ResidentialDemandRuleProperty, StockSeedRuleOperation, StockSeedRuleProperty, TradeAsk, TradeBid } from "../../managed/database";
 import { TradeService } from "../../areas/trade/service";
 import { Time } from "../../../interface/time";
 import { MarketPriceRange } from "./price-range";
@@ -28,10 +28,42 @@ export class MarketTracker {
 	}
 
 	async update() {
+		const now = new Date();
 		const tasks = [];
 
-		for (let commodity of await this.database.commodity.toArray()) {
-			tasks.push(this.updateCommodity(commodity));
+		this.logger.log(`prepare ${tasks.length} tracker update`);
+
+		const assessments = await this.database.residentAssessment
+			.toArray();
+
+		const asks = await this.database.tradeAsk
+			.where(bid => bid.expires == null || bid.expires.isBefore(now))
+			.toArray();
+
+		const bids = await this.database.tradeBid
+			.where(bid => bid.expires == null || bid.expires.isBefore(now))
+			.include(bid => bid.trades)
+			.toArray();
+
+		const commodities = await this.database.commodity
+			.include(commodity => commodity.stockSeedRules)
+			.include(commodity => commodity.residentialDemand)
+			.toArray();
+
+		const residentialDemand = await this.database.residentialDemand
+			.include(ruleset => ruleset.rules)
+			.toArray();
+
+		for (let commodity of commodities) {
+			tasks.push(this.updateCommodity(
+				commodity,
+				assessments,
+
+				residentialDemand.filter(ask => ask.commodityId == commodity.id),
+
+				asks.filter(ask => ask.commodityId == commodity.id),
+				bids.filter(bid => bid.commodityId == commodity.id)
+			));
 		}
 
 		this.logger.log(`update ${tasks.length} trackers`);
@@ -68,26 +100,23 @@ export class MarketTracker {
 		console.groupEnd();
 	}
 
-	async updateCommodity(commodity: Commodity) {
+	async updateCommodity(
+		commodity: Commodity,
+
+		assessments: ResidentAssessment[],
+		residentialDemand: ResidentialDemand[],
+
+		asks: TradeAsk[],
+		bids: TradeBid[]
+	) {
 		const now = new Date();
 		let tracker = this.trackers.find(tracker => tracker.commodity.id == commodity.id);
-
-		const asks = await this.database.tradeAsk
-			.where(ask => ask.commodityId == commodity.id)
-			.where(ask => ask.expires == null || ask.expires.isBefore(now))
-			.toArray();
 
 		const askRange = new MarketPriceRange();
 
 		for (let ask of asks) {
 			askRange.push(ask.price, ask.quantity);
 		}
-
-		const bids = await this.database.tradeBid
-			.where(bid => bid.commodityId == commodity.id)
-			.where(bid => bid.expires == null || bid.expires.isBefore(now))
-			.include(bid => bid.trades)
-			.toArray();
 
 		const bidRange = new MarketPriceRange();
 
@@ -117,8 +146,8 @@ export class MarketTracker {
 		tracker.bid = bidRange;
 		bidRange.calculate();
 
-		tracker.estimatedStockSize = await this.estimateStockSize(commodity);
-		tracker.estimatedDemand = await this.estimateDemands(commodity);
+		tracker.estimatedStockSize = await this.estimateStockSize(commodity, assessments);
+		tracker.estimatedDemand = await this.estimateDemands(commodity, residentialDemand, assessments);
 	}
 
 	// estimate the stock size of the commodity across the entire population
@@ -126,20 +155,16 @@ export class MarketTracker {
 	//
 	// uses 50% average on all rules
 	// ignores multi-assigns (overestimate source)
-	private async estimateStockSize(commodity: Commodity) {
-		const rules = await commodity.stockSeedRules
-			.include(rule => rule.parameter)
-			.where(rule => rule.property == StockSeedRuleProperty.quantity)
-			.toArray();
+	private async estimateStockSize(commodity: Commodity, assessments: ResidentAssessment[]) {
+		const rules = await commodity.stockSeedRules.toArray();
 
 		let volume = 0;
 
 		for (let rule of rules) {
-			const parameter = await rule.parameter.fetch();
-
-			const assessmentCount = await parameter.assessments
-				.where(assessment => assessment.value.valueOf() >= rule.parameterMinimum && assessment.value.valueOf() < rule.parameterMaximum)
-				.count();
+			const assessmentCount = assessments
+				.filter(assessment => assessment.parameterId == rule.parameter)
+				.filter(assessment => assessment.value >= rule.parameterMinimum && assessment.value < rule.parameterMaximum)
+				.length;
 
 			const size = assessmentCount * (rule.valueMaximum + rule.valueMinimum) / 2;
 
@@ -166,14 +191,11 @@ export class MarketTracker {
 	}
 
 	// calculate demands
-	private async estimateDemands(commodity: Commodity) {
+	private async estimateDemands(commodity: Commodity, rulesets: ResidentialDemand[], assessments: ResidentAssessment[]) {
 		const timeline: Demand[] = [];
 
-		for (let ruleset of await commodity.residentialDemand.toArray()) {
-			const rules = await ruleset.rules
-				.include(rule => rule.parameter)
-				.where(rule => rule.property == StockSeedRuleProperty.quantity)
-				.toArray();
+		for (let ruleset of rulesets) {
+			const rules = await ruleset.rules.toArray();
 
 			const demand = new Demand();
 			demand.activates = ruleset.activates;
@@ -183,26 +205,27 @@ export class MarketTracker {
 			timeline.push(demand);
 
 			for (let rule of rules) {
-				const parameter = await rule.parameter.fetch();
+				if (rule.property == ResidentialDemandRuleProperty.quantity) {
+					const assessmentCount = assessments
+						.filter(assessment => assessment.parameterId == rule.parameterId)
+						.filter(assessment => assessment.value >= rule.parameterMinimum && assessment.value < rule.parameterMaximum)
+						.length;
 
-				const assessmentCount = await parameter.assessments
-					.where(assessment => assessment.value.valueOf() >= rule.parameterMinimum && assessment.value.valueOf() < rule.parameterMaximum)
-					.count();
+					const size = assessmentCount * (rule.valueMaximum + rule.valueMinimum) / 2;
 
-				const size = assessmentCount * (rule.valueMaximum + rule.valueMinimum) / 2;
+					switch (rule.operation) {
+						case StockSeedRuleOperation.add:
+						case StockSeedRuleOperation.apply: {
+							demand.target += size;
 
-				switch (rule.operation) {
-					case StockSeedRuleOperation.add:
-					case StockSeedRuleOperation.apply: {
-						demand.target += size;
+							break;
+						}
 
-						break;
-					}
+						case StockSeedRuleOperation.subtract: {
+							demand.target -= size;
 
-					case StockSeedRuleOperation.subtract: {
-						demand.target -= size;
-
-						break;
+							break;
+						}
 					}
 				}
 			}

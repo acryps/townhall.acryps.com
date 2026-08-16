@@ -3161,6 +3161,7 @@ export class MarketCycleQueryProxy extends QueryProxy {
 	get closed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get confidence(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get configuration(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get context(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get opened(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get outlook(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get riskAppetite(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -3180,6 +3181,7 @@ export class MarketCycle extends Entity<MarketCycleQueryProxy> {
 		closed: Date;
 	confidence: number;
 	configuration: string;
+	context: string;
 	declare id: string;
 	opened: Date;
 	outlook: number;
@@ -3194,6 +3196,7 @@ export class MarketCycle extends Entity<MarketCycleQueryProxy> {
 			closed: { type: "timestamp", name: "closed" },
 			confidence: { type: "float4", name: "confidence" },
 			configuration: { type: "text", name: "configuration" },
+			context: { type: "text", name: "context" },
 			id: { type: "uuid", name: "id" },
 			opened: { type: "timestamp", name: "opened" },
 			outlook: { type: "float4", name: "outlook" },

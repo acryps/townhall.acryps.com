@@ -22,6 +22,10 @@ export class Point {
 		return `(${this.x}, ${this.y})`;
 	}
 
+	toContextString() {
+		return `X${this.x}/Y${this.y}`;
+	}
+
 	copy(x = 0, y = 0) {
 		return new Point(this.x + x, this.y + y);
 	}

@@ -119,7 +119,7 @@ export class BaseTileServer {
 			}
 
 			for (let x = Math.floor(minX / MapImporter.tile); x < Math.ceil(maxX / MapImporter.tile); x++) {
-				for (let y = Math.floor(minY / MapImporter.tile); x < Math.ceil(maxY / MapImporter.tile); y++) {
+				for (let y = Math.floor(minY / MapImporter.tile); y < Math.ceil(maxY / MapImporter.tile); y++) {
 					const tile = await database.mapTile
 						.where(tile => tile.regionX == x)
 						.where(tile => tile.regionY == y)

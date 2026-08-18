@@ -29,20 +29,10 @@ export class MarketTracker {
 
 	async update() {
 		const now = new Date();
-		const tasks = [];
 
-		this.logger.log(`prepare ${tasks.length} tracker update`);
+		this.logger.log(`preparing tracker update`);
 
 		const assessments = await this.database.residentAssessment
-			.toArray();
-
-		const asks = await this.database.tradeAsk
-			.where(bid => bid.expires == null || bid.expires.isBefore(now))
-			.toArray();
-
-		const bids = await this.database.tradeBid
-			.where(bid => bid.expires == null || bid.expires.isBefore(now))
-			.include(bid => bid.trades)
 			.toArray();
 
 		const commodities = await this.database.commodity
@@ -54,21 +44,23 @@ export class MarketTracker {
 			.include(ruleset => ruleset.rules)
 			.toArray();
 
+		this.logger.log(`updating ${commodities.length} trackers`);
+
+		const start = Date.now();
+
 		for (let commodity of commodities) {
-			tasks.push(this.updateCommodity(
+			await this.updateCommodity(
 				commodity,
 				assessments,
 
-				residentialDemand.filter(ask => ask.commodityId == commodity.id),
-
-				asks.filter(ask => ask.commodityId == commodity.id),
-				bids.filter(bid => bid.commodityId == commodity.id)
-			));
+				residentialDemand.filter(ask => ask.commodityId == commodity.id)
+			);
 		}
 
-		this.logger.log(`update ${tasks.length} trackers`);
+		const end = Date.now();
+		console.log(end - start);
 
-		await Promise.all(tasks);
+		this.logger.log(`updated ${commodities.length} trackers`);
 	}
 
 	find(commodity: Commodity | string) {
@@ -104,34 +96,9 @@ export class MarketTracker {
 		commodity: Commodity,
 
 		assessments: ResidentAssessment[],
-		residentialDemand: ResidentialDemand[],
-
-		asks: TradeAsk[],
-		bids: TradeBid[]
+		residentialDemand: ResidentialDemand[]
 	) {
-		const now = new Date();
 		let tracker = this.trackers.find(tracker => tracker.commodity.id == commodity.id);
-
-		const askRange = new MarketPriceRange();
-
-		for (let ask of asks) {
-			askRange.push(ask.price, ask.quantity);
-		}
-
-		const bidRange = new MarketPriceRange();
-
-		for (let bid of bids) {
-			// only count unfulfilled asks
-			let sold = 0;
-
-			for (let trade of await bid.trades.toArray()) {
-				sold += trade.quantity;
-			}
-
-			if (sold != bid.quantity) {
-				bidRange.push(bid.price, bid.quantity);
-			}
-		}
 
 		if (!tracker) {
 			tracker = new CommodityPriceTracker();
@@ -139,12 +106,6 @@ export class MarketTracker {
 
 			this.trackers.push(tracker);
 		}
-
-		tracker.ask = askRange;
-		askRange.calculate();
-
-		tracker.bid = bidRange;
-		bidRange.calculate();
 
 		tracker.estimatedStockSize = await this.estimateStockSize(commodity, assessments);
 		tracker.estimatedDemand = await this.estimateDemands(commodity, residentialDemand, assessments);
@@ -161,25 +122,27 @@ export class MarketTracker {
 		let volume = 0;
 
 		for (let rule of rules) {
-			const assessmentCount = assessments
-				.filter(assessment => assessment.parameterId == rule.parameter)
-				.filter(assessment => assessment.value >= rule.parameterMinimum && assessment.value < rule.parameterMaximum)
-				.length;
+			if (rule.property == StockSeedRuleProperty.quantity) {
+				const assessmentCount = assessments
+					.filter(assessment => assessment.parameterId == rule.parameter)
+					.filter(assessment => assessment.value >= rule.parameterMinimum && assessment.value < rule.parameterMaximum)
+					.length;
 
-			const size = assessmentCount * (rule.valueMaximum + rule.valueMinimum) / 2;
+				const size = assessmentCount * (rule.valueMaximum + rule.valueMinimum) / 2;
 
-			switch (rule.operation) {
-				case StockSeedRuleOperation.add:
-				case StockSeedRuleOperation.apply: {
-					volume += size;
+				switch (rule.operation) {
+					case StockSeedRuleOperation.add:
+					case StockSeedRuleOperation.apply: {
+						volume += size;
 
-					break;
-				}
+						break;
+					}
 
-				case StockSeedRuleOperation.subtract: {
-					volume -= size;
+					case StockSeedRuleOperation.subtract: {
+						volume -= size;
 
-					break;
+						break;
+					}
 				}
 			}
 		}

@@ -83,8 +83,6 @@ DbClient.connectedClient.connect().then(async () => {
 
 	ScheduledEpoch.import(await database.epoch.toArray());
 
-	// new ResidentAssessor(database).next();
-
 	// market experiments
 	const marketLogger = new Logger('market');
 

@@ -11,7 +11,6 @@ import { ArticleNewstickerModel, ArticlePreviewModel, PublicationService } from 
 import { NewstickerComponent } from "./newsticker";
 import { Banner } from "../../interface/banner";
 import { Time } from "../../interface/time";
-import { HomeBoroughListComponent } from "./boroughs";
 
 export class HomePage extends Component {
 	render() {
@@ -58,35 +57,11 @@ export class HomePage extends Component {
 					{publicationIcon()}
 
 					<ui-name>
-						Publications (News)
+						News
 					</ui-name>
 
 					<ui-description>
 						Read up on what is going on in the city
-					</ui-description>
-				</ui-topic>
-
-				<ui-topic ui-href='/properties'>
-					{propertyRegisterIcon()}
-
-					<ui-name>
-						Property Register
-					</ui-name>
-
-					<ui-description>
-						Register, view or aquire plots of land
-					</ui-description>
-				</ui-topic>
-
-				<ui-topic ui-href='/metrics'>
-					{metricIcon()}
-
-					<ui-name>
-						Metrics
-					</ui-name>
-
-					<ui-description>
-						See key values and trends
 					</ui-description>
 				</ui-topic>
 
@@ -111,6 +86,30 @@ export class HomePage extends Component {
 
 					<ui-description>
 						View all residents living in Pilegron
+					</ui-description>
+				</ui-topic>
+
+				<ui-topic ui-href='/properties'>
+					{propertyRegisterIcon()}
+
+					<ui-name>
+						Property Register
+					</ui-name>
+
+					<ui-description>
+						Register, view or aquire plots of land
+					</ui-description>
+				</ui-topic>
+
+				<ui-topic ui-href='/metrics'>
+					{metricIcon()}
+
+					<ui-name>
+						Metrics
+					</ui-name>
+
+					<ui-description>
+						See key values and trends
 					</ui-description>
 				</ui-topic>
 
@@ -150,18 +149,6 @@ export class HomePage extends Component {
 					</ui-description>
 				</ui-topic>
 
-				<ui-topic ui-href='/law-house'>
-					{lawIcon()}
-
-					<ui-name>
-						Law House
-					</ui-name>
-
-					<ui-description>
-						Everything legal.
-					</ui-description>
-				</ui-topic>
-
 				<ui-topic ui-href='/company-office'>
 					{companyOfficeIcon()}
 
@@ -171,18 +158,6 @@ export class HomePage extends Component {
 
 					<ui-description>
 						Come here if you mean business!
-					</ui-description>
-				</ui-topic>
-
-				<ui-topic ui-href='/oracle'>
-					{oracleIcon()}
-
-					<ui-name>
-						Oracle
-					</ui-name>
-
-					<ui-description>
-						Lore proposing oracle
 					</ui-description>
 				</ui-topic>
 
@@ -206,19 +181,6 @@ export class HomePage extends Component {
 					* You must be whitelisted. Contact ME if you would like to join.
 				</ui-hint>
 			</ui-connection>
-
-			<ui-section>
-				<ui-title>
-					Boroughs
-				</ui-title>
-
-				<ui-description>
-					The city is split into {Application.boroughs.length} administrative districts called boroughs.
-					Each borough has its own administration, rules and history.
-				</ui-description>
-
-				{new HomeBoroughListComponent()}
-			</ui-section>
 
 			<ui-about>
 				This application is a testing bed for large language models (LLM), our own open source libraries and geographic information systems (GIS) at <ui-company ui-href='https://acryps.com'>Acryps AG</ui-company>.

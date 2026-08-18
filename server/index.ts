@@ -58,6 +58,7 @@ import { CourtCaseSession } from "./legal/court";
 import { readdirSync, readFileSync } from "fs";
 import { CommodityIconImageInterface } from "./areas/market/icon";
 import { MarketCycle, MarketCycleGenerator } from "./market/cycle";
+import { WorkerDispatch } from "./worker";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const runMarket = process.env.RUN_MARKET == 'YES';
@@ -76,12 +77,17 @@ DbClient.connectedClient = new DbClient({ max: 2 });
 DbClient.connectedClient.connect().then(async () => {
 	logger.log('connected');
 
-	const app = new ManagedServer();
-	ws(app.app);
-
 	const database = new DbContext(new RunContext());
 
+	// environment context
 	ScheduledEpoch.import(await database.epoch.toArray());
+
+	if (WorkerDispatch.main(database)) {
+		return;
+	}
+
+	const app = new ManagedServer();
+	ws(app.app);
 
 	// market experiments
 	const marketLogger = new Logger('market');

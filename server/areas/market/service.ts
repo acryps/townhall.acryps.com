@@ -67,26 +67,24 @@ export class MarketService extends Service {
 		const tickers: LiveCommodityTickerModel[] = [];
 
 		for (let ticker of this.tracker.trackers) {
-			if (ticker.ask.valid || ticker.bid.valid) {
-				tickers.push({
-					commodityId: ticker.commodity.id,
+			tickers.push({
+				commodityId: ticker.commodity.id,
 
-					askLow: ticker.ask.low,
-					askMedian: ticker.ask.median,
-					askHigh: ticker.ask.high,
-					askVolume: ticker.ask.volume,
-					askCapitalization: ticker.ask.capitalization,
+				askLow: ticker.ask.low,
+				askMedian: ticker.ask.median,
+				askHigh: ticker.ask.high,
+				askVolume: ticker.ask.volume,
+				askCapitalization: ticker.ask.capitalization,
 
-					bidLow: ticker.bid.low,
-					bidMedian: ticker.bid.median,
-					bidHigh: ticker.bid.high,
-					bidVolume: ticker.bid.volume,
-					bidCapitalization: ticker.bid.capitalization,
+				bidLow: ticker.bid.low,
+				bidMedian: ticker.bid.median,
+				bidHigh: ticker.bid.high,
+				bidVolume: ticker.bid.volume,
+				bidCapitalization: ticker.bid.capitalization,
 
-					estimatedStockSize: ticker.estimatedStockSize,
-					estimatedDemandTarget: ticker.estimatedDemand.find(demand => demand.active)?.target ?? 0
-				});
-			}
+				estimatedStockSize: ticker.estimatedStockSize,
+				estimatedDemandTarget: ticker.estimatedDemand.find(demand => demand.active)?.target ?? 0
+			});
 		}
 
 		return LiveCommodityTickerResponseModel.from(tickers);

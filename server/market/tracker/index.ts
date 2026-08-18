@@ -6,30 +6,37 @@ import { MarketPriceRange } from "./price-range";
 import { CommodityPriceTracker } from "./tracker";
 import { Logger } from "@acryps/log";
 import { Demand } from "./demand";
+import { WorkerDispatch, WorkerHandle } from "../../worker";
 
-export class MarketTracker {
+export class MarketTracker extends WorkerHandle {
 	trackers: CommodityPriceTracker[] = [];
 
 	constructor(
 		private logger: Logger,
 		private database: DbContext
-	) {}
+	) {
+		super();
+	}
+
+	static async dispatch(logger: Logger, database: DbContext) {
+		const tracker = new MarketTracker(logger, database);
+		await tracker.update();
+
+		return tracker.trackers;
+	}
 
 	schedule() {
 		const next = async () => {
 			const start = Date.now();
-			await this.update();
-			const end = Date.now();
+			this.trackers = await WorkerDispatch.dispatch<CommodityPriceTracker[]>(MarketTracker as any);
 
-			setTimeout(next, 1000 * 10 + end - start);
+			setTimeout(next, 1000 * 10 + Date.now() - start);
 		};
 
 		next();
 	}
 
 	async update() {
-		const now = new Date();
-
 		this.logger.log(`preparing tracker update`);
 
 		const assessments = await this.database.residentAssessment
@@ -106,6 +113,9 @@ export class MarketTracker {
 
 			this.trackers.push(tracker);
 		}
+
+		tracker.ask = new MarketPriceRange();
+		tracker.bid = new MarketPriceRange();
 
 		tracker.estimatedStockSize = await this.estimateStockSize(commodity, assessments);
 		tracker.estimatedDemand = await this.estimateDemands(commodity, residentialDemand, assessments);

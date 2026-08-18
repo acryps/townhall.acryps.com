@@ -6,6 +6,7 @@ export class CityViewModel extends ViewModel<City> {
 
 	name;
 	incorporated;
+	description;
 
 	mainImpressionId;
 

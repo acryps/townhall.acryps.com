@@ -2,11 +2,11 @@ import { select, style, content, Font, fontFamily, fontWeight, fontStyle } from 
 
 
 export const iconFont = new Font('icons', fontWeight('normal'), fontStyle('normal'))
-	.addSource('/assets/icons/managed/font/index.eot?4e4e99395b58', 'embedded-opentype')
-	.addSource('/assets/icons/managed/font/index.svg?7e161ff6126f', 'svg')
-	.addSource('/assets/icons/managed/font/index.ttf?02693e18b9b4', 'truetype')
-	.addSource('/assets/icons/managed/font/index.woff?dc9d9e3264cd', 'woff')
-	.addSource('/assets/icons/managed/font/index.woff2?c3ada294890a', 'woff2');
+	.addSource('/assets/icons/managed/font/index.eot?8672fe2e68e3', 'embedded-opentype')
+	.addSource('/assets/icons/managed/font/index.svg?f8073b522300', 'svg')
+	.addSource('/assets/icons/managed/font/index.ttf?eb8c73660ca3', 'truetype')
+	.addSource('/assets/icons/managed/font/index.woff?d59896ae6b0c', 'woff')
+	.addSource('/assets/icons/managed/font/index.woff2?4ad2c0e2bd6d', 'woff2');
 
 export const icons = () => select('ui-icon',
 	fontFamily(iconFont.name),
@@ -26,35 +26,36 @@ export const icons = () => select('ui-icon',
 	style('[ui-down]').before('\f10a'),
 	style('[ui-draw]').before('\f10b'),
 	style('[ui-election]').before('\f10c'),
-	style('[ui-flip]').before('\f10d'),
-	style('[ui-go]').before('\f10e'),
-	style('[ui-home]').before('\f10f'),
-	style('[ui-item-context]').before('\f110'),
-	style('[ui-law]').before('\f111'),
-	style('[ui-map]').before('\f112'),
-	style('[ui-market]').before('\f113'),
-	style('[ui-metric]').before('\f114'),
-	style('[ui-military]').before('\f115'),
-	style('[ui-minimap-compass]').before('\f116'),
-	style('[ui-movement]').before('\f117'),
-	style('[ui-oracle]').before('\f118'),
-	style('[ui-plan]').before('\f119'),
-	style('[ui-price]').before('\f11a'),
-	style('[ui-property-register]').before('\f11b'),
-	style('[ui-publication]').before('\f11c'),
-	style('[ui-relation-graph]').before('\f11d'),
-	style('[ui-relation]').before('\f11e'),
-	style('[ui-resident]').before('\f11f'),
-	style('[ui-route-interchange]').before('\f120'),
-	style('[ui-speak]').before('\f121'),
-	style('[ui-state]').before('\f122'),
-	style('[ui-street]').before('\f123'),
-	style('[ui-time-machine]').before('\f124'),
-	style('[ui-train]').before('\f125'),
-	style('[ui-undo]').before('\f126'),
-	style('[ui-up-all]').before('\f127'),
-	style('[ui-up]').before('\f128'),
-	style('[ui-water]').before('\f129'),
+	style('[ui-explore]').before('\f10d'),
+	style('[ui-flip]').before('\f10e'),
+	style('[ui-go]').before('\f10f'),
+	style('[ui-home]').before('\f110'),
+	style('[ui-item-context]').before('\f111'),
+	style('[ui-law]').before('\f112'),
+	style('[ui-map]').before('\f113'),
+	style('[ui-market]').before('\f114'),
+	style('[ui-metric]').before('\f115'),
+	style('[ui-military]').before('\f116'),
+	style('[ui-minimap-compass]').before('\f117'),
+	style('[ui-movement]').before('\f118'),
+	style('[ui-oracle]').before('\f119'),
+	style('[ui-plan]').before('\f11a'),
+	style('[ui-price]').before('\f11b'),
+	style('[ui-property-register]').before('\f11c'),
+	style('[ui-publication]').before('\f11d'),
+	style('[ui-relation-graph]').before('\f11e'),
+	style('[ui-relation]').before('\f11f'),
+	style('[ui-resident]').before('\f120'),
+	style('[ui-route-interchange]').before('\f121'),
+	style('[ui-speak]').before('\f122'),
+	style('[ui-state]').before('\f123'),
+	style('[ui-street]').before('\f124'),
+	style('[ui-time-machine]').before('\f125'),
+	style('[ui-train]').before('\f126'),
+	style('[ui-undo]').before('\f127'),
+	style('[ui-up-all]').before('\f128'),
+	style('[ui-up]').before('\f129'),
+	style('[ui-water]').before('\f12a'),
 );
 
 const createIconElement = (name: string) => {
@@ -76,6 +77,7 @@ export const downAllIcon = () => createIconElement('down-all');
 export const downIcon = () => createIconElement('down');
 export const drawIcon = () => createIconElement('draw');
 export const electionIcon = () => createIconElement('election');
+export const exploreIcon = () => createIconElement('explore');
 export const flipIcon = () => createIconElement('flip');
 export const goIcon = () => createIconElement('go');
 export const homeIcon = () => createIconElement('home');

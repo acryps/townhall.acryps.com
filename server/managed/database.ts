@@ -813,6 +813,7 @@ export class CityQueryProxy extends QueryProxy {
 	get mainImpression(): Partial<ImpressionQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get centerX(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get centerY(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get description(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get incorporated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get mainImpressionId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -824,6 +825,7 @@ export class City extends Entity<CityQueryProxy> {
 	get mainImpression(): Partial<ForeignReference<Impression>> { return this.$mainImpression; }
 	centerX: number;
 	centerY: number;
+	description: string;
 	declare id: string;
 	incorporated: Date;
 	mainImpressionId: string;
@@ -836,6 +838,7 @@ export class City extends Entity<CityQueryProxy> {
 		columns: {
 			centerX: { type: "float4", name: "center_x" },
 			centerY: { type: "float4", name: "center_y" },
+			description: { type: "text", name: "description" },
 			id: { type: "uuid", name: "id" },
 			incorporated: { type: "timestamp", name: "incorporated" },
 			mainImpressionId: { type: "uuid", name: "main_impression_id" },

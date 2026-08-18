@@ -23,6 +23,8 @@ export class ImpressionImageInterface {
 				impressionCache.set(id, impression);
 			}
 
+			response.setHeader('cache-control', 'public, max-age=31536000, immutable');
+
 			response.contentType(impression.mimeType);
 			response.end(impression.image);
 		});

@@ -198,6 +198,7 @@ export interface ChangeFrameViewModel {
 export interface CityViewModel {
     centerX: number;
 	centerY: number;
+	description: string;
 	id: string;
 	incorporated: Date;
 	mainImpressionId: string;

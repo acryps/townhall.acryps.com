@@ -1,4 +1,4 @@
-import { alignItems, backdropFilter, backgroundColor, blur, borderBottom, boxShadow, brightness, child, color, ColorValue, contrast, cursor, display, dropShadow, em, filter, fontFamily, fontSize, grayscale, hex, margin, marginLeft, outline, padding, position, px, rem, root, textAlign, top, Variable, zIndex } from "@acryps/style";
+import { alignItems, backdropFilter, backgroundColor, blur, borderBottom, boxShadow, brightness, child, color, ColorValue, contrast, cursor, display, dropShadow, em, filter, fontFamily, fontSize, grayscale, hex, lineHeight, margin, marginLeft, outline, padding, position, px, rem, root, textAlign, top, Variable, zIndex } from "@acryps/style";
 import { homeStyle } from "./home/index.style";
 import { boldFont, boldItalicFont, headlineFont, microFont, regularFont, regularItalicFont } from "./assets/font/index.style";
 import { boroughStyle } from "./borough/index.style";
@@ -40,11 +40,19 @@ import { waterStyle } from "./water/index.style";
 import { marketStyle } from "./market/index.style";
 import { loreStyle } from "./lore/index.style";
 
+export const navigationHeight = new Variable('navigation-height',
+	rem(0.8).multiply(2).multiply(1.2)
+		.add(pageGutter.multiply(2))
+		.add(px(2))
+);
+
 export const pageStyle = () => root(
 	boldFont,
 	boldItalicFont,
 	regularFont,
 	regularItalicFont,
+
+	navigationHeight,
 
 	iconFont,
 	icons(),
@@ -79,6 +87,7 @@ export const pageStyle = () => root(
 				display('flex'),
 				alignItems('center'),
 				padding(pageGutter),
+				lineHeight(1.2),
 
 				backgroundColor(navigationBackgroundColor),
 				borderBottom(px(2), 'solid', navigationBorderColor),

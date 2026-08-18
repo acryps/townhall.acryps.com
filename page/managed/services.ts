@@ -450,6 +450,7 @@ export class ChangeFrameViewModel {
 export class CityViewModel {
 	centerX: number;
 	centerY: number;
+	description: string;
 	id: string;
 	incorporated: Date;
 	mainImpressionId: string;
@@ -459,6 +460,7 @@ export class CityViewModel {
 		const item = new CityViewModel();
 		raw.centerX === undefined || (item.centerX = raw.centerX === null ? null : +raw.centerX)
 		raw.centerY === undefined || (item.centerY = raw.centerY === null ? null : +raw.centerY)
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.incorporated === undefined || (item.incorporated = raw.incorporated ? new Date(raw.incorporated) : null)
 		raw.mainImpressionId === undefined || (item.mainImpressionId = raw.mainImpressionId === null ? null : `${raw.mainImpressionId}`)

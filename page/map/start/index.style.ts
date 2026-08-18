@@ -1,4 +1,4 @@
-import { aspectRatio, background, backgroundColor, blur, bottom, boxShadow, child, color, cursor, display, filter, flexBasis, flexGrow, flexWrap, fontSize, fontWeight, gap, height, hex, imageRendering, inset, insetInline, justifyContent, margin, marginBottom, mixBlendMode, objectFit, opacity, padding, paddingBlock, paddingInline, percentage, position, px, ratio, rem, textAlign, whiteSpace, width } from "@acryps/style";
+import { alignItems, alignSelf, aspectRatio, background, backgroundColor, blur, bottom, boxShadow, child, color, cursor, display, filter, flexBasis, flexDirection, flexGrow, flexWrap, fontSize, fontWeight, fr, gap, gridTemplateColumns, height, hex, imageRendering, inset, insetInline, justifyContent, lineHeight, margin, marginBottom, minMax, minWidth, mixBlendMode, Number, objectFit, objectPosition, opacity, overflow, overflowWrap, padding, paddingBlock, paddingBottom, paddingInline, paddingTop, percentage, position, px, ratio, rem, repeat, textAlign, Variable, vh, whiteSpace, width } from "@acryps/style";
 import { boxed } from "../../shared/boxed.style";
 import { collection, collectionItem } from "../../shared/collection.style";
 import { navigationBackgroundColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
@@ -7,63 +7,73 @@ import { buttonStyle } from "../../shared/index.style";
 import { microFont } from "../../assets/font/index.style";
 
 export const mapStartStyle = () => child('ui-map-start',
-	child('ui-minimap',
-		position('fixed'),
-		inset(rem(0)),
+	display('flex'),
+	flexDirection('column'),
 
-		cursor('crosshair'),
+	child('ui-cities',
+		collection(rem(20), pageGutter),
 
-		child('img',
-			width(percentage(100)),
-			height(percentage(100)),
+		flexGrow(1),
+		margin(px(2)),
 
-			objectFit('cover'),
-			imageRendering('pixelated')
-		),
+		child('ui-city',
+			card(false),
 
-		child('canvas',
-			position('absolute'),
-			inset(0),
-			width(percentage(100)),
-			height(percentage(100)),
+			display('flex'),
+			flexDirection('column'),
 
-			objectFit('cover'),
+			collectionItem(),
+			overflow('hidden'),
 
-			filter(blur(px(2))),
-			opacity(0.75)
-		),
+			child('img',
+				width(percentage(100)),
 
-		child('ui-cursor',
-			position('absolute'),
+				objectFit('cover')
+			),
 
-			paddingInline(rem(0.5)),
-			paddingBlock(rem(0.25)),
-			margin(px(5)),
-			whiteSpace('pre'),
+			child('ui-label',
+				display('flex'),
+				justifyContent('space-between'),
+				alignItems('flex-start'),
 
-			opacity(0.95),
+				padding(pageGutter),
+				paddingTop(pageGutter.divide(2)),
+				paddingBottom(rem(0.25)),
 
-			color(pageTextColor),
-			backgroundColor(pageBackgroundColor),
-			boxShadow(hex('0004'), 0, rem(0.25), rem(0.5)),
+				child('ui-name',
+					fontWeight('bold')
+				),
 
-			child('ui-borough',
-				display('block'),
-				marginBottom(rem(0.25))
-			)
-				.empty(display('none')),
+				child('ui-location',
+					microFont,
+					fontSize(rem(0.6))
+				)
+			),
 
-			child('ui-position',
-				display('block'),
+			child('ui-detail',
+				display('flex'),
+				gap(rem(1)),
+				flexGrow(1),
 
-				microFont,
-				fontSize(rem(0.75))
+				padding(pageGutter),
+				paddingTop(0),
+
+				child('ui-description',
+					display('block'),
+					flexGrow(1)
+				),
+
+				child('ui-icon',
+					alignSelf('flex-end'),
+
+					fontSize(rem(2))
+				)
 			)
 		)
 	),
 
 	child('ui-actions',
-		position('fixed'),
+		position('sticky'),
 		insetInline(0),
 		bottom(0),
 

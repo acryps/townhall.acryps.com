@@ -4060,6 +4060,7 @@ ViewModel.mappings = {
 			return {
 				centerX: this.$$model.centerX,
 				centerY: this.$$model.centerY,
+				description: this.$$model.description,
 				id: this.$$model.id,
 				incorporated: this.$$model.incorporated,
 				mainImpressionId: this.$$model.mainImpressionId,
@@ -4095,6 +4096,7 @@ ViewModel.mappings = {
 			return {
 				centerX: true,
 				centerY: true,
+				description: true,
 				id: true,
 				incorporated: true,
 				mainImpressionId: true,
@@ -4106,6 +4108,7 @@ ViewModel.mappings = {
 			const item = new CityViewModel(null);
 			"centerX" in data && (item.centerX = data.centerX === null ? null : +data.centerX);
 			"centerY" in data && (item.centerY = data.centerY === null ? null : +data.centerY);
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"incorporated" in data && (item.incorporated = data.incorporated === null ? null : new Date(data.incorporated));
 			"mainImpressionId" in data && (item.mainImpressionId = data.mainImpressionId === null ? null : `${data.mainImpressionId}`);
@@ -4125,6 +4128,7 @@ ViewModel.mappings = {
 			
 			"centerX" in viewModel && (model.centerX = viewModel.centerX === null ? null : +viewModel.centerX);
 			"centerY" in viewModel && (model.centerY = viewModel.centerY === null ? null : +viewModel.centerY);
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"incorporated" in viewModel && (model.incorporated = viewModel.incorporated === null ? null : new Date(viewModel.incorporated));
 			"mainImpressionId" in viewModel && (model.mainImpressionId = viewModel.mainImpressionId === null ? null : `${viewModel.mainImpressionId}`);

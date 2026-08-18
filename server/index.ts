@@ -59,6 +59,7 @@ import { readdirSync, readFileSync } from "fs";
 import { CommodityIconImageInterface } from "./areas/market/icon";
 import { MarketCycle, MarketCycleGenerator } from "./market/cycle";
 import { WorkerDispatch } from "./worker";
+import { PlanningMapGenerator } from "./map/planning";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const runMarket = process.env.RUN_MARKET == 'YES';
@@ -113,6 +114,7 @@ DbClient.connectedClient.connect().then(async () => {
 	await MetricTracker.executeTask();
 
 	new MinimapGenerator(database, app).schedule();
+	new PlanningMapGenerator(database, app);
 
 	const preload = new Preload(database);
 	registerPreload(preload, database);

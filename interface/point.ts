@@ -100,16 +100,26 @@ export class Point {
 	}
 
 	static bounds(points: Point[], offset = 0): BoundingBox {
-		const minX = Math.min(...points.map(point => point.x)) - offset;
-		const maxX = Math.max(...points.map(point => point.x)) + offset;
+		let minX = Infinity;
+		let maxX = -Infinity;
+		let minY = Infinity;
+		let maxY = -Infinity;
 
-		const minY = Math.min(...points.map(point => point.y)) - offset;
-		const maxY = Math.max(...points.map(point => point.y)) + offset;
+		for (let point of points) {
+			if (point.x < minX) minX = point.x;
+			if (point.x > maxX) maxX = point.x;
+			if (point.y < minY) minY = point.y;
+			if (point.y > maxY) maxY = point.y;
+		}
+
+		minX -= offset;
+		maxX += offset;
+		minY -= offset;
+		maxY += offset;
 
 		return {
 			x: { min: minX, max: maxX },
 			y: { min: minY, max: maxY },
-
 			width: maxX - minX,
 			height: maxY - minY
 		};

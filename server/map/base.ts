@@ -19,6 +19,8 @@ export class BaseTileServer {
 		private app: ManagedServer,
 		private database: DbContext
 	) {
+		this.preloadMilitaryFacilities();
+
 		app.app.get('/tile/base/:type/:x/:y', async (request, response) => {
 			const type = request.params.type == 'day' ? MapType.overworld : MapType.night;
 
@@ -143,6 +145,26 @@ export class BaseTileServer {
 			response.contentType('image/png');
 			response.end(await canvas.toBuffer('png'));
 		});
+	}
+
+	async preloadMilitaryFacilities() {
+		this.logger.log('preloading military facilities');
+
+		const militaryFacilities = await this.database.militaryFacility
+			.include(facility => facility.property)
+			.toArray();
+
+		for (let facility of militaryFacilities) {
+			const property = await facility.property.fetch();
+			const activeBoundary = await property.activePlotBoundary.fetch();
+
+			this.logger.log(`blurring ${facility.name ?? property.name ?? property.id}`);
+
+			for (let type of [MapType.overworld, MapType.night]) {
+				const blurred = await this.renderBlurredMilitaryFacility(facility, Point.unpack(activeBoundary.shape), type);
+				this.militaryFacilityCache[type].set(facility.id, blurred);
+			}
+		}
 	}
 
 	async getTile(regionX: number, regionY: number, type: MapType) {

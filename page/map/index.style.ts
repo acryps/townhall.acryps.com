@@ -1,10 +1,11 @@
-import { alignItems, alignSelf, background, backgroundColor, border, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, display, flexDirection, flexGrow, flexShrink, flexWrap, fontSize, gap, height, Hex, hex, imageRendering, inset, insetInline, justifyContent, margin, marginInline, marginLeft, marginTop, maxWidth, Number, opacity, overflow, padding, paddingBlock, paddingInline, paddingTop, percentage, pointerEvents, position, px, rem, select, style, textAlign, Variable, width } from "@acryps/style";
+import { alignItems, alignSelf, background, backgroundColor, border, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, display, flexDirection, flexGrow, flexShrink, flexWrap, fontSize, gap, height, Hex, hex, imageRendering, inset, insetInline, justifyContent, left, lineHeight, margin, marginBottom, marginInline, marginLeft, marginTop, maxWidth, Number, opacity, overflow, padding, paddingBlock, paddingInline, paddingTop, percentage, pointerEvents, position, px, rem, right, select, style, textAlign, top, Variable, width } from "@acryps/style";
 import { pageTextColor, navigationBackgroundColor, navigationBorderColor, pageGutter, pageBackgroundColor, neutralColor } from "../index.style";
 import { buttonStyle } from "../shared/index.style";
 import { PageComponent } from "../page";
 import { createFeatureStyle } from "./create/index.style";
 import { boxed } from "../shared/boxed.style";
 import { fieldStyle, inputStyle } from "../shared/field.style";
+import { navigationHeight } from "../page.style";
 
 const buttonPaddingSize = rem(0.8);
 
@@ -34,15 +35,90 @@ export const mapStyle = () => [
 
 		child('ui-tools',
 			position('fixed'),
-			insetInline(0),
+			left(0),
 			bottom(0),
 
 			display('flex'),
 			flexDirection('column'),
+			alignItems('flex-start'),
+
+			pointerEvents('none'),
+			child('*', pointerEvents('all')),
+
+			child('ui-location',
+				position('fixed'),
+				top(pageGutter.add(navigationHeight)),
+				right(pageGutter),
+
+				paddingInline(rem(0.5)),
+				paddingBlock(rem(0.25)),
+				lineHeight(1),
+
+				fontSize(rem(0.75)),
+				color(activeBoroughContrast),
+				backgroundColor(activeBoroughColor),
+				textAlign('right'),
+
+				child('ui-coordinates',
+					display('block')
+				),
+
+				child('ui-borough',
+					display('block')
+				)
+			),
+
+			child('ui-drawer',
+				display('flex'),
+				flexDirection('column'),
+				flexWrap('wrap'),
+				justifyContent('space-between'),
+				gap(pageGutter.divide(2)),
+
+				padding(pageGutter),
+
+				select('ui-layer',
+					display('flex'),
+
+					paddingBlock(buttonPaddingSize.multiply(0.6)),
+					paddingInline(buttonPaddingSize),
+
+					fontSize(rem(1.25)),
+
+					color(pageTextColor),
+					backgroundColor(navigationBackgroundColor),
+
+					border(px(1), 'solid', 'currentColor'),
+					marginBottom(px(-1))
+				),
+
+				child('ui-layers',
+					display('flex'),
+					flexDirection('column')
+				),
+
+				child('ui-actions',
+					display('flex'),
+					flexDirection('column'),
+
+					color(pageTextColor),
+					backgroundColor(navigationBackgroundColor),
+
+					child('ui-action',
+						display('flex'),
+						paddingBlock(buttonPaddingSize.multiply(0.6)),
+						paddingInline(buttonPaddingSize),
+
+						border(px(1), 'solid', 'currentColor'),
+						marginBottom(px(-1)),
+
+						fontSize(rem(1.25))
+					)
+				)
+			),
 
 			child('ui-actions',
 				display('flex'),
-				flexWrap('wrap'),
 				margin(pageGutter),
 				gap(pageGutter.divide(2)),
 
@@ -98,18 +174,6 @@ export const mapStyle = () => [
 
 					inputStyle()
 				)
-			),
-
-			child('ui-location',
-				display('flex'),
-				justifyContent('space-between'),
-
-				paddingInline(pageGutter),
-				paddingBlock(rem(0.25)),
-
-				fontSize(rem(0.75)),
-				color(activeBoroughContrast),
-				backgroundColor(activeBoroughColor),
 			),
 
 			child('ui-plans',
@@ -176,37 +240,6 @@ export const mapStyle = () => [
 				child('input',
 					inputStyle(),
 					flexGrow(1)
-				)
-			),
-
-			child('ui-drawer',
-				display('flex'),
-				flexWrap('wrap'),
-				justifyContent('space-between'),
-				padding(pageGutter.subtract(buttonPaddingSize)),
-
-				color(pageTextColor),
-				backgroundColor(navigationBackgroundColor),
-
-				select('ui-layer',
-					paddingInline(buttonPaddingSize.divide(2)),
-					paddingBlock(buttonPaddingSize),
-
-					fontSize(rem(1.5))
-				),
-
-				child('ui-layers',
-					display('flex')
-				),
-
-				child('ui-actions',
-					display('flex'),
-
-					child('ui-action',
-						padding(buttonPaddingSize),
-
-						fontSize(rem(1.5))
-					)
 				)
 			)
 		)

@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import { DbContext, MapTile, MapType } from "../managed/database";
 import { Canvas, CanvasRenderingContext2D, loadImage } from "skia-canvas";
-import { Point } from "../../interface/point";
+import { PackedPoint, Point } from "../../interface/point";
 import { mapBaseTileSize } from "../../interface/tile";
 import { Logger } from "@acryps/log";
 
@@ -30,6 +30,29 @@ export class MapImporter {
 		MapImporter.instance = this;
 	}
 
+	// re-imports entire map
+	async reimport() {
+		const regions = await this.database.mapTile.includeTree({ id: 1, regionX: 1, regionY: 1 }).toArray();
+
+		const imported: string[] = [];
+
+		const station = new Point(-1, -1);
+		await this.update(station);
+		imported.push(station.toString());
+
+		for (let region of regions) {
+			const point = new Point(region.regionX, region.regionY);
+
+			if (!imported.includes(point.toString())) {
+				console.log(point.x, point.y);
+
+				await this.update(point);
+
+				imported.push(point.toString());
+			}
+		}
+	}
+
 	// call when a change is suspected at the location
 	static poke(point: Point) {
 		const region = new Point(point.x / MapImporter.tile, point.y / MapImporter.tile).floor();
@@ -50,7 +73,7 @@ export class MapImporter {
 	async update(region: Point) {
 		const logger = this.logger.task(`update region ${region.x} ${region.y}`);
 
-		for (let type of [MapType.overworld]) {
+		for (let type of [MapType.overworld, MapType.night]) {
 			logger.log(`fetch ${type}`);
 
 			const source = Buffer.from(

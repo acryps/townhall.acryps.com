@@ -44,40 +44,10 @@ export class MapToolbarComponent extends Component {
 		};
 
 		return <ui-tools>
-			{this.parent.map.drawer && <ui-actions>
-				<ui-group>
-					<ui-action ui-click={() => this.parent.map.pushDrawingPoint()}>
-						{addIcon()} Add
-					</ui-action>
-
-					<ui-action ui-click={() => this.parent.map.popDrawingPoint()}>
-						{undoIcon()}
-					</ui-action>
-
-					<ui-action ui-click={() => this.parent.map.flipDrawingDirection()}>
-						{flipIcon()}
-					</ui-action>
-				</ui-group>
-
-				{this.parent.drawing.type == 'closed-shape' ? (
-					this.parent.map.drawer.closeable.map(possible => possible ? <ui-action ui-click={() => this.parent.completeDrawing()}>
-						{this.parent.drawing.name} {goIcon()}
-					</ui-action> : <ui-action ui-disabled>
-						{this.parent.drawing.name} {goIcon()}
-					</ui-action>)
-				) : <ui-action ui-click={() => this.parent.completeDrawing()}>
-					{this.parent.drawing.name} {goIcon()}
-				</ui-action>}
-			</ui-actions>}
-
-			{this.timeMachine}
-
 			<ui-location>
 				{this.coordinateTracker = <ui-coordinates></ui-coordinates>}
 				{this.boroughTracker = <ui-borough></ui-borough>}
 			</ui-location>
-
-			{(this.parent.child instanceof Action) && this.parent.child.renderPanel()}
 
 			<ui-drawer>
 				{this.action}
@@ -92,10 +62,6 @@ export class MapToolbarComponent extends Component {
 					</ui-layer>
 
 					<ui-layer ui-click={() => this.toggleLayer(propertyLayer)}>
-						{propertyRegisterIcon()}
-					</ui-layer>
-
-					<ui-layer ui-click={() => this.toggleLayer(propertyOwnershipLayer)}>
 						{propertyRegisterIcon()}
 					</ui-layer>
 
@@ -169,6 +135,36 @@ export class MapToolbarComponent extends Component {
 					</ui-action>
 				</ui-actions>
 			</ui-drawer>
+
+			{this.timeMachine}
+
+			{this.parent.map.drawer && <ui-actions>
+				<ui-group>
+					<ui-action ui-click={() => this.parent.map.pushDrawingPoint()}>
+						{addIcon()} Add
+					</ui-action>
+
+					<ui-action ui-click={() => this.parent.map.popDrawingPoint()}>
+						{undoIcon()}
+					</ui-action>
+
+					<ui-action ui-click={() => this.parent.map.flipDrawingDirection()}>
+						{flipIcon()}
+					</ui-action>
+				</ui-group>
+
+				{this.parent.drawing.type == 'closed-shape' ? (
+					this.parent.map.drawer.closeable.map(possible => possible ? <ui-action ui-click={() => this.parent.completeDrawing()}>
+						{this.parent.drawing.name} {goIcon()}
+					</ui-action> : <ui-action ui-disabled>
+						{this.parent.drawing.name} {goIcon()}
+					</ui-action>)
+				) : <ui-action ui-click={() => this.parent.completeDrawing()}>
+					{this.parent.drawing.name} {goIcon()}
+				</ui-action>}
+			</ui-actions>}
+
+			{(this.parent.child instanceof Action) && this.parent.child.renderPanel()}
 		</ui-tools>
 	}
 

@@ -161,31 +161,31 @@ export class ResidentAssessor {
 			try {
 				await interpreter.execute(
 					new SystemMessage(`
-					# Situation
-					We are currently trying to assess our fictional characters one by one to analyse our virtual civilisation.
+						# Situation
+						We are currently trying to assess our fictional characters one by one to analyse our virtual civilisation.
 
-					I will provide you with details on ${resident.familyName} ${resident.givenName}.
-					You will see a biography, as well as some details about them.
-				`),
+						I will provide you with details on ${resident.familyName} ${resident.givenName}.
+						You will see a biography, as well as some details about them.
+					`),
 
 					new UserMessage(details.join('\n\n')),
 
 					new SystemMessage(`
-					# Task
-					Please assess the person, calling the tool for each parameter.
-					Provide a value and confidence.
+						# Task
+						Please assess the person, calling the tool for each parameter.
+						Provide a value and confidence.
 
-					# Parameters
-					Call the tools for all of the following parameters.
+						# Parameters
+						Call the tools for all of the following parameters.
 
-					${parameters.map(parameter => `
-						## ${parameter.name}
-						${parameter.prompt}
+						${parameters.map(parameter => `
+							## ${parameter.name}
+							${parameter.prompt}
 
-						0.0 when ${parameter.low}
-						1.0 when ${parameter.high}
-					`).join('')}
-				`)
+							0.0 when ${parameter.low}
+							1.0 when ${parameter.high}
+						`).join('')}
+					`)
 				);
 			} catch (error) {
 				logger.error(`assess failed. marking as assessed`, error);

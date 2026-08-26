@@ -2,6 +2,7 @@ import { Component } from "@acryps/page";
 import { CompanyOfficeService, WorkOfferViewModel } from "../../managed/services";
 import { Time } from "../../../interface/time";
 import { convertToLegalCompanyName } from "../../../interface/company";
+import { convertToCurrency } from "../../../interface/currency";
 
 export class WorkOfferPage extends Component {
 	declare parameters: { id };
@@ -17,6 +18,10 @@ export class WorkOfferPage extends Component {
 			<ui-title>
 				{this.workOffer.title}
 			</ui-title>
+
+			<ui-salary>
+				{convertToCurrency(this.workOffer.dailySalary)}/day salary
+			</ui-salary>
 
 			<ui-task>
 				{this.workOffer.task}
@@ -39,6 +44,10 @@ export class WorkOfferPage extends Component {
 					<ui-timespan>
 						Signed {contract.signed.toLocaleDateString()}{contract.canceled ? `, canceled ${contract.canceled.toLocaleDateString()}.` : ''}
 					</ui-timespan>
+
+					<ui-salary>
+						{convertToCurrency(this.workOffer.dailySalary)}/day
+					</ui-salary>
 				</ui-contract>)}
 			</ui-contracts>
 		</ui-work-offer>

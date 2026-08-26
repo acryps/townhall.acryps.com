@@ -6382,6 +6382,7 @@ export class WorkContractQueryProxy extends QueryProxy {
 	get offer(): Partial<WorkOfferQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get worker(): Partial<ResidentQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get canceled(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get dailySalary(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get match(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get offerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get signed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -6392,6 +6393,7 @@ export class WorkContract extends Entity<WorkContractQueryProxy> {
 	get offer(): Partial<ForeignReference<WorkOffer>> { return this.$offer; }
 	get worker(): Partial<ForeignReference<Resident>> { return this.$worker; }
 	canceled: Date;
+	dailySalary: number;
 	declare id: string;
 	match: string;
 	offerId: string;
@@ -6402,6 +6404,7 @@ export class WorkContract extends Entity<WorkContractQueryProxy> {
 		source: "work_contract",
 		columns: {
 			canceled: { type: "timestamp", name: "canceled" },
+			dailySalary: { type: "float4", name: "daily_salary" },
 			id: { type: "uuid", name: "id" },
 			match: { type: "text", name: "match" },
 			offerId: { type: "uuid", name: "offer_id" },
@@ -6523,6 +6526,7 @@ export class WorkOfferQueryProxy extends QueryProxy {
 	get office(): Partial<OfficeQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get closed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get count(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get dailySalary(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get offered(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get officeId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get task(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -6534,6 +6538,7 @@ export class WorkOffer extends Entity<WorkOfferQueryProxy> {
 		get office(): Partial<ForeignReference<Office>> { return this.$office; }
 	closed: Date;
 	count: number;
+	dailySalary: number;
 	declare id: string;
 	offered: Date;
 	officeId: string;
@@ -6545,6 +6550,7 @@ export class WorkOffer extends Entity<WorkOfferQueryProxy> {
 		columns: {
 			closed: { type: "timestamp", name: "closed" },
 			count: { type: "int4", name: "count" },
+			dailySalary: { type: "float4", name: "daily_salary" },
 			id: { type: "uuid", name: "id" },
 			offered: { type: "timestamp", name: "offered" },
 			officeId: { type: "uuid", name: "office_id" },

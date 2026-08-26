@@ -18,6 +18,7 @@ export class WorkOfferEmplymentModel extends WorkOfferSummaryModel {
 export class WorkOfferViewModel extends WorkOfferSummaryModel {
 	task;
 	offered;
+	dailySalary;
 
 	office: OfficeViewModel;
 	workContracts: WorkContractViewModel[];
@@ -28,6 +29,7 @@ export class WorkContractSummaryModel extends ViewModel<WorkContract> {
 
 	signed;
 	canceled;
+	dailySalary;
 }
 
 export class WorkContractViewModel extends WorkContractSummaryModel {

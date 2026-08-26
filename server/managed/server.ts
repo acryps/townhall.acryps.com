@@ -3937,6 +3937,7 @@ ViewModel.mappings = {
 		async map() {
 			return {
 				canceled: this.$$model.canceled,
+				dailySalary: this.$$model.dailySalary,
 				id: this.$$model.id,
 				signed: this.$$model.signed
 			}
@@ -3969,6 +3970,7 @@ ViewModel.mappings = {
 
 			return {
 				canceled: true,
+				dailySalary: true,
 				id: true,
 				signed: true
 			};
@@ -3977,6 +3979,7 @@ ViewModel.mappings = {
 		static toViewModel(data) {
 			const item = new WorkContractSummaryModel(null);
 			"canceled" in data && (item.canceled = data.canceled === null ? null : new Date(data.canceled));
+			"dailySalary" in data && (item.dailySalary = data.dailySalary === null ? null : +data.dailySalary);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"signed" in data && (item.signed = data.signed === null ? null : new Date(data.signed));
 
@@ -3993,6 +3996,7 @@ ViewModel.mappings = {
 			}
 			
 			"canceled" in viewModel && (model.canceled = viewModel.canceled === null ? null : new Date(viewModel.canceled));
+			"dailySalary" in viewModel && (model.dailySalary = viewModel.dailySalary === null ? null : +viewModel.dailySalary);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"signed" in viewModel && (model.signed = viewModel.signed === null ? null : new Date(viewModel.signed));
 
@@ -9521,6 +9525,7 @@ ViewModel.mappings = {
 				office: new OfficeViewModel(await BaseServer.unwrap(this.$$model.office)),
 				closed: this.$$model.closed,
 				count: this.$$model.count,
+				dailySalary: this.$$model.dailySalary,
 				id: this.$$model.id,
 				offered: this.$$model.offered,
 				task: this.$$model.task,
@@ -9568,6 +9573,7 @@ ViewModel.mappings = {
 				},
 				closed: true,
 				count: true,
+				dailySalary: true,
 				id: true,
 				offered: true,
 				task: true,
@@ -9581,6 +9587,7 @@ ViewModel.mappings = {
 			"office" in data && (item.office = data.office && ViewModel.mappings[OfficeViewModel.name].toViewModel(data.office));
 			"closed" in data && (item.closed = data.closed === null ? null : new Date(data.closed));
 			"count" in data && (item.count = data.count === null ? null : +data.count);
+			"dailySalary" in data && (item.dailySalary = data.dailySalary === null ? null : +data.dailySalary);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"offered" in data && (item.offered = data.offered === null ? null : new Date(data.offered));
 			"task" in data && (item.task = data.task === null ? null : `${data.task}`);
@@ -9602,6 +9609,7 @@ ViewModel.mappings = {
 			"office" in viewModel && (model.office.id = viewModel.office ? viewModel.office.id : null);
 			"closed" in viewModel && (model.closed = viewModel.closed === null ? null : new Date(viewModel.closed));
 			"count" in viewModel && (model.count = viewModel.count === null ? null : +viewModel.count);
+			"dailySalary" in viewModel && (model.dailySalary = viewModel.dailySalary === null ? null : +viewModel.dailySalary);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"offered" in viewModel && (model.offered = viewModel.offered === null ? null : new Date(viewModel.offered));
 			"task" in viewModel && (model.task = viewModel.task === null ? null : `${viewModel.task}`);
@@ -9615,6 +9623,7 @@ ViewModel.mappings = {
 			return {
 				worker: new ResidentSummaryModel(await BaseServer.unwrap(this.$$model.worker)),
 				canceled: this.$$model.canceled,
+				dailySalary: this.$$model.dailySalary,
 				id: this.$$model.id,
 				match: this.$$model.match,
 				signed: this.$$model.signed
@@ -9654,6 +9663,7 @@ ViewModel.mappings = {
 					);
 				},
 				canceled: true,
+				dailySalary: true,
 				id: true,
 				match: true,
 				signed: true
@@ -9664,6 +9674,7 @@ ViewModel.mappings = {
 			const item = new WorkContractViewModel(null);
 			"worker" in data && (item.worker = data.worker && ViewModel.mappings[ResidentSummaryModel.name].toViewModel(data.worker));
 			"canceled" in data && (item.canceled = data.canceled === null ? null : new Date(data.canceled));
+			"dailySalary" in data && (item.dailySalary = data.dailySalary === null ? null : +data.dailySalary);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"match" in data && (item.match = data.match === null ? null : `${data.match}`);
 			"signed" in data && (item.signed = data.signed === null ? null : new Date(data.signed));
@@ -9682,6 +9693,7 @@ ViewModel.mappings = {
 			
 			"worker" in viewModel && (model.worker.id = viewModel.worker ? viewModel.worker.id : null);
 			"canceled" in viewModel && (model.canceled = viewModel.canceled === null ? null : new Date(viewModel.canceled));
+			"dailySalary" in viewModel && (model.dailySalary = viewModel.dailySalary === null ? null : +viewModel.dailySalary);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"match" in viewModel && (model.match = viewModel.match === null ? null : `${viewModel.match}`);
 			"signed" in viewModel && (model.signed = viewModel.signed === null ? null : new Date(viewModel.signed));
@@ -9694,6 +9706,7 @@ ViewModel.mappings = {
 			return {
 				offer: new WorkOfferEmplymentModel(await BaseServer.unwrap(this.$$model.offer)),
 				canceled: this.$$model.canceled,
+				dailySalary: this.$$model.dailySalary,
 				id: this.$$model.id,
 				signed: this.$$model.signed
 			}
@@ -9732,6 +9745,7 @@ ViewModel.mappings = {
 					);
 				},
 				canceled: true,
+				dailySalary: true,
 				id: true,
 				signed: true
 			};
@@ -9741,6 +9755,7 @@ ViewModel.mappings = {
 			const item = new WorkContractEmploymentModel(null);
 			"offer" in data && (item.offer = data.offer && ViewModel.mappings[WorkOfferEmplymentModel.name].toViewModel(data.offer));
 			"canceled" in data && (item.canceled = data.canceled === null ? null : new Date(data.canceled));
+			"dailySalary" in data && (item.dailySalary = data.dailySalary === null ? null : +data.dailySalary);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"signed" in data && (item.signed = data.signed === null ? null : new Date(data.signed));
 
@@ -9758,6 +9773,7 @@ ViewModel.mappings = {
 			
 			"offer" in viewModel && (model.offer.id = viewModel.offer ? viewModel.offer.id : null);
 			"canceled" in viewModel && (model.canceled = viewModel.canceled === null ? null : new Date(viewModel.canceled));
+			"dailySalary" in viewModel && (model.dailySalary = viewModel.dailySalary === null ? null : +viewModel.dailySalary);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"signed" in viewModel && (model.signed = viewModel.signed === null ? null : new Date(viewModel.signed));
 

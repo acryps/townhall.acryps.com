@@ -12,6 +12,11 @@ export const workOfferStyle = () => child('ui-work-offer',
 		fontSize(rem(1.5))
 	),
 
+	child('ui-salary',
+		display('block'),
+		marginBottom(rem(2))
+	),
+
 	child('ui-task',
 		display('block'),
 		marginBottom(rem(1.5)),
@@ -43,7 +48,11 @@ export const workOfferStyle = () => child('ui-work-offer',
 
 			child('ui-timespan',
 				display('block')
-			)
+			),
+
+			child('ui-salary',
+				display('block')
+			),
 		)
 	)
 );

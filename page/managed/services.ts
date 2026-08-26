@@ -421,12 +421,14 @@ export class WorkOfferSummaryModel {
 
 export class WorkContractSummaryModel {
 	canceled: Date;
+	dailySalary: number;
 	id: string;
 	signed: Date;
 
 	private static $build(raw) {
 		const item = new WorkContractSummaryModel();
 		raw.canceled === undefined || (item.canceled = raw.canceled ? new Date(raw.canceled) : null)
+		raw.dailySalary === undefined || (item.dailySalary = raw.dailySalary === null ? null : +raw.dailySalary)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.signed === undefined || (item.signed = raw.signed ? new Date(raw.signed) : null)
 		
@@ -1781,6 +1783,7 @@ export class WorkOfferViewModel {
 	office: OfficeViewModel;
 	closed: Date;
 	count: number;
+	dailySalary: number;
 	id: string;
 	offered: Date;
 	task: string;
@@ -1792,6 +1795,7 @@ export class WorkOfferViewModel {
 		raw.office === undefined || (item.office = raw.office ? OfficeViewModel["$build"](raw.office) : null)
 		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
 		raw.count === undefined || (item.count = raw.count === null ? null : +raw.count)
+		raw.dailySalary === undefined || (item.dailySalary = raw.dailySalary === null ? null : +raw.dailySalary)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.offered === undefined || (item.offered = raw.offered ? new Date(raw.offered) : null)
 		raw.task === undefined || (item.task = raw.task === null ? null : `${raw.task}`)
@@ -1804,6 +1808,7 @@ export class WorkOfferViewModel {
 export class WorkContractViewModel {
 	worker: ResidentSummaryModel;
 	canceled: Date;
+	dailySalary: number;
 	id: string;
 	match: string;
 	signed: Date;
@@ -1812,6 +1817,7 @@ export class WorkContractViewModel {
 		const item = new WorkContractViewModel();
 		raw.worker === undefined || (item.worker = raw.worker ? ResidentSummaryModel["$build"](raw.worker) : null)
 		raw.canceled === undefined || (item.canceled = raw.canceled ? new Date(raw.canceled) : null)
+		raw.dailySalary === undefined || (item.dailySalary = raw.dailySalary === null ? null : +raw.dailySalary)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.match === undefined || (item.match = raw.match === null ? null : `${raw.match}`)
 		raw.signed === undefined || (item.signed = raw.signed ? new Date(raw.signed) : null)
@@ -1823,6 +1829,7 @@ export class WorkContractViewModel {
 export class WorkContractEmploymentModel {
 	offer: WorkOfferEmplymentModel;
 	canceled: Date;
+	dailySalary: number;
 	id: string;
 	signed: Date;
 
@@ -1830,6 +1837,7 @@ export class WorkContractEmploymentModel {
 		const item = new WorkContractEmploymentModel();
 		raw.offer === undefined || (item.offer = raw.offer ? WorkOfferEmplymentModel["$build"](raw.offer) : null)
 		raw.canceled === undefined || (item.canceled = raw.canceled ? new Date(raw.canceled) : null)
+		raw.dailySalary === undefined || (item.dailySalary = raw.dailySalary === null ? null : +raw.dailySalary)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.signed === undefined || (item.signed = raw.signed ? new Date(raw.signed) : null)
 		

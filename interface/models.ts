@@ -186,6 +186,7 @@ export interface WorkOfferSummaryModel {
 
 export interface WorkContractSummaryModel {
     canceled: Date;
+	dailySalary: number;
 	id: string;
 	signed: Date;
 }
@@ -755,6 +756,7 @@ export interface WorkOfferViewModel {
 	office: OfficeViewModel;
 	closed: Date;
 	count: number;
+	dailySalary: number;
 	id: string;
 	offered: Date;
 	task: string;
@@ -764,6 +766,7 @@ export interface WorkOfferViewModel {
 export interface WorkContractViewModel {
     worker: ResidentSummaryModel;
 	canceled: Date;
+	dailySalary: number;
 	id: string;
 	match: string;
 	signed: Date;
@@ -772,6 +775,7 @@ export interface WorkContractViewModel {
 export interface WorkContractEmploymentModel {
     offer: WorkOfferEmplymentModel;
 	canceled: Date;
+	dailySalary: number;
 	id: string;
 	signed: Date;
 }

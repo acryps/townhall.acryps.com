@@ -3,7 +3,7 @@ import { Canvas, CanvasRenderingContext2D, FontLibrary, loadImage } from "skia-c
 import { BoundingBox, Point } from "../../../interface/point";
 import { DbContext, MapType, Street } from "../../managed/database";
 import { getTiles, mapBaseTileSize } from "../../../interface/tile";
-import { calculateDanwinstonShapePath } from "../../../interface/line";
+import { calculateDanwinstonShapePath, drawDanwinstonLine } from "../../../interface/line";
 import { ManagedServer } from "../../managed/server";
 import { BoroughSummaryModel } from "../../areas/borough.summary";
 import { Logger } from "@acryps/log";
@@ -98,6 +98,17 @@ export class PlanningMapGenerator {
 
 			use(boundary);
 			this.fill(boundary, topLeft, context, '#eee', '#000', this.plotWidth);
+
+			const path = calculateDanwinstonShapePath(Point.unpack(street.path), false);
+			context.fillStyle = '#f00';
+
+			for (let pointIndex = 5; pointIndex < path.length; pointIndex += 10) {
+				const point = path[pointIndex];
+
+				if (boundary.has(Point.pack([point]))) {
+					this.label(point, topLeft, labelContext, '#222', street.name);
+				}
+			}
 		}
 
 		// draw water
@@ -227,6 +238,18 @@ export class PlanningMapGenerator {
 				return;
 			}
 		}
+	}
+
+	label(center: Point, topLeft: Point, context: CanvasRenderingContext2D, color: string, text: string) {
+		context.textAlign = 'center';
+		context.textBaseline = 'middle';
+		context.fillStyle = color;
+
+		context.fillText(
+			text,
+			(center.x - topLeft.x) * this.scale,
+			(center.y - topLeft.y) * this.scale
+		);
 	}
 
 	labelFilledShape(filled: Map<string, Point>, topLeft: Point, context: CanvasRenderingContext2D, color: string, text: string) {

@@ -7,7 +7,7 @@ import { LawHouseSessionManager } from "./session";
 export class LawHouse {
 	active = false;
 
-	interval = 4 * 60 * 60 * 1000;
+	interval = 1000 * 60; /// 4 * 60 * 60 * 1000;
 
 	constructor(
 		private database: DbContext,
@@ -20,10 +20,11 @@ export class LawHouse {
 			const hour = new Date().getHours();
 
 			// sessions can only take place in the work day
-			if (hour >= 8 && hour <= 18) {
+			////if (hour >= 8 && hour <= 18) {
 				this.active = true;
 
 				for (let district of await this.database.district.toArray()) {
+					console.log('DSISTRICT', district.name)
 					const lastSession = await district.lawHouseSessions.orderByDescending(session => session.started).first();
 
 					if (!lastSession || +new Date() - +lastSession.ended > this.interval) {
@@ -32,7 +33,7 @@ export class LawHouse {
 				}
 
 				this.active = false;
-			}
+				///}
 
 			// check every minute
 			setTimeout(() => {

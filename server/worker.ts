@@ -56,10 +56,22 @@ export class WorkerDispatch {
 
 				// execute the rest of the main application
 				// WorkerDispatch.main will stop the rest of the program from executing
-				this.applicationMain
+				this.applicationMain,
 			].join('\n');
 
-			const worker = new Worker(startScript, { eval: true });
+			const worker = new Worker(startScript, {
+				eval: true,
+				stdout: true,
+				stderr: true
+			});
+
+			worker.stdout.on('data', (chunk) => {
+				process.stdout.write(`\x1b[2m${identifier} ${chunk}\x1b[0m`);
+			});
+
+			worker.stderr.on('data', (chunk) => {
+				process.stderr.write(`${identifier} ${chunk}`);
+			});
 
 			worker.on('message', async result => {
 				logger.finish(`completed in ${Date.now() - start}ms`);

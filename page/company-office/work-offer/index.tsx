@@ -46,7 +46,7 @@ export class WorkOfferPage extends Component {
 					</ui-timespan>
 
 					<ui-salary>
-						{convertToCurrency(this.workOffer.dailySalary)}/day
+						{convertToCurrency(contract.dailySalary)}/day
 					</ui-salary>
 				</ui-contract>)}
 			</ui-contracts>

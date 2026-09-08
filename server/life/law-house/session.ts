@@ -3,6 +3,8 @@ import { Life } from "..";
 import { BillHonestium, Company, DbContext, District, LawHouseSession, LawHouseSessionary, LawHouseSessionProtocol, Resident, ResidentEventView, Vote } from "../../managed/database";
 import { Language } from "../language";
 import { Debate } from "../interpreter/debate";
+import { Interpreter } from "../interpreter";
+import { OpenAiInterpreterProvider } from "../interpreter/provider/openai";
 
 export class LawHouseSessionManager {
 	sessionaryCount = 7;
@@ -105,7 +107,7 @@ export class LawHouseSessionManager {
 		await this.writeHonestiums();
 		await this.certifyBills();
 		await this.sendVotingBallots();
-		await this.incorporateCompanies();
+		// await this.incorporateCompanies();
 	}
 
 	private async close() {
@@ -136,6 +138,8 @@ export class LawHouseSessionManager {
 
 	// write honestiums for bills
 	private async writeHonestiums() {
+		const sponsor = await this.database.tokenSponsor.first();
+
 		for (let bill of await this.getOpenBills()) {
 			const honestiums = await bill.honestiums.toArray();
 
@@ -155,6 +159,8 @@ export class LawHouseSessionManager {
 					async (person, message) => await this.protocol(message, person),
 					async (conclusion) => await this.language.verify(this.language.verifyHonestiumQuestion(pro, conclusion))
 				);
+
+				debate.intepreter = new Interpreter(new OpenAiInterpreterProvider(sponsor));
 
 				honestium.question = await debate.debateUntilConcluded(this.sessionaryCount * 4);
 

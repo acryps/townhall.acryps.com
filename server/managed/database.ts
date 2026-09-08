@@ -3123,6 +3123,7 @@ export class LoreQuerySource extends Entity<LoreQuerySourceQueryProxy> {
 			
 export class MapTileQueryProxy extends QueryProxy {
 	get captured(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get changedBlocks(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get complete(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get hash(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get image(): Partial<QueryBuffer> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -3133,6 +3134,7 @@ export class MapTileQueryProxy extends QueryProxy {
 
 export class MapTile extends Entity<MapTileQueryProxy> {
 	captured: Date;
+	changedBlocks: string;
 	complete: boolean;
 	hash: string;
 	declare id: string;
@@ -3145,6 +3147,7 @@ export class MapTile extends Entity<MapTileQueryProxy> {
 		source: "map_tile",
 		columns: {
 			captured: { type: "timestamp", name: "captured" },
+			changedBlocks: { type: "text", name: "changed_blocks" },
 			complete: { type: "bool", name: "complete" },
 			hash: { type: "text", name: "hash" },
 			id: { type: "uuid", name: "id" },

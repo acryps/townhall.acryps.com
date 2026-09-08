@@ -5,7 +5,7 @@ import { Interpreter, SystemMessage, UserMessage } from ".";
 export class Debate {
 	readonly maximumLength = 500;
 
-	private intepreter = new Interpreter();
+	intepreter = new Interpreter();
 
 	prepared = false;
 	iterations = 0;

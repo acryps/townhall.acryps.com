@@ -10,6 +10,7 @@ import { Interface } from "readline/promises";
 import { config } from "process";
 import { Point } from "../../interface/point";
 import { Time } from "../../interface/time";
+import { Logger } from "@acryps/log";
 
 export class Life {
 	// weights, of how many people do what on a tick
@@ -17,6 +18,8 @@ export class Life {
 	readonly bondingFactor = new TickFactor(this, 'bond', 0.1, 2);
 
 	readonly language = new Language('smart');
+
+	private logger = new Logger('life');
 
 	residents: Resident[];
 
@@ -41,7 +44,7 @@ export class Life {
 		this.familyNameGenerator = new NameGenerator('family', this.residents.map(resident => resident.familyName));
 		this.givenNameGenerators = genders.map(gender => new NameGenerator('given', this.residents.map(resident => resident.givenName), gender));
 
-		console.log(`[life] now: ${Time.now().toString()}`);
+		this.logger.log(`now: ${Time.now().toString()}`);
 	}
 
 	async updateResidentAnchors() {
@@ -112,7 +115,7 @@ export class Life {
 		const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
 		const pick = Math.random() * totalWeight;
 
-		console.log('pick', totalWeight, pick);
+		this.logger.log('pick', totalWeight, pick);
 
 		let cumulative = 0;
 		for (let index = 0; index < pool.length; index++) {
@@ -120,7 +123,6 @@ export class Life {
 
 			if (pick < cumulative) {
 				const peer = pool[index].peer;
-				console.log(peer);
 
 				await this.bond(initiator, peer);
 
@@ -137,7 +139,7 @@ export class Life {
 			.include(vote => vote.resident)
 			.toArray();
 
-		console.log(`open vote ballots: ${openVotes.length}`);
+		this.logger.log(`open vote ballots: ${openVotes.length}`);
 
 		for (let ballot of openVotes) {
 			await this.voteBill(ballot);
@@ -155,7 +157,9 @@ export class Life {
 		const bill = await ballot.bill.fetch();
 		const honestums = await bill.honestiums.toArray();
 
-		console.log('vote', bill.title, resident.id, resident.givenName, resident.familyName);
+		const logger = this.logger.child('vote').task(resident.tag);
+
+		logger.log('vote', bill.title, resident.id, resident.givenName, resident.familyName);
 
 		let response = await fast.respondRaw(this.language.vote(resident),
 			await this.compileDescription(resident),
@@ -171,7 +175,7 @@ export class Life {
 		}
 
 		if (!response.startsWith('yes') && !response.startsWith('no')) {
-			console.log(response);
+			this.logger.warn(`invalid response ${response}`);
 
 			return this.voteBill(ballot);
 		}
@@ -185,7 +189,7 @@ export class Life {
 			ballot.reason = reason;
 		}
 
-		console.log('+ vote', resident.givenName, resident.familyName, ballot.pro, ballot.reason);
+		logger.finish('+ vote', resident.givenName, resident.familyName, ballot.pro, ballot.reason);
 
 		await ballot.update();
 	}
@@ -234,7 +238,7 @@ export class Life {
 		const existingRelationship = initiatorRelationships.find(relationship => relationship.initiatorId == peer.id || relationship.peerId == peer.id);
 
 		if (existingRelationship && !existingRelationship.unbreakable) {
-			console.log(`-separate: ${initiator.tag} ${peer.tag}`);
+			this.logger.log(`- separate: ${initiator.tag} ${peer.tag}`);
 
 			const interpreter = new Interpreter();
 
@@ -265,7 +269,7 @@ export class Life {
 			return;
 		}
 
-		console.log(`+bond: ${initiator.tag} ${peer.tag}`);
+		this.logger.log(`+bond: ${initiator.tag} ${peer.tag}`);
 
 		const relationship = new ResidentRelationship();
 		relationship.bonded = new Date();
@@ -362,7 +366,7 @@ export class Life {
 		this.residents.push(resident);
 		this.assignFigure(resident);
 
-		console.log(`+ merge ${resident.tag} ${parentA.givenName} + ${parentB.givenName} ${familyName} = ${resident.givenName} ${familyName}`);
+		this.logger.log(`+ merge ${resident.tag} ${parentA.givenName} + ${parentB.givenName} ${familyName} = ${resident.givenName} ${familyName}`);
 
 		for (let parent of [parentA, parentB]) {
 			const relation = new ResidentRelationship();

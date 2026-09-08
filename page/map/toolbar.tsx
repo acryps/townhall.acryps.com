@@ -83,6 +83,10 @@ export class MapToolbarComponent extends Component {
 						{residentIcon()}
 					</ui-layer>
 
+					<ui-layer ui-click={() => this.toggleLayer(movementHeatmapLayer)}>
+						{movementIcon()}
+					</ui-layer>
+
 					<ui-layer ui-click={() => this.toggleLayer(propertyValueHeatmapLayer)}>
 						{priceIcon()}
 					</ui-layer>

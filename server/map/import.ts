@@ -105,9 +105,58 @@ export class MapImporter {
 
 				await entry.create();
 
+				if (entry.complete) {
+					const last = await this.database.mapTile
+						.where(tile => tile.regionX == entry.regionX)
+						.where(tile => tile.regionY == entry.regionY)
+						.where(tile => tile.type == type)
+						.where(tile => tile.captured.isBefore(entry.captured))
+						.where(tile => tile.complete == true)
+						.orderByDescending(tile => tile.captured)
+						.first();
+
+					if (last) {
+						const changes = await this.findChangedBlocks(last, entry);
+						logger.log(`changed ${changes.length} blocks`);
+
+						entry.changedBlocks = Point.pack(changes);
+						await entry.update();
+					}
+				}
+
 				logger.finish(`changed, ${entry.complete ? 'complete' : 'has holes'}`);
 			}
 		}
+	}
+
+	async findChangedBlocks(old: MapTile, updated: MapTile) {
+		const canvas = new Canvas(mapBaseTileSize, mapBaseTileSize);
+		const context = canvas.getContext('2d');
+
+		context.drawImage(await loadImage(old.image), 0, 0);
+		const oldPixels = [...context.getImageData(0, 0, mapBaseTileSize, mapBaseTileSize).data];
+
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		context.drawImage(await loadImage(updated.image), 0, 0);
+		const updatedPixels = [...context.getImageData(0, 0, mapBaseTileSize, mapBaseTileSize).data];
+
+		const changes: Point[] = [];
+
+		for (let x = 0; x < mapBaseTileSize; x++) {
+			for (let y = 0; y < mapBaseTileSize; y++) {
+				const offset = ((y * mapBaseTileSize) + x) * 4;
+
+				if (
+					(oldPixels[offset] != updatedPixels[offset]) ||
+					(oldPixels[offset + 1] != updatedPixels[offset + 1]) ||
+					(oldPixels[offset + 2] != updatedPixels[offset + 2])
+				) {
+					changes.push(new Point(x + old.regionX * mapBaseTileSize, y + old.regionY * mapBaseTileSize));
+				}
+			}
+		}
+
+		return changes;
 	}
 
 	private hasHoles(context: CanvasRenderingContext2D) {

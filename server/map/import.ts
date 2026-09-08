@@ -117,7 +117,7 @@ export class MapImporter {
 
 					if (last) {
 						const changes = await this.findChangedBlocks(last, entry);
-						logger.log(`changed ${changes.length} blocks`);
+						logger.log(`changed ${changes.length} blocks from ${last.id} to ${entry.id}`);
 
 						entry.changedBlocks = Point.pack(changes);
 						await entry.update();
@@ -136,7 +136,7 @@ export class MapImporter {
 		context.drawImage(await loadImage(old.image), 0, 0);
 		const oldPixels = [...context.getImageData(0, 0, mapBaseTileSize, mapBaseTileSize).data];
 
-		context.clearRect(0, 0, canvas.width, canvas.height);
+		context.clearRect(0, 0, mapBaseTileSize, mapBaseTileSize);
 		context.drawImage(await loadImage(updated.image), 0, 0);
 		const updatedPixels = [...context.getImageData(0, 0, mapBaseTileSize, mapBaseTileSize).data];
 

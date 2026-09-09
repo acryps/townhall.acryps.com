@@ -8,7 +8,7 @@ import { Logger } from "@acryps/log";
 export class BlockTouchesTileServer extends GradiantHeatmapTileServer<BlockTouchesView> {
 	values: BlockTouchesView[] = [];
 
-	static readonly range = 1000;
+	static readonly range = 500;
 
 	logger = new Logger('block-touches');
 
@@ -20,8 +20,8 @@ export class BlockTouchesTileServer extends GradiantHeatmapTileServer<BlockTouch
 			app,
 			`block-touches`,
 
-			1000,
-			10,
+			112,
+			2,
 
 			BlockTouchesTileServer.range,
 
@@ -34,7 +34,7 @@ export class BlockTouchesTileServer extends GradiantHeatmapTileServer<BlockTouch
 			},
 
 			(target, values, range) => {
-				const pixel = this.values.find(pixel => pixel.x == target.x && pixel.y == target.y);
+				const pixel = values.find(pixel => pixel.x == target.x && pixel.y == target.y);
 
 				return pixel?.touches ?? 0;
 			}

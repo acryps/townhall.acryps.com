@@ -22,5 +22,5 @@ export const trainRouteLayer = (code: string) => MapLayer.fromShapeSource((x, y)
 
 export const planLayer = (tag: string) => MapLayer.fromShapeSource((x, y) => `/tile/plan/${tag}/${x}/${y}`, 500, 'source-over');
 
-export const blockTouchesHeatmapLayer = MapLayer.fromTileSource((x, y) => `/tile/block-touches/${x}/${y}`, 1000, 'source-over');
+export const blockTouchesHeatmapLayer = MapLayer.fromTileSource((x, y) => `/tile/block-touches/${x}/${y}`, 112, 'color');
 export const propertyValueHeatmapLayer = MapLayer.fromTileSource((x, y) => `/tile/property-value/${x}/${y}`, 200, 'color');

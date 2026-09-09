@@ -1,5 +1,6 @@
 import { Canvas, ImageData, loadImage } from "skia-canvas";
 import { Point } from "../../../../../interface/point";
+import { setImmediate } from "timers/promises";
 import { ManagedServer } from "../../../../managed/server";
 
 export class GradiantHeatmapTileServer<SourceType> {
@@ -33,7 +34,12 @@ export class GradiantHeatmapTileServer<SourceType> {
 			const canvas = new Canvas(sampleSize, sampleSize);
 			const context = canvas.getContext('2d');
 
-			const data = load(offset.subtract(new Point(interpolationFieldSize, interpolationFieldSize)), tileSize + interpolationFieldSize * 2);
+			const data = load(
+				offset.subtract(new Point(interpolationFieldSize, interpolationFieldSize)),
+				tileSize + interpolationFieldSize * 2
+			);
+
+			await setImmediate();
 
 			for (let x = 0; x < sampleSize; x++) {
 				for (let y = 0; y < sampleSize; y++) {
@@ -62,6 +68,8 @@ export class GradiantHeatmapTileServer<SourceType> {
 					}
 				}
 			}
+
+			await setImmediate();
 
 			// scale and interpolate
 			const image = await canvas.toBuffer('png');

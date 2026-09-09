@@ -216,7 +216,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new TrainRoutesTileServer(app, database);
 	new StationTileServer(app, database);
 	new PlanTileServer(app, database);
-	new BlockTouchesTileServer(app, database, 5000);
+	new BlockTouchesTileServer(app, database);
 
 	ChangeFrame.registerInterface(app);
 

@@ -1,0 +1,9 @@
+CREATE OR REPLACE VIEW block_touches AS
+SELECT
+	ROUND(x)::INT4 AS x,
+	ROUND(y)::INT4 AS y,
+	COUNT(*) AS touches
+FROM movement
+GROUP BY
+	ROUND(x)::INT4,
+	ROUND(y)::INT4;

@@ -37,7 +37,7 @@ export class GradiantHeatmapTileServer<SourceType> {
 
 			for (let x = 0; x < sampleSize; x++) {
 				for (let y = 0; y < sampleSize; y++) {
-					const sampeledValue = sample(
+					const sampledValue = sample(
 						new Point(
 							x * interpolationFieldSize + offset.x - interpolationFieldSize / 2,
 							y * interpolationFieldSize + offset.y - interpolationFieldSize / 2
@@ -48,13 +48,13 @@ export class GradiantHeatmapTileServer<SourceType> {
 						interpolationFieldSize / 2
 					);
 
-					if (sampeledValue === null) {
+					if (sampledValue === null) {
 						context.fillStyle = 'white';
 						context.fillRect(x, y, 1, 1);
 					} else {
 						const value = Math.min(
 							maxValue,
-							sampeledValue
+							sampledValue
 						);
 
 						context.fillStyle = `hsl(${value / maxValue * 300}deg, 100%, 50%)`;

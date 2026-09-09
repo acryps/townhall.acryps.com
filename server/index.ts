@@ -60,7 +60,7 @@ import { CommodityIconImageInterface } from "./areas/market/icon";
 import { MarketCycle, MarketCycleGenerator } from "./market/cycle";
 import { WorkerDispatch } from "./worker";
 import { PlanningMapGenerator } from "./map/planning";
-import { MovementTileServer } from "./map/layers/heatmap/density/movement";
+import { BlockTouchesTileServer } from "./map/layers/heatmap/gradiant/block-touches";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const runMarket = process.env.RUN_MARKET == 'YES';
@@ -216,7 +216,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new TrainRoutesTileServer(app, database);
 	new StationTileServer(app, database);
 	new PlanTileServer(app, database);
-	new MovementTileServer(app, database);
+	new BlockTouchesTileServer(app, database, 5000);
 
 	ChangeFrame.registerInterface(app);
 

@@ -6702,6 +6702,31 @@ export class ResidentAssessmentParameterDistributionView extends View<ResidentAs
 	name: string;
 }
 			
+class BlockTouchesViewProxy extends QueryProxy {
+	get x(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get y(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get touches(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class BlockTouchesView extends View<BlockTouchesViewProxy> {
+	$$meta = {
+		source: "block_touches",
+		get set(): ViewSet<BlockTouchesView, BlockTouchesViewProxy> { 
+			return new ViewSet<BlockTouchesView, BlockTouchesViewProxy>(BlockTouchesView, null);
+		},
+
+		columns: {
+			x: { type: "int4", name: "x" },
+			y: { type: "int4", name: "y" },
+			touches: { type: "int4", name: "touches" }
+		}
+	};
+
+	x: number;
+	y: number;
+	touches: number;
+}
+			
 
 export class DbContext {
 	article: DbSet<Article, ArticleQueryProxy>;
@@ -6927,6 +6952,7 @@ export class DbContext {
 	views = {
 		residentEvent: new ViewSet<ResidentEventView, ResidentEventViewProxy>(ResidentEventView),
 		residentAssessmentMatch: new ViewSet<ResidentAssessmentMatchView, ResidentAssessmentMatchViewProxy>(ResidentAssessmentMatchView),
-		residentAssessmentParameterDistribution: new ViewSet<ResidentAssessmentParameterDistributionView, ResidentAssessmentParameterDistributionViewProxy>(ResidentAssessmentParameterDistributionView)
+		residentAssessmentParameterDistribution: new ViewSet<ResidentAssessmentParameterDistributionView, ResidentAssessmentParameterDistributionViewProxy>(ResidentAssessmentParameterDistributionView),
+		blockTouches: new ViewSet<BlockTouchesView, BlockTouchesViewProxy>(BlockTouchesView)
 	}
 };

@@ -64,7 +64,7 @@ export class MapStartPage extends Component {
 					{this.players.map(player => {
 						const lastSeen = Math.floor((Date.now() - +player.time) / (1000 * 60 * 60 * 24));
 
-						return <ui-player>
+						return <ui-player ui-href={`${player.x}/${player.y}/6`}>
 							<img src={`/player/head/${player.id}`} />
 
 							<ui-label>

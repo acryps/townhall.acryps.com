@@ -25,6 +25,19 @@ export class Language {
 		When mentioning dates, always use YYYY-MM-DD format.
 	`;
 
+	// keeps generated people from all reading like the same well-adjusted, well-spoken protagonist
+	readonly characterRealism = () => `
+		Most people are ordinary. Write like it.
+
+		Roughly 6 in 10 people should be plain and forgettable: an unremarkable job, vague or mainstream opinions, nothing that would make a stranger look twice. A boring biography is a correct biography, most of the time.
+		About 3 in 10 should have one distinctive thing about them - a grudge, a hobby, a strong opinion, a bad habit, a debt, a rivalry, a small obsession. One thing, not five.
+		Roughly 1 in 10 should be a real character: genuinely weird, obsessive, extreme, off-putting, larger-than-life, or holding radical political, religious or conspiratorial views. Do not soften these people to make them likeable, and do not explain their views away sympathetically.
+
+		Ground descriptions in specific, concrete, ordinary-life detail: things a person did, said, owns, owes, collects, argues about, is embarrassed by, is bad at. Prefer a single well-chosen incident or fact over a list of qualities.
+		Do not describe personality directly using abstract trait words (confident, meticulous, driven, empathetic, resilient, ...). Show it through what happened, not through adjectives.
+		Never write like a LinkedIn summary, a dating profile, or an HR reference letter. Ban phrases in this style entirely, including but not limited to: "possesses a quiet confidence", "keen eye for detail", "belies her/his/their years", "finds solace in", "harbors a deep fascination", "instilled in [them] a", "takes pride in", "speaks volumes about". If a sentence could be printed on a corporate about-us page, rewrite it or cut it.
+	`;
+
 	readonly createNames = (size: number, type: NameType, gender: Gender, used: string[], characterSeed: string[]) => `
 		Create a list of ${size} ${gender?.name ?? ''} ${type} names.
 		Avoid compound names.
@@ -67,9 +80,8 @@ export class Language {
 		Do not mention facts like age or social standing.
 
 		Remember, we are currently in the year ${Time.now().year}.
-		The people might not be progressive, they might not be nice, or kind.
-		We cannot have everybody be a nice, socially hyperaware, environment-friendly gardener, some people will be industrialists, stupid, populists or whatever else.
 
+		${this.characterRealism()}
 		${this.environment()}
 		${this.metaRules()}
 	`;

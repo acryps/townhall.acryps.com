@@ -4,11 +4,14 @@ import { Time, toRealTime } from "../../../interface/time";
 import { Borough, DbContext, Dwelling, Property, Resident, ResidentRelationship, Tenancy, WorkContract, WorkOffer } from "../../managed/database";
 import { female, genders, male } from "../gender";
 import { Interpreter, SystemMessage, UserMessage } from "../interpreter";
+import { Language } from "../language";
 
 export class FillLife {
 	oldestPersonBirthday = +new Date('2021-06-01');
 	youngestParentBirthday = +new Date('2024-01-01');
 	now = +new Date();
+
+	language = new Language('smart');
 
 	constructor(
 		private life: Life,
@@ -53,13 +56,17 @@ export class FillLife {
 				Your job is to generate a fictional family.
 
 				When generating people, call the 'addPerson' function.
-				The core values should be a text reflecting how the person might act in any setting.
-				The core values will apply to this person forever, so make sure to make the kids have values what might not manifest as kids yet.
+				Core values are a short, concrete description of the person: an opinion, a habit, a grudge, a debt, a hobby, a fear, a belief, a routine - not an abstract summary of their character.
+				Write core values the way you'd describe someone to a friend over a drink, not the way you'd describe them in a job reference.
+				The core values will apply to this person forever, so make sure kids get values that might not manifest as kids yet, but will shape who they become.
 
 				I will tell you the role, you respond create the responding person.
 				The role will be followed by a job description of their current or future job.
-				Try to form the person to match this job.
+				Try to form the person to match this job, but not everyone loves their job - some do it for the money, some resent it, some are just drifting.
 				Consider the person a housewife/houseman or otherwise unemployed if there is no job description
+
+				${this.language.characterRealism()}
+				${this.language.environment()}
 
 				Suggested family names: ${await this.life.familyNameGenerator.selection()}
 			`)
@@ -269,25 +276,40 @@ export class FillLife {
 	async updateBiography(resident: Resident, referenceJob: WorkOffer, familyMembers: Resident[]) {
 		const interpreter = new Interpreter('smart');
 
-		interpreter.addTool('biography', [{ type: String, name: 'text' }], async (text) => {
+		interpreter.addTool('biography', [
+			{ type: String, name: 'text' },
+			{ type: String, name: 'secret' }
+		], async (text, secret) => {
 			resident.biography = text;
+			resident.secret = secret;
 
 			await resident.update();
 		});
 
 		await interpreter.execute(new UserMessage(`
-			Come up with a fictional biography of ${resident.givenName} ${resident.familyName} aged ${new Time(resident.birthday).age()}.
-			Make sure to highlight their core values, without directly mentioning them: ${resident.coreValues}.
+			Write a short biography of ${resident.givenName} ${resident.familyName}, aged ${new Time(resident.birthday).age()}.
 			Never mention any dates.
 
+			Use the following as raw material to draw from, not as a checklist of traits to describe or allude to:
+			${resident.coreValues}
+
 			${referenceJob && `
-				The person currently works in the following position.
-				Make sure to let this shape their character, but do not mention the job directly.
+				They currently work here. Let it shape the biography, but do not mention the job description directly.
 				${referenceJob.task}
 			`}
 
 			Family members:
 			${familyMembers.filter(member => member.id != resident.id).map(member => `- ${member.givenName} ${member.familyName}, aged ${new Time(member.birthday).age()}`).join('\n')}
+
+			Also invent a secret for them, passed separately to the 'secret' parameter.
+			This is something true about them that shapes who they are, but that they would never volunteer, and that they'd be uncomfortable, ashamed or afraid of others finding out.
+			It must not appear anywhere in the biography, not even hinted at - the biography is what people can find out about them, the secret is what they can't.
+			Make it human and plausible, not a crime-novel twist: things like resenting a family member, no longer loving a partner and not having said so, skimming a little money, having lied about a qualification to get the job, secretly doubting a belief they publicly hold, being afraid of something mundane, still wanting someone they shouldn't.
+			It can be dark or it can be small and petty - both are realistic. Write it plainly, one or two sentences, no flourishes.
+			${referenceJob && `Feel free to let their job shape the secret - what the role involves, who it puts them near, what it tempts or exposes them to.`}
+
+			${this.language.characterRealism()}
+			${this.language.environment()}
 		`));
 	}
 }

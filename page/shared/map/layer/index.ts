@@ -12,6 +12,9 @@ export class MapLayer {
 
 	labels: Label[] = [];
 
+	// opacity this layer is drawn at when composited onto the map (1 = fully opaque)
+	alpha = 1;
+
 	constructor(
 		protected source: (x: number, y: number) => Promise<CanvasImageSource>,
 		protected size: number,

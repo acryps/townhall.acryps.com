@@ -31,7 +31,10 @@ export abstract class MapView {
 			const image = layer.render(this.map.cursor, this.map.width, this.map.height, this.superscale);
 
 			this.context.globalCompositeOperation = layer.blendMode;
+			this.context.globalAlpha = layer.alpha;
 			this.context.drawImage(image, 0, 0);
 		}
+
+		this.context.globalAlpha = 1;
 	}
 }

@@ -1,4 +1,4 @@
-import { alignItems, alignSelf, background, backgroundColor, border, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, display, flexDirection, flexGrow, flexShrink, flexWrap, fontSize, gap, height, Hex, hex, imageRendering, inset, insetInline, justifyContent, left, lineHeight, margin, marginBottom, marginInline, marginLeft, marginTop, maxWidth, Number, opacity, overflow, padding, paddingBlock, paddingInline, paddingTop, percentage, pointerEvents, position, px, rem, right, select, style, textAlign, top, Variable, width } from "@acryps/style";
+import { alignItems, alignSelf, background, backgroundColor, border, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, display, flexDirection, flexGrow, flexShrink, flexWrap, fontSize, gap, height, Hex, hex, imageRendering, inset, insetInline, justifyContent, left, lineHeight, margin, marginBottom, marginInline, marginLeft, marginTop, maxWidth, Number, opacity, overflow, padding, paddingBlock, paddingBottom, paddingInline, paddingTop, percentage, pointerEvents, position, px, rem, right, select, style, textAlign, top, Variable, width } from "@acryps/style";
 import { pageTextColor, navigationBackgroundColor, navigationBorderColor, pageGutter, pageBackgroundColor, neutralColor } from "../index.style";
 import { buttonStyle } from "../shared/index.style";
 import { PageComponent } from "../page";
@@ -36,6 +36,7 @@ export const mapStyle = () => [
 		child('ui-tools',
 			position('fixed'),
 			left(0),
+			right(0),
 			bottom(0),
 
 			display('flex'),
@@ -177,6 +178,7 @@ export const mapStyle = () => [
 			),
 
 			child('ui-plans',
+				alignSelf('stretch'),
 				display('flex'),
 				gap(pageGutter.divide(2)),
 				flexWrap('wrap'),
@@ -208,6 +210,7 @@ export const mapStyle = () => [
 			),
 
 			child('ui-create-building',
+				alignSelf('stretch'),
 				paddingTop(pageGutter.divide(2)),
 				paddingInline(pageGutter),
 
@@ -215,13 +218,34 @@ export const mapStyle = () => [
 			),
 
 			child('ui-edit-plot',
+				alignSelf('stretch'),
 				paddingTop(pageGutter.divide(2)),
 				paddingInline(pageGutter),
 
 				backgroundColor(navigationBackgroundColor)
 			),
 
+			child('ui-plan-shape',
+				alignSelf('stretch'),
+				paddingTop(pageGutter.divide(2)),
+				paddingInline(pageGutter),
+				paddingBottom(pageGutter.divide(2)),
+
+				backgroundColor(navigationBackgroundColor),
+
+				child('ui-action',
+					buttonStyle(),
+
+					backgroundColor(pageBackgroundColor)
+				)
+					.attribute('ui-active',
+						color(pageBackgroundColor),
+						backgroundColor(pageTextColor)
+					)
+			),
+
 			child('ui-insert-train-stop',
+				alignSelf('stretch'),
 				paddingTop(pageGutter.divide(2)),
 				paddingInline(pageGutter),
 
@@ -229,6 +253,7 @@ export const mapStyle = () => [
 			),
 
 			child('ui-quick-valueation',
+				alignSelf('stretch'),
 				display('flex'),
 				gap(pageGutter),
 

@@ -1251,6 +1251,23 @@ export class PlotBoundaryShapeModel {
 	}
 }
 
+export class EmptyDwellingCandidateViewModel {
+	id: string;
+	distance: number;
+	property: PropertySummaryModel;
+	owners: PropertyOwnerViewModel[];
+
+	private static $build(raw) {
+		const item = new EmptyDwellingCandidateViewModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.distance === undefined || (item.distance = raw.distance === null ? null : +raw.distance)
+		raw.property === undefined || (item.property = raw.property ? PropertySummaryModel["$build"](raw.property) : null)
+		raw.owners === undefined || (item.owners = raw.owners ? raw.owners.map(i => PropertyOwnerViewModel["$build"](i)) : null)
+		
+		return item;
+	}
+}
+
 export class ArticleNewstickerModel {
 	id: string;
 	published: Date;
@@ -4571,6 +4588,48 @@ export class PropertyService {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
 				throw new Error(r.error);
+			}
+		});
+	}
+
+	async findNearestEmptyDwellings(dwellingId: string, page: number): Promise<Array<EmptyDwellingCandidateViewModel>> {
+		const $data = new FormData();
+		$data.append("ZmOGJ2Y2V2c2VoeHFxM2ZxczYwanB6OG", Service.stringify(dwellingId))
+		$data.append("Y5Mjlmcn9senM0YzRudzdrbmprdmZjZm", Service.stringify(page))
+
+		return await fetch(Service.toURL("J5OTMzOXNyaWd3YjhtdmFtZ3IzYWl2d3"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : EmptyDwellingCandidateViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async relocateTenancy(dwellingId: string, targetDwellingId: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("JmM3w1bzh6MjdlZmcxemcwcmptbXNxZH", Service.stringify(dwellingId))
+		$data.append("FwdGJndnh4b29hdjJvM3g2MzVrMGduMm", Service.stringify(targetDwellingId))
+
+		return await fetch(Service.toURL("Bua2B5MnV4Yzp2dzpiaD8wdmM3dGVuZ2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
 			}
 		});
 	}

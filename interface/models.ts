@@ -531,6 +531,13 @@ export interface PlotBoundaryShapeModel {
 	shape: string;
 }
 
+export interface EmptyDwellingCandidateViewModel {
+    id: string;
+	distance: number;
+	property: PropertySummaryModel;
+	owners: PropertyOwnerViewModel[];
+}
+
 export interface ArticleNewstickerModel {
     id: string;
 	published: Date;

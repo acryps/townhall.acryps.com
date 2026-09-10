@@ -1,9 +1,10 @@
 import { alignContent, alignItems, alignSelf, aspectRatio, background, backgroundColor, backgroundImage, backgroundPosition, backgroundPositionX, backgroundSize, border, borderBottom, borderRight, bottom, Ch, child, color, colorStop, columnGap, cursor, display, Dvi, flexBasis, flexDirection, flexGrow, flexWrap, fontSize, fontStyle, fontWeight, gap, height, imageRendering, justifyContent, justifyItems, left, linearGradient, LinearGradient, lineHeight, margin, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, milliseconds, min, Mm, objectFit, objectPosition, opacity, overflow, padding, paddingBlock, paddingInline, percentage, position, px, ratio, rem, select, style, textAlign, textDecorationLine, top, turn, Variable, vh, width } from "@acryps/style";
 import { infoColor, negativeColor, neutralColor, pageBackgroundColor, pageGutter, pageTextColor } from "../../index.style";
 import { fieldStyle, inputStyle } from "../../shared/field.style";
-import { buttonStyle } from "../../shared/index.style";
+import { buttonGroupStyle, buttonStyle } from "../../shared/index.style";
 import { buildingStyle } from "./building/index.style";
 import { ownershipStructureStyle } from "./ownership/index.style";
+import { relocateDwellingStyle } from "./relocate/index.style";
 import { tabsStyle } from "../../shared/tabs/index.style";
 import { boxed } from "../../shared/boxed.style";
 import { changeFramesStyle } from "../../shared/change-frames/index.style";
@@ -31,6 +32,7 @@ export const propertyStyle = () => child('ui-property',
 
 	buildingStyle(),
 	ownershipStructureStyle(),
+	relocateDwellingStyle(),
 
 	child('ui-content',
 		child('ui-map-container',
@@ -281,6 +283,17 @@ export const propertyStyle = () => child('ui-property',
 						child('ui-vacant',
 							display('block'),
 							opacity(0.5)
+						),
+
+						child('ui-actions',
+							buttonGroupStyle(),
+							justifyContent('flex-end'),
+
+							child('ui-action',
+								marginTop(rem(0.5)),
+
+								buttonStyle()
+							)
 						)
 					),
 

@@ -116,6 +116,7 @@ import { PlanService } from "././../areas/plan/index";
 import { Building } from "././database";
 import { Dwelling } from "././database";
 import { PropertyOwner } from "././database";
+import { Tenancy } from "././database";
 import { Valuation } from "././database";
 import { DwellingViewModel } from "././../areas/life/resident";
 import { PropertyDwellingViewModel } from "././../areas/property.view";
@@ -125,6 +126,8 @@ import { PlotBoundarySummaryModel } from "././../areas/property/plot";
 import { Shape } from "././../../interface/shape";
 import { TradeManager } from "././../areas/trade/manager";
 import { PropertyValueator } from "././../areas/trade/valuation/property";
+import { EmptyDwellingCandidateModel } from "././../areas/property/relocate";
+import { EmptyDwellingCandidateViewModel } from "././../areas/property/relocate";
 import { PropertyService } from "././../areas/property/service";
 import { Article } from "././database";
 import { ArticleImage } from "././database";
@@ -215,7 +218,6 @@ import { Bridge } from "./../managed/database";
 import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
 import { PropertyType } from "./../managed/database";
-import { Tenancy } from "./../managed/database";
 import { Square } from "./../managed/database";
 import { WorkOffer } from "./../managed/database";
 import { WorkContract } from "./../managed/database";
@@ -1549,6 +1551,32 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.editPlotBoundary(
 				params["dwbmRjbWR1bGE2NjFndzJ1enw0b2VyMX"],
 				params["I4NmJpenJib2hzcWhoOXgxMX53bHlvdD"]
+			)
+		);
+
+		this.expose(
+			"J5OTMzOXNyaWd3YjhtdmFtZ3IzYWl2d3",
+			{
+			"ZmOGJ2Y2V2c2VoeHFxM2ZxczYwanB6OG": { type: "string", isArray: false, isOptional: false },
+				"Y5Mjlmcn9senM0YzRudzdrbmprdmZjZm": { type: "number", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PropertyService),
+			(controller, params) => controller.findNearestEmptyDwellings(
+				params["ZmOGJ2Y2V2c2VoeHFxM2ZxczYwanB6OG"],
+				params["Y5Mjlmcn9senM0YzRudzdrbmprdmZjZm"]
+			)
+		);
+
+		this.expose(
+			"Bua2B5MnV4Yzp2dzpiaD8wdmM3dGVuZ2",
+			{
+			"JmM3w1bzh6MjdlZmcxemcwcmptbXNxZH": { type: "string", isArray: false, isOptional: false },
+				"FwdGJndnh4b29hdjJvM3g2MzVrMGduMm": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PropertyService),
+			(controller, params) => controller.relocateTenancy(
+				params["JmM3w1bzh6MjdlZmcxemcwcmptbXNxZH"],
+				params["FwdGJndnh4b29hdjJvM3g2MzVrMGduMm"]
 			)
 		);
 
@@ -7312,6 +7340,76 @@ ViewModel.mappings = {
 			
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"shape" in viewModel && (model.shape = viewModel.shape === null ? null : `${viewModel.shape}`);
+
+			return model;
+		}
+	},
+	[EmptyDwellingCandidateViewModel.name]: class ComposedEmptyDwellingCandidateViewModel extends EmptyDwellingCandidateViewModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				distance: this.$$model.distance,
+				property: this.$$model.property,
+				owners: this.$$model.owners
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				distance: true,
+				property: true,
+				owners: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new EmptyDwellingCandidateViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"distance" in data && (item.distance = data.distance === null ? null : +data.distance);
+			"property" in data && (undefined);
+			"owners" in data && (undefined);
+
+			return item;
+		}
+
+		static async toModel(viewModel: EmptyDwellingCandidateViewModel) {
+			let model: EmptyDwellingCandidateModel;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(EmptyDwellingCandidateModel).find(viewModel.id)
+			} else {
+				model = new EmptyDwellingCandidateModel();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"distance" in viewModel && (model.distance = viewModel.distance === null ? null : +viewModel.distance);
+			"property" in viewModel && (undefined);
+			"owners" in viewModel && (undefined);
 
 			return model;
 		}

@@ -173,8 +173,10 @@ export class MapService extends Service {
 			throw new Error('Inactive properties cannot have any offices');
 		}
 
-		if (await property.dwellings.count()) {
-			throw new Error('Inactive properties cannot have any dwellings');
+		for (let dwelling of await property.dwellings.toArray()) {
+			if (await dwelling.tenants.where(tenant => tenant.end == null).count()) {
+				throw new Error('Inactive properties cannot have any actively tenanted dwellings');
+			}
 		}
 
 		if (!property.deactivated) {

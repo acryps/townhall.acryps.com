@@ -37,15 +37,25 @@ export class PropertyUsageTab extends Component {
 			</ui-offices>
 
 			<ui-dwellings>
-				{this.page.property.dwellings.map(dwelling => <ui-dwelling>
-					<ui-name>
-						Dwelling #{dwelling.id.split('-')[0]}
-					</ui-name>
+				{this.page.property.dwellings.map(dwelling => {
+					const activeTenants = dwelling.tenants.filter(tenant => !tenant.end);
 
-					{dwelling.tenants.length ? new ResidentBadgeListComponent(dwelling.tenants.map(tenant => tenant.inhabitant)) : <ui-vacant>
-						Vacant
-					</ui-vacant>}
-				</ui-dwelling>)}
+					return <ui-dwelling>
+						<ui-name>
+							Dwelling #{dwelling.id.split('-')[0]}
+						</ui-name>
+
+						{activeTenants.length ? new ResidentBadgeListComponent(activeTenants.map(tenant => tenant.inhabitant)) : <ui-vacant>
+							Vacant
+						</ui-vacant>}
+
+						<ui-actions>
+							{activeTenants.length != 0 && <ui-action ui-href={`/property/${this.page.property.id}/relocate/${dwelling.id}`}>
+								Relocate
+							</ui-action>}
+						</ui-actions>
+					</ui-dwelling>;
+				})}
 
 				<ui-create>
 					<ui-hint>

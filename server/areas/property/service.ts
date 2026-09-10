@@ -1,5 +1,5 @@
 import { Service } from "vlserver";
-import { Building, DbContext, Dwelling, PlotBoundary, PropertyOwner, Valuation } from "../../managed/database";
+import { Building, DbContext, Dwelling, PlotBoundary, Property, PropertyOwner, Tenancy, Valuation } from "../../managed/database";
 import { DwellingViewModel } from "../life/resident";
 import { PropertyDwellingViewModel, PropertyOwnerViewModel, PropertyViewModel } from "../property.view";
 import { BuildingSummaryModel } from "./building";
@@ -11,7 +11,7 @@ import { PropertyManager } from "./manager";
 import { BoroughSummaryModel } from "../borough.summary";
 import { PropertyValueator } from "../trade/valuation/property";
 import { LegalEntityManager } from "../legal-entity/manager";
-import { A } from "ollama/dist/shared/ollama.7cdb1e15";
+import { EmptyDwellingCandidateModel, EmptyDwellingCandidateViewModel } from "./relocate";
 
 export class PropertyService extends Service {
 	constructor(
@@ -178,5 +178,106 @@ export class PropertyService extends Service {
 		await property.update();
 
 		return new PlotBoundarySummaryModel(plotBoundary);
+	}
+
+	async findNearestEmptyDwellings(dwellingId: string, page: number) {
+		const pageSize = 50;
+
+		const sourceDwelling = await this.database.dwelling.find(dwellingId);
+		const sourceProperty = await sourceDwelling.property.fetch();
+		const sourcePlot = await sourceProperty.activePlotBoundary.fetch();
+		const sourceCenter = Point.center(Point.unpack(sourcePlot.shape));
+
+		// batch-load everything needed for vacancy checks & ownership up front, instead of querying per dwelling/owner (was an N+1 query per candidate)
+		const properties = await this.database.property
+			.where(property => property.deactivated == null)
+			.where(property => property.activePlotBoundaryId != null)
+			.where(property => property.id != sourceProperty.id)
+			.includeTree({
+				id: true,
+
+				activePlotBoundary: {
+					id: true,
+					shape: true
+				},
+
+				owners: {
+					id: true,
+					sold: true,
+					share: true,
+					aquired: true,
+					aquiredValuationId: true,
+					ownerId: true
+				},
+
+				dwellings: {
+					id: true,
+
+					tenants: {
+						id: true,
+						end: true
+					}
+				}
+			})
+			.toArray();
+
+		const candidates: { dwelling: Dwelling, property: Property, owners: PropertyOwner[], distance: number }[] = [];
+
+		for (let property of properties) {
+			const plot = await property.activePlotBoundary.fetch();
+			const center = Point.center(Point.unpack(plot.shape));
+			const distance = center.distance(sourceCenter);
+
+			const owners = (await property.owners.toArray()).filter(owner => owner.sold == null);
+
+			// only one candidate per property - further vacant dwellings on the same property are at the same location
+			for (let dwelling of await property.dwellings.toArray()) {
+				const tenants = await dwelling.tenants.toArray();
+
+				if (tenants.every(tenant => tenant.end != null)) {
+					candidates.push({ dwelling, property, owners, distance });
+
+					break;
+				}
+			}
+		}
+
+		candidates.sort((a, b) => a.distance - b.distance);
+
+		const models: EmptyDwellingCandidateModel[] = [];
+
+		for (let candidate of candidates.slice(page * pageSize, (page + 1) * pageSize)) {
+			models.push(await EmptyDwellingCandidateModel.from(candidate.dwelling, candidate.distance, candidate.property, candidate.owners));
+		}
+
+		return EmptyDwellingCandidateViewModel.from(models);
+	}
+
+	async relocateTenancy(dwellingId: string, targetDwellingId: string) {
+		const dwelling = await this.database.dwelling.find(dwellingId);
+		const targetDwelling = await this.database.dwelling.find(targetDwellingId);
+
+		if (await targetDwelling.tenants.where(tenant => tenant.end == null).count()) {
+			throw new Error('Target dwelling is already occupied');
+		}
+
+		const activeTenancies = await dwelling.tenants.where(tenant => tenant.end == null).toArray();
+
+		for (let tenancy of activeTenancies) {
+			const resident = await tenancy.inhabitant.fetch();
+
+			tenancy.end = new Date();
+			await tenancy.update();
+
+			const relocated = new Tenancy();
+			relocated.dwelling = targetDwelling;
+			relocated.inhabitant = resident;
+			relocated.start = new Date();
+
+			await relocated.create();
+
+			resident.mainTenancyId = relocated.id;
+			await resident.update();
+		}
 	}
 }

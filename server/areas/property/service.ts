@@ -11,7 +11,6 @@ import { PropertyManager } from "./manager";
 import { BoroughSummaryModel } from "../borough.summary";
 import { PropertyValueator } from "../trade/valuation/property";
 import { LegalEntityManager } from "../legal-entity/manager";
-import { EmptyDwellingCandidateModel, EmptyDwellingCandidateViewModel } from "./relocate";
 
 export class PropertyService extends Service {
 	constructor(
@@ -180,86 +179,31 @@ export class PropertyService extends Service {
 		return new PlotBoundarySummaryModel(plotBoundary);
 	}
 
-	async findNearestEmptyDwellings(dwellingId: string, page: number) {
-		const pageSize = 50;
+	async getDwelling(dwellingId: string) {
+		return new PropertyDwellingViewModel(await this.database.dwelling.find(dwellingId));
+	}
 
-		const sourceDwelling = await this.database.dwelling.find(dwellingId);
-		const sourceProperty = await sourceDwelling.property.fetch();
-		const sourcePlot = await sourceProperty.activePlotBoundary.fetch();
-		const sourceCenter = Point.center(Point.unpack(sourcePlot.shape));
+	async relocateTenancyToProperty(dwellingId: string, targetPropertyId: string) {
+		const dwelling = await this.database.dwelling.find(dwellingId);
+		const targetProperty = await this.database.property.find(targetPropertyId);
 
-		// batch-load everything needed for vacancy checks & ownership up front, instead of querying per dwelling/owner (was an N+1 query per candidate)
-		const properties = await this.database.property
-			.where(property => property.deactivated == null)
-			.where(property => property.activePlotBoundaryId != null)
-			.where(property => property.id != sourceProperty.id)
-			.includeTree({
-				id: true,
+		if (dwelling.propertyId == targetProperty.id) {
+			throw new Error('Cannot relocate within the same property');
+		}
 
-				activePlotBoundary: {
-					id: true,
-					shape: true
-				},
+		const vacantTargetDwellings = [];
 
-				owners: {
-					id: true,
-					sold: true,
-					share: true,
-					aquired: true,
-					aquiredValuationId: true,
-					ownerId: true
-				},
-
-				dwellings: {
-					id: true,
-
-					tenants: {
-						id: true,
-						end: true
-					}
-				}
-			})
-			.toArray();
-
-		const candidates: { dwelling: Dwelling, property: Property, owners: PropertyOwner[], distance: number }[] = [];
-
-		for (let property of properties) {
-			const plot = await property.activePlotBoundary.fetch();
-			const center = Point.center(Point.unpack(plot.shape));
-			const distance = center.distance(sourceCenter);
-
-			const owners = (await property.owners.toArray()).filter(owner => owner.sold == null);
-
-			// only one candidate per property - further vacant dwellings on the same property are at the same location
-			for (let dwelling of await property.dwellings.toArray()) {
-				const tenants = await dwelling.tenants.toArray();
-
-				if (tenants.every(tenant => tenant.end != null)) {
-					candidates.push({ dwelling, property, owners, distance });
-
-					break;
-				}
+		for (let candidate of await targetProperty.dwellings.toArray()) {
+			if (await candidate.tenants.where(tenant => tenant.end == null).count() == 0) {
+				vacantTargetDwellings.push(candidate);
 			}
 		}
 
-		candidates.sort((a, b) => a.distance - b.distance);
-
-		const models: EmptyDwellingCandidateModel[] = [];
-
-		for (let candidate of candidates.slice(page * pageSize, (page + 1) * pageSize)) {
-			models.push(await EmptyDwellingCandidateModel.from(candidate.dwelling, candidate.distance, candidate.property, candidate.owners));
+		if (!vacantTargetDwellings.length) {
+			throw new Error('Target property has no vacant dwellings');
 		}
 
-		return EmptyDwellingCandidateViewModel.from(models);
-	}
-
-	async relocateTenancy(dwellingId: string, targetDwellingId: string) {
-		const dwelling = await this.database.dwelling.find(dwellingId);
-		const targetDwelling = await this.database.dwelling.find(targetDwellingId);
-
-		if (await targetDwelling.tenants.where(tenant => tenant.end == null).count()) {
-			throw new Error('Target dwelling is already occupied');
-		}
+		const targetDwelling = vacantTargetDwellings[Math.floor(Math.random() * vacantTargetDwellings.length)];
 
 		const activeTenancies = await dwelling.tenants.where(tenant => tenant.end == null).toArray();
 

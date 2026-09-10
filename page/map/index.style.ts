@@ -1,4 +1,4 @@
-import { alignItems, alignSelf, background, backgroundColor, border, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, display, flexDirection, flexGrow, flexShrink, flexWrap, fontSize, gap, height, Hex, hex, imageRendering, inset, insetInline, justifyContent, left, lineHeight, margin, marginBottom, marginInline, marginLeft, marginTop, maxWidth, Number, opacity, overflow, padding, paddingBlock, paddingBottom, paddingInline, paddingTop, percentage, pointerEvents, position, px, rem, right, select, style, textAlign, top, Variable, width } from "@acryps/style";
+import { alignItems, alignSelf, background, backgroundColor, border, borderBottom, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, cursor, display, flexDirection, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, height, Hex, hex, imageRendering, inset, insetInline, justifyContent, left, lineHeight, margin, marginBottom, marginInline, marginLeft, marginTop, maxHeight, maxWidth, Number, objectFit, opacity, overflow, overflowY, padding, paddingBlock, paddingBottom, paddingInline, paddingTop, pointerEvents, position, px, rem, right, select, style, textAlign, top, Variable, vh, width } from "@acryps/style";
 import { pageTextColor, navigationBackgroundColor, navigationBorderColor, pageGutter, pageBackgroundColor, neutralColor } from "../index.style";
 import { buttonStyle } from "../shared/index.style";
 import { PageComponent } from "../page";
@@ -265,6 +265,103 @@ export const mapStyle = () => [
 				child('input',
 					inputStyle(),
 					flexGrow(1)
+				)
+			),
+
+			child('ui-relocate-tenancy',
+				alignSelf('stretch'),
+				display('block'),
+
+				paddingTop(pageGutter.divide(2)),
+				paddingInline(pageGutter),
+				paddingBottom(pageGutter.divide(2)),
+
+				backgroundColor(navigationBackgroundColor),
+
+				child('ui-title',
+					display('block'),
+					marginBottom(pageGutter.divide(4)),
+
+					fontWeight('bold')
+				),
+
+				child('ui-subtitle',
+					display('block'),
+					marginBottom(pageGutter.divide(2)),
+
+					opacity(0.7),
+					fontSize(rem(0.85))
+				),
+
+				child('ui-tenants',
+					display('block'),
+
+					maxHeight(vh(18)),
+					overflowY('auto'),
+
+					border(px(1), 'solid', 'currentColor'),
+
+					child('ui-tenant',
+						display('flex'),
+						alignItems('center'),
+						gap(pageGutter.divide(2)),
+
+						paddingBlock(rem(0.4)),
+						paddingInline(rem(0.5)),
+
+						cursor('pointer'),
+
+						style(':not(:last-of-type)',
+							borderBottom(px(1), 'dotted', 'currentColor')
+						),
+
+						child('img',
+							height(rem(2.5)),
+							width(rem(2.5)),
+
+							objectFit('contain')
+						),
+
+						child('ui-detail',
+							display('block'),
+
+							child('ui-name',
+								display('block'),
+								fontWeight('bold')
+							),
+
+							child('ui-info',
+								display('block'),
+								fontSize(rem(0.8)),
+								opacity(0.7)
+							)
+						)
+					)
+				)
+			),
+
+			child('ui-relocate-office',
+				alignSelf('stretch'),
+				display('block'),
+
+				paddingTop(pageGutter.divide(2)),
+				paddingInline(pageGutter),
+				paddingBottom(pageGutter.divide(2)),
+
+				backgroundColor(navigationBackgroundColor),
+
+				child('ui-title',
+					display('block'),
+					marginBottom(pageGutter.divide(4)),
+
+					fontWeight('bold')
+				),
+
+				child('ui-purpose',
+					display('block'),
+
+					fontSize(rem(0.85)),
+					opacity(0.7)
 				)
 			)
 		)

@@ -126,8 +126,6 @@ import { PlotBoundarySummaryModel } from "././../areas/property/plot";
 import { Shape } from "././../../interface/shape";
 import { TradeManager } from "././../areas/trade/manager";
 import { PropertyValueator } from "././../areas/trade/valuation/property";
-import { EmptyDwellingCandidateModel } from "././../areas/property/relocate";
-import { EmptyDwellingCandidateViewModel } from "././../areas/property/relocate";
 import { PropertyService } from "././../areas/property/service";
 import { Article } from "././database";
 import { ArticleImage } from "././database";
@@ -790,6 +788,19 @@ export class ManagedServer extends BaseServer {
 				params["l3YzB6dWcycDFoeWFseWdha2RhMzptcT"],
 				params["dodHJhcWgxYzd4eDF4ejNva2d6Mzl3OX"],
 				params["kxZTQ1eDJuMGM4NWh6ZH1vMzM3NjZpM2"]
+			)
+		);
+
+		this.expose(
+			"Voa2ptcGc1dmRxeDVhYTE5MGJ0ND9kaH",
+			{
+			"NvYTR4OXlsb2Q3aW51aWoxZDg5ODd0cW": { type: "string", isArray: false, isOptional: false },
+				"M3dGE0eWhrMDZrY2N3YWh1N3RlMG5oZD": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(CompanyOfficeService),
+			(controller, params) => controller.relocateOfficeToProperty(
+				params["NvYTR4OXlsb2Q3aW51aWoxZDg5ODd0cW"],
+				params["M3dGE0eWhrMDZrY2N3YWh1N3RlMG5oZD"]
 			)
 		);
 
@@ -1555,28 +1566,26 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"J5OTMzOXNyaWd3YjhtdmFtZ3IzYWl2d3",
+			"VrbWI2azp6ZTJlOWMxZGcwd3NleWE0cW",
 			{
-			"ZmOGJ2Y2V2c2VoeHFxM2ZxczYwanB6OG": { type: "string", isArray: false, isOptional: false },
-				"Y5Mjlmcn9senM0YzRudzdrbmprdmZjZm": { type: "number", isArray: false, isOptional: false }
+			"ZrbnJjemY1Z2B5cmNiNWQ0YT1pZDJten": { type: "string", isArray: false, isOptional: false }
 			},
 			inject => inject.construct(PropertyService),
-			(controller, params) => controller.findNearestEmptyDwellings(
-				params["ZmOGJ2Y2V2c2VoeHFxM2ZxczYwanB6OG"],
-				params["Y5Mjlmcn9senM0YzRudzdrbmprdmZjZm"]
+			(controller, params) => controller.getDwelling(
+				params["ZrbnJjemY1Z2B5cmNiNWQ0YT1pZDJten"]
 			)
 		);
 
 		this.expose(
-			"Bua2B5MnV4Yzp2dzpiaD8wdmM3dGVuZ2",
+			"5kdXd2aXMwejlxOTB4NGVwYXJrcnE5OW",
 			{
-			"JmM3w1bzh6MjdlZmcxemcwcmptbXNxZH": { type: "string", isArray: false, isOptional: false },
-				"FwdGJndnh4b29hdjJvM3g2MzVrMGduMm": { type: "string", isArray: false, isOptional: false }
+			"NycXF2aTJvZHdrZzZsM3llb2p3aXlzZG": { type: "string", isArray: false, isOptional: false },
+				"VrM2ZvMmJ5YmR5ZWZ1aHNrbDJ0Yno5ND": { type: "string", isArray: false, isOptional: false }
 			},
 			inject => inject.construct(PropertyService),
-			(controller, params) => controller.relocateTenancy(
-				params["JmM3w1bzh6MjdlZmcxemcwcmptbXNxZH"],
-				params["FwdGJndnh4b29hdjJvM3g2MzVrMGduMm"]
+			(controller, params) => controller.relocateTenancyToProperty(
+				params["NycXF2aTJvZHdrZzZsM3llb2p3aXlzZG"],
+				params["VrM2ZvMmJ5YmR5ZWZ1aHNrbDJ0Yno5ND"]
 			)
 		);
 
@@ -7340,76 +7349,6 @@ ViewModel.mappings = {
 			
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"shape" in viewModel && (model.shape = viewModel.shape === null ? null : `${viewModel.shape}`);
-
-			return model;
-		}
-	},
-	[EmptyDwellingCandidateViewModel.name]: class ComposedEmptyDwellingCandidateViewModel extends EmptyDwellingCandidateViewModel {
-		async map() {
-			return {
-				id: this.$$model.id,
-				distance: this.$$model.distance,
-				property: this.$$model.property,
-				owners: this.$$model.owners
-			}
-		};
-
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
-			return {
-				id: true,
-				distance: true,
-				property: true,
-				owners: true
-			};
-		};
-
-		static toViewModel(data) {
-			const item = new EmptyDwellingCandidateViewModel(null);
-			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
-			"distance" in data && (item.distance = data.distance === null ? null : +data.distance);
-			"property" in data && (undefined);
-			"owners" in data && (undefined);
-
-			return item;
-		}
-
-		static async toModel(viewModel: EmptyDwellingCandidateViewModel) {
-			let model: EmptyDwellingCandidateModel;
-			
-			if (viewModel.id) {
-				model = await ViewModel.globalFetchingContext.findSet(EmptyDwellingCandidateModel).find(viewModel.id)
-			} else {
-				model = new EmptyDwellingCandidateModel();
-			}
-			
-			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
-			"distance" in viewModel && (model.distance = viewModel.distance === null ? null : +viewModel.distance);
-			"property" in viewModel && (undefined);
-			"owners" in viewModel && (undefined);
 
 			return model;
 		}

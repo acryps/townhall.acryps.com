@@ -26,6 +26,8 @@ import { StreetFiller } from "./map/fill/street";
 import { LegalEntityReferenceCounter } from "./areas/legal-entity/reference-counter";
 import { PropertyValueTileServer } from "./map/layers/heatmap/gradiant/property-value";
 import { PropertyOwnershipTileServer } from "./map/layers/shape/propety-ownership";
+import { RelocateTenancyTileServer } from "./map/layers/shape/relocate-tenancy";
+import { RelocateOfficeTileServer } from "./map/layers/shape/relocate-office";
 import { PropertyValueator } from "./areas/trade/valuation/property";
 import { LegalEntityManager } from "./areas/legal-entity/manager";
 import { FillLife } from "./life/fill/fill";
@@ -212,6 +214,8 @@ DbClient.connectedClient.connect().then(async () => {
 	new PropertyUsageTileServer(app, database);
 	new PropertyValueTileServer(app, database);
 	new PropertyOwnershipTileServer(app, database);
+	new RelocateTenancyTileServer(app, database);
+	new RelocateOfficeTileServer(app, database);
 	new TrainRouteTileServer(app, database);
 	new TrainRoutesTileServer(app, database);
 	new StationTileServer(app, database);

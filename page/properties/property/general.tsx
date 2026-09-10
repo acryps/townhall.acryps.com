@@ -5,6 +5,7 @@ import { PackedPointArray, Point } from "../../../interface/point";
 import { addIcon, deleteIcon, drawIcon } from "../../assets/icons/managed";
 import { BoroughSummaryModel, MapService, PropertyService, PropertyTypeViewModel } from "../../managed/services";
 import { Application } from "../..";
+import { Alert } from "../../shared/alert";
 
 export class GeneralPropertyTab extends Component {
 	touchingBoroughs: BoroughSummaryModel[];
@@ -109,9 +110,15 @@ export class GeneralPropertyTab extends Component {
 
 			<ui-actions>
 				<ui-action ui-click={async () => {
-					await new MapService().archiveProperty(this.page.property);
+					try {
+						await new MapService().archiveProperty(this.page.property);
 
-					history.back();
+						history.back();
+					} catch (error) {
+						Alert.show('Archive Failed', error.message ?? `${error}`)
+							.addPrimaryAction('OK', alert => alert.close())
+							.show();
+					}
 				}}>
 					{deleteIcon()} Archive Property
 				</ui-action>

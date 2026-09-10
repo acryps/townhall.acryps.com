@@ -4,7 +4,6 @@ import { fieldStyle, inputStyle } from "../../shared/field.style";
 import { buttonGroupStyle, buttonStyle } from "../../shared/index.style";
 import { buildingStyle } from "./building/index.style";
 import { ownershipStructureStyle } from "./ownership/index.style";
-import { relocateDwellingStyle } from "./relocate/index.style";
 import { tabsStyle } from "../../shared/tabs/index.style";
 import { boxed } from "../../shared/boxed.style";
 import { changeFramesStyle } from "../../shared/change-frames/index.style";
@@ -32,7 +31,6 @@ export const propertyStyle = () => child('ui-property',
 
 	buildingStyle(),
 	ownershipStructureStyle(),
-	relocateDwellingStyle(),
 
 	child('ui-content',
 		child('ui-map-container',
@@ -350,6 +348,17 @@ export const propertyStyle = () => child('ui-property',
 
 						child('ui-name',
 							display('block')
+						),
+
+						child('ui-actions',
+							buttonGroupStyle(),
+							justifyContent('flex-end'),
+
+							child('ui-action',
+								marginTop(rem(0.5)),
+
+								buttonStyle()
+							)
 						)
 					),
 

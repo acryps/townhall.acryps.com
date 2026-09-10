@@ -99,4 +99,16 @@ export class CompanyOfficeService extends Service {
 
 		return office.id;
 	}
+
+	async relocateOfficeToProperty(officeId: string, targetPropertyId: string) {
+		const office = await this.database.office.find(officeId);
+		const targetProperty = await this.database.property.find(targetPropertyId);
+
+		if (office.propertyId == targetProperty.id) {
+			throw new Error('Cannot relocate within the same property');
+		}
+
+		office.property = targetProperty;
+		await office.update();
+	}
 }

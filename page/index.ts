@@ -46,7 +46,8 @@ import { PropertyOwnershipPage } from "./properties/property/ownership";
 import { QuickValueationAction } from "./map/quick-valueation";
 import { MapStartPage } from "./map/start";
 import { RevaluePropertyPage } from "./properties/property/ownership/revalue";
-import { RelocateDwellingPage } from "./properties/property/relocate";
+import { RelocateTenancyAction } from "./map/relocate-tenancy";
+import { RelocateOfficeAction } from "./map/relocate-office";
 import { EntityAssetsPage } from "./trade/assets";
 import { MetricsPage } from "./metrics";
 import { TrainsPage } from "./train";
@@ -130,6 +131,8 @@ export class Application {
 					.route('/edit-plot/:id', EditPlotAction)
 					.route('/edit-route/:id', EditRouteAction)
 					.route('/quick-valueation', QuickValueationAction)
+					.route('/relocate-tenancy/:dwellingId', RelocateTenancyAction)
+					.route('/relocate-office/:officeId', RelocateOfficeAction)
 
 					.route('/train-route/insert-stop/:code/:segmentIndex', InsertTrainRouteStopAction)
 					.route('/train-route/edit-route/:code/:segmentIndex', EditTrainRouteAction)
@@ -144,7 +147,6 @@ export class Application {
 				.route('/properties', PropertiesComponent)
 				.route('/property/:id', PropertyPage
 					.route('/building/:id', BuildingPage)
-					.route('/relocate/:dwellingId', RelocateDwellingPage)
 					.route('/ownership', PropertyOwnershipPage
 						.route('/revalue/:ownerId', RevaluePropertyPage)
 					)

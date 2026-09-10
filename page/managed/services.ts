@@ -1251,23 +1251,6 @@ export class PlotBoundaryShapeModel {
 	}
 }
 
-export class EmptyDwellingCandidateViewModel {
-	id: string;
-	distance: number;
-	property: PropertySummaryModel;
-	owners: PropertyOwnerViewModel[];
-
-	private static $build(raw) {
-		const item = new EmptyDwellingCandidateViewModel();
-		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
-		raw.distance === undefined || (item.distance = raw.distance === null ? null : +raw.distance)
-		raw.property === undefined || (item.property = raw.property ? PropertySummaryModel["$build"](raw.property) : null)
-		raw.owners === undefined || (item.owners = raw.owners ? raw.owners.map(i => PropertyOwnerViewModel["$build"](i)) : null)
-		
-		return item;
-	}
-}
-
 export class ArticleNewstickerModel {
 	id: string;
 	published: Date;
@@ -3122,6 +3105,26 @@ export class CompanyOfficeService {
 			}
 		});
 	}
+
+	async relocateOfficeToProperty(officeId: string, targetPropertyId: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("NvYTR4OXlsb2Q3aW51aWoxZDg5ODd0cW", Service.stringify(officeId))
+		$data.append("M3dGE0eWhrMDZrY2N3YWh1N3RlMG5oZD", Service.stringify(targetPropertyId))
+
+		return await fetch(Service.toURL("Voa2ptcGc1dmRxeDVhYTE5MGJ0ND9kaH"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
 }
 
 export class EpochService {
@@ -4592,12 +4595,11 @@ export class PropertyService {
 		});
 	}
 
-	async findNearestEmptyDwellings(dwellingId: string, page: number): Promise<Array<EmptyDwellingCandidateViewModel>> {
+	async getDwelling(dwellingId: string): Promise<PropertyDwellingViewModel> {
 		const $data = new FormData();
-		$data.append("ZmOGJ2Y2V2c2VoeHFxM2ZxczYwanB6OG", Service.stringify(dwellingId))
-		$data.append("Y5Mjlmcn9senM0YzRudzdrbmprdmZjZm", Service.stringify(page))
+		$data.append("ZrbnJjemY1Z2B5cmNiNWQ0YT1pZDJten", Service.stringify(dwellingId))
 
-		return await fetch(Service.toURL("J5OTMzOXNyaWd3YjhtdmFtZ3IzYWl2d3"), {
+		return await fetch(Service.toURL("VrbWI2azp6ZTJlOWMxZGcwd3NleWE0cW"), {
 			method: "post",
 			credentials: "include",
 			body: $data
@@ -4605,7 +4607,7 @@ export class PropertyService {
 			if ("data" in r) {
 				const d = r.data;
 
-				return d.map(d => d === null ? null : EmptyDwellingCandidateViewModel["$build"](d));
+				return d === null ? null : PropertyDwellingViewModel["$build"](d);
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
@@ -4614,12 +4616,12 @@ export class PropertyService {
 		});
 	}
 
-	async relocateTenancy(dwellingId: string, targetDwellingId: string): Promise<void> {
+	async relocateTenancyToProperty(dwellingId: string, targetPropertyId: string): Promise<void> {
 		const $data = new FormData();
-		$data.append("JmM3w1bzh6MjdlZmcxemcwcmptbXNxZH", Service.stringify(dwellingId))
-		$data.append("FwdGJndnh4b29hdjJvM3g2MzVrMGduMm", Service.stringify(targetDwellingId))
+		$data.append("NycXF2aTJvZHdrZzZsM3llb2p3aXlzZG", Service.stringify(dwellingId))
+		$data.append("VrM2ZvMmJ5YmR5ZWZ1aHNrbDJ0Yno5ND", Service.stringify(targetPropertyId))
 
-		return await fetch(Service.toURL("Bua2B5MnV4Yzp2dzpiaD8wdmM3dGVuZ2"), {
+		return await fetch(Service.toURL("5kdXd2aXMwejlxOTB4NGVwYXJrcnE5OW"), {
 			method: "post",
 			credentials: "include",
 			body: $data

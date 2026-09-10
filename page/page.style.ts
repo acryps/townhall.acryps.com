@@ -22,6 +22,7 @@ import { writeArticleStyle } from "./news/write/index.style";
 import { annotatedTextStyle } from "./shared/annotaded-text/index.style";
 import { streetStyle } from "./street/index.style";
 import { legalEntitySelectorStyle } from "./shared/legal-entity/select/index.style";
+import { alertStyle } from "./shared/alert/index.style";
 import { articleStyle } from "./news/article/index.style";
 import { valuationStyle } from "./trade/valuation/index.style";
 import { mapStartStyle } from "./map/start/index.style";
@@ -73,6 +74,9 @@ export const pageStyle = () => root(
 
 		color(pageTextColor),
 		backgroundColor(navigationBackgroundColor),
+
+		// mounted directly onto document.body (outside the router), so it must be a direct child of body here too - child() compiles to a '>' combinator
+		alertStyle(),
 
 		child('ui-page',
 			display('block'),

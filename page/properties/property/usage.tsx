@@ -4,6 +4,7 @@ import { addIcon } from "../../assets/icons/managed";
 import { convertToLegalCompanyName } from "../../../interface/company";
 import { ResidentBadgeListComponent } from "../../shared/resident-badge-list";
 import { PropertyService } from "../../managed/services";
+import { Point } from "../../../interface/point";
 
 export class PropertyUsageTab extends Component {
 	newDwellingCount = 1;
@@ -15,6 +16,8 @@ export class PropertyUsageTab extends Component {
 	}
 
 	render() {
+		const center = Point.center(Point.unpack(this.page.activePlotBoundary.shape));
+
 		return <ui-usage>
 			<ui-offices>
 				{this.page.property.offices.map(office => <ui-office ui-href={`/company-office/office/${office.id}`}>
@@ -25,6 +28,12 @@ export class PropertyUsageTab extends Component {
 					<ui-name>
 						{office.name ?? office.id.split('-')[0]}
 					</ui-name>
+
+					<ui-actions>
+						<ui-action ui-href={`/map/${center.x}/${center.y}/5/relocate-office/${office.id}`}>
+							Relocate
+						</ui-action>
+					</ui-actions>
 				</ui-office>)}
 
 				<ui-action ui-href={`/company-office/register/${this.page.property.id}`}>
@@ -50,7 +59,7 @@ export class PropertyUsageTab extends Component {
 						</ui-vacant>}
 
 						<ui-actions>
-							{activeTenants.length != 0 && <ui-action ui-href={`/property/${this.page.property.id}/relocate/${dwelling.id}`}>
+							{activeTenants.length != 0 && <ui-action ui-href={`/map/${center.x}/${center.y}/5/relocate-tenancy/${dwelling.id}`}>
 								Relocate
 							</ui-action>}
 						</ui-actions>

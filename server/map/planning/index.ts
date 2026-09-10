@@ -9,6 +9,7 @@ import { BoroughSummaryModel } from "../../areas/borough.summary";
 import { Logger } from "@acryps/log";
 import { StreetFiller } from "../fill/street";
 import { WaterBodyFiller } from "../fill/water";
+import { SquareFiller } from "../fill/square";
 import { join } from "path";
 
 export class PlanningMapGenerator {
@@ -80,6 +81,25 @@ export class PlanningMapGenerator {
 			}
 
 			return filled;
+		}
+
+		// draw squares (take priority over streets and water)
+		logger.log('render squares');
+		const squareFiller = new SquareFiller(this.database);
+		const filledSquares = await squareFiller.update();
+
+		for (let square of new Set(filledSquares.filled.values())) {
+			const boundary = new Map<string, Point>();
+
+			for (let [point, source] of filledSquares.filled) {
+				if (source == square) {
+					boundary.set(point, Point.unpackSingle(point));
+				}
+			}
+
+			use(boundary);
+			this.fill(boundary, topLeft, context, '#ccc', '#000', this.plotWidth);
+			this.labelFilledShape(boundary, topLeft, labelContext, '#000', square.name);
 		}
 
 		// draw roads

@@ -314,17 +314,36 @@ export class TenantViewModel {
 }
 
 export class SquareViewModel {
-	borough: BoroughSummaryModel;
-	bounds: string;
+	boundaries: SquareBoundarySummaryModel[];
+	activeBoundaryId: string;
 	id: string;
 	name: string;
+	tag: string;
 
 	private static $build(raw) {
 		const item = new SquareViewModel();
-		raw.borough === undefined || (item.borough = raw.borough ? BoroughSummaryModel["$build"](raw.borough) : null)
-		raw.bounds === undefined || (item.bounds = raw.bounds === null ? null : `${raw.bounds}`)
+		raw.boundaries === undefined || (item.boundaries = raw.boundaries ? raw.boundaries.map(i => SquareBoundarySummaryModel["$build"](i)) : null)
+		raw.activeBoundaryId === undefined || (item.activeBoundaryId = raw.activeBoundaryId === null ? null : `${raw.activeBoundaryId}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
+		
+		return item;
+	}
+}
+
+export class SquareBoundarySummaryModel {
+	changeComment: string;
+	created: Date;
+	id: string;
+	shape: string;
+
+	private static $build(raw) {
+		const item = new SquareBoundarySummaryModel();
+		raw.changeComment === undefined || (item.changeComment = raw.changeComment === null ? null : `${raw.changeComment}`)
+		raw.created === undefined || (item.created = raw.created ? new Date(raw.created) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.shape === undefined || (item.shape = raw.shape === null ? null : `${raw.shape}`)
 		
 		return item;
 	}
@@ -2444,27 +2463,6 @@ export class MapService {
 		});
 	}
 
-	async getSquares(): Promise<Array<SquareViewModel>> {
-		const $data = new FormData();
-		
-
-		return await fetch(Service.toURL("hpejphODJldWo2b2NxaWVxdzx3c2V3bm"), {
-			method: "post",
-			credentials: "include",
-			body: $data
-		}).then(res => res.json()).then(r => {
-			if ("data" in r) {
-				const d = r.data;
-
-				return d.map(d => d === null ? null : SquareViewModel["$build"](d));
-			} else if ("aborted" in r) {
-				throw new Error("request aborted by server");
-			} else if ("error" in r) {
-				throw new Error(r.error);
-			}
-		});
-	}
-
 	async getWaterBodies(): Promise<Array<WaterBodyViewModel>> {
 		const $data = new FormData();
 		
@@ -2657,25 +2655,6 @@ export class MapService {
 		$data.append("YwNnJhZnZycjNzNGU3emQ0Y2RtNnhmZG", Service.stringify(streetViewModel))
 
 		return await fetch(Service.toURL("VsbndnaTI4bTllbnh0endpaHdkM3w1MD"), {
-			method: "post",
-			credentials: "include",
-			body: $data
-		}).then(res => res.json()).then(r => {
-			if ("error" in r) {
-				throw new Error(r.error);
-			}
-
-			if ("aborted" in r) {
-				throw new Error("request aborted by server");
-			}
-		});
-	}
-
-	async createSquare(squareViewModel: SquareViewModel): Promise<void> {
-		const $data = new FormData();
-		$data.append("FwZXk2OGVmcWRxeHdiZW9ucjhxcGE5cG", Service.stringify(squareViewModel))
-
-		return await fetch(Service.toURL("RhZGo0ejpmdnJhZ3lla3I4bzB2M2F5cn"), {
 			method: "post",
 			credentials: "include",
 			body: $data
@@ -4968,6 +4947,110 @@ export class ChatService {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
 				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class SquareService {
+	async getSquare(tag: string): Promise<SquareViewModel> {
+		const $data = new FormData();
+		$data.append("10N2Q0ZDh2YjhnZHRlZmE4am1wZn50Zm", Service.stringify(tag))
+
+		return await fetch(Service.toURL("c3cH9kanZiMXczc2NwazA3dXF5bmZveW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : SquareViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async createSquare(shape: string, name: string): Promise<string> {
+		const $data = new FormData();
+		$data.append("YyemZ0b2AycTlraDFkbzRzbzU3d3VyZD", Service.stringify(shape))
+		$data.append("NqeTlhYXhod2NoaWdzZmFzcXg5YzpveW", Service.stringify(name))
+
+		return await fetch(Service.toURL("g0eWd3YTJtMDFnam1lank0NWZ2YXU1MG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async rename(id: string, name: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("lkd3R6cHBkOTJhd2o0M2NwbzhiOWVyMW", Service.stringify(id))
+		$data.append("cxeXVvYnI0bXY4dDJlMjtsMn52bzlhZT", Service.stringify(name))
+
+		return await fetch(Service.toURL("lxYjU5N2hlMXRwMmZhYntiNT5scXkzdG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async editBoundary(id: string, shape: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("kzbTBkM2psZGliaTBwNDpwZnw1NXFiZX", Service.stringify(id))
+		$data.append("F4bmRsbzhpNWYzcGF4YmhzdnRvYnNqNG", Service.stringify(shape))
+
+		return await fetch(Service.toURL("Rqbnp3NnlpejF0aWdpZGJtcjNrbDM5NT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async archive(id: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("RuMGl3MTE2OWRtN2MzZnM5MnQzMHQxMH", Service.stringify(id))
+
+		return await fetch(Service.toURL("Rjc2h0Nm9mOWhiank1czE2cm1jeDljZG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
 			}
 		});
 	}

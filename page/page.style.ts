@@ -38,6 +38,8 @@ import { militaryStyle } from "./military/index.style";
 import { reviewStyle } from "./review/index.style";
 import { createWaterBodyStyle } from "./water/create/index.style";
 import { waterStyle } from "./water/index.style";
+import { createSquareStyle } from "./square/create/index.style";
+import { squareStyle } from "./square/index.style";
 import { marketStyle } from "./market/index.style";
 import { loreStyle } from "./lore/index.style";
 
@@ -158,6 +160,9 @@ export const pageStyle = () => root(
 				timeStyle(),
 
 				streetStyle(),
+
+				squareStyle(),
+				createSquareStyle(),
 
 				trainStyle(),
 

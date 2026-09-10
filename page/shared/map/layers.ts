@@ -11,6 +11,7 @@ export const propertyOwnershipLayer = MapLayer.fromShapeSource((x, y) => `/tile/
 export const boroughLayer = MapLayer.fromShapeSource((x, y) => `/tile/borough/${x}/${y}`, 500, 'source-over', true);
 export const propertyUsageLayer = MapLayer.fromShapeSource((x, y) => `/tile/usage/${x}/${y}`, 500, 'source-over', true);
 
+// includes squares (drawn darker, with a centered name label) - they're part of the same tile
 export const streetLayer = MapLayer.fromTileSource((x, y) => `/tile/street/${x}/${y}`, 500, 'source-over', (x, y) => `/pick/street/${x}/${y}`);
 export const streetBoundaryLayer = MapLayer.fromTileSource((x, y) => `/tile/street/${x}/${y}/boundary`, 500, 'source-over', (x, y) => `/pick/street/${x}/${y}`);
 

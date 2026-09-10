@@ -7,7 +7,6 @@ import { HistoryEntryViewModel } from "./history.view";
 import { PropertyTypeViewModel } from "./property-type.view";
 import { PropertySummaryModel } from "./property.summary";
 import { PropertyOverviewModel, PropertyViewModel } from "./property.view";
-import { SquareViewModel } from "./squre.view";
 import { StreetViewModel } from "./street.view";
 import { WaterBodyViewModel } from "./water-body.view";
 import { Point } from "../../interface/point";
@@ -51,13 +50,6 @@ export class MapService extends Service {
 			this.database.street
 				.orderByAscending(street => street.size)
 				.orderByAscending(street => street.name)
-		);
-	}
-
-	getSquares() {
-		return SquareViewModel.from(
-			this.database.square
-				.orderByAscending(square => square.name)
 		);
 	}
 
@@ -142,12 +134,6 @@ export class MapService extends Service {
 		const street = await streetViewModel.toModel();
 
 		await street.create();
-	}
-
-	async createSquare(squareViewModel: SquareViewModel) {
-		const square = await squareViewModel.toModel();
-
-		await square.create();
 	}
 
 	async createWaterBody(waterBodyViewModel: WaterBodyViewModel) {

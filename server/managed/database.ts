@@ -396,7 +396,6 @@ export class BoroughQueryProxy extends QueryProxy {
 
 export class Borough extends Entity<BoroughQueryProxy> {
 	properties: PrimaryReference<Property, PropertyQueryProxy>;
-		squares: PrimaryReference<Square, SquareQueryProxy>;
 		get district(): Partial<ForeignReference<District>> { return this.$district; }
 	aiDescription: string;
 	aiSummary: string;
@@ -448,7 +447,6 @@ export class Borough extends Entity<BoroughQueryProxy> {
 		super();
 		
 		this.properties = new PrimaryReference<Property, PropertyQueryProxy>(this, "boroughId", Property);
-		this.squares = new PrimaryReference<Square, SquareQueryProxy>(this, "boroughId", Square);
 		this.$district = new ForeignReference<District>(this, "districtId", District);
 	}
 	
@@ -5045,26 +5043,30 @@ export class ResidentialDemandRule extends Entity<ResidentialDemandRuleQueryProx
 }
 			
 export class SquareQueryProxy extends QueryProxy {
-	get borough(): Partial<BoroughQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get boroughId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get bounds(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get activeBoundary(): Partial<SquareBoundaryQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get activeBoundaryId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get deactivated(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class Square extends Entity<SquareQueryProxy> {
-	get borough(): Partial<ForeignReference<Borough>> { return this.$borough; }
-	boroughId: string;
-	bounds: string;
+	get activeBoundary(): Partial<ForeignReference<SquareBoundary>> { return this.$activeBoundary; }
+	boundaries: PrimaryReference<SquareBoundary, SquareBoundaryQueryProxy>;
+		activeBoundaryId: string;
+	deactivated: Date;
 	declare id: string;
 	name: string;
+	tag: string;
 	
 	$$meta = {
 		source: "square",
 		columns: {
-			boroughId: { type: "uuid", name: "borough_id" },
-			bounds: { type: "text", name: "bounds" },
+			activeBoundaryId: { type: "uuid", name: "active_boundary_id" },
+			deactivated: { type: "timestamp", name: "deactivated" },
 			id: { type: "uuid", name: "id" },
-			name: { type: "text", name: "name" }
+			name: { type: "text", name: "name" },
+			tag: { type: "text", name: "tag" }
 		},
 		get set(): DbSet<Square, SquareQueryProxy> { 
 			return new DbSet<Square, SquareQueryProxy>(Square, null);
@@ -5074,18 +5076,70 @@ export class Square extends Entity<SquareQueryProxy> {
 	constructor() {
 		super();
 		
-		this.$borough = new ForeignReference<Borough>(this, "boroughId", Borough);
+		this.$activeBoundary = new ForeignReference<SquareBoundary>(this, "activeBoundaryId", SquareBoundary);
+	this.boundaries = new PrimaryReference<SquareBoundary, SquareBoundaryQueryProxy>(this, "squareId", SquareBoundary);
 	}
 	
-	private $borough: ForeignReference<Borough>;
+	private $activeBoundary: ForeignReference<SquareBoundary>;
 
-	set borough(value: Partial<ForeignReference<Borough>>) {
+	set activeBoundary(value: Partial<ForeignReference<SquareBoundary>>) {
 		if (value) {
 			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
 
-			this.boroughId = value.id as string;
+			this.activeBoundaryId = value.id as string;
 		} else {
-			this.boroughId = null;
+			this.activeBoundaryId = null;
+		}
+	}
+
+	
+}
+			
+export class SquareBoundaryQueryProxy extends QueryProxy {
+	get square(): Partial<SquareQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get changeComment(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get shape(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get squareId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class SquareBoundary extends Entity<SquareBoundaryQueryProxy> {
+	get square(): Partial<ForeignReference<Square>> { return this.$square; }
+	changeComment: string;
+	created: Date;
+	declare id: string;
+	shape: string;
+	squareId: string;
+	
+	$$meta = {
+		source: "square_boundary",
+		columns: {
+			changeComment: { type: "text", name: "change_comment" },
+			created: { type: "timestamp", name: "created" },
+			id: { type: "uuid", name: "id" },
+			shape: { type: "text", name: "shape" },
+			squareId: { type: "uuid", name: "square_id" }
+		},
+		get set(): DbSet<SquareBoundary, SquareBoundaryQueryProxy> { 
+			return new DbSet<SquareBoundary, SquareBoundaryQueryProxy>(SquareBoundary, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$square = new ForeignReference<Square>(this, "squareId", Square);
+	}
+	
+	private $square: ForeignReference<Square>;
+
+	set square(value: Partial<ForeignReference<Square>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.squareId = value.id as string;
+		} else {
+			this.squareId = null;
 		}
 	}
 
@@ -6846,6 +6900,7 @@ export class DbContext {
 	residentialDemand: DbSet<ResidentialDemand, ResidentialDemandQueryProxy>;
 	residentialDemandRule: DbSet<ResidentialDemandRule, ResidentialDemandRuleQueryProxy>;
 	square: DbSet<Square, SquareQueryProxy>;
+	squareBoundary: DbSet<SquareBoundary, SquareBoundaryQueryProxy>;
 	stockSeed: DbSet<StockSeed, StockSeedQueryProxy>;
 	stockSeedRule: DbSet<StockSeedRule, StockSeedRuleQueryProxy>;
 	street: DbSet<Street, StreetQueryProxy>;
@@ -6951,6 +7006,7 @@ export class DbContext {
 		this.residentialDemand = new DbSet<ResidentialDemand, ResidentialDemandQueryProxy>(ResidentialDemand, this.runContext);
 		this.residentialDemandRule = new DbSet<ResidentialDemandRule, ResidentialDemandRuleQueryProxy>(ResidentialDemandRule, this.runContext);
 		this.square = new DbSet<Square, SquareQueryProxy>(Square, this.runContext);
+		this.squareBoundary = new DbSet<SquareBoundary, SquareBoundaryQueryProxy>(SquareBoundary, this.runContext);
 		this.stockSeed = new DbSet<StockSeed, StockSeedQueryProxy>(StockSeed, this.runContext);
 		this.stockSeedRule = new DbSet<StockSeedRule, StockSeedRuleQueryProxy>(StockSeedRule, this.runContext);
 		this.street = new DbSet<Street, StreetQueryProxy>(Street, this.runContext);

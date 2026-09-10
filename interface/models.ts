@@ -141,10 +141,18 @@ export interface TenantViewModel {
 }
 
 export interface SquareViewModel {
-    borough: BoroughSummaryModel;
-	bounds: string;
+    boundaries: SquareBoundarySummaryModel[];
+	activeBoundaryId: string;
 	id: string;
 	name: string;
+	tag: string;
+}
+
+export interface SquareBoundarySummaryModel {
+    changeComment: string;
+	created: Date;
+	id: string;
+	shape: string;
 }
 
 export interface StreetViewModel {

@@ -74,6 +74,9 @@ import { CreateWaterBodyPage } from "./water/create";
 import { WaterPage } from "./water";
 import { WaterBodyPage } from "./water/water-body";
 import { CreateWaterBodyAction } from "./map/create-water-body-area";
+import { CreateSquarePage } from "./square/create";
+import { SquarePage } from "./square";
+import { EditSquareBoundaryAction } from "./map/edit-square-boundary";
 import { MarketPage } from "./market";
 import { CommodityPage } from "./market/commodity";
 import { MarketEntityPage } from "./market/entity";
@@ -130,6 +133,7 @@ export class Application {
 
 					.route('/edit-plot/:id', EditPlotAction)
 					.route('/edit-route/:id', EditRouteAction)
+					.route('/edit-square-boundary/:tag', EditSquareBoundaryAction)
 					.route('/quick-valueation', QuickValueationAction)
 					.route('/relocate-tenancy/:dwellingId', RelocateTenancyAction)
 					.route('/relocate-office/:officeId', RelocateOfficeAction)
@@ -158,6 +162,9 @@ export class Application {
 				.route('/borough/:tag', BoroughPage)
 
 				.route('/street/:id', StreetPage)
+
+				.route('/square/create/:shape', CreateSquarePage)
+				.route('/square/:tag', SquarePage)
 
 				.route('/time', TimePage)
 

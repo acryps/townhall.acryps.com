@@ -2,9 +2,13 @@ import { Filler } from ".";
 import { calculateDanwinstonShapePath } from "../../../interface/line";
 import { PackedPoint, Point } from "../../../interface/point";
 import { DbContext, Street } from "../../managed/database";
+import { SquareFiller } from "./square";
 
 export class StreetFiller extends Filler<Street> {
 	static active: StreetFiller;
+
+	// squares take priority over streets - if a street passes through a square, the square wins
+	after = [SquareFiller];
 
 	constructor(
 		private database: DbContext

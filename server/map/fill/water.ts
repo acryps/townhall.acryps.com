@@ -2,11 +2,13 @@ import { Filler } from ".";
 import { PackedPoint, Point } from "../../../interface/point";
 import { DbContext, Street, WaterBody } from "../../managed/database";
 import { StreetFiller } from "./street";
+import { SquareFiller } from "./square";
 
 export class WaterBodyFiller extends Filler<WaterBody> {
 	static active: WaterBodyFiller;
 
-	after = [StreetFiller];
+	// streets and squares both take priority over water
+	after = [StreetFiller, SquareFiller];
 
 	constructor(
 		private database: DbContext

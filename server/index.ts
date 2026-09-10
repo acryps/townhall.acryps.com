@@ -51,6 +51,7 @@ import { StationTileServer } from "./map/layers/shape/train/stations";
 import { MinimapGenerator } from "./map/minimap";
 import { WaterBodyTileServer } from "./map/layers/filled/water";
 import { WaterBodyFiller } from "./map/fill/water";
+import { SquareFiller } from "./map/fill/square";
 import { TradingEntity } from "./market/entity";
 import { MarketTracker } from "./market/tracker";
 import { MarketIterationGenerator } from "./market/cycle/generator";
@@ -203,6 +204,7 @@ DbClient.connectedClient.connect().then(async () => {
 		await life.assignFigure(resident);
 	} */
 
+	SquareFiller.active = new SquareFiller(database).schedule();
 	StreetFiller.active = new StreetFiller(database).schedule();
 	WaterBodyFiller.active = new WaterBodyFiller(database).schedule();
 

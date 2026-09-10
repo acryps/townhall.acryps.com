@@ -99,10 +99,6 @@ export const registerInteraction = (
 				scale: map.scale
 			}
 		} else {
-			if (movement) {
-				return;
-			}
-
 			const pointers = getPointers(event);
 
 			if (!pointers.length) {

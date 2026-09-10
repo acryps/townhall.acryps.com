@@ -12,7 +12,6 @@ import { PropertyTypeViewModel } from "././../areas/property-type.view";
 import { PropertySummaryModel } from "././../areas/property.summary";
 import { PropertyOverviewModel } from "././../areas/property.view";
 import { PropertyViewModel } from "././../areas/property.view";
-import { SquareViewModel } from "././../areas/squre.view";
 import { StreetViewModel } from "././../areas/street.view";
 import { WaterBodyViewModel } from "././../areas/water-body.view";
 import { Point } from "././../../interface/point";
@@ -140,6 +139,10 @@ import { PublicationService } from "././../areas/publication/service";
 import { ChatManager } from "././../areas/resident/chat/manager";
 import { ChatInteractionViewModel } from "././../areas/resident/chat/interaction";
 import { ChatService } from "././../areas/resident/chat/service";
+import { Square } from "././database";
+import { SquareBoundary } from "././database";
+import { SquareViewModel } from "././../areas/square.view";
+import { SquareService } from "././../areas/square/service";
 import { Street } from "././database";
 import { StreetRoute } from "././database";
 import { PlotBoundaryShapeModel } from "././../areas/property/plot";
@@ -180,6 +183,7 @@ import { LoreService } from "././../lore/index";
 import { OfficeSummaryModel } from "./../areas/company.view";
 import { OfficeCapacityViewModel } from "./../areas/company.view";
 import { TenantViewModel } from "./../areas/property.view";
+import { SquareBoundarySummaryModel } from "./../areas/square.view";
 import { StreetRouteSummaryModel } from "./../areas/street.view";
 import { WaterBodyAreaViewModel } from "./../areas/water-body.view";
 import { WorkOfferSummaryModel } from "./../areas/work";
@@ -217,7 +221,6 @@ import { Bridge } from "./../managed/database";
 import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
 import { PropertyType } from "./../managed/database";
-import { Square } from "./../managed/database";
 import { WorkOffer } from "./../managed/database";
 import { WorkContract } from "./../managed/database";
 import { City } from "./../managed/database";
@@ -371,6 +374,10 @@ Inject.mappings = {
 		objectConstructor: ChatManager,
 		parameters: ["DbContext","Life"]
 	},
+	"SquareService": {
+		objectConstructor: SquareService,
+		parameters: ["DbContext"]
+	},
 	"StreetService": {
 		objectConstructor: StreetService,
 		parameters: ["DbContext"]
@@ -433,15 +440,6 @@ export class ManagedServer extends BaseServer {
 			{},
 			inject => inject.construct(MapService),
 			(controller, params) => controller.getStreets(
-				
-			)
-		);
-
-		this.expose(
-			"hpejphODJldWo2b2NxaWVxdzx3c2V3bm",
-			{},
-			inject => inject.construct(MapService),
-			(controller, params) => controller.getSquares(
 				
 			)
 		);
@@ -541,17 +539,6 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(MapService),
 			(controller, params) => controller.createStreet(
 				params["YwNnJhZnZycjNzNGU3emQ0Y2RtNnhmZG"]
-			)
-		);
-
-		this.expose(
-			"RhZGo0ejpmdnJhZ3lla3I4bzB2M2F5cn",
-			{
-			"FwZXk2OGVmcWRxeHdiZW9ucjhxcGE5cG": { type: SquareViewModel, isArray: false, isOptional: false }
-			},
-			inject => inject.construct(MapService),
-			(controller, params) => controller.createSquare(
-				params["FwZXk2OGVmcWRxeHdiZW9ucjhxcGE5cG"]
 			)
 		);
 
@@ -1761,6 +1748,67 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.send(
 				params["prbXM3dnU2aTAyNDYxdWs5aWdtbnRsZn"],
 				params["J2ZXFweXFuNGd1cmQ1enFsaG14NTA5c3"]
+			)
+		);
+
+		this.expose(
+			"c3cH9kanZiMXczc2NwazA3dXF5bmZveW",
+			{
+			"10N2Q0ZDh2YjhnZHRlZmE4am1wZn50Zm": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(SquareService),
+			(controller, params) => controller.getSquare(
+				params["10N2Q0ZDh2YjhnZHRlZmE4am1wZn50Zm"]
+			)
+		);
+
+		this.expose(
+			"g0eWd3YTJtMDFnam1lank0NWZ2YXU1MG",
+			{
+			"YyemZ0b2AycTlraDFkbzRzbzU3d3VyZD": { type: "string", isArray: false, isOptional: false },
+				"NqeTlhYXhod2NoaWdzZmFzcXg5YzpveW": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(SquareService),
+			(controller, params) => controller.createSquare(
+				params["YyemZ0b2AycTlraDFkbzRzbzU3d3VyZD"],
+				params["NqeTlhYXhod2NoaWdzZmFzcXg5YzpveW"]
+			)
+		);
+
+		this.expose(
+			"lxYjU5N2hlMXRwMmZhYntiNT5scXkzdG",
+			{
+			"lkd3R6cHBkOTJhd2o0M2NwbzhiOWVyMW": { type: "string", isArray: false, isOptional: false },
+				"cxeXVvYnI0bXY4dDJlMjtsMn52bzlhZT": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(SquareService),
+			(controller, params) => controller.rename(
+				params["lkd3R6cHBkOTJhd2o0M2NwbzhiOWVyMW"],
+				params["cxeXVvYnI0bXY4dDJlMjtsMn52bzlhZT"]
+			)
+		);
+
+		this.expose(
+			"Rqbnp3NnlpejF0aWdpZGJtcjNrbDM5NT",
+			{
+			"kzbTBkM2psZGliaTBwNDpwZnw1NXFiZX": { type: "string", isArray: false, isOptional: false },
+				"F4bmRsbzhpNWYzcGF4YmhzdnRvYnNqNG": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(SquareService),
+			(controller, params) => controller.editBoundary(
+				params["kzbTBkM2psZGliaTBwNDpwZnw1NXFiZX"],
+				params["F4bmRsbzhpNWYzcGF4YmhzdnRvYnNqNG"]
+			)
+		);
+
+		this.expose(
+			"Rjc2h0Nm9mOWhiank1czE2cm1jeDljZG",
+			{
+			"RuMGl3MTE2OWRtN2MzZnM5MnQzMHQxMH": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(SquareService),
+			(controller, params) => controller.archive(
+				params["RuMGl3MTE2OWRtN2MzZnM5MnQzMHQxMH"]
 			)
 		);
 
@@ -3541,10 +3589,11 @@ ViewModel.mappings = {
 	[SquareViewModel.name]: class ComposedSquareViewModel extends SquareViewModel {
 		async map() {
 			return {
-				borough: new BoroughSummaryModel(await BaseServer.unwrap(this.$$model.borough)),
-				bounds: this.$$model.bounds,
+				boundaries: (await this.$$model.boundaries.includeTree(ViewModel.mappings[SquareBoundarySummaryModel.name].items).toArray()).map(item => new SquareBoundarySummaryModel(item)),
+				activeBoundaryId: this.$$model.activeBoundaryId,
 				id: this.$$model.id,
-				name: this.$$model.name
+				name: this.$$model.name,
+				tag: this.$$model.tag
 			}
 		};
 
@@ -3574,24 +3623,26 @@ ViewModel.mappings = {
 			}
 
 			return {
-				get borough() {
-					return ViewModel.mappings[BoroughSummaryModel.name].getPrefetchingProperties(
+				get boundaries() {
+					return ViewModel.mappings[SquareBoundarySummaryModel.name].getPrefetchingProperties(
 						level,
-						[...parents, "borough-SquareViewModel"]
+						[...parents, "boundaries-SquareViewModel"]
 					);
 				},
-				bounds: true,
+				activeBoundaryId: true,
 				id: true,
-				name: true
+				name: true,
+				tag: true
 			};
 		};
 
 		static toViewModel(data) {
 			const item = new SquareViewModel(null);
-			"borough" in data && (item.borough = data.borough && ViewModel.mappings[BoroughSummaryModel.name].toViewModel(data.borough));
-			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
+			"boundaries" in data && (item.boundaries = data.boundaries && [...data.boundaries].map(i => ViewModel.mappings[SquareBoundarySummaryModel.name].toViewModel(i)));
+			"activeBoundaryId" in data && (item.activeBoundaryId = data.activeBoundaryId === null ? null : `${data.activeBoundaryId}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 
 			return item;
 		}
@@ -3605,10 +3656,81 @@ ViewModel.mappings = {
 				model = new Square();
 			}
 			
-			"borough" in viewModel && (model.borough.id = viewModel.borough ? viewModel.borough.id : null);
-			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
+			"boundaries" in viewModel && (null);
+			"activeBoundaryId" in viewModel && (model.activeBoundaryId = viewModel.activeBoundaryId === null ? null : `${viewModel.activeBoundaryId}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
+
+			return model;
+		}
+	},
+	[SquareBoundarySummaryModel.name]: class ComposedSquareBoundarySummaryModel extends SquareBoundarySummaryModel {
+		async map() {
+			return {
+				changeComment: this.$$model.changeComment,
+				created: this.$$model.created,
+				id: this.$$model.id,
+				shape: this.$$model.shape
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				changeComment: true,
+				created: true,
+				id: true,
+				shape: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new SquareBoundarySummaryModel(null);
+			"changeComment" in data && (item.changeComment = data.changeComment === null ? null : `${data.changeComment}`);
+			"created" in data && (item.created = data.created === null ? null : new Date(data.created));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"shape" in data && (item.shape = data.shape === null ? null : `${data.shape}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: SquareBoundarySummaryModel) {
+			let model: SquareBoundary;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(SquareBoundary).find(viewModel.id)
+			} else {
+				model = new SquareBoundary();
+			}
+			
+			"changeComment" in viewModel && (model.changeComment = viewModel.changeComment === null ? null : `${viewModel.changeComment}`);
+			"created" in viewModel && (model.created = viewModel.created === null ? null : new Date(viewModel.created));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"shape" in viewModel && (model.shape = viewModel.shape === null ? null : `${viewModel.shape}`);
 
 			return model;
 		}

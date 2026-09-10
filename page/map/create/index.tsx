@@ -2,7 +2,7 @@ import { Component } from "@acryps/page";
 import { Point } from "../../../interface/point";
 import { MapComponent } from "../../shared/map";
 import { LocationMarkerComponent } from "../../shared/location";
-import { boroughIcon, propertyRegisterIcon, streetIcon, trainIcon, waterIcon } from "../../assets/icons/managed";
+import { boroughIcon, propertyRegisterIcon, squareIcon, streetIcon, trainIcon, waterIcon } from "../../assets/icons/managed";
 import { MapService, StreetService, WaterBodyService, WaterService } from "../../managed/services";
 
 export class CreateFeaturePage extends Component {
@@ -80,6 +80,14 @@ export class CreateFeaturePage extends Component {
 
 					<ui-name>
 						Register Water Body
+					</ui-name>
+				</ui-type>
+
+				<ui-type ui-href={`/square/create/${btoa(Point.pack(this.shape))}`}>
+					{squareIcon()}
+
+					<ui-name>
+						Register Square
 					</ui-name>
 				</ui-type>
 			</ui-types>

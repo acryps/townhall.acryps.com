@@ -2,11 +2,11 @@ import { select, style, content, Font, fontFamily, fontWeight, fontStyle } from 
 
 
 export const iconFont = new Font('icons', fontWeight('normal'), fontStyle('normal'))
-	.addSource('/assets/icons/managed/font/index.eot?05f0e101923e', 'embedded-opentype')
-	.addSource('/assets/icons/managed/font/index.svg?f8073b522300', 'svg')
-	.addSource('/assets/icons/managed/font/index.ttf?b8a99ddadc10', 'truetype')
-	.addSource('/assets/icons/managed/font/index.woff?98083a3016c1', 'woff')
-	.addSource('/assets/icons/managed/font/index.woff2?3f684d635eaa', 'woff2');
+	.addSource('/assets/icons/managed/font/index.eot?211a375cca30', 'embedded-opentype')
+	.addSource('/assets/icons/managed/font/index.svg?2b84243c96af', 'svg')
+	.addSource('/assets/icons/managed/font/index.ttf?51d16673d633', 'truetype')
+	.addSource('/assets/icons/managed/font/index.woff?b03c8b72fd71', 'woff')
+	.addSource('/assets/icons/managed/font/index.woff2?a4ca17b41ea6', 'woff2');
 
 export const icons = () => select('ui-icon',
 	fontFamily(iconFont.name),
@@ -48,14 +48,15 @@ export const icons = () => select('ui-icon',
 	style('[ui-resident]').before('\f120'),
 	style('[ui-route-interchange]').before('\f121'),
 	style('[ui-speak]').before('\f122'),
-	style('[ui-state]').before('\f123'),
-	style('[ui-street]').before('\f124'),
-	style('[ui-time-machine]').before('\f125'),
-	style('[ui-train]').before('\f126'),
-	style('[ui-undo]').before('\f127'),
-	style('[ui-up-all]').before('\f128'),
-	style('[ui-up]').before('\f129'),
-	style('[ui-water]').before('\f12a'),
+	style('[ui-square]').before('\f123'),
+	style('[ui-state]').before('\f124'),
+	style('[ui-street]').before('\f125'),
+	style('[ui-time-machine]').before('\f126'),
+	style('[ui-train]').before('\f127'),
+	style('[ui-undo]').before('\f128'),
+	style('[ui-up-all]').before('\f129'),
+	style('[ui-up]').before('\f12a'),
+	style('[ui-water]').before('\f12b'),
 );
 
 const createIconElement = (name: string) => {
@@ -99,6 +100,7 @@ export const relationIcon = () => createIconElement('relation');
 export const residentIcon = () => createIconElement('resident');
 export const routeInterchangeIcon = () => createIconElement('route-interchange');
 export const speakIcon = () => createIconElement('speak');
+export const squareIcon = () => createIconElement('square');
 export const stateIcon = () => createIconElement('state');
 export const streetIcon = () => createIconElement('street');
 export const timeMachineIcon = () => createIconElement('time-machine');

@@ -4,7 +4,7 @@ import { MapComponent } from "../shared/map";
 import { Point } from "../../interface/point";
 import { Shape } from "../../interface/shape";
 import { calcualteDanwinstonLine } from "../../interface/line";
-import { propertyLayer } from "../shared/map/layers";
+import { streetLayer } from "../shared/map/layers";
 import { RouteComponent } from "./route";
 import { addIcon, deleteIcon, drawIcon, streetIcon } from "../assets/icons/managed";
 
@@ -22,7 +22,10 @@ export class StreetPage extends Component {
 	render(child) {
 		const path = Point.unpack(this.currentRoute.path);
 		const center = Point.center(path).floor();
-		const map = new MapComponent().highlight(path, false);
+
+		const map = new MapComponent();
+		map.layers.push(streetLayer);
+		map.highlight(path, false);
 
 		return <ui-street>
 			<ui-field>
@@ -39,7 +42,7 @@ export class StreetPage extends Component {
 				<ui-routes>
 					<ui-hint>
 						The streets route defines the main path of the street.
-						The plots will automatically be generated based on the active route and width.
+						The plots will automatically be generated based on the active route and width - shown filled in on the map above.
 						The plots will extend in each direction to half the streets width rounded up.
 						Thicker roads get plots before smaller roads.
 					</ui-hint>

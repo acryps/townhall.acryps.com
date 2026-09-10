@@ -214,6 +214,14 @@ export interface EpochTimelineModel {
 	start: Date;
 }
 
+export interface PlayerPositionViewModel {
+    id: string;
+	x: number;
+	y: number;
+	time: Date;
+	username: string;
+}
+
 export interface HistoricListingGradeViewModel {
     description: string;
 	grade: number;

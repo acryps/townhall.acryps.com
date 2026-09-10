@@ -41,6 +41,7 @@ import { EpochTimelineModel } from "././../areas/epoch/epoch";
 import { EpochViewModel } from "././../areas/epoch/epoch";
 import { EpochService } from "././../areas/epoch/index";
 import { PlayerViewModel } from "././../areas/player.view";
+import { PlayerPositionViewModel } from "././../areas/game/position";
 import { GameService } from "././../areas/game/game.service";
 import { PropertyHistoricListingModifier } from "././database";
 import { HistoricListingGradeViewModel } from "././../areas/history-listing/grade.view";
@@ -221,6 +222,7 @@ import { WorkOffer } from "./../managed/database";
 import { WorkContract } from "./../managed/database";
 import { City } from "./../managed/database";
 import { Epoch } from "./../managed/database";
+import { PlayerPositionView } from "./../managed/database";
 import { HistoricListingGrade } from "./../managed/database";
 import { HistoricListingModifier } from "./../managed/database";
 import { Impression } from "./../managed/database";
@@ -836,6 +838,15 @@ export class ManagedServer extends BaseServer {
 			{},
 			inject => inject.construct(GameService),
 			(controller, params) => controller.getOnlinePlayers(
+				
+			)
+		);
+
+		this.expose(
+			"FiZTdmNWFqODRkbWJsenU3bGVmejQ5cj",
+			{},
+			inject => inject.construct(GameService),
+			(controller, params) => controller.getPlayerPositions(
 				
 			)
 		);
@@ -4248,6 +4259,80 @@ ViewModel.mappings = {
 			"offset" in viewModel && (model.offset = viewModel.offset === null ? null : +viewModel.offset);
 			"rate" in viewModel && (model.rate = viewModel.rate === null ? null : +viewModel.rate);
 			"start" in viewModel && (model.start = viewModel.start === null ? null : new Date(viewModel.start));
+
+			return model;
+		}
+	},
+	[PlayerPositionViewModel.name]: class ComposedPlayerPositionViewModel extends PlayerPositionViewModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				x: this.$$model.x,
+				y: this.$$model.y,
+				time: this.$$model.time,
+				username: this.$$model.username
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				x: true,
+				y: true,
+				time: true,
+				username: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new PlayerPositionViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"x" in data && (item.x = data.x === null ? null : +data.x);
+			"y" in data && (item.y = data.y === null ? null : +data.y);
+			"time" in data && (item.time = data.time === null ? null : new Date(data.time));
+			"username" in data && (item.username = data.username === null ? null : `${data.username}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: PlayerPositionViewModel) {
+			let model: PlayerPositionView;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(PlayerPositionView).find(viewModel.id)
+			} else {
+				model = new PlayerPositionView();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"x" in viewModel && (model.x = viewModel.x === null ? null : +viewModel.x);
+			"y" in viewModel && (model.y = viewModel.y === null ? null : +viewModel.y);
+			"time" in viewModel && (model.time = viewModel.time === null ? null : new Date(viewModel.time));
+			"username" in viewModel && (model.username = viewModel.username === null ? null : `${viewModel.username}`);
 
 			return model;
 		}

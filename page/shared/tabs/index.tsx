@@ -55,21 +55,13 @@ export class Tabs extends Component {
 		return <ui-tabs>
 			<ui-headers>
 				{this.tabs.map(tab => {
-					const element: HTMLElement = <ui-header ui-active={tab == this.active} ui-click={() => {
+					return <ui-header ui-active={tab == this.active} ui-click={() => {
 						this.active = tab;
 
 						this.update();
 					}}>
 						{tab.header}
 					</ui-header>;
-
-					if (tab == this.active) {
-						requestAnimationFrame(() => {
-							element.scrollIntoView();
-						});
-					}
-
-					return element;
 				})}
 			</ui-headers>
 

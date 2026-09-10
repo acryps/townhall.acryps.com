@@ -3831,6 +3831,7 @@ export class PlanShape extends Entity<PlanShapeQueryProxy> {
 export class PlayerQueryProxy extends QueryProxy {
 	get legalEntity(): Partial<LegalEntityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get gameUuid(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get head(): Partial<QueryBuffer> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get legalEntityId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get online(): Partial<QueryBoolean> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get username(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -3843,6 +3844,7 @@ export class Player extends Entity<PlayerQueryProxy> {
 	properties: PrimaryReference<Property, PropertyQueryProxy>;
 		movements: PrimaryReference<Movement, MovementQueryProxy>;
 		gameUuid: string;
+	head: Buffer;
 	declare id: string;
 	legalEntityId: string;
 	online: boolean;
@@ -3854,6 +3856,7 @@ export class Player extends Entity<PlayerQueryProxy> {
 		source: "player",
 		columns: {
 			gameUuid: { type: "text", name: "game_uuid" },
+			head: { type: "bytea", name: "head" },
 			id: { type: "uuid", name: "id" },
 			legalEntityId: { type: "uuid", name: "legal_entity_id" },
 			online: { type: "bool", name: "online" },
@@ -4625,7 +4628,7 @@ export class Resident extends Entity<ResidentQueryProxy> {
 	politicalSetting: string;
 	secret: string;
 	tag: string;
-
+	
 	$$meta = {
 		source: "resident",
 		columns: {
@@ -6730,6 +6733,36 @@ export class BlockTouchesView extends View<BlockTouchesViewProxy> {
 	touches: number;
 }
 			
+class PlayerPositionViewProxy extends QueryProxy {
+	get x(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get y(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get time(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get username(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class PlayerPositionView extends View<PlayerPositionViewProxy> {
+	$$meta = {
+		source: "player_position",
+		get set(): ViewSet<PlayerPositionView, PlayerPositionViewProxy> { 
+			return new ViewSet<PlayerPositionView, PlayerPositionViewProxy>(PlayerPositionView, null);
+		},
+
+		columns: {
+			id: { type: "uuid", name: "id" },
+			x: { type: "float4", name: "x" },
+			y: { type: "float4", name: "y" },
+			time: { type: "timestamp", name: "time" },
+			username: { type: "text", name: "username" }
+		}
+	};
+
+	id: string;
+	x: number;
+	y: number;
+	time: Date;
+	username: string;
+}
+			
 
 export class DbContext {
 	article: DbSet<Article, ArticleQueryProxy>;
@@ -6956,6 +6989,7 @@ export class DbContext {
 		residentEvent: new ViewSet<ResidentEventView, ResidentEventViewProxy>(ResidentEventView),
 		residentAssessmentMatch: new ViewSet<ResidentAssessmentMatchView, ResidentAssessmentMatchViewProxy>(ResidentAssessmentMatchView),
 		residentAssessmentParameterDistribution: new ViewSet<ResidentAssessmentParameterDistributionView, ResidentAssessmentParameterDistributionViewProxy>(ResidentAssessmentParameterDistributionView),
-		blockTouches: new ViewSet<BlockTouchesView, BlockTouchesViewProxy>(BlockTouchesView)
+		blockTouches: new ViewSet<BlockTouchesView, BlockTouchesViewProxy>(BlockTouchesView),
+		playerPosition: new ViewSet<PlayerPositionView, PlayerPositionViewProxy>(PlayerPositionView)
 	}
 };

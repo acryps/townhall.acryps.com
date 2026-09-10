@@ -1,3 +1,4 @@
+import { Logger } from "@acryps/log";
 import { JoinMessage, LeaveMessage, Message, MoveMessage } from "../interface";
 import { Point } from "../interface/point";
 import { PlayerViewModel } from "./areas/player.view";
@@ -6,6 +7,8 @@ import { ManagedServer } from "./managed/server";
 import { MapImporter } from "./map/import";
 
 export class GameBridge {
+	logger = new Logger('bridge');
+
 	constructor(
 		app: ManagedServer,
 		database: DbContext,
@@ -19,6 +22,8 @@ export class GameBridge {
 				player.username = request.params.displayName;
 				player.gameUuid = request.params.uuid;
 
+				this.logger.log(`new player '${player.username}'`);
+
 				await player.create();
 			}
 
@@ -29,6 +34,9 @@ export class GameBridge {
 			join.player = await new PlayerViewModel(player).resolveToJSON();
 
 			broadcast(join);
+
+			this.logger.log(`join '${player.username}'`);
+			this.updateHead(player);
 
 			response.end();
 		});
@@ -119,5 +127,19 @@ export class GameBridge {
 
 			response.end();
 		});
+	}
+
+	private async updateHead(player: Player) {
+		try {
+			const head = await fetch(`https://mc-heads.net/avatar/${player.username}/8`)
+				.then(response => response.arrayBuffer());
+
+			player.head = Buffer.from(head);
+			await player.update();
+
+			this.logger.log(`updated head for '${player.username}'`);
+		} catch (error) {
+			this.logger.warn(`update head for '${player.username}' failed`, error);
+		}
 	}
 }

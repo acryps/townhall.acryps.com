@@ -491,6 +491,25 @@ export class EpochTimelineModel {
 	}
 }
 
+export class PlayerPositionViewModel {
+	id: string;
+	x: number;
+	y: number;
+	time: Date;
+	username: string;
+
+	private static $build(raw) {
+		const item = new PlayerPositionViewModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.x === undefined || (item.x = raw.x === null ? null : +raw.x)
+		raw.y === undefined || (item.y = raw.y === null ? null : +raw.y)
+		raw.time === undefined || (item.time = raw.time ? new Date(raw.time) : null)
+		raw.username === undefined || (item.username = raw.username === null ? null : `${raw.username}`)
+		
+		return item;
+	}
+}
+
 export class HistoricListingGradeViewModel {
 	description: string;
 	grade: number;
@@ -3206,6 +3225,27 @@ export class GameService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : PlayerViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getPlayerPositions(): Promise<Array<PlayerPositionViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("FiZTdmNWFqODRkbWJsenU3bGVmejQ5cj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : PlayerPositionViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

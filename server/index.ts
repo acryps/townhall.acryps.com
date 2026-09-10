@@ -63,6 +63,7 @@ import { MarketCycle, MarketCycleGenerator } from "./market/cycle";
 import { WorkerDispatch } from "./worker";
 import { PlanningMapGenerator } from "./map/planning";
 import { BlockTouchesTileServer } from "./map/layers/heatmap/gradiant/block-touches";
+import { PlayerHeadImageInterface } from "./areas/game/head";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const runMarket = process.env.RUN_MARKET == 'YES';
@@ -244,6 +245,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new PlotterInterface(app, database);
 	new WallpaperInterface(app, database);
 	new CommodityIconImageInterface(app, database);
+	new PlayerHeadImageInterface(app, database);
 
 	app.createInjector = context => new Inject({
 		Context: context,

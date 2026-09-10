@@ -105,8 +105,13 @@ export class PlanningMapGenerator {
 			for (let pointIndex = 5; pointIndex < path.length; pointIndex += 10) {
 				const point = path[pointIndex];
 
-				if (boundary.has(Point.pack([point]))) {
-					this.label(point, topLeft, labelContext, '#222', street.name);
+				const before = path[pointIndex - 1];
+				const after = path[pointIndex + 1];
+
+				if (before && after) {
+					if (boundary.has(Point.pack([point]))) {
+						this.label(point, topLeft, labelContext, '#aaa', street.name);
+					}
 				}
 			}
 		}
@@ -247,8 +252,8 @@ export class PlanningMapGenerator {
 
 		context.fillText(
 			text,
-			(center.x - topLeft.x) * this.scale,
-			(center.y - topLeft.y) * this.scale
+			Math.floor((center.x - topLeft.x) * this.scale),
+			Math.floor((center.y - topLeft.y) * this.scale)
 		);
 	}
 

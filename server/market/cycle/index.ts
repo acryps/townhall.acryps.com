@@ -104,6 +104,7 @@ export class MarketCycleGenerator {
 
 		const boroughs = await this.database.borough
 			.orderByDescending(borough => borough.name.length())
+			.include(borough => borough.activeBoundary)
 			.toArray();
 
 		const mentionedBoroughs = new Set<Borough>();
@@ -148,7 +149,8 @@ export class MarketCycleGenerator {
 		}
 
 		for (let borough of mentionedBoroughs) {
-			const center = Point.center(Point.unpack(borough.bounds));
+			const activeBoundary = await borough.activeBoundary.fetch();
+			const center = Point.center(Point.unpack(activeBoundary.shape));
 
 			interpreter.remember([new UserMessage(`
 				# Borough ${borough.name}

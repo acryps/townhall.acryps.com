@@ -16,11 +16,13 @@ export class PropertyTileServer extends ShapeTileServer {
 			async () => {
 				const shapes = [];
 
-				for (let borough of await database.borough.toArray()) {
+				for (let borough of await database.borough.include(borough => borough.activeBoundary).toArray()) {
+					const activeBoundary = await borough.activeBoundary.fetch();
+
 					shapes.push({
 						fill: '#fffc',
 						stroke: borough.color,
-						bounds: borough.bounds
+						bounds: activeBoundary.shape
 					});
 				}
 

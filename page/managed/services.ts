@@ -13,9 +13,9 @@ export enum ItemContextLinkRank {
 }
 
 export class BoroughSummaryModel {
+	activeBoundary: BoroughBoundaryShapeModel;
 	district: DistrictSummaryModel;
 	banner: string;
-	bounds: string;
 	color: string;
 	contextTagline: string;
 	id: string;
@@ -25,9 +25,9 @@ export class BoroughSummaryModel {
 
 	private static $build(raw) {
 		const item = new BoroughSummaryModel();
+		raw.activeBoundary === undefined || (item.activeBoundary = raw.activeBoundary ? BoroughBoundaryShapeModel["$build"](raw.activeBoundary) : null)
 		raw.district === undefined || (item.district = raw.district ? DistrictSummaryModel["$build"](raw.district) : null)
 		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
-		raw.bounds === undefined || (item.bounds = raw.bounds === null ? null : `${raw.bounds}`)
 		raw.color === undefined || (item.color = raw.color === null ? null : `${raw.color}`)
 		raw.contextTagline === undefined || (item.contextTagline = raw.contextTagline === null ? null : `${raw.contextTagline}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
@@ -40,9 +40,10 @@ export class BoroughSummaryModel {
 }
 
 export class BoroughViewModel {
+	boundaries: BoroughBoundarySummaryModel[];
 	district: DistrictViewModel;
+	activeBoundaryId: string;
 	banner: string;
-	bounds: string;
 	color: string;
 	description: string;
 	id: string;
@@ -52,9 +53,10 @@ export class BoroughViewModel {
 
 	private static $build(raw) {
 		const item = new BoroughViewModel();
+		raw.boundaries === undefined || (item.boundaries = raw.boundaries ? raw.boundaries.map(i => BoroughBoundarySummaryModel["$build"](i)) : null)
 		raw.district === undefined || (item.district = raw.district ? DistrictViewModel["$build"](raw.district) : null)
+		raw.activeBoundaryId === undefined || (item.activeBoundaryId = raw.activeBoundaryId === null ? null : `${raw.activeBoundaryId}`)
 		raw.banner === undefined || (item.banner = raw.banner === null ? null : `${raw.banner}`)
-		raw.bounds === undefined || (item.bounds = raw.bounds === null ? null : `${raw.bounds}`)
 		raw.color === undefined || (item.color = raw.color === null ? null : `${raw.color}`)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
@@ -450,6 +452,19 @@ export class WorkContractSummaryModel {
 		raw.dailySalary === undefined || (item.dailySalary = raw.dailySalary === null ? null : +raw.dailySalary)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.signed === undefined || (item.signed = raw.signed ? new Date(raw.signed) : null)
+		
+		return item;
+	}
+}
+
+export class BoroughBoundaryShapeModel {
+	id: string;
+	shape: string;
+
+	private static $build(raw) {
+		const item = new BoroughBoundaryShapeModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.shape === undefined || (item.shape = raw.shape === null ? null : `${raw.shape}`)
 		
 		return item;
 	}
@@ -1883,6 +1898,23 @@ export class WorkContractEmploymentModel {
 	}
 }
 
+export class BoroughBoundarySummaryModel {
+	changeComment: string;
+	created: Date;
+	id: string;
+	shape: string;
+
+	private static $build(raw) {
+		const item = new BoroughBoundarySummaryModel();
+		raw.changeComment === undefined || (item.changeComment = raw.changeComment === null ? null : `${raw.changeComment}`)
+		raw.created === undefined || (item.created = raw.created ? new Date(raw.created) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.shape === undefined || (item.shape = raw.shape === null ? null : `${raw.shape}`)
+		
+		return item;
+	}
+}
+
 export class EpochViewModel {
 	description: string;
 	end: Date;
@@ -2769,6 +2801,26 @@ export class BoroughService {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
 				throw new Error(r.error);
+			}
+		});
+	}
+
+	async editBoundary(id: string, shape: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("lndmJ6N3puaDlmYzAwd3lsa2dhY390Nz", Service.stringify(id))
+		$data.append("JpMmdvMGdjNmk0Z3NzY2gxc380YTNrZT", Service.stringify(shape))
+
+		return await fetch(Service.toURL("dubThrbnV2dGQ5dz03OXNvdzp0d2Jjb2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
 			}
 		});
 	}

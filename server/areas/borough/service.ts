@@ -1,6 +1,6 @@
 import { Service } from "vlserver";
 import { BoroughViewModel } from "../borough.view";
-import { Borough, DbContext } from "../../managed/database";
+import { Borough, BoroughBoundary, DbContext } from "../../managed/database";
 import { BoroughSummaryModel } from "../borough.summary";
 import { Point } from "../../../interface/point";
 import { DistrictViewModel } from "../vote/district";
@@ -21,7 +21,6 @@ export class BoroughService extends Service {
 
 	async register(bounds: string, name: string, description: string, districtId: string) {
 		const borough = new Borough();
-		borough.bounds = Point.pack(Point.unpack(bounds));
 		borough.incorporation = new Date();
 		borough.name = name;
 		borough.description = description;
@@ -37,7 +36,31 @@ export class BoroughService extends Service {
 
 		await borough.create();
 
+		const boundary = new BoroughBoundary();
+		boundary.shape = Point.pack(Point.unpack(bounds));
+		boundary.created = new Date();
+		boundary.borough = borough;
+
+		await boundary.create();
+
+		borough.activeBoundary = boundary;
+		await borough.update();
+
 		return borough.tag;
+	}
+
+	async editBoundary(id: string, shape: string) {
+		const borough = await this.database.borough.find(id);
+
+		const boundary = new BoroughBoundary();
+		boundary.shape = Point.pack(Point.unpack(shape));
+		boundary.created = new Date();
+		boundary.borough = borough;
+
+		await boundary.create();
+
+		borough.activeBoundary = boundary;
+		await borough.update();
 	}
 
 	list() {

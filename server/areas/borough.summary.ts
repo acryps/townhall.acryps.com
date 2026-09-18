@@ -1,6 +1,7 @@
 import { ViewModel } from "vlserver";
 import { Borough } from "../managed/database";
 import { DistrictSummaryModel, DistrictViewModel } from "./vote/district";
+import { BoroughBoundaryShapeModel } from "./borough/boundary";
 
 export class BoroughSummaryModel extends ViewModel<Borough> {
 	id;
@@ -11,8 +12,8 @@ export class BoroughSummaryModel extends ViewModel<Borough> {
 
 	color;
 	banner;
-	bounds;
 	incorporation;
 
+	activeBoundary: BoroughBoundaryShapeModel;
 	district: DistrictSummaryModel;
 }

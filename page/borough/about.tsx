@@ -18,7 +18,9 @@ export class BoroughAboutTab extends Component {
 
 	async onload() {
 		this.residentCount = await new BoroughService().residentCount(this.borough.id);
-		this.area = Point.area(Point.unpack(this.borough.bounds));
+
+		const currentBoundary = this.borough.boundaries.find(boundary => boundary.id == this.borough.activeBoundaryId);
+		this.area = Point.area(Point.unpack(currentBoundary.shape));
 	}
 
 	render() {

@@ -1,4 +1,4 @@
-import { alignItems, alignSelf, aspectRatio, backgroundColor, border, borderBottom, boxSizing, child, display, flexBasis, flexGrow, flexShrink, fontSize, fontWeight, fr, gap, gridTemplateColumns, height, hex, imageRendering, justifyContent, marginBottom, marginInline, marginLeft, marginTop, maxHeight, maxWidth, min, minMax, minWidth, objectFit, objectPosition, opacity, overflow, overflowWrap, padding, paddingInline, paddingRight, percentage, px, ratio, rem, tabSize, textAlign, vh, whiteSpace, width, wordBreak } from "@acryps/style";
+import { alignItems, alignSelf, aspectRatio, backgroundColor, border, borderBottom, boxSizing, child, columnGap, display, flexBasis, flexGrow, flexShrink, fontSize, fontWeight, fr, gap, gridTemplateColumns, height, hex, imageRendering, justifyContent, marginBottom, marginInline, marginLeft, marginTop, maxHeight, maxWidth, min, minMax, minWidth, objectFit, objectPosition, opacity, overflow, overflowWrap, padding, paddingInline, paddingRight, percentage, px, ratio, rem, tabSize, textAlign, vh, whiteSpace, width, wordBreak } from "@acryps/style";
 import { boxed } from "../shared/boxed.style";
 import { bannerBorder, bannerStyle, headerBannerStyle } from "../banner/index.style";
 import { collection, collectionItem } from "../shared/collection.style";
@@ -106,6 +106,49 @@ export const boroughStyle = () => child('ui-borough',
 				width(percentage(100)),
 				aspectRatio(ratio(1, 1)),
 				marginBottom(pageGutter)
+			),
+
+			child('ui-boundaries',
+				display('block'),
+
+				border(px(1), 'solid', 'currentColor'),
+
+				child('ui-boundary',
+					display('flex'),
+					padding(pageGutter),
+
+					borderBottom(px(1), 'dotted', 'currentColor'),
+					opacity(0.5),
+
+					child('ui-name',
+						display('block'),
+						marginBottom(rem(0.25))
+					),
+
+					child('canvas',
+						marginLeft('auto'),
+						width(rem(8)),
+						height(rem(2)),
+						objectFit('contain'),
+
+						imageRendering('pixelated')
+					)
+				)
+					.attribute('ui-active',
+						opacity(1),
+
+						child('canvas',
+							height(rem(5))
+						)
+					),
+
+				child('ui-action',
+					display('flex'),
+					columnGap(pageGutter),
+					alignItems('center'),
+
+					padding(pageGutter)
+				)
 			)
 		),
 

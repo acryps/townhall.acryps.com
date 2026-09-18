@@ -19,7 +19,8 @@ export class PropertyManager extends Manager {
 		const bounds = Point.bounds(shape);
 
 		for (let borough of boroughs) {
-			const boundary = Point.unpack(borough.bounds);
+			const activeBoundary = await borough.activeBoundary.fetch();
+			const boundary = Point.unpack(activeBoundary.shape);
 
 			if (Point.touches(
 				new Point(bounds.x.min, bounds.y.min),

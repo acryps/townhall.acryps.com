@@ -25,6 +25,7 @@ export class WaterBodyFiller extends Filler<WaterBody> {
 	async obstacles() {
 		const properties = await this.database.property
 			.where(street => street.deactivated == null)
+			.where(property => property.activePlotBoundaryId != null)
 			.include(street => street.activePlotBoundary)
 			.toArray();
 

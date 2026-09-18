@@ -18,6 +18,7 @@ import { Point } from "././../../interface/point";
 import { PropertyManager } from "././../areas/property/manager";
 import { mapBaseTileSize } from "././../../interface/tile";
 import { MapService } from "././../areas/map.service";
+import { BoroughBoundary } from "././database";
 import { BoroughSummaryModel } from "././../areas/borough.summary";
 import { DistrictViewModel } from "././../areas/vote/district";
 import { OfficeViewModel } from "././../areas/company.view";
@@ -188,6 +189,7 @@ import { StreetRouteSummaryModel } from "./../areas/street.view";
 import { WaterBodyAreaViewModel } from "./../areas/water-body.view";
 import { WorkOfferSummaryModel } from "./../areas/work";
 import { WorkContractSummaryModel } from "./../areas/work";
+import { BoroughBoundaryShapeModel } from "./../areas/borough/boundary";
 import { ItemContextSummaryModel } from "./../areas/item-context/context";
 import { LawHouseSessionaryViewModel } from "./../areas/law-house/session";
 import { LawHouseSessionProtocolViewModel } from "./../areas/law-house/session";
@@ -217,6 +219,7 @@ import { OfficeEmployeeModel } from "./../areas/company.view";
 import { WorkOfferEmplymentModel } from "./../areas/work";
 import { WorkContractViewModel } from "./../areas/work";
 import { WorkContractEmploymentModel } from "./../areas/work";
+import { BoroughBoundarySummaryModel } from "./../areas/borough/boundary";
 import { Bridge } from "./../managed/database";
 import { HistoryEntry } from "./../history";
 import { Player } from "./../managed/database";
@@ -600,6 +603,19 @@ export class ManagedServer extends BaseServer {
 				params["BsZmUxZ3lvdmhpbGtleHgxN3FkMGFrcj"],
 				params["h2cTNqeWQ2NWY5ZHI5NWxsMzB6ZXR0em"],
 				params["0xOTYybDBpMDgzaHgxbWJ2ZjR6bzIyYW"]
+			)
+		);
+
+		this.expose(
+			"dubThrbnV2dGQ5dz03OXNvdzp0d2Jjb2",
+			{
+			"lndmJ6N3puaDlmYzAwd3lsa2dhY390Nz": { type: "string", isArray: false, isOptional: false },
+				"JpMmdvMGdjNmk0Z3NzY2gxc380YTNrZT": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(BoroughService),
+			(controller, params) => controller.editBoundary(
+				params["lndmJ6N3puaDlmYzAwd3lsa2dhY390Nz"],
+				params["JpMmdvMGdjNmk0Z3NzY2gxc380YTNrZT"]
 			)
 		);
 
@@ -2328,9 +2344,9 @@ ViewModel.mappings = {
 	[BoroughSummaryModel.name]: class ComposedBoroughSummaryModel extends BoroughSummaryModel {
 		async map() {
 			return {
+				activeBoundary: new BoroughBoundaryShapeModel(await BaseServer.unwrap(this.$$model.activeBoundary)),
 				district: new DistrictSummaryModel(await BaseServer.unwrap(this.$$model.district)),
 				banner: this.$$model.banner,
-				bounds: this.$$model.bounds,
 				color: this.$$model.color,
 				contextTagline: this.$$model.contextTagline,
 				id: this.$$model.id,
@@ -2366,6 +2382,12 @@ ViewModel.mappings = {
 			}
 
 			return {
+				get activeBoundary() {
+					return ViewModel.mappings[BoroughBoundaryShapeModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "activeBoundary-BoroughSummaryModel"]
+					);
+				},
 				get district() {
 					return ViewModel.mappings[DistrictSummaryModel.name].getPrefetchingProperties(
 						level,
@@ -2373,7 +2395,6 @@ ViewModel.mappings = {
 					);
 				},
 				banner: true,
-				bounds: true,
 				color: true,
 				contextTagline: true,
 				id: true,
@@ -2385,9 +2406,9 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new BoroughSummaryModel(null);
+			"activeBoundary" in data && (item.activeBoundary = data.activeBoundary && ViewModel.mappings[BoroughBoundaryShapeModel.name].toViewModel(data.activeBoundary));
 			"district" in data && (item.district = data.district && ViewModel.mappings[DistrictSummaryModel.name].toViewModel(data.district));
 			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
-			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
 			"contextTagline" in data && (item.contextTagline = data.contextTagline === null ? null : `${data.contextTagline}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
@@ -2407,9 +2428,9 @@ ViewModel.mappings = {
 				model = new Borough();
 			}
 			
+			"activeBoundary" in viewModel && (model.activeBoundary.id = viewModel.activeBoundary ? viewModel.activeBoundary.id : null);
 			"district" in viewModel && (model.district.id = viewModel.district ? viewModel.district.id : null);
 			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
-			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
 			"contextTagline" in viewModel && (model.contextTagline = viewModel.contextTagline === null ? null : `${viewModel.contextTagline}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
@@ -2423,9 +2444,10 @@ ViewModel.mappings = {
 	[BoroughViewModel.name]: class ComposedBoroughViewModel extends BoroughViewModel {
 		async map() {
 			return {
+				boundaries: (await this.$$model.boundaries.includeTree(ViewModel.mappings[BoroughBoundarySummaryModel.name].items).toArray()).map(item => new BoroughBoundarySummaryModel(item)),
 				district: new DistrictViewModel(await BaseServer.unwrap(this.$$model.district)),
+				activeBoundaryId: this.$$model.activeBoundaryId,
 				banner: this.$$model.banner,
-				bounds: this.$$model.bounds,
 				color: this.$$model.color,
 				description: this.$$model.description,
 				id: this.$$model.id,
@@ -2461,14 +2483,20 @@ ViewModel.mappings = {
 			}
 
 			return {
+				get boundaries() {
+					return ViewModel.mappings[BoroughBoundarySummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "boundaries-BoroughViewModel"]
+					);
+				},
 				get district() {
 					return ViewModel.mappings[DistrictViewModel.name].getPrefetchingProperties(
 						level,
 						[...parents, "district-BoroughViewModel"]
 					);
 				},
+				activeBoundaryId: true,
 				banner: true,
-				bounds: true,
 				color: true,
 				description: true,
 				id: true,
@@ -2480,9 +2508,10 @@ ViewModel.mappings = {
 
 		static toViewModel(data) {
 			const item = new BoroughViewModel(null);
+			"boundaries" in data && (item.boundaries = data.boundaries && [...data.boundaries].map(i => ViewModel.mappings[BoroughBoundarySummaryModel.name].toViewModel(i)));
 			"district" in data && (item.district = data.district && ViewModel.mappings[DistrictViewModel.name].toViewModel(data.district));
+			"activeBoundaryId" in data && (item.activeBoundaryId = data.activeBoundaryId === null ? null : `${data.activeBoundaryId}`);
 			"banner" in data && (item.banner = data.banner === null ? null : `${data.banner}`);
-			"bounds" in data && (item.bounds = data.bounds === null ? null : `${data.bounds}`);
 			"color" in data && (item.color = data.color === null ? null : `${data.color}`);
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
@@ -2502,9 +2531,10 @@ ViewModel.mappings = {
 				model = new Borough();
 			}
 			
+			"boundaries" in viewModel && (null);
 			"district" in viewModel && (model.district.id = viewModel.district ? viewModel.district.id : null);
+			"activeBoundaryId" in viewModel && (model.activeBoundaryId = viewModel.activeBoundaryId === null ? null : `${viewModel.activeBoundaryId}`);
 			"banner" in viewModel && (model.banner = viewModel.banner === null ? null : `${viewModel.banner}`);
-			"bounds" in viewModel && (model.bounds = viewModel.bounds === null ? null : `${viewModel.bounds}`);
 			"color" in viewModel && (model.color = viewModel.color === null ? null : `${viewModel.color}`);
 			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
@@ -4169,6 +4199,68 @@ ViewModel.mappings = {
 			"dailySalary" in viewModel && (model.dailySalary = viewModel.dailySalary === null ? null : +viewModel.dailySalary);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"signed" in viewModel && (model.signed = viewModel.signed === null ? null : new Date(viewModel.signed));
+
+			return model;
+		}
+	},
+	[BoroughBoundaryShapeModel.name]: class ComposedBoroughBoundaryShapeModel extends BoroughBoundaryShapeModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				shape: this.$$model.shape
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				shape: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new BoroughBoundaryShapeModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"shape" in data && (item.shape = data.shape === null ? null : `${data.shape}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: BoroughBoundaryShapeModel) {
+			let model: BoroughBoundary;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(BoroughBoundary).find(viewModel.id)
+			} else {
+				model = new BoroughBoundary();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"shape" in viewModel && (model.shape = viewModel.shape === null ? null : `${viewModel.shape}`);
 
 			return model;
 		}
@@ -10020,6 +10112,76 @@ ViewModel.mappings = {
 			"dailySalary" in viewModel && (model.dailySalary = viewModel.dailySalary === null ? null : +viewModel.dailySalary);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"signed" in viewModel && (model.signed = viewModel.signed === null ? null : new Date(viewModel.signed));
+
+			return model;
+		}
+	},
+	[BoroughBoundarySummaryModel.name]: class ComposedBoroughBoundarySummaryModel extends BoroughBoundarySummaryModel {
+		async map() {
+			return {
+				changeComment: this.$$model.changeComment,
+				created: this.$$model.created,
+				id: this.$$model.id,
+				shape: this.$$model.shape
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				changeComment: true,
+				created: true,
+				id: true,
+				shape: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new BoroughBoundarySummaryModel(null);
+			"changeComment" in data && (item.changeComment = data.changeComment === null ? null : `${data.changeComment}`);
+			"created" in data && (item.created = data.created === null ? null : new Date(data.created));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"shape" in data && (item.shape = data.shape === null ? null : `${data.shape}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: BoroughBoundarySummaryModel) {
+			let model: BoroughBoundary;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(BoroughBoundary).find(viewModel.id)
+			} else {
+				model = new BoroughBoundary();
+			}
+			
+			"changeComment" in viewModel && (model.changeComment = viewModel.changeComment === null ? null : `${viewModel.changeComment}`);
+			"created" in viewModel && (model.created = viewModel.created === null ? null : new Date(viewModel.created));
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"shape" in viewModel && (model.shape = viewModel.shape === null ? null : `${viewModel.shape}`);
 
 			return model;
 		}

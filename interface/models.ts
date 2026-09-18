@@ -13,9 +13,9 @@ export enum ItemContextLinkRank {
 }
 
 export interface BoroughSummaryModel {
-    district: DistrictSummaryModel;
+    activeBoundary: BoroughBoundaryShapeModel;
+	district: DistrictSummaryModel;
 	banner: string;
-	bounds: string;
 	color: string;
 	contextTagline: string;
 	id: string;
@@ -25,9 +25,10 @@ export interface BoroughSummaryModel {
 }
 
 export interface BoroughViewModel {
-    district: DistrictViewModel;
+    boundaries: BoroughBoundarySummaryModel[];
+	district: DistrictViewModel;
+	activeBoundaryId: string;
 	banner: string;
-	bounds: string;
 	color: string;
 	description: string;
 	id: string;
@@ -197,6 +198,11 @@ export interface WorkContractSummaryModel {
 	dailySalary: number;
 	id: string;
 	signed: Date;
+}
+
+export interface BoroughBoundaryShapeModel {
+    id: string;
+	shape: string;
 }
 
 export interface ChangeFrameViewModel {
@@ -794,6 +800,13 @@ export interface WorkContractEmploymentModel {
 	dailySalary: number;
 	id: string;
 	signed: Date;
+}
+
+export interface BoroughBoundarySummaryModel {
+    changeComment: string;
+	created: Date;
+	id: string;
+	shape: string;
 }
 
 export interface EpochViewModel {

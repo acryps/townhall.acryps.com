@@ -46,7 +46,7 @@ export class MinimapComponent extends Component {
 					if (borough) {
 						boroughLabel.textContent = borough.name;
 
-						const bounds = Point.unpack(borough.bounds);
+						const bounds = Point.unpack(borough.activeBoundary.shape);
 
 						context.beginPath();
 						context.fillStyle = borough.color;
@@ -96,7 +96,7 @@ export class MinimapComponent extends Component {
 
 	getBorough(target: Point) {
 		for (let borough of Application.boroughs) {
-			if (Point.contains(Point.unpack(borough.bounds), target)) {
+			if (Point.contains(Point.unpack(borough.activeBoundary.shape), target)) {
 				return borough;
 			}
 		}

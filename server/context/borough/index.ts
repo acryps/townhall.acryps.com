@@ -9,10 +9,12 @@ export class BoroughContextComposer extends ItemContextComposer<Borough> {
 	title = (item: Borough) => `${item.name} Borough`;
 
 	async collect(borough: Borough) {
+		const activeBoundary = await borough.activeBoundary.fetch();
+
 		return [
 			async () => [
 				new DescriptionFragment(borough.description),
-				new MetricFragment('Area', () => `${Point.area(Point.unpack(borough.bounds))} b2`),
+				new MetricFragment('Area', () => `${Point.area(Point.unpack(activeBoundary.shape))} b2`),
 				new MetricFragment('Population', async () => `${await this.database.resident.where(resident => resident.mainTenancy.dwelling.property.boroughId == borough.id).count()} residents`)
 			],
 			async () => [

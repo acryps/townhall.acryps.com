@@ -21,6 +21,7 @@ export class SquareFiller extends Filler<Square> {
 	async obstacles() {
 		const properties = await this.database.property
 			.where(property => property.deactivated == null)
+			.where(property => property.activePlotBoundaryId != null)
 			.include(property => property.activePlotBoundary)
 			.toArray();
 

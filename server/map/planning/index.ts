@@ -215,10 +215,12 @@ export class PlanningMapGenerator {
 		// outline boroughs
 		logger.log('render borough outlines');
 		const boroughs = await this.database.borough
+			.include(borough => borough.activeBoundary)
 			.toArray();
 
 		for (let borough of boroughs) {
-			const boundary = Point.unpack(borough.bounds);
+			const activeBoundary = await borough.activeBoundary.fetch();
+			const boundary = Point.unpack(activeBoundary.shape);
 			const pixels = this.fillShape(boundary, topLeft, context, null, '#f00', this.administrativeWidth);
 
 			// remove used pixels

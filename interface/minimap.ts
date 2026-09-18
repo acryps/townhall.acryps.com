@@ -14,7 +14,7 @@ export const getMinimapBounds = (boroughs: BoroughSummaryModel[]) => {
 
 	for (let borough of boroughs) {
 		if (borough.district?.includeInMinimap) {
-			boroughBounds.push(...Point.unpack(borough.bounds));
+			boroughBounds.push(...Point.unpack(borough.activeBoundary.shape));
 		}
 	}
 

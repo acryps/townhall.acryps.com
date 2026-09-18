@@ -223,7 +223,7 @@ export class MapToolbarComponent extends Component {
 
 	getActiveBorough(packed: PackedPoint, cursor: Point) {
 		for (let borough of Application.boroughs) {
-			const bounds = Point.unpack(borough.bounds);
+			const bounds = Point.unpack(borough.activeBoundary.shape);
 
 			if (Point.contains(bounds, cursor)) {
 				return borough;

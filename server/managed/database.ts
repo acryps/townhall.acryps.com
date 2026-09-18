@@ -374,11 +374,12 @@ export class BillHonestium extends Entity<BillHonestiumQueryProxy> {
 }
 			
 export class BoroughQueryProxy extends QueryProxy {
+	get activeBoundary(): Partial<BoroughBoundaryQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get district(): Partial<DistrictQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get activeBoundaryId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get aiDescription(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get aiSummary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get banner(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
-	get bounds(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get color(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get contextReport(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get contextSummary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -395,12 +396,14 @@ export class BoroughQueryProxy extends QueryProxy {
 }
 
 export class Borough extends Entity<BoroughQueryProxy> {
-	properties: PrimaryReference<Property, PropertyQueryProxy>;
-		get district(): Partial<ForeignReference<District>> { return this.$district; }
+	boundaries: PrimaryReference<BoroughBoundary, BoroughBoundaryQueryProxy>;
+		properties: PrimaryReference<Property, PropertyQueryProxy>;
+		get activeBoundary(): Partial<ForeignReference<BoroughBoundary>> { return this.$activeBoundary; }
+	get district(): Partial<ForeignReference<District>> { return this.$district; }
+	activeBoundaryId: string;
 	aiDescription: string;
 	aiSummary: string;
 	banner: string;
-	bounds: string;
 	color: string;
 	contextReport: string;
 	contextSummary: string;
@@ -415,14 +418,14 @@ export class Borough extends Entity<BoroughQueryProxy> {
 	survey: boolean;
 	tag: string;
 	ttsDescription: string;
-	
+
 	$$meta = {
 		source: "borough",
 		columns: {
+			activeBoundaryId: { type: "uuid", name: "active_boundary_id" },
 			aiDescription: { type: "text", name: "ai_description" },
 			aiSummary: { type: "text", name: "ai_summary" },
 			banner: { type: "text", name: "banner" },
-			bounds: { type: "text", name: "bounds" },
 			color: { type: "text", name: "color" },
 			contextReport: { type: "text", name: "context_report" },
 			contextSummary: { type: "text", name: "context_summary" },
@@ -438,18 +441,32 @@ export class Borough extends Entity<BoroughQueryProxy> {
 			tag: { type: "text", name: "tag" },
 			ttsDescription: { type: "text", name: "tts_description" }
 		},
-		get set(): DbSet<Borough, BoroughQueryProxy> { 
+		get set(): DbSet<Borough, BoroughQueryProxy> {
 			return new DbSet<Borough, BoroughQueryProxy>(Borough, null);
 		}
 	};
-	
+
 	constructor() {
 		super();
-		
+
+		this.boundaries = new PrimaryReference<BoroughBoundary, BoroughBoundaryQueryProxy>(this, "boroughId", BoroughBoundary);
 		this.properties = new PrimaryReference<Property, PropertyQueryProxy>(this, "boroughId", Property);
+		this.$activeBoundary = new ForeignReference<BoroughBoundary>(this, "activeBoundaryId", BoroughBoundary);
 		this.$district = new ForeignReference<District>(this, "districtId", District);
 	}
-	
+
+	private $activeBoundary: ForeignReference<BoroughBoundary>;
+
+	set activeBoundary(value: Partial<ForeignReference<BoroughBoundary>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.activeBoundaryId = value.id as string;
+		} else {
+			this.activeBoundaryId = null;
+		}
+	}
+
 	private $district: ForeignReference<District>;
 
 	set district(value: Partial<ForeignReference<District>>) {
@@ -462,9 +479,60 @@ export class Borough extends Entity<BoroughQueryProxy> {
 		}
 	}
 
-	
+
 }
-			
+
+export class BoroughBoundaryQueryProxy extends QueryProxy {
+	get borough(): Partial<BoroughQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get boroughId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get changeComment(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get created(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get shape(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class BoroughBoundary extends Entity<BoroughBoundaryQueryProxy> {
+	get borough(): Partial<ForeignReference<Borough>> { return this.$borough; }
+	boroughId: string;
+	changeComment: string;
+	created: Date;
+	declare id: string;
+	shape: string;
+
+	$$meta = {
+		source: "borough_boundary",
+		columns: {
+			boroughId: { type: "uuid", name: "borough_id" },
+			changeComment: { type: "text", name: "change_comment" },
+			created: { type: "timestamp", name: "created" },
+			id: { type: "uuid", name: "id" },
+			shape: { type: "text", name: "shape" }
+		},
+		get set(): DbSet<BoroughBoundary, BoroughBoundaryQueryProxy> {
+			return new DbSet<BoroughBoundary, BoroughBoundaryQueryProxy>(BoroughBoundary, null);
+		}
+	};
+
+	constructor() {
+		super();
+
+		this.$borough = new ForeignReference<Borough>(this, "boroughId", Borough);
+	}
+
+	private $borough: ForeignReference<Borough>;
+
+	set borough(value: Partial<ForeignReference<Borough>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.boroughId = value.id as string;
+		} else {
+			this.boroughId = null;
+		}
+	}
+
+
+}
+
 export class BridgeQueryProxy extends QueryProxy {
 	get street(): Partial<StreetQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }

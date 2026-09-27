@@ -65,6 +65,7 @@ import { WorkerDispatch } from "./worker";
 import { PlanningMapGenerator } from "./map/planning";
 import { BlockTouchesTileServer } from "./map/layers/heatmap/gradiant/block-touches";
 import { PlayerHeadImageInterface } from "./areas/game/head";
+import { MarketFeedInterface } from "./market/feed";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const runMarket = process.env.RUN_MARKET == 'YES';
@@ -258,6 +259,7 @@ DbClient.connectedClient.connect().then(async () => {
 	});
 
 	new GoInterface(app, database);
+	new MarketFeedInterface(app, marketTracker);
 
 	app.prepareRoutes();
 	app.use(new StaticFileRoute('/assets/', join(process.cwd(), '..', 'page', 'assets')));

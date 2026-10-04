@@ -1,8 +1,6 @@
 import { Component } from "@acryps/page";
 import { MarketPage } from ".";
-import { CommoditySummaryModel, LiveCommodityTickerResponseModel } from "../managed/services";
-import { ContentAppendable } from "@acryps/style";
-import { convertToCurrency } from "../../interface/currency";
+import { CommoditySummaryModel, CommodityRatingViewModel } from "../managed/services";
 import { formatTradingUnit } from "../../interface/trading-unit";
 
 export class CommodityTickerComponent extends Component {
@@ -10,32 +8,38 @@ export class CommodityTickerComponent extends Component {
 
 	last: string;
 
-	ticker: LiveCommodityTickerResponseModel;
+	rating: CommodityRatingViewModel;
 
-	estimatedStockSize = document.createTextNode('?');
-	estimatedDemandTarget = document.createTextNode('?');
+	retailStockSize = document.createTextNode('?');
+	retailDemand = document.createTextNode('?');
+	commercialStockSize = document.createTextNode('?');
+	commercialDemand = document.createTextNode('?');
 
 	constructor(
 		public commodity: CommoditySummaryModel
 	) {
 		super();
 
-		this.estimatedStockSize.textContent = formatTradingUnit(this.commodity.tradingUnit, 0);
-		this.estimatedDemandTarget.textContent = formatTradingUnit(this.commodity.tradingUnit, 0);
+		this.retailStockSize.textContent = formatTradingUnit(this.commodity.tradingUnit, 0);
+		this.retailDemand.textContent = formatTradingUnit(this.commodity.tradingUnit, 0);
+		this.commercialStockSize.textContent = formatTradingUnit(this.commodity.tradingUnit, 0);
+		this.commercialDemand.textContent = formatTradingUnit(this.commodity.tradingUnit, 0);
 	}
 
-	tick(ticker: LiveCommodityTickerResponseModel) {
-		const updated = JSON.stringify(ticker);
+	tick(rating: CommodityRatingViewModel) {
+		const updated = JSON.stringify(rating);
 
 		if (updated == this.last) {
 			return;
 		}
 
-		this.ticker = ticker;
+		this.rating = rating;
 
 		if (this.rootNode) {
-			this.estimatedStockSize.textContent = formatTradingUnit(this.commodity.tradingUnit, this.ticker.estimatedStockSize);
-			this.estimatedDemandTarget.textContent = formatTradingUnit(this.commodity.tradingUnit, this.ticker.estimatedDemandTarget);
+			this.retailStockSize.textContent = formatTradingUnit(this.commodity.tradingUnit, this.rating.retailStockSize);
+			this.retailDemand.textContent = formatTradingUnit(this.commodity.tradingUnit, this.rating.retailDemand);
+			this.commercialStockSize.textContent = formatTradingUnit(this.commodity.tradingUnit, this.rating.commercialStockSize);
+			this.commercialDemand.textContent = formatTradingUnit(this.commodity.tradingUnit, this.rating.commercialDemand);
 
 			this.last = updated;
 
@@ -68,38 +72,16 @@ export class CommodityTickerComponent extends Component {
 				</ui-header>
 
 				<ui-volume>
-					SS={this.estimatedStockSize} / DT={this.estimatedDemandTarget}
+					Retail: {this.retailStockSize} stock / {this.retailDemand} demand
+				</ui-volume>
+
+				<ui-volume>
+					Commercial: {this.commercialStockSize} stock / {this.commercialDemand} demand
 				</ui-volume>
 			</ui-detail>
 		</ui-commodity>;
 	}
 }
 
-class RangeComponent {
-	priceLabel = document.createTextNode('**');
-	spreadLabel = document.createTextNode('**');
-	capitalizationLabel = document.createTextNode('0');
-
-	constructor(
-		private parent: CommodityTickerComponent,
-		private propertyPrefix: string
-	) {}
-
-	update() {
-		if (!this.parent.ticker || !this.parent.ticker[`${this.propertyPrefix}Median`]) {
-			return;
-		}
-
-		const capitalization = this.parent.ticker[`${this.propertyPrefix}Capitalization`] as number;
-		this.capitalizationLabel.textContent = convertToCurrency(capitalization);
-
-		const volume = this.parent.ticker[`${this.propertyPrefix}Volume`] as number;
-		const price = capitalization / volume;
-		this.priceLabel.textContent = convertToCurrency(price);
-
-		const low = this.parent.ticker[`${this.propertyPrefix}Low`] as number;
-		const high = this.parent.ticker[`${this.propertyPrefix}High`] as number;
-
-		this.spreadLabel.textContent = convertToCurrency(high - low);
-	}
-}
+export const ratingStockSize = (rating: CommodityRatingViewModel) => rating ? rating.retailStockSize + rating.commercialStockSize : 0;
+export const ratingDemand = (rating: CommodityRatingViewModel) => rating ? rating.retailDemand + rating.commercialDemand : 0;

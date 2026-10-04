@@ -1,8 +1,10 @@
-import { Commodity, DbContext, LegalEntity, Resident, StockSeed, StockSeedRule, StockSeedRuleOperation, StockSeedRuleProperty } from "../managed/database";
+import { Commodity, DbContext, LegalEntity, Resident, StockSeedRule } from "../managed/database";
 import { convertToLegalCompanyName } from "../../interface/company";
 import { Stock } from "./stock";
 import { HashRandom } from "./random";
 import { formatTradingUnit } from "../../interface/trading-unit";
+import { MarketRule, MarketRuleResolver } from "./rule";
+import { MarketAssessment } from "./rule/assessment";
 
 export class TradingEntity {
 	constructor(
@@ -41,98 +43,8 @@ export class TradingEntity {
 		);
 	}
 
-	async getCommunity() {
-		const community: TradingEntity[] = [];
-
-		if (this.entity.residentId) {
-			const resident = await this.entity.resident.fetch();
-			const mainTenancy = await resident.mainTenancy.fetch();
-
-			if (mainTenancy) {
-				const peers = await this.database.tenancy
-					.where(tenancy => tenancy.id != mainTenancy.id)
-					.where(tenancy => tenancy.dwellingId == mainTenancy.dwellingId)
-					.include(tenancy => tenancy.inhabitant)
-					.toArray();
-
-				for (let tenancy of peers) {
-					const resident = await tenancy.inhabitant.fetch();
-					let legalEntity = await this.database.legalEntity.first(entity => entity.residentId == resident.id);
-
-					if (!legalEntity) {
-						legalEntity = new LegalEntity();
-						legalEntity.residentId = resident.id;
-
-						await legalEntity.create();
-					}
-
-					community.push(await TradingEntity.from(legalEntity, this.database));
-				}
-			}
-		}
-
-		return community;
-	}
-
-	async getIncome() {
-		let balance = 0;
-
-		/*
-		const sales = await this.database.trade
-			.where(trade => trade.ask.askerId == this.entity.id)
-			.toArray();
-
-		for (let trade of sales) {
-			balance += trade.price * trade.quantity;
-		}
-
-		const transports = await this.database.commodityTransport
-			.where(transport => transport.route.operatorId == this.entity.id)
-			.toArray();
-
-		for (let transport of transports) {
-			balance += transport.price;
-		}
-		*/
-
-		return balance;
-	}
-
-	async getExpenses() {
-		let balance = 0;
-
-		const buys = await this.entity.trades
-			.toArray();
-
-		for (let trade of buys) {
-			balance += trade.price * trade.quantity;
-		}
-
-		const productions = await this.entity.productions
-			.toArray();
-
-		for (let production of productions) {
-			balance += production.cost;
-		}
-
-		const transports = await this.entity.boughtTransports
-			.toArray();
-
-		for (let transport of transports) {
-			balance += transport.price;
-		}
-
-		return balance;
-	}
-
-	async getTradeBalance() {
-		const income = await this.getIncome();
-		const expenses = await this.getExpenses();
-
-		return income - expenses;
-	}
-
-	async getStock() {
+	// stock this entity currently owns
+	async getStock(assessments?: MarketAssessment[]) {
 		const stock: Stock[] = [];
 
 		// stock owned before tracking (seeding)
@@ -151,7 +63,7 @@ export class TradingEntity {
 		// generate stock for residents
 		// it would be insanely wasteful to generate full stock lists for all residents all the time
 		if (this.entity.residentId) {
-			for (let entry of await this.generateResidentSeedStock(await this.entity.resident.fetch())) {
+			for (let entry of await this.generateResidentStock(await this.entity.resident.fetch(), assessments)) {
 				this.trackAsset(stock, entry.commodity, entry.quantity, entry.quality, ...entry.sources);
 			}
 		}
@@ -161,13 +73,100 @@ export class TradingEntity {
 		return stock;
 	}
 
-	private async generateResidentSeedStock(resident: Resident) {
+	// what this entity currently wants, allow injecting a pre-fetched assessment list to save db hits when running in batches (eg the tracker)
+	async getDemand(assessments?: MarketAssessment[]): Promise<Stock[]> {
+		if (this.entity.residentId) {
+			const resident = await this.entity.resident.fetch();
+
+			return this.resolveDemand(
+				resident.id,
+				assessments ?? await resident.assessments.toArray(),
+
+				commodity => commodity.activeResidentialDemandId,
+				this.database.commodity.where(commodity => commodity.activeResidentialDemandId != null),
+
+				await this.database.residentialDemand
+					.where(ruleset => ruleset.activates != null)
+					.include(ruleset => ruleset.rules)
+					.toArray()
+			);
+		}
+
+		if (this.entity.companyId) {
+			const company = await this.entity.company.fetch();
+
+			return this.resolveDemand(
+				company.id,
+				assessments ?? await company.assessments.toArray(),
+
+				commodity => commodity.activeCommercialDemandId,
+				this.database.commodity.where(commodity => commodity.activeCommercialDemandId != null),
+
+				await this.database.commercialDemand
+					.where(ruleset => ruleset.activates != null)
+					.include(ruleset => ruleset.rules)
+					.toArray()
+			);
+		}
+
+		if (this.entity.boroughId) {
+			const borough = await this.entity.borough.fetch();
+
+			return this.resolveDemand(
+				borough.id,
+				assessments ?? await borough.assessments.toArray(),
+
+				commodity => commodity.activeBoroughDemandId,
+				this.database.commodity.where(commodity => commodity.activeBoroughDemandId != null),
+
+				await this.database.boroughDemand
+					.where(ruleset => ruleset.activates != null)
+					.include(ruleset => ruleset.rules)
+					.toArray()
+			);
+		}
+
+		return [];
+	}
+
+	// shared by getDemand()'s resident / company / borough branches: resolve the active demand ruleset per commodity for this subject
+	private async resolveDemand(
+		subjectId: string,
+		values: MarketAssessment[],
+
+		activeDemandId: (commodity: Commodity) => string,
+		commodities: { toArray(): Promise<Commodity[]> },
+		rulesets: { id: string, likeliness: number, rules: { toArray(): Promise<MarketRule[]> } }[]
+	) {
 		const stock: Stock[] = [];
 
-		const assessment = await resident.assessments
-			.toArray();
+		for (let commodity of await commodities.toArray()) {
+			const ruleset = rulesets.find(ruleset => ruleset.id == activeDemandId(commodity));
 
-		const parameters = await this.database.residentAssessmentParameter.toArray();
+			if (!ruleset) {
+				continue;
+			}
+
+			if (HashRandom.random([subjectId, commodity.id]) >= (ruleset.likeliness ?? 0)) {
+				continue;
+			}
+
+			const resolution = MarketRuleResolver.generate(await ruleset.rules.toArray(), values, [subjectId, commodity.id]);
+
+			if (resolution.quantity <= 0) {
+				continue;
+			}
+
+			stock.push(new Stock(commodity, resolution.quantity, resolution.quality, resolution.sources));
+		}
+
+		return stock;
+	}
+
+	private async generateResidentStock(resident: Resident, assessments?: MarketAssessment[]) {
+		const stock: Stock[] = [];
+
+		const values = assessments ?? await resident.assessments.toArray();
 
 		const commodities = await this.database.commodity
 			.include(commodity => commodity.tradingUnit)
@@ -177,61 +176,27 @@ export class TradingEntity {
 			.orderByAscending(rule => rule.id) // sort to have strict case for conflicts
 			.toArray();
 
-		const qualityRules: StockSeedRule[] = [];
+		const rulesByCommodity = new Map<string, StockSeedRule[]>();
 
 		for (let rule of rules) {
-			const assessedParameter = assessment.find(parameter => parameter.parameterId == rule.parameterId);
+			if (!rulesByCommodity.has(rule.commodityId)) {
+				rulesByCommodity.set(rule.commodityId, []);
+			}
 
-			if (assessedParameter && assessedParameter.value >= rule.parameterMinimum && assessedParameter.value <= rule.parameterMaximum) {
-				switch (rule.property) {
-					case StockSeedRuleProperty.quality: {
-						qualityRules.push(rule);
+			rulesByCommodity.get(rule.commodityId).push(rule);
+		}
 
-						break;
-					}
+		for (let [commodityId, commodityRules] of rulesByCommodity) {
+			const commodity = commodities.find(commodity => commodity.id == commodityId);
 
-					case StockSeedRuleProperty.quantity: {
-						const commodity = commodities.find(commodity => commodity.id == rule.commodityId);
-						const unit = await commodity.tradingUnit.fetch();
-						const parameter = parameters.find(parameter => parameter.id == assessedParameter.parameterId);
+			if (!commodity) {
+				continue;
+			}
 
-						const value = HashRandom.random([resident.id, rule.id], rule.valueMinimum, rule.valueMaximum);
+			const resolution = MarketRuleResolver.generate(commodityRules, values, [resident.id, commodity.id]);
 
-						let entry = stock.find(entry => entry.commodity == commodity);
-
-						if (!entry) {
-							entry = new Stock(commodity);
-							stock.push(entry);
-						}
-
-						const sourceText = `${formatTradingUnit(unit, value)} ${parameter.name} ${rule.parameterMinimum} < ${assessedParameter.value} < ${rule.parameterMaximum} (rule #${rule.id.split('-')[0]})`;
-
-						switch (rule.operation) {
-							case StockSeedRuleOperation.apply: {
-								entry.sources = [`=${sourceText}`];
-								entry.quantity = value;
-
-								break;
-							}
-
-							case StockSeedRuleOperation.add: {
-								entry.sources.push(`+${sourceText}`);
-								entry.quantity += value;
-
-								break;
-							}
-
-							case StockSeedRuleOperation.subtract: {
-								entry.sources.push(`-${sourceText}`);
-								entry.quantity -= value;
-
-								break;
-							}
-						}
-
-						break;
-					}
-				}
+			if (resolution.quantity > 0) {
+				stock.push(new Stock(commodity, resolution.quantity, resolution.quality, resolution.sources));
 			}
 		}
 
@@ -239,17 +204,6 @@ export class TradingEntity {
 		for (let entry of [...stock]) {
 			if (HashRandom.random([resident.id, entry.commodity.id]) < entry.commodity.residentialOwnershipLikeliness) {
 				stock.splice(stock.indexOf(entry), 1);
-			}
-		}
-
-		// assign quality to given stock
-		for (let qualityRule of qualityRules) {
-			for (let entry of stock) {
-				if (entry.commodity.id == qualityRule.commodityId) {
-					const quality = HashRandom.random([resident.id, qualityRule.id], qualityRule.valueMinimum, qualityRule.valueMaximum);
-
-					entry.quality = Math.round(quality);
-				}
 			}
 		}
 

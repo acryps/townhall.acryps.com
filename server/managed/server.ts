@@ -76,13 +76,9 @@ import { NameFrequency } from "././../areas/life/name-frequency";
 import { NameFrequencyViewModel } from "././../areas/life/name-frequency";
 import { ResidentAssessmentParameterDistributionViewModel } from "././../areas/life/assessment-distribution";
 import { LifeService } from "././../areas/life/service";
-import { Commodity } from "././database";
-import { MarketManager } from "././../market/manager";
-import { MarketTracker } from "././../market/tracker";
 import { CommoditySummaryModel } from "././../areas/market/commodity";
 import { CommodityViewModel } from "././../areas/market/commodity";
-import { LiveCommodityTickerModel } from "././../areas/market/ticker";
-import { LiveCommodityTickerResponseModel } from "././../areas/market/ticker";
+import { CommodityRatingViewModel } from "././../areas/market/rating";
 import { TradingEntity } from "././../market/entity";
 import { StockModel } from "././../areas/market/stock";
 import { StockSeedViewModel } from "././../areas/market/stock";
@@ -91,7 +87,6 @@ import { CommodityBidViewModel } from "././../areas/market/bid";
 import { TraderBidViewModel } from "././../areas/market/bid";
 import { CommodityAskViewModel } from "././../areas/market/ask";
 import { TraderAskViewModel } from "././../areas/market/ask";
-import { DemandViewModel } from "././../areas/market/demand";
 import { MarketCycleSummaryModel } from "././../areas/market/cycle";
 import { MarketCycleViewModel } from "././../areas/market/cycle";
 import { MarketService } from "././../areas/market/service";
@@ -199,6 +194,7 @@ import { TenancyViewModel } from "./../areas/life/resident";
 import { AskViewModel } from "./../areas/market/ask";
 import { BidViewModel } from "./../areas/market/bid";
 import { CommodityCategorySummaryModel } from "./../areas/market/commodity";
+import { StockSeedRuleViewModel } from "./../areas/market/commodity";
 import { TradingUnitViewModel } from "./../areas/market/unit";
 import { OracleProposalSummaryModel } from "./../areas/oracle/proposal";
 import { PlanSummaryModel } from "./../areas/plan/plan";
@@ -247,9 +243,11 @@ import { ResidentAssessmentMatchView } from "./../managed/database";
 import { ResidentRelationship } from "./../managed/database";
 import { TradeAsk } from "./../managed/database";
 import { TradeBid } from "./../managed/database";
+import { Commodity } from "./../managed/database";
 import { CommodityCategory } from "./../managed/database";
+import { StockSeedRule } from "./../managed/database";
 import { MarketCycle } from "./../managed/database";
-import { Demand } from "./../market/tracker/demand";
+import { CommodityRating } from "./../managed/database";
 import { StockSeed } from "./../managed/database";
 import { CommodityTradingUnit } from "./../managed/database";
 import { Metric } from "./../managed/database";
@@ -331,15 +329,7 @@ Inject.mappings = {
 	},
 	"MarketService": {
 		objectConstructor: MarketService,
-		parameters: ["DbContext","MarketManager","MarketTracker"]
-	},
-	"MarketManager": {
-		objectConstructor: MarketManager,
 		parameters: ["DbContext"]
-	},
-	"MarketTracker": {
-		objectConstructor: MarketTracker,
-		parameters: ["Logger","DbContext"]
 	},
 	"MetricService": {
 		objectConstructor: MetricService,
@@ -1167,10 +1157,10 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"ozOXR2dDVhZmxvc2RndmJqMWRuN3A5aT",
+			"J5dG5oY2MzZGVtYnZmaHlobT9hbTlkej",
 			{},
 			inject => inject.construct(MarketService),
-			(controller, params) => controller.getTickers(
+			(controller, params) => controller.getRatings(
 				
 			)
 		);
@@ -1183,17 +1173,6 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(MarketService),
 			(controller, params) => controller.getStock(
 				params["pidzE4ZDFqd2AyaTBtMmNucGhnaTp0ND"]
-			)
-		);
-
-		this.expose(
-			"Vqc2k3aGo4emExOGlybnRqeGloemJnd3",
-			{
-			"I4aGgwOWxkMDlxMHo5M3E1YnFlbHRmcX": { type: "string", isArray: false, isOptional: false }
-			},
-			inject => inject.construct(MarketService),
-			(controller, params) => controller.getDemand(
-				params["I4aGgwOWxkMDlxMHo5M3E1YnFlbHRmcX"]
 			)
 		);
 
@@ -5743,6 +5722,7 @@ ViewModel.mappings = {
 				high: this.$$model.high,
 				id: this.$$model.id,
 				low: this.$$model.low,
+				name: this.$$model.name,
 				prompt: this.$$model.prompt
 			}
 		};
@@ -5776,6 +5756,7 @@ ViewModel.mappings = {
 				high: true,
 				id: true,
 				low: true,
+				name: true,
 				prompt: true
 			};
 		};
@@ -5785,6 +5766,7 @@ ViewModel.mappings = {
 			"high" in data && (item.high = data.high === null ? null : `${data.high}`);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"low" in data && (item.low = data.low === null ? null : `${data.low}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
 			"prompt" in data && (item.prompt = data.prompt === null ? null : `${data.prompt}`);
 
 			return item;
@@ -5802,6 +5784,7 @@ ViewModel.mappings = {
 			"high" in viewModel && (model.high = viewModel.high === null ? null : `${viewModel.high}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"low" in viewModel && (model.low = viewModel.low === null ? null : `${viewModel.low}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
 			"prompt" in viewModel && (model.prompt = viewModel.prompt === null ? null : `${viewModel.prompt}`);
 
 			return model;
@@ -6558,6 +6541,97 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[StockSeedRuleViewModel.name]: class ComposedStockSeedRuleViewModel extends StockSeedRuleViewModel {
+		async map() {
+			return {
+				parameter: new ResidentAssessmentParameterViewModel(await BaseServer.unwrap(this.$$model.parameter)),
+				id: this.$$model.id,
+				operation: this.$$model.operation,
+				parameterMaximum: this.$$model.parameterMaximum,
+				parameterMinimum: this.$$model.parameterMinimum,
+				property: this.$$model.property,
+				valueMaximum: this.$$model.valueMaximum,
+				valueMinimum: this.$$model.valueMinimum
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get parameter() {
+					return ViewModel.mappings[ResidentAssessmentParameterViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "parameter-StockSeedRuleViewModel"]
+					);
+				},
+				id: true,
+				operation: true,
+				parameterMaximum: true,
+				parameterMinimum: true,
+				property: true,
+				valueMaximum: true,
+				valueMinimum: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new StockSeedRuleViewModel(null);
+			"parameter" in data && (item.parameter = data.parameter && ViewModel.mappings[ResidentAssessmentParameterViewModel.name].toViewModel(data.parameter));
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"operation" in data && (item.operation = data.operation === null ? null : data.operation);
+			"parameterMaximum" in data && (item.parameterMaximum = data.parameterMaximum === null ? null : +data.parameterMaximum);
+			"parameterMinimum" in data && (item.parameterMinimum = data.parameterMinimum === null ? null : +data.parameterMinimum);
+			"property" in data && (item.property = data.property === null ? null : data.property);
+			"valueMaximum" in data && (item.valueMaximum = data.valueMaximum === null ? null : +data.valueMaximum);
+			"valueMinimum" in data && (item.valueMinimum = data.valueMinimum === null ? null : +data.valueMinimum);
+
+			return item;
+		}
+
+		static async toModel(viewModel: StockSeedRuleViewModel) {
+			let model: StockSeedRule;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(StockSeedRule).find(viewModel.id)
+			} else {
+				model = new StockSeedRule();
+			}
+			
+			"parameter" in viewModel && (model.parameter.id = viewModel.parameter ? viewModel.parameter.id : null);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"operation" in viewModel && (model.operation = viewModel.operation === null ? null : viewModel.operation);
+			"parameterMaximum" in viewModel && (model.parameterMaximum = viewModel.parameterMaximum === null ? null : +viewModel.parameterMaximum);
+			"parameterMinimum" in viewModel && (model.parameterMinimum = viewModel.parameterMinimum === null ? null : +viewModel.parameterMinimum);
+			"property" in viewModel && (model.property = viewModel.property === null ? null : viewModel.property);
+			"valueMaximum" in viewModel && (model.valueMaximum = viewModel.valueMaximum === null ? null : +viewModel.valueMaximum);
+			"valueMinimum" in viewModel && (model.valueMinimum = viewModel.valueMinimum === null ? null : +viewModel.valueMinimum);
+
+			return model;
+		}
+	},
 	[MarketCycleSummaryModel.name]: class ComposedMarketCycleSummaryModel extends MarketCycleSummaryModel {
 		async map() {
 			return {
@@ -6628,12 +6702,15 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	[DemandViewModel.name]: class ComposedDemandViewModel extends DemandViewModel {
+	[CommodityRatingViewModel.name]: class ComposedCommodityRatingViewModel extends CommodityRatingViewModel {
 		async map() {
 			return {
-				active: this.$$model.active,
-				activates: this.$$model.activates,
-				target: this.$$model.target
+				commodity: new CommoditySummaryModel(await BaseServer.unwrap(this.$$model.commodity)),
+				commercialDemand: this.$$model.commercialDemand,
+				commercialStockSize: this.$$model.commercialStockSize,
+				id: this.$$model.id,
+				retailDemand: this.$$model.retailDemand,
+				retailStockSize: this.$$model.retailStockSize
 			}
 		};
 
@@ -6663,27 +6740,47 @@ ViewModel.mappings = {
 			}
 
 			return {
-				active: true,
-				activates: true,
-				target: true
+				get commodity() {
+					return ViewModel.mappings[CommoditySummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "commodity-CommodityRatingViewModel"]
+					);
+				},
+				commercialDemand: true,
+				commercialStockSize: true,
+				id: true,
+				retailDemand: true,
+				retailStockSize: true
 			};
 		};
 
 		static toViewModel(data) {
-			const item = new DemandViewModel(null);
-			"active" in data && (item.active = !!data.active);
-			"activates" in data && (item.activates = data.activates === null ? null : new Date(data.activates));
-			"target" in data && (item.target = data.target === null ? null : +data.target);
+			const item = new CommodityRatingViewModel(null);
+			"commodity" in data && (item.commodity = data.commodity && ViewModel.mappings[CommoditySummaryModel.name].toViewModel(data.commodity));
+			"commercialDemand" in data && (item.commercialDemand = data.commercialDemand === null ? null : +data.commercialDemand);
+			"commercialStockSize" in data && (item.commercialStockSize = data.commercialStockSize === null ? null : +data.commercialStockSize);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"retailDemand" in data && (item.retailDemand = data.retailDemand === null ? null : +data.retailDemand);
+			"retailStockSize" in data && (item.retailStockSize = data.retailStockSize === null ? null : +data.retailStockSize);
 
 			return item;
 		}
 
-		static async toModel(viewModel: DemandViewModel) {
-			const model = new Demand();
+		static async toModel(viewModel: CommodityRatingViewModel) {
+			let model: CommodityRating;
 			
-			"active" in viewModel && (model.active = !!viewModel.active);
-			"activates" in viewModel && (model.activates = viewModel.activates === null ? null : new Date(viewModel.activates));
-			"target" in viewModel && (model.target = viewModel.target === null ? null : +viewModel.target);
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(CommodityRating).find(viewModel.id)
+			} else {
+				model = new CommodityRating();
+			}
+			
+			"commodity" in viewModel && (model.commodity.id = viewModel.commodity ? viewModel.commodity.id : null);
+			"commercialDemand" in viewModel && (model.commercialDemand = viewModel.commercialDemand === null ? null : +viewModel.commercialDemand);
+			"commercialStockSize" in viewModel && (model.commercialStockSize = viewModel.commercialStockSize === null ? null : +viewModel.commercialStockSize);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"retailDemand" in viewModel && (model.retailDemand = viewModel.retailDemand === null ? null : +viewModel.retailDemand);
+			"retailStockSize" in viewModel && (model.retailStockSize = viewModel.retailStockSize === null ? null : +viewModel.retailStockSize);
 
 			return model;
 		}
@@ -6821,106 +6918,6 @@ ViewModel.mappings = {
 			"sourceName" in viewModel && (model.sourceName = viewModel.sourceName === null ? null : `${viewModel.sourceName}`);
 			"sourceQuantity" in viewModel && (model.sourceQuantity = viewModel.sourceQuantity === null ? null : `${viewModel.sourceQuantity}`);
 			"sourceReason" in viewModel && (model.sourceReason = viewModel.sourceReason === null ? null : `${viewModel.sourceReason}`);
-
-			return model;
-		}
-	},
-	[LiveCommodityTickerResponseModel.name]: class ComposedLiveCommodityTickerResponseModel extends LiveCommodityTickerResponseModel {
-		async map() {
-			return {
-				commodityId: this.$$model.commodityId,
-				askLow: this.$$model.askLow,
-				askMedian: this.$$model.askMedian,
-				askHigh: this.$$model.askHigh,
-				askVolume: this.$$model.askVolume,
-				askCapitalization: this.$$model.askCapitalization,
-				bidLow: this.$$model.bidLow,
-				bidMedian: this.$$model.bidMedian,
-				bidHigh: this.$$model.bidHigh,
-				bidVolume: this.$$model.bidVolume,
-				bidCapitalization: this.$$model.bidCapitalization,
-				estimatedStockSize: this.$$model.estimatedStockSize,
-				estimatedDemandTarget: this.$$model.estimatedDemandTarget
-			}
-		};
-
-		static get items() {
-			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
-		}
-
-		static getPrefetchingProperties(level: number, parents: string[]) {
-			let repeats = false;
-
-			for (let size = 1; size <= parents.length / 2; size++) {
-				if (!repeats) {
-					for (let index = 0; index < parents.length; index++) {
-						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
-							repeats = true;
-						}
-					}
-				}
-			}
-
-			if (repeats) {
-				level--;
-			}
-
-			if (!level) {
-				return {};
-			}
-
-			return {
-				commodityId: true,
-				askLow: true,
-				askMedian: true,
-				askHigh: true,
-				askVolume: true,
-				askCapitalization: true,
-				bidLow: true,
-				bidMedian: true,
-				bidHigh: true,
-				bidVolume: true,
-				bidCapitalization: true,
-				estimatedStockSize: true,
-				estimatedDemandTarget: true
-			};
-		};
-
-		static toViewModel(data) {
-			const item = new LiveCommodityTickerResponseModel(null);
-			"commodityId" in data && (item.commodityId = data.commodityId === null ? null : `${data.commodityId}`);
-			"askLow" in data && (item.askLow = data.askLow === null ? null : +data.askLow);
-			"askMedian" in data && (item.askMedian = data.askMedian === null ? null : +data.askMedian);
-			"askHigh" in data && (item.askHigh = data.askHigh === null ? null : +data.askHigh);
-			"askVolume" in data && (item.askVolume = data.askVolume === null ? null : +data.askVolume);
-			"askCapitalization" in data && (item.askCapitalization = data.askCapitalization === null ? null : +data.askCapitalization);
-			"bidLow" in data && (item.bidLow = data.bidLow === null ? null : +data.bidLow);
-			"bidMedian" in data && (item.bidMedian = data.bidMedian === null ? null : +data.bidMedian);
-			"bidHigh" in data && (item.bidHigh = data.bidHigh === null ? null : +data.bidHigh);
-			"bidVolume" in data && (item.bidVolume = data.bidVolume === null ? null : +data.bidVolume);
-			"bidCapitalization" in data && (item.bidCapitalization = data.bidCapitalization === null ? null : +data.bidCapitalization);
-			"estimatedStockSize" in data && (item.estimatedStockSize = data.estimatedStockSize === null ? null : +data.estimatedStockSize);
-			"estimatedDemandTarget" in data && (item.estimatedDemandTarget = data.estimatedDemandTarget === null ? null : +data.estimatedDemandTarget);
-
-			return item;
-		}
-
-		static async toModel(viewModel: LiveCommodityTickerResponseModel) {
-			const model = new LiveCommodityTickerModel();
-			
-			"commodityId" in viewModel && (model.commodityId = viewModel.commodityId === null ? null : `${viewModel.commodityId}`);
-			"askLow" in viewModel && (model.askLow = viewModel.askLow === null ? null : +viewModel.askLow);
-			"askMedian" in viewModel && (model.askMedian = viewModel.askMedian === null ? null : +viewModel.askMedian);
-			"askHigh" in viewModel && (model.askHigh = viewModel.askHigh === null ? null : +viewModel.askHigh);
-			"askVolume" in viewModel && (model.askVolume = viewModel.askVolume === null ? null : +viewModel.askVolume);
-			"askCapitalization" in viewModel && (model.askCapitalization = viewModel.askCapitalization === null ? null : +viewModel.askCapitalization);
-			"bidLow" in viewModel && (model.bidLow = viewModel.bidLow === null ? null : +viewModel.bidLow);
-			"bidMedian" in viewModel && (model.bidMedian = viewModel.bidMedian === null ? null : +viewModel.bidMedian);
-			"bidHigh" in viewModel && (model.bidHigh = viewModel.bidHigh === null ? null : +viewModel.bidHigh);
-			"bidVolume" in viewModel && (model.bidVolume = viewModel.bidVolume === null ? null : +viewModel.bidVolume);
-			"bidCapitalization" in viewModel && (model.bidCapitalization = viewModel.bidCapitalization === null ? null : +viewModel.bidCapitalization);
-			"estimatedStockSize" in viewModel && (model.estimatedStockSize = viewModel.estimatedStockSize === null ? null : +viewModel.estimatedStockSize);
-			"estimatedDemandTarget" in viewModel && (model.estimatedDemandTarget = viewModel.estimatedDemandTarget === null ? null : +viewModel.estimatedDemandTarget);
 
 			return model;
 		}
@@ -10850,6 +10847,7 @@ ViewModel.mappings = {
 				category: new CommodityCategorySummaryModel(await BaseServer.unwrap(this.$$model.category)),
 				asks: (await this.$$model.asks.includeTree(ViewModel.mappings[CommodityAskViewModel.name].items).toArray()).map(item => new CommodityAskViewModel(item)),
 				bids: (await this.$$model.bids.includeTree(ViewModel.mappings[CommodityBidViewModel.name].items).toArray()).map(item => new CommodityBidViewModel(item)),
+				stockSeedRules: (await this.$$model.stockSeedRules.includeTree(ViewModel.mappings[StockSeedRuleViewModel.name].items).toArray()).map(item => new StockSeedRuleViewModel(item)),
 				tradingUnit: new TradingUnitViewModel(await BaseServer.unwrap(this.$$model.tradingUnit)),
 				activeResidentialDemandId: this.$$model.activeResidentialDemandId,
 				description: this.$$model.description,
@@ -10908,6 +10906,12 @@ ViewModel.mappings = {
 						[...parents, "bids-CommodityViewModel"]
 					);
 				},
+				get stockSeedRules() {
+					return ViewModel.mappings[StockSeedRuleViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "stockSeedRules-CommodityViewModel"]
+					);
+				},
 				get tradingUnit() {
 					return ViewModel.mappings[TradingUnitViewModel.name].getPrefetchingProperties(
 						level,
@@ -10932,6 +10936,7 @@ ViewModel.mappings = {
 			"category" in data && (item.category = data.category && ViewModel.mappings[CommodityCategorySummaryModel.name].toViewModel(data.category));
 			"asks" in data && (item.asks = data.asks && [...data.asks].map(i => ViewModel.mappings[CommodityAskViewModel.name].toViewModel(i)));
 			"bids" in data && (item.bids = data.bids && [...data.bids].map(i => ViewModel.mappings[CommodityBidViewModel.name].toViewModel(i)));
+			"stockSeedRules" in data && (item.stockSeedRules = data.stockSeedRules && [...data.stockSeedRules].map(i => ViewModel.mappings[StockSeedRuleViewModel.name].toViewModel(i)));
 			"tradingUnit" in data && (item.tradingUnit = data.tradingUnit && ViewModel.mappings[TradingUnitViewModel.name].toViewModel(data.tradingUnit));
 			"activeResidentialDemandId" in data && (item.activeResidentialDemandId = data.activeResidentialDemandId === null ? null : `${data.activeResidentialDemandId}`);
 			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
@@ -10959,6 +10964,7 @@ ViewModel.mappings = {
 			"category" in viewModel && (model.category.id = viewModel.category ? viewModel.category.id : null);
 			"asks" in viewModel && (null);
 			"bids" in viewModel && (null);
+			"stockSeedRules" in viewModel && (null);
 			"tradingUnit" in viewModel && (model.tradingUnit.id = viewModel.tradingUnit ? viewModel.tradingUnit.id : null);
 			"activeResidentialDemandId" in viewModel && (model.activeResidentialDemandId = viewModel.activeResidentialDemandId === null ? null : `${viewModel.activeResidentialDemandId}`);
 			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);

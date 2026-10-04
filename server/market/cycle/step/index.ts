@@ -3,7 +3,6 @@ import { MarketCycleGenerator } from "..";
 import { Interpreter, SystemMessage } from "../../../life/interpreter";
 import { OpenAiInterpreterProvider } from "../../../life/interpreter/provider/openai";
 import { DbContext, LegalEntity, LegalEntityQueryProxy, MarketCycle, TokenSponsor } from "../../../managed/database";
-import { MarketManager } from "../../manager";
 import { MarketTracker } from "../../tracker";
 import { Logger, TaskLogger } from "@acryps/log";
 import { TradingEntity } from "../../entity";

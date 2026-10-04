@@ -43,7 +43,7 @@ export class StreetFiller extends Filler<Street> {
 
 	rank(a: Street, b: Street) {
 		if (a.size == b.size) {
-			return a.name.localeCompare(b.name);
+			return a.name?.localeCompare(b.name);
 		}
 
 		return b.size - a.size;

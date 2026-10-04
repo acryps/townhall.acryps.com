@@ -9,6 +9,7 @@ import { formatTradingUnit } from "../../../interface/trading-unit";
 import { Tabs } from "../../shared/tabs";
 import { CommodityPositionsTab } from "./positions";
 import { CommodityDemandTab } from "./demand";
+import { CommodityStockingTab } from "./stocking";
 
 export class CommodityPage extends Component {
 	declare parameters: { tag };
@@ -40,6 +41,7 @@ export class CommodityPage extends Component {
 
 			{new Tabs()
 				.addTab('Demand', () => new CommodityDemandTab(this.commodity))
+				.addTab('Stocking', () => new CommodityStockingTab(this.commodity))
 				.addTab('Asks', () => new CommodityPositionsTab(
 					this.commodity,
 					'asks',

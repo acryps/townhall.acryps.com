@@ -1,6 +1,4 @@
-import { formatTradingUnit } from "../../interface/trading-unit";
 import { ManagedServer } from "../managed/server";
-import { MarketManager } from "./manager";
 import { MarketTracker } from "./tracker";
 
 export class MarketFeedInterface {
@@ -11,11 +9,11 @@ export class MarketFeedInterface {
 		app.app.get('/market/feed/ticker', async (request, response) => {
 			let feed = [];
 
-			for (let commodity of tracker.trackers) {
-				if (commodity.commodity.symbol) {
-					const direction = parseInt(commodity.commodity.id[0], 16) >= 8;
+			for (let entry of tracker.ratings) {
+				if (entry.commodity.symbol) {
+					const direction = parseInt(entry.commodity.id[0], 16) >= 8;
 
-					feed.push(`${commodity.commodity.symbol} ${this.formatNumber(commodity.estimatedStockSize)}${direction ? '{' : '}'}`);
+					feed.push(`${entry.commodity.symbol} ${this.formatNumber(entry.rating.retailStockSize)}${direction ? '{' : '}'}`);
 				}
 			}
 

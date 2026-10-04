@@ -41,6 +41,7 @@ export class ResidentAssessmentViewModel extends ViewModel<ResidentAssessment> {
 
 export class ResidentAssessmentParameterViewModel extends ViewModel<ResidentAssessmentParameter> {
 	id;
+	name;
 	prompt;
 	low;
 	high;

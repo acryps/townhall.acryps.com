@@ -12,6 +12,17 @@ export enum ItemContextLinkRank {
 	primary = "primary"
 }
 
+export enum StockSeedRuleOperation {
+	add = "add",
+	apply = "apply",
+	subtract = "subtract"
+}
+
+export enum StockSeedRuleProperty {
+	quality = "quality",
+	quantity = "quantity"
+}
+
 export interface BoroughSummaryModel {
     activeBoundary: BoroughBoundaryShapeModel;
 	district: DistrictSummaryModel;
@@ -355,6 +366,7 @@ export interface ResidentAssessmentParameterViewModel {
     high: string;
 	id: string;
 	low: string;
+	name: string;
 	prompt: string;
 }
 
@@ -436,6 +448,17 @@ export interface CommodityCategorySummaryModel {
 	name: string;
 }
 
+export interface StockSeedRuleViewModel {
+    parameter: ResidentAssessmentParameterViewModel;
+	id: string;
+	operation: StockSeedRuleOperation;
+	parameterMaximum: number;
+	parameterMinimum: number;
+	property: StockSeedRuleProperty;
+	valueMaximum: number;
+	valueMinimum: number;
+}
+
 export interface MarketCycleSummaryModel {
     closed: Date;
 	id: string;
@@ -443,10 +466,13 @@ export interface MarketCycleSummaryModel {
 	riskAppetite: number;
 }
 
-export interface DemandViewModel {
-    active: boolean;
-	activates: Date;
-	target: number;
+export interface CommodityRatingViewModel {
+    commodity: CommoditySummaryModel;
+	commercialDemand: number;
+	commercialStockSize: number;
+	id: string;
+	retailDemand: number;
+	retailStockSize: number;
 }
 
 export interface StockViewModel {
@@ -462,22 +488,6 @@ export interface StockSeedViewModel {
 	sourceName: string;
 	sourceQuantity: string;
 	sourceReason: string;
-}
-
-export interface LiveCommodityTickerResponseModel {
-    commodityId: string;
-	askLow: number;
-	askMedian: number;
-	askHigh: number;
-	askVolume: number;
-	askCapitalization: number;
-	bidLow: number;
-	bidMedian: number;
-	bidHigh: number;
-	bidVolume: number;
-	bidCapitalization: number;
-	estimatedStockSize: number;
-	estimatedDemandTarget: number;
 }
 
 export interface TradingUnitViewModel {
@@ -881,6 +891,7 @@ export interface CommodityViewModel {
     category: CommodityCategorySummaryModel;
 	asks: CommodityAskViewModel[];
 	bids: CommodityBidViewModel[];
+	stockSeedRules: StockSeedRuleViewModel[];
 	tradingUnit: TradingUnitViewModel;
 	activeResidentialDemandId: string;
 	description: string;

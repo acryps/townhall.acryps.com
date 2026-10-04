@@ -52,15 +52,15 @@ import { MinimapGenerator } from "./map/minimap";
 import { WaterBodyTileServer } from "./map/layers/filled/water";
 import { WaterBodyFiller } from "./map/fill/water";
 import { SquareFiller } from "./map/fill/square";
-import { TradingEntity } from "./market/entity";
 import { MarketTracker } from "./market/tracker";
-import { MarketIterationGenerator } from "./market/cycle/generator";
 import { Logger } from "@acryps/log";
 import { ResidentAssessor } from "./life/assess";
+import { CompanyAssessor } from "./life/assess-company";
+import { BoroughAssessor } from "./life/assess-borough";
 import { CourtCaseSession } from "./legal/court";
 import { readdirSync, readFileSync } from "fs";
 import { CommodityIconImageInterface } from "./areas/market/icon";
-import { MarketCycle, MarketCycleGenerator } from "./market/cycle";
+import { MarketCycleGenerator } from "./market/cycle";
 import { WorkerDispatch } from "./worker";
 import { PlanningMapGenerator } from "./map/planning";
 import { BlockTouchesTileServer } from "./map/layers/heatmap/gradiant/block-touches";
@@ -100,11 +100,9 @@ DbClient.connectedClient.connect().then(async () => {
 	const marketLogger = new Logger('market');
 
 	const marketTracker = new MarketTracker(new Logger('tracker', marketLogger), database);
-	marketTracker.schedule();
+	await marketTracker.load();
 
 	if (runMarket) {
-		marketTracker.dump();
-
 		const cycle = new MarketCycleGenerator(database, marketTracker);
 
 		const nextMarketCycle = async () => {
@@ -159,6 +157,8 @@ DbClient.connectedClient.connect().then(async () => {
 
 		new PoliticalCompassRater(database).next();
 		new ResidentAssessor(database).next();
+		new CompanyAssessor(database).next();
+		new BoroughAssessor(database).next();
 
 		// lawHouse.schedule();
 		life.vote();

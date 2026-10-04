@@ -1,6 +1,5 @@
 import { Component } from "@acryps/page";
-import { MarketPage } from ".";
-import { LiveCommodityTickerResponseModel } from "../managed/services";
+import { CommodityRatingViewModel } from "../managed/services";
 import { formatTradingUnit } from "../../interface/trading-unit";
 
 export class MarketSymbolsComponent extends Component {
@@ -13,13 +12,7 @@ export class MarketSymbolsComponent extends Component {
 
 	margin = 20;
 
-	constructor(
-		public market: MarketPage
-	) {
-		super();
-	}
-
-	updateTicker(tickers: LiveCommodityTickerResponseModel[]) {
+	updateRatings(ratings: CommodityRatingViewModel[]) {
 		if (!(this.rootNode instanceof HTMLElement)) {
 			return;
 		}
@@ -34,11 +27,11 @@ export class MarketSymbolsComponent extends Component {
 
 		let textMetrics: TextMetrics;
 
-		for (let ticker of tickers) {
-			const commodity = this.market.commodities.find(commodity => commodity.id == ticker.commodityId);
+		for (let rating of ratings) {
+			const commodity = rating.commodity;
 
 			if (commodity && commodity.symbol && commodity.tradingUnit) {
-				const text = `${commodity.symbol} ${formatTradingUnit(commodity.tradingUnit, ticker.estimatedStockSize)}`
+				const text = `${commodity.symbol} ${formatTradingUnit(commodity.tradingUnit, rating.retailStockSize + rating.commercialStockSize)}`
 				textMetrics = this.scrollerContext.measureText(text);
 
 				width += textMetrics.width;

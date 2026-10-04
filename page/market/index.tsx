@@ -1,7 +1,7 @@
 import { Component } from "@acryps/page";
-import { CommoditySummaryModel, LiveCommodityTickerResponseModel, MarketCycleSummaryModel, MarketCycleViewModel, MarketService } from "../managed/services";
+import { CommoditySummaryModel, MarketCycleSummaryModel, MarketCycleViewModel, MarketService } from "../managed/services";
 import { marketIcon } from "../assets/icons/managed";
-import { CommodityTickerComponent } from "./ticker";
+import { CommodityTickerComponent, ratingDemand, ratingStockSize } from "./ticker";
 import { MarketSymbolsComponent } from "./symbols";
 import { Time } from "../../interface/time";
 
@@ -14,23 +14,23 @@ export class MarketPage extends Component {
 
 	search: HTMLInputElement;
 
-	symbols = new MarketSymbolsComponent(this);
+	symbols = new MarketSymbolsComponent();
 
 	sorters = [
 		new Sorter('Name', (a, b) => 0), // name is always applied first
-		new Sorter('Stock Size', (a, b) => (b.ticker?.estimatedStockSize ?? 0) - (a.ticker?.estimatedStockSize ?? 0)),
-		new Sorter('Demand', (a, b) => (b.ticker?.estimatedDemandTarget ?? 0) - (a.ticker?.estimatedDemandTarget ?? 0)),
+		new Sorter('Stock Size', (a, b) => ratingStockSize(b.rating) - ratingStockSize(a.rating)),
+		new Sorter('Demand', (a, b) => ratingDemand(b.rating) - ratingDemand(a.rating)),
 		new Sorter('Spread', (a, b) => {
-			if (!a.ticker?.estimatedDemandTarget || !b.ticker?.estimatedDemandTarget) {
+			if (!ratingDemand(a.rating) || !ratingDemand(b.rating)) {
 				return -Infinity;
 			}
 
-			if (!a.ticker?.estimatedStockSize || !b.ticker?.estimatedStockSize) {
+			if (!ratingStockSize(a.rating) || !ratingStockSize(b.rating)) {
 				return -Infinity;
 			}
 
-			const spreadA = Math.abs(a.ticker?.estimatedStockSize / a.ticker?.estimatedDemandTarget);
-			const spreadB = Math.abs(b.ticker?.estimatedStockSize / b.ticker?.estimatedDemandTarget);
+			const spreadA = Math.abs(ratingStockSize(a.rating) / ratingDemand(a.rating));
+			const spreadB = Math.abs(ratingStockSize(b.rating) / ratingDemand(b.rating));
 
 			return spreadA > spreadB ? 1 : -1;
 		}),
@@ -62,14 +62,14 @@ export class MarketPage extends Component {
 	}
 
 	async updateTicker() {
-		const update = await new MarketService().getTickers();
+		const update = await new MarketService().getRatings();
 
-		this.symbols.updateTicker(update);
+		this.symbols.updateRatings(update);
 
-		for (let ticker of update) {
-			const component = this.tickers.find(component => component.commodity.id == ticker.commodityId);
+		for (let rating of update) {
+			const component = this.tickers.find(component => component.commodity.id == rating.commodity.id);
 
-			component?.tick(ticker);
+			component?.tick(rating);
 		}
 
 		if (document.contains(this.rootNode)) {

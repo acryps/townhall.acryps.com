@@ -41,7 +41,7 @@ export class WaterBodyFiller extends Filler<WaterBody> {
 	}
 
 	rank(a: WaterBody, b: WaterBody) {
-		return a.name.localeCompare(b.name);
+		return a.name?.localeCompare(b.name);
 	}
 
 	async fill(source: WaterBody) {

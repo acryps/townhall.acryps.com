@@ -37,7 +37,7 @@ export class SquareFiller extends Filler<Square> {
 	}
 
 	rank(a: Square, b: Square) {
-		return a.name.localeCompare(b.name);
+		return a.name?.localeCompare(b.name);
 	}
 
 	async fill(source: Square) {

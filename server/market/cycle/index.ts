@@ -5,6 +5,8 @@ import { MarketCycleGeneratorStep } from "./step";
 import { StockSeedRuleMarketCycleGeneratorStep } from "./step/1-stock-seed";
 import { Time } from "../../../interface/time";
 import { ResidentialDemandMarketCycleGeneratorStep } from "./step/2-residential-demand";
+import { CommercialDemandMarketCycleGeneratorStep } from "./step/3-commercial-demand";
+import { BoroughDemandMarketCycleGeneratorStep } from "./step/4-borough-demand";
 import { Interpreter, SystemMessage, ToolError, UserMessage } from "../../life/interpreter";
 import { OpenAiInterpreterProvider } from "../../life/interpreter/provider/openai";
 import { Point } from "../../../interface/point";
@@ -14,6 +16,8 @@ import { MarketSituationParameter } from "./situation";
 export class MarketCycleGenerator {
 	steps = () => ({
 		'residential demand': ResidentialDemandMarketCycleGeneratorStep,
+		'commercial demand': CommercialDemandMarketCycleGeneratorStep,
+		'borough demand': BoroughDemandMarketCycleGeneratorStep,
 		'stock seed rule': StockSeedRuleMarketCycleGeneratorStep,
 	});
 
@@ -75,6 +79,9 @@ export class MarketCycleGenerator {
 
 		cycle.closed = new Date();
 		await cycle.update();
+
+		logger.log(`updating trackers`);
+		await this.tracker.update(cycle);
 
 		logger.log(`cycle closed`);
 	}

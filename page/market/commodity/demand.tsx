@@ -1,10 +1,9 @@
 import { Component } from "@acryps/page";
-import { CommodityViewModel, DemandViewModel, MarketService } from "../../managed/services";
-import { Time } from "../../../interface/time";
+import { CommodityRatingViewModel, CommodityViewModel, MarketService } from "../../managed/services";
 import { formatTradingUnit } from "../../../interface/trading-unit";
 
 export class CommodityDemandTab extends Component {
-	timeline: DemandViewModel[];
+	rating: CommodityRatingViewModel;
 
 	constructor(
 		public commodity: CommodityViewModel
@@ -13,29 +12,44 @@ export class CommodityDemandTab extends Component {
 	}
 
 	async onload() {
-		this.timeline = await new MarketService().getDemand(this.commodity.id);
+		const ratings = await new MarketService().getRatings();
+
+		this.rating = ratings.find(rating => rating.commodity.id == this.commodity.id);
 	}
 
 	render() {
 		return <ui-demand>
 			<ui-description>
-				The demand lists how much residents want to own a commodity.
-				Values are targets, representing how much someone would like to have at home / on them.
-				Companies will try to meet the demand.
-
-				Demand may shift at any time and point, because sometimes, consumer habits change.
+				The demand lists how much residents and companies want to own a commodity, compared to how much is currently in stock.
+				Values reflect the most recently closed market cycle. Demand may shift over time, because sometimes, consumer and company habits change.
 			</ui-description>
 
 			<ui-timeline>
-				{this.timeline.map(demand => <ui-demand ui-active={demand.active}>
-					<ui-activates>
-						{new Time(demand.activates).toDateString()}
-					</ui-activates>
+				{this.rating ? [
+					<ui-demand>
+						<ui-activates>
+							Retail
+						</ui-activates>
 
-					<ui-target>
-						{formatTradingUnit(this.commodity.tradingUnit, demand.target)}
-					</ui-target>
-				</ui-demand>)}
+						<ui-target>
+							{formatTradingUnit(this.commodity.tradingUnit, this.rating.retailStockSize)} stocked / {formatTradingUnit(this.commodity.tradingUnit, this.rating.retailDemand)} demanded
+						</ui-target>
+					</ui-demand>,
+
+					<ui-demand>
+						<ui-activates>
+							Commercial
+						</ui-activates>
+
+						<ui-target>
+							{formatTradingUnit(this.commodity.tradingUnit, this.rating.commercialStockSize)} stocked / {formatTradingUnit(this.commodity.tradingUnit, this.rating.commercialDemand)} demanded
+						</ui-target>
+					</ui-demand>
+				] : <ui-demand>
+					<ui-activates>
+						No rating recorded yet
+					</ui-activates>
+				</ui-demand>}
 			</ui-timeline>
 		</ui-demand>;
 	}

@@ -1,4 +1,4 @@
-import { alignItems, alignSelf, animationDelay, animationIterationCount, aspectRatio, backgroundColor, border, borderTop, ch, child, color, cursor, display, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, height, imageRendering, justifyContent, Keyframes, margin, marginBottom, marginInline, marginLeft, marginRight, marginTop, maxHeight, minWidth, objectFit, objectPosition, outline, overflow, overflowWrap, padding, paddingBlock, PaddingBlockStyleProperty, paddingBottom, paddingInline, paddingLeft, percentage, pointerEvents, px, ratio, rem, seconds, textAlign, textDecoration, textDecorationLine, textTransform, transform, translateX, Variable, vh, whiteSpace, width } from "@acryps/style";
+import { alignItems, alignSelf, animationDelay, animationIterationCount, aspectRatio, backgroundColor, border, borderTop, child, color, cursor, display, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, height, imageRendering, justifyContent, Keyframes, margin, marginBottom, marginInline, marginLeft, marginRight, marginTop, maxHeight, minWidth, objectFit, objectPosition, outline, overflow, overflowWrap, padding, paddingBlock, PaddingBlockStyleProperty, paddingBottom, paddingInline, paddingLeft, percentage, pointerEvents, px, ratio, rem, seconds, textAlign, textDecoration, textDecorationLine, textTransform, transform, translateX, Variable, vh, whiteSpace, width } from "@acryps/style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { pageBackgroundColor, pageGutter, pageTextColor } from "../index.style";
 import { card } from "../shared/card.style";
@@ -177,29 +177,6 @@ export const marketStyle = () => child('ui-market',
 					display('block'),
 
 					fontSize(rem(0.8))
-				)
-			),
-
-			child('ui-price',
-				display('block'),
-
-				fontSize(rem(0.8)),
-
-				child('*',
-					display('flex'),
-					justifyContent('flex-end'),
-					gap(rem(0.5)),
-
-					child('ui-median',
-						width(ch(8)),
-
-						textAlign('right')
-					),
-
-					child('ui-spread',
-						width(ch(8)),
-						textAlign('right')
-					)
 				)
 			)
 		)

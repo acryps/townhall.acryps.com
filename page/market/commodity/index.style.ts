@@ -49,6 +49,35 @@ export const commodityStyle = () => child('ui-commodity',
 			),
 		),
 
+		child('ui-stocking',
+			display('block'),
+
+			child('ui-description',
+				display('block'),
+				marginBottom(pageGutter)
+			),
+
+			child('ui-rules',
+				display('block'),
+				marginBottom(rem(2)),
+
+				border(px(1), 'solid', 'currentColor'),
+
+				child('ui-rule',
+					display('flex'),
+					justifyContent('space-between'),
+					padding(pageGutter),
+
+					borderBottom(px(1), 'dotted', 'currentColor')
+				),
+
+				child('ui-empty',
+					display('block'),
+					padding(pageGutter)
+				)
+			)
+		),
+
 		child('ui-positions',
 			display('block'),
 			overflow('hidden'),

@@ -1,21 +1,16 @@
 import { Service } from "vlserver";
-import { Commodity, DbContext } from "../../managed/database";
-import { MarketManager } from "../../market/manager";
-import { MarketTracker } from "../../market/tracker";
+import { DbContext } from "../../managed/database";
 import { CommoditySummaryModel, CommodityViewModel } from "./commodity";
-import { LiveCommodityTickerModel, LiveCommodityTickerResponseModel } from "./ticker";
+import { CommodityRatingViewModel } from "./rating";
 import { TradingEntity } from "../../market/entity";
 import { StockModel, StockSeedViewModel, StockViewModel } from "./stock";
 import { CommodityBidViewModel, TraderBidViewModel } from "./bid";
 import { CommodityAskViewModel, TraderAskViewModel } from "./ask";
-import { DemandViewModel } from "./demand";
 import { MarketCycleSummaryModel, MarketCycleViewModel } from "./cycle";
 
 export class MarketService extends Service {
 	constructor(
-		private database: DbContext,
-		private market: MarketManager,
-		private tracker: MarketTracker
+		private database: DbContext
 	) {
 		super();
 	}
@@ -63,31 +58,21 @@ export class MarketService extends Service {
 		);
 	}
 
-	getTickers() {
-		const tickers: LiveCommodityTickerModel[] = [];
+	async getRatings() {
+		const lastCycle = await this.database.marketCycle
+			.where(cycle => cycle.closed != null)
+			.orderByDescending(cycle => cycle.closed)
+			.first();
 
-		for (let ticker of this.tracker.trackers) {
-			tickers.push({
-				commodityId: ticker.commodity.id,
-
-				askLow: ticker.ask.low,
-				askMedian: ticker.ask.median,
-				askHigh: ticker.ask.high,
-				askVolume: ticker.ask.volume,
-				askCapitalization: ticker.ask.capitalization,
-
-				bidLow: ticker.bid.low,
-				bidMedian: ticker.bid.median,
-				bidHigh: ticker.bid.high,
-				bidVolume: ticker.bid.volume,
-				bidCapitalization: ticker.bid.capitalization,
-
-				estimatedStockSize: ticker.estimatedStockSize,
-				estimatedDemandTarget: ticker.estimatedDemand.find(demand => demand.active)?.target ?? 0
-			});
+		if (!lastCycle) {
+			return [];
 		}
 
-		return LiveCommodityTickerResponseModel.from(tickers);
+		return CommodityRatingViewModel.from(
+			this.database.commodityRating
+				.where(rating => rating.cycleId == lastCycle.id)
+				.include(rating => rating.commodity)
+		);
 	}
 
 	async getStock(entityId: string) {
@@ -97,16 +82,6 @@ export class MarketService extends Service {
 		const stock = await trader.getStock();
 
 		return StockViewModel.from(stock.map(item => StockModel.from(item)));
-	}
-
-	async getDemand(commodityId: string) {
-		const tracker = this.tracker.find(commodityId);
-
-		if (tracker.estimatedDemand) {
-			return DemandViewModel.from(tracker.estimatedDemand);
-		}
-
-		return [];
 	}
 
 	async getBids(entityId: string) {

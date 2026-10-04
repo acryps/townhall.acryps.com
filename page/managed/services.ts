@@ -12,6 +12,17 @@ export enum ItemContextLinkRank {
 	primary = "primary"
 }
 
+export enum StockSeedRuleOperation {
+	add = "add",
+	apply = "apply",
+	subtract = "subtract"
+}
+
+export enum StockSeedRuleProperty {
+	quality = "quality",
+	quantity = "quantity"
+}
+
 export class BoroughSummaryModel {
 	activeBoundary: BoroughBoundaryShapeModel;
 	district: DistrictSummaryModel;
@@ -826,6 +837,7 @@ export class ResidentAssessmentParameterViewModel {
 	high: string;
 	id: string;
 	low: string;
+	name: string;
 	prompt: string;
 
 	private static $build(raw) {
@@ -833,6 +845,7 @@ export class ResidentAssessmentParameterViewModel {
 		raw.high === undefined || (item.high = raw.high === null ? null : `${raw.high}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.low === undefined || (item.low = raw.low === null ? null : `${raw.low}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
 		raw.prompt === undefined || (item.prompt = raw.prompt === null ? null : `${raw.prompt}`)
 		
 		return item;
@@ -1025,6 +1038,31 @@ export class CommodityCategorySummaryModel {
 	}
 }
 
+export class StockSeedRuleViewModel {
+	parameter: ResidentAssessmentParameterViewModel;
+	id: string;
+	operation: StockSeedRuleOperation;
+	parameterMaximum: number;
+	parameterMinimum: number;
+	property: StockSeedRuleProperty;
+	valueMaximum: number;
+	valueMinimum: number;
+
+	private static $build(raw) {
+		const item = new StockSeedRuleViewModel();
+		raw.parameter === undefined || (item.parameter = raw.parameter ? ResidentAssessmentParameterViewModel["$build"](raw.parameter) : null)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.operation === undefined || (item.operation = raw.operation)
+		raw.parameterMaximum === undefined || (item.parameterMaximum = raw.parameterMaximum === null ? null : +raw.parameterMaximum)
+		raw.parameterMinimum === undefined || (item.parameterMinimum = raw.parameterMinimum === null ? null : +raw.parameterMinimum)
+		raw.property === undefined || (item.property = raw.property)
+		raw.valueMaximum === undefined || (item.valueMaximum = raw.valueMaximum === null ? null : +raw.valueMaximum)
+		raw.valueMinimum === undefined || (item.valueMinimum = raw.valueMinimum === null ? null : +raw.valueMinimum)
+		
+		return item;
+	}
+}
+
 export class MarketCycleSummaryModel {
 	closed: Date;
 	id: string;
@@ -1042,16 +1080,22 @@ export class MarketCycleSummaryModel {
 	}
 }
 
-export class DemandViewModel {
-	active: boolean;
-	activates: Date;
-	target: number;
+export class CommodityRatingViewModel {
+	commodity: CommoditySummaryModel;
+	commercialDemand: number;
+	commercialStockSize: number;
+	id: string;
+	retailDemand: number;
+	retailStockSize: number;
 
 	private static $build(raw) {
-		const item = new DemandViewModel();
-		raw.active === undefined || (item.active = !!raw.active)
-		raw.activates === undefined || (item.activates = raw.activates ? new Date(raw.activates) : null)
-		raw.target === undefined || (item.target = raw.target === null ? null : +raw.target)
+		const item = new CommodityRatingViewModel();
+		raw.commodity === undefined || (item.commodity = raw.commodity ? CommoditySummaryModel["$build"](raw.commodity) : null)
+		raw.commercialDemand === undefined || (item.commercialDemand = raw.commercialDemand === null ? null : +raw.commercialDemand)
+		raw.commercialStockSize === undefined || (item.commercialStockSize = raw.commercialStockSize === null ? null : +raw.commercialStockSize)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.retailDemand === undefined || (item.retailDemand = raw.retailDemand === null ? null : +raw.retailDemand)
+		raw.retailStockSize === undefined || (item.retailStockSize = raw.retailStockSize === null ? null : +raw.retailStockSize)
 		
 		return item;
 	}
@@ -1088,41 +1132,6 @@ export class StockSeedViewModel {
 		raw.sourceName === undefined || (item.sourceName = raw.sourceName === null ? null : `${raw.sourceName}`)
 		raw.sourceQuantity === undefined || (item.sourceQuantity = raw.sourceQuantity === null ? null : `${raw.sourceQuantity}`)
 		raw.sourceReason === undefined || (item.sourceReason = raw.sourceReason === null ? null : `${raw.sourceReason}`)
-		
-		return item;
-	}
-}
-
-export class LiveCommodityTickerResponseModel {
-	commodityId: string;
-	askLow: number;
-	askMedian: number;
-	askHigh: number;
-	askVolume: number;
-	askCapitalization: number;
-	bidLow: number;
-	bidMedian: number;
-	bidHigh: number;
-	bidVolume: number;
-	bidCapitalization: number;
-	estimatedStockSize: number;
-	estimatedDemandTarget: number;
-
-	private static $build(raw) {
-		const item = new LiveCommodityTickerResponseModel();
-		raw.commodityId === undefined || (item.commodityId = raw.commodityId === null ? null : `${raw.commodityId}`)
-		raw.askLow === undefined || (item.askLow = raw.askLow === null ? null : +raw.askLow)
-		raw.askMedian === undefined || (item.askMedian = raw.askMedian === null ? null : +raw.askMedian)
-		raw.askHigh === undefined || (item.askHigh = raw.askHigh === null ? null : +raw.askHigh)
-		raw.askVolume === undefined || (item.askVolume = raw.askVolume === null ? null : +raw.askVolume)
-		raw.askCapitalization === undefined || (item.askCapitalization = raw.askCapitalization === null ? null : +raw.askCapitalization)
-		raw.bidLow === undefined || (item.bidLow = raw.bidLow === null ? null : +raw.bidLow)
-		raw.bidMedian === undefined || (item.bidMedian = raw.bidMedian === null ? null : +raw.bidMedian)
-		raw.bidHigh === undefined || (item.bidHigh = raw.bidHigh === null ? null : +raw.bidHigh)
-		raw.bidVolume === undefined || (item.bidVolume = raw.bidVolume === null ? null : +raw.bidVolume)
-		raw.bidCapitalization === undefined || (item.bidCapitalization = raw.bidCapitalization === null ? null : +raw.bidCapitalization)
-		raw.estimatedStockSize === undefined || (item.estimatedStockSize = raw.estimatedStockSize === null ? null : +raw.estimatedStockSize)
-		raw.estimatedDemandTarget === undefined || (item.estimatedDemandTarget = raw.estimatedDemandTarget === null ? null : +raw.estimatedDemandTarget)
 		
 		return item;
 	}
@@ -2079,6 +2088,7 @@ export class CommodityViewModel {
 	category: CommodityCategorySummaryModel;
 	asks: CommodityAskViewModel[];
 	bids: CommodityBidViewModel[];
+	stockSeedRules: StockSeedRuleViewModel[];
 	tradingUnit: TradingUnitViewModel;
 	activeResidentialDemandId: string;
 	description: string;
@@ -2096,6 +2106,7 @@ export class CommodityViewModel {
 		raw.category === undefined || (item.category = raw.category ? CommodityCategorySummaryModel["$build"](raw.category) : null)
 		raw.asks === undefined || (item.asks = raw.asks ? raw.asks.map(i => CommodityAskViewModel["$build"](i)) : null)
 		raw.bids === undefined || (item.bids = raw.bids ? raw.bids.map(i => CommodityBidViewModel["$build"](i)) : null)
+		raw.stockSeedRules === undefined || (item.stockSeedRules = raw.stockSeedRules ? raw.stockSeedRules.map(i => StockSeedRuleViewModel["$build"](i)) : null)
 		raw.tradingUnit === undefined || (item.tradingUnit = raw.tradingUnit ? TradingUnitViewModel["$build"](raw.tradingUnit) : null)
 		raw.activeResidentialDemandId === undefined || (item.activeResidentialDemandId = raw.activeResidentialDemandId === null ? null : `${raw.activeResidentialDemandId}`)
 		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
@@ -3927,11 +3938,11 @@ export class MarketService {
 		});
 	}
 
-	async getTickers(): Promise<Array<LiveCommodityTickerResponseModel>> {
+	async getRatings(): Promise<Array<CommodityRatingViewModel>> {
 		const $data = new FormData();
 		
 
-		return await fetch(Service.toURL("ozOXR2dDVhZmxvc2RndmJqMWRuN3A5aT"), {
+		return await fetch(Service.toURL("J5dG5oY2MzZGVtYnZmaHlobT9hbTlkej"), {
 			method: "post",
 			credentials: "include",
 			body: $data
@@ -3939,7 +3950,7 @@ export class MarketService {
 			if ("data" in r) {
 				const d = r.data;
 
-				return d.map(d => d === null ? null : LiveCommodityTickerResponseModel["$build"](d));
+				return d.map(d => d === null ? null : CommodityRatingViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
@@ -3961,27 +3972,6 @@ export class MarketService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : StockViewModel["$build"](d));
-			} else if ("aborted" in r) {
-				throw new Error("request aborted by server");
-			} else if ("error" in r) {
-				throw new Error(r.error);
-			}
-		});
-	}
-
-	async getDemand(commodityId: string): Promise<Array<DemandViewModel>> {
-		const $data = new FormData();
-		$data.append("I4aGgwOWxkMDlxMHo5M3E1YnFlbHRmcX", Service.stringify(commodityId))
-
-		return await fetch(Service.toURL("Vqc2k3aGo4emExOGlybnRqeGloemJnd3"), {
-			method: "post",
-			credentials: "include",
-			body: $data
-		}).then(res => res.json()).then(r => {
-			if ("data" in r) {
-				const d = r.data;
-
-				return d.map(d => d === null ? null : DemandViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

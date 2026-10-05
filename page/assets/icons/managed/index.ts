@@ -2,11 +2,11 @@ import { select, style, content, Font, fontFamily, fontWeight, fontStyle } from 
 
 
 export const iconFont = new Font('icons', fontWeight('normal'), fontStyle('normal'))
-	.addSource('/assets/icons/managed/font/index.eot?4e0822563f7b', 'embedded-opentype')
-	.addSource('/assets/icons/managed/font/index.svg?2b84243c96af', 'svg')
-	.addSource('/assets/icons/managed/font/index.ttf?104c6c385aa4', 'truetype')
-	.addSource('/assets/icons/managed/font/index.woff?2b950490e4ae', 'woff')
-	.addSource('/assets/icons/managed/font/index.woff2?78b8388deb68', 'woff2');
+	.addSource('/assets/icons/managed/font/index.eot?a715662c1385', 'embedded-opentype')
+	.addSource('/assets/icons/managed/font/index.svg?aa3760c36a9a', 'svg')
+	.addSource('/assets/icons/managed/font/index.ttf?060288045d20', 'truetype')
+	.addSource('/assets/icons/managed/font/index.woff?16839a1e8fcf', 'woff')
+	.addSource('/assets/icons/managed/font/index.woff2?b0b63e19730e', 'woff2');
 
 export const icons = () => select('ui-icon',
 	fontFamily(iconFont.name),
@@ -19,44 +19,46 @@ export const icons = () => select('ui-icon',
 	style('[ui-building-code]').before('\f103'),
 	style('[ui-capture]').before('\f104'),
 	style('[ui-chat]').before('\f105'),
-	style('[ui-company-office]').before('\f106'),
-	style('[ui-day]').before('\f107'),
-	style('[ui-delete]').before('\f108'),
-	style('[ui-down-all]').before('\f109'),
-	style('[ui-down]').before('\f10a'),
-	style('[ui-draw]').before('\f10b'),
-	style('[ui-election]').before('\f10c'),
-	style('[ui-explore]').before('\f10d'),
-	style('[ui-flip]').before('\f10e'),
-	style('[ui-go]').before('\f10f'),
-	style('[ui-home]').before('\f110'),
-	style('[ui-item-context]').before('\f111'),
-	style('[ui-law]').before('\f112'),
-	style('[ui-map]').before('\f113'),
-	style('[ui-market]').before('\f114'),
-	style('[ui-metric]').before('\f115'),
-	style('[ui-military]').before('\f116'),
-	style('[ui-minimap-compass]').before('\f117'),
-	style('[ui-movement]').before('\f118'),
-	style('[ui-oracle]').before('\f119'),
-	style('[ui-plan]').before('\f11a'),
-	style('[ui-price]').before('\f11b'),
-	style('[ui-property-register]').before('\f11c'),
-	style('[ui-publication]').before('\f11d'),
-	style('[ui-relation-graph]').before('\f11e'),
-	style('[ui-relation]').before('\f11f'),
-	style('[ui-resident]').before('\f120'),
-	style('[ui-route-interchange]').before('\f121'),
-	style('[ui-speak]').before('\f122'),
-	style('[ui-square]').before('\f123'),
-	style('[ui-state]').before('\f124'),
-	style('[ui-street]').before('\f125'),
-	style('[ui-time-machine]').before('\f126'),
-	style('[ui-train]').before('\f127'),
-	style('[ui-undo]').before('\f128'),
-	style('[ui-up-all]').before('\f129'),
-	style('[ui-up]').before('\f12a'),
-	style('[ui-water]').before('\f12b'),
+	style('[ui-commercial]').before('\f106'),
+	style('[ui-company-office]').before('\f107'),
+	style('[ui-day]').before('\f108'),
+	style('[ui-delete]').before('\f109'),
+	style('[ui-down-all]').before('\f10a'),
+	style('[ui-down]').before('\f10b'),
+	style('[ui-draw]').before('\f10c'),
+	style('[ui-election]').before('\f10d'),
+	style('[ui-explore]').before('\f10e'),
+	style('[ui-flip]').before('\f10f'),
+	style('[ui-go]').before('\f110'),
+	style('[ui-home]').before('\f111'),
+	style('[ui-item-context]').before('\f112'),
+	style('[ui-law]').before('\f113'),
+	style('[ui-map]').before('\f114'),
+	style('[ui-market]').before('\f115'),
+	style('[ui-metric]').before('\f116'),
+	style('[ui-military]').before('\f117'),
+	style('[ui-minimap-compass]').before('\f118'),
+	style('[ui-movement]').before('\f119'),
+	style('[ui-oracle]').before('\f11a'),
+	style('[ui-plan]').before('\f11b'),
+	style('[ui-price]').before('\f11c'),
+	style('[ui-property-register]').before('\f11d'),
+	style('[ui-publication]').before('\f11e'),
+	style('[ui-relation-graph]').before('\f11f'),
+	style('[ui-relation]').before('\f120'),
+	style('[ui-resident]').before('\f121'),
+	style('[ui-retail]').before('\f122'),
+	style('[ui-route-interchange]').before('\f123'),
+	style('[ui-speak]').before('\f124'),
+	style('[ui-square]').before('\f125'),
+	style('[ui-state]').before('\f126'),
+	style('[ui-street]').before('\f127'),
+	style('[ui-time-machine]').before('\f128'),
+	style('[ui-train]').before('\f129'),
+	style('[ui-undo]').before('\f12a'),
+	style('[ui-up-all]').before('\f12b'),
+	style('[ui-up]').before('\f12c'),
+	style('[ui-water]').before('\f12d'),
 );
 
 const createIconElement = (name: string) => {
@@ -71,6 +73,7 @@ export const boroughIcon = () => createIconElement('borough');
 export const buildingCodeIcon = () => createIconElement('building-code');
 export const captureIcon = () => createIconElement('capture');
 export const chatIcon = () => createIconElement('chat');
+export const commercialIcon = () => createIconElement('commercial');
 export const companyOfficeIcon = () => createIconElement('company-office');
 export const dayIcon = () => createIconElement('day');
 export const deleteIcon = () => createIconElement('delete');
@@ -98,6 +101,7 @@ export const publicationIcon = () => createIconElement('publication');
 export const relationGraphIcon = () => createIconElement('relation-graph');
 export const relationIcon = () => createIconElement('relation');
 export const residentIcon = () => createIconElement('resident');
+export const retailIcon = () => createIconElement('retail');
 export const routeInterchangeIcon = () => createIconElement('route-interchange');
 export const speakIcon = () => createIconElement('speak');
 export const squareIcon = () => createIconElement('square');

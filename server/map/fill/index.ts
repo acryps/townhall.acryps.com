@@ -1,6 +1,7 @@
 import { Logger } from "@acryps/log";
 import { calcualteDanwinstonLine, calculateDanwinstonShapePath, drawDanwinstonLine } from "../../../interface/line";
 import { PackedPoint, Point } from "../../../interface/point";
+import { WorkerDispatch, WorkerHandle } from "../../worker";
 
 export abstract class Filler<SourceType> {
 	cached: {
@@ -19,12 +20,13 @@ export abstract class Filler<SourceType> {
 	abstract rank(a: SourceType, b: SourceType): number;
 	abstract fill(source: SourceType): Promise<PackedPoint[]>;
 
-	schedule() {
+	// computes on a worker thread - see `WorkerHandle` subclasses in the concrete fillers
+	schedule(handle: typeof WorkerHandle) {
 		const logger = new Logger(this.constructor.name);
 
 		const next = async () => {
 			logger.log('fill');
-			this.cached = await this.update();
+			this.cached = await dispatchFill(handle);
 
 			setTimeout(() => next(), 1000 * 60 * 5);
 		};
@@ -83,4 +85,19 @@ export abstract class Filler<SourceType> {
 			boundaries
 		};
 	}
+}
+
+// `Map`s can't cross the worker boundary (WorkerDispatch.serialize can't walk them), so `WorkerHandle`s return this shape instead
+export type SerializedFillResult<SourceType> = {
+	filled: [PackedPoint, SourceType][],
+	boundaries: PackedPoint[]
+};
+
+export async function dispatchFill<SourceType>(handle: typeof WorkerHandle) {
+	const result = await WorkerDispatch.dispatch<SerializedFillResult<SourceType>>(handle);
+
+	return {
+		filled: new Map(result.filled),
+		boundaries: result.boundaries
+	};
 }

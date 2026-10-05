@@ -1,8 +1,10 @@
-import { Filler } from ".";
+import { Logger } from "@acryps/log";
+import { Filler, SerializedFillResult } from ".";
 import { calculateDanwinstonShapePath } from "../../../interface/line";
 import { PackedPoint, Point } from "../../../interface/point";
 import { DbContext, Street } from "../../managed/database";
 import { SquareFiller } from "./square";
+import { WorkerHandle } from "../../worker";
 
 export class StreetFiller extends Filler<Street> {
 	static active: StreetFiller;
@@ -64,5 +66,19 @@ export class StreetFiller extends Filler<Street> {
 		}
 
 		return points;
+	}
+}
+
+export class StreetFillWorkerHandle extends WorkerHandle {
+	static async dispatch(logger: Logger, database: DbContext): Promise<SerializedFillResult<Street>> {
+		SquareFiller.active ??= new SquareFiller(database);
+		StreetFiller.active ??= new StreetFiller(database);
+
+		const result = await StreetFiller.active.update();
+
+		return {
+			filled: [...result.filled],
+			boundaries: result.boundaries
+		};
 	}
 }

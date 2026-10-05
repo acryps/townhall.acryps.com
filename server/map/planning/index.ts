@@ -1,15 +1,16 @@
 
 import { Canvas, CanvasRenderingContext2D, FontLibrary, loadImage } from "skia-canvas";
 import { BoundingBox, Point } from "../../../interface/point";
-import { DbContext, MapType, Street } from "../../managed/database";
+import { DbContext, MapType, Square, Street, WaterBody } from "../../managed/database";
 import { getTiles, mapBaseTileSize } from "../../../interface/tile";
 import { calculateDanwinstonShapePath, drawDanwinstonLine } from "../../../interface/line";
 import { ManagedServer } from "../../managed/server";
 import { BoroughSummaryModel } from "../../areas/borough.summary";
 import { Logger } from "@acryps/log";
-import { StreetFiller } from "../fill/street";
-import { WaterBodyFiller } from "../fill/water";
-import { SquareFiller } from "../fill/square";
+import { dispatchFill } from "../fill";
+import { StreetFillWorkerHandle } from "../fill/street";
+import { WaterBodyFillWorkerHandle } from "../fill/water";
+import { SquareFillWorkerHandle } from "../fill/square";
 import { join } from "path";
 
 export class PlanningMapGenerator {
@@ -85,8 +86,7 @@ export class PlanningMapGenerator {
 
 		// draw squares (take priority over streets and water)
 		logger.log('render squares');
-		const squareFiller = new SquareFiller(this.database);
-		const filledSquares = await squareFiller.update();
+		const filledSquares = await dispatchFill<Square>(SquareFillWorkerHandle);
 
 		for (let square of new Set(filledSquares.filled.values())) {
 			const boundary = new Map<string, Point>();
@@ -104,8 +104,7 @@ export class PlanningMapGenerator {
 
 		// draw roads
 		logger.log('render streets');
-		const streetFiller = new StreetFiller(this.database);
-		const filledStreets = await streetFiller.update();
+		const filledStreets = await dispatchFill<Street>(StreetFillWorkerHandle);
 
 		for (let street of new Set(filledStreets.filled.values())) {
 			const boundary = new Map<string, Point>();
@@ -138,8 +137,7 @@ export class PlanningMapGenerator {
 
 		// draw water
 		logger.log('render water bodies');
-		const waterFiller = new WaterBodyFiller(this.database);
-		const filledWaterBodies = await waterFiller.update();
+		const filledWaterBodies = await dispatchFill<WaterBody>(WaterBodyFillWorkerHandle);
 
 		for (let waterBody of new Set(filledWaterBodies.filled.values())) {
 			const boundary = new Map<string, Point>();

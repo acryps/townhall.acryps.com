@@ -2,6 +2,7 @@ import { Component } from "@acryps/page";
 import { MarketPage } from ".";
 import { CommoditySummaryModel, CommodityRatingViewModel } from "../managed/services";
 import { formatTradingUnit } from "../../interface/trading-unit";
+import { commercialIcon, homeIcon, retailIcon } from "../assets/icons/managed";
 
 export class CommodityTickerComponent extends Component {
 	declare rootNode: HTMLElement;
@@ -72,11 +73,11 @@ export class CommodityTickerComponent extends Component {
 				</ui-header>
 
 				<ui-volume>
-					Retail: {this.retailStockSize} stock / {this.retailDemand} demand
+					{retailIcon()} S={this.retailStockSize} D={this.retailDemand}
 				</ui-volume>
 
 				<ui-volume>
-					Commercial: {this.commercialStockSize} stock / {this.commercialDemand} demand
+					{commercialIcon()} S={this.commercialStockSize} D={this.commercialDemand}
 				</ui-volume>
 			</ui-detail>
 		</ui-commodity>;

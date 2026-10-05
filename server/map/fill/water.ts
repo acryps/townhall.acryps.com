@@ -1,8 +1,10 @@
-import { Filler } from ".";
+import { Logger } from "@acryps/log";
+import { Filler, SerializedFillResult } from ".";
 import { PackedPoint, Point } from "../../../interface/point";
 import { DbContext, Street, WaterBody } from "../../managed/database";
 import { StreetFiller } from "./street";
 import { SquareFiller } from "./square";
+import { WorkerHandle } from "../../worker";
 
 export class WaterBodyFiller extends Filler<WaterBody> {
 	static active: WaterBodyFiller;
@@ -59,5 +61,20 @@ export class WaterBodyFiller extends Filler<WaterBody> {
 		}
 
 		return points;
+	}
+}
+
+export class WaterBodyFillWorkerHandle extends WorkerHandle {
+	static async dispatch(logger: Logger, database: DbContext): Promise<SerializedFillResult<WaterBody>> {
+		SquareFiller.active ??= new SquareFiller(database);
+		StreetFiller.active ??= new StreetFiller(database);
+		WaterBodyFiller.active ??= new WaterBodyFiller(database);
+
+		const result = await WaterBodyFiller.active.update();
+
+		return {
+			filled: [...result.filled],
+			boundaries: result.boundaries
+		};
 	}
 }

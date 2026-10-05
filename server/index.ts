@@ -22,7 +22,7 @@ import { StreetTileServer } from "./map/layers/filled/street";
 import { updateWorkOffers } from "./life/work/offers";
 import { Annotator } from "./annotate";
 import { PlotterInterface } from "./plot/interface";
-import { StreetFiller } from "./map/fill/street";
+import { StreetFiller, StreetFillWorkerHandle } from "./map/fill/street";
 import { LegalEntityReferenceCounter } from "./areas/legal-entity/reference-counter";
 import { PropertyValueTileServer } from "./map/layers/heatmap/gradiant/property-value";
 import { PropertyOwnershipTileServer } from "./map/layers/shape/propety-ownership";
@@ -50,8 +50,8 @@ import { ItemContextTracker } from "./context";
 import { StationTileServer } from "./map/layers/shape/train/stations";
 import { MinimapGenerator } from "./map/minimap";
 import { WaterBodyTileServer } from "./map/layers/filled/water";
-import { WaterBodyFiller } from "./map/fill/water";
-import { SquareFiller } from "./map/fill/square";
+import { WaterBodyFiller, WaterBodyFillWorkerHandle } from "./map/fill/water";
+import { SquareFiller, SquareFillWorkerHandle } from "./map/fill/square";
 import { MarketTracker } from "./market/tracker";
 import { Logger } from "@acryps/log";
 import { ResidentAssessor } from "./life/assess";
@@ -205,9 +205,9 @@ DbClient.connectedClient.connect().then(async () => {
 		await life.assignFigure(resident);
 	} */
 
-	SquareFiller.active = new SquareFiller(database).schedule();
-	StreetFiller.active = new StreetFiller(database).schedule();
-	WaterBodyFiller.active = new WaterBodyFiller(database).schedule();
+	SquareFiller.active = new SquareFiller(database).schedule(SquareFillWorkerHandle);
+	StreetFiller.active = new StreetFiller(database).schedule(StreetFillWorkerHandle);
+	WaterBodyFiller.active = new WaterBodyFiller(database).schedule(WaterBodyFillWorkerHandle);
 
 	new BaseTileServer(app, database);
 	new TimeMachineTileServer(app, database);

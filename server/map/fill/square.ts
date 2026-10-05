@@ -1,6 +1,8 @@
-import { Filler } from ".";
+import { Logger } from "@acryps/log";
+import { Filler, SerializedFillResult } from ".";
 import { PackedPoint, Point } from "../../../interface/point";
 import { DbContext, Square } from "../../managed/database";
+import { WorkerHandle } from "../../worker";
 
 export class SquareFiller extends Filler<Square> {
 	static active: SquareFiller;
@@ -45,5 +47,18 @@ export class SquareFiller extends Filler<Square> {
 		const shape = Point.fill(Point.unpack(boundary.shape));
 
 		return [...shape.keys()];
+	}
+}
+
+export class SquareFillWorkerHandle extends WorkerHandle {
+	static async dispatch(logger: Logger, database: DbContext): Promise<SerializedFillResult<Square>> {
+		SquareFiller.active ??= new SquareFiller(database);
+
+		const result = await SquareFiller.active.update();
+
+		return {
+			filled: [...result.filled],
+			boundaries: result.boundaries
+		};
 	}
 }

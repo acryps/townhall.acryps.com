@@ -7,6 +7,7 @@ import { ManagedServer } from "../../managed/server";
 import { getMinimapBounds, minimapScale } from "../../../interface/minimap";
 import { BoroughSummaryModel } from "../../areas/borough.summary";
 import { Logger } from "@acryps/log";
+import { WorkerDispatch, WorkerHandle } from "../../worker";
 
 export class MinimapGenerator {
 	private logger = new Logger('minimap');
@@ -15,7 +16,7 @@ export class MinimapGenerator {
 
 	constructor(
 		private database: DbContext,
-		server: ManagedServer
+		server?: ManagedServer
 	) {
 		// generate empty image
 		const canvas = new Canvas(1, 1);
@@ -23,16 +24,21 @@ export class MinimapGenerator {
 
 		this.cached = canvas.toBufferSync('png');
 
-		server.app.get('/minimap', (request, response) => {
-			response.contentType('image/png');
-			response.end(this.cached);
-		});
+		if (server) {
+			server.app.get('/minimap', (request, response) => {
+				response.contentType('image/png');
+				response.end(this.cached);
+			});
+		}
 	}
 
+	// computes on a worker thread - see `MinimapWorkerHandle`
 	schedule() {
 		const next = async () => {
 			this.logger.log('render');
-			this.cached = await this.generate();
+
+			const result = await WorkerDispatch.dispatch<{ image: string }>(MinimapWorkerHandle);
+			this.cached = Buffer.from(result.image, 'base64');
 
 			this.logger.log('rendered');
 			setTimeout(() => next(), 1000 * 60 * 60);
@@ -254,5 +260,13 @@ export class MinimapGenerator {
 		}
 
 		return hue;
+	}
+}
+
+export class MinimapWorkerHandle extends WorkerHandle {
+	static async dispatch(logger: Logger, database: DbContext) {
+		const image = await new MinimapGenerator(database).generate();
+
+		return { image: image.toString('base64') };
 	}
 }

@@ -4,7 +4,7 @@ import { OnlinePlayerComponent } from "./online";
 import { boroughColor } from "./index.style";
 import { hex } from "@acryps/style";
 import { BannerComponent } from "../banner";
-import { buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, marketIcon, metricIcon, militaryIcon, oracleIcon, planIcon, priceIcon, propertyRegisterIcon, publicationIcon, residentIcon, trainIcon } from "../assets/icons/managed";
+import { boroughIcon, buildingCodeIcon, companyOfficeIcon, electionIcon, lawIcon, mapIcon, marketIcon, metricIcon, militaryIcon, oracleIcon, planIcon, priceIcon, propertyRegisterIcon, publicationIcon, residentIcon, trainIcon } from "../assets/icons/managed";
 import { Point } from "../../interface/point";
 import { ImpressionsComponent } from "./impressions";
 import { ArticleNewstickerModel, ArticlePreviewModel, PublicationService } from "../managed/services";
@@ -170,6 +170,18 @@ export class HomePage extends Component {
 
 					<ui-description>
 						Everything about defence.
+					</ui-description>
+				</ui-topic>
+
+				<ui-topic ui-href='/boroughs'>
+					{boroughIcon()}
+
+					<ui-name>
+						Boroughs
+					</ui-name>
+
+					<ui-description>
+						All the boroughs of our world.
 					</ui-description>
 				</ui-topic>
 			</ui-topics>

@@ -90,6 +90,7 @@ import { WriteLoreProposalPage } from "./lore/propose/write";
 import { LoreProposalReviewPage } from "./lore/propose/review";
 import { ExpandLorePage } from "./lore/item/expand";
 import { MarketCyclePage } from "./market/cycle";
+import { BoroughsPage } from "./boroughs";
 
 export class Application {
 	static router: Router;
@@ -162,6 +163,8 @@ export class Application {
 
 				.route('/borough/register/:bounds', RegisterBoroughPage)
 				.route('/borough/:tag', BoroughPage)
+
+				.route('/boroughs', BoroughsPage)
 
 				.route('/street/:id', StreetPage)
 

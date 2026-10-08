@@ -1219,6 +1219,17 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"BuajI3c2YzaHFsYWN2anh6NmQ5cjdyZ3",
+			{
+			"Q3dmU1eTk5b39qdjU4aDRhNHh2b2Nta3": { type: "date", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(MetricService),
+			(controller, params) => controller.listBoroughMetrics(
+				params["Q3dmU1eTk5b39qdjU4aDRhNHh2b2Nta3"]
+			)
+		);
+
+		this.expose(
 			"V4d2kxM3N6aHtqNHc3YTkydGlmaGBtaj",
 			{
 			"NvNjYzd3V0MDV4ZWlxaHQ5YndjZHl2cG": { type: "string", isArray: false, isOptional: false },

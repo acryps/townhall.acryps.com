@@ -3,6 +3,10 @@ import { MetricTracker } from "./tracker";
 import { AllocatedAreaMetric } from "./tracker/allocated-area";
 import { NewsArticleCountMetric } from "./tracker/articles";
 import { PopulationAgeAverageMetric } from "./tracker/average-age";
+import { BoroughAllocatedAreaMetric } from "./tracker/borough/allocated-area";
+import { BoroughJobCapacityMetric } from "./tracker/borough/job-capacity";
+import { BoroughJobCountMetric } from "./tracker/borough/job-count";
+import { BoroughResidentCountMetric } from "./tracker/borough/resident-count";
 import { CompanyAssetTotalMetric } from "./tracker/company-asset-total";
 import { CompanyCountMetric } from "./tracker/company-count";
 import { DwellingCountMetric } from "./tracker/dwelling-count";
@@ -22,7 +26,7 @@ export const registerMetrics = async (database: DbContext) => {
 	// order will be keept in client
 	await MetricTracker.track(new PopulationSizeMetric(database));
 	await MetricTracker.track(new PopulationAgeAverageMetric(database));
-	await MetricTracker.track(new RelationDistanceMetric(database));
+	/// await MetricTracker.track(new RelationDistanceMetric(database)); // very slow
 
 	await MetricTracker.track(new PlayerTraveledBlocksMetric(database));
 
@@ -48,4 +52,11 @@ export const registerMetrics = async (database: DbContext) => {
 	}
 
 	await MetricTracker.track(new CompanyAssetTotalMetric(database));
+
+	for (let borough of await database.borough.toArray()) {
+		await MetricTracker.track(new BoroughAllocatedAreaMetric(database, borough));
+		await MetricTracker.track(new BoroughResidentCountMetric(database, borough));
+		await MetricTracker.track(new BoroughJobCountMetric(database, borough));
+		await MetricTracker.track(new BoroughJobCapacityMetric(database, borough));
+	}
 };

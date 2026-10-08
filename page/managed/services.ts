@@ -4066,6 +4066,27 @@ export class MetricService {
 		});
 	}
 
+	async listBoroughMetrics(cutoff: Date): Promise<Array<MetricValueViewModel>> {
+		const $data = new FormData();
+		$data.append("Q3dmU1eTk5b39qdjU4aDRhNHh2b2Nta3", Service.stringify(cutoff))
+
+		return await fetch(Service.toURL("BuajI3c2YzaHFsYWN2anh6NmQ5cjdyZ3"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : MetricValueViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async plot(id: string, start: Date): Promise<Array<MetricValueViewModel>> {
 		const $data = new FormData();
 		$data.append("NvNjYzd3V0MDV4ZWlxaHQ5YndjZHl2cG", Service.stringify(id))

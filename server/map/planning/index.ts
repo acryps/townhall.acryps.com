@@ -13,6 +13,51 @@ import { WaterBodyFillWorkerHandle } from "../fill/water";
 import { SquareFillWorkerHandle } from "../fill/square";
 import { join } from "path";
 
+interface PlanningMapTheme {
+	tag: string;
+
+	background: string;
+	square: { fill: string, stroke: string, label: string },
+	street: { fill: string, stroke: string, label: string },
+	waterBody: { fill: string, stroke: string },
+	plot: { fill: string, stroke: string, label: string },
+	building: { fill: string, stroke: string },
+	train: { fillEven: string, fillOdd: string },
+	borough: { stroke: string, label: string },
+	unused: { fill: string, stroke: string },
+	unallocated: { fill: string, stroke: string }
+}
+
+const townhallTheme: PlanningMapTheme = {
+	tag: 'default',
+
+	background: '#fff',
+	square: { fill: '#ccc', stroke: '#000', label: '#000' },
+	street: { fill: '#eee', stroke: '#000', label: '#aaa' },
+	waterBody: { fill: '#00fa', stroke: '#00f' },
+	plot: { fill: '#fff', stroke: '#000', label: '#000' },
+	building: { fill: '#ff0', stroke: '#000' },
+	train: { fillEven: '#222', fillOdd: '#eee' },
+	borough: { stroke: '#f00', label: '#fff' },
+	unused: { fill: '#afa', stroke: '#4f4' },
+	unallocated: { fill: '#f004', stroke: null }
+};
+
+const adminTheme: PlanningMapTheme = {
+	tag: 'admin',
+
+	background: '#fff',
+	square: { fill: '#fff', stroke: '#000', label: '#000' },
+	street: { fill: '#fff', stroke: '#000', label: '#000' },
+	waterBody: { fill: '#fff', stroke: '#000' },
+	plot: { fill: '#fff', stroke: '#000', label: '#000' },
+	building: { fill: '#ccc', stroke: '#000' },
+	train: { fillEven: '#000', fillOdd: '#fff' },
+	borough: { stroke: '#f00', label: '#fff' },
+	unused: { fill: '#afa', stroke: '#4f4' },
+	unallocated: { fill: '#f004', stroke: null }
+};
+
 export class PlanningMapGenerator {
 	private logger = new Logger('planning-map');
 
@@ -32,16 +77,18 @@ export class PlanningMapGenerator {
 		private database: DbContext,
 		server: ManagedServer
 	) {
-		server.app.get('/planning-map/:x/:y', async (request, response) => {
-			const regionX = +request.params.x;
-			const regionY = +request.params.y;
+		for (let theme of [townhallTheme, adminTheme]) {
+			server.app.get(`/planning-map/${theme.tag}/:x/:y`, async (request, response) => {
+				const regionX = +request.params.x;
+				const regionY = +request.params.y;
 
-			response.contentType('image/png');
-			response.end(await this.generate(regionX, regionY));
-		});
+				response.contentType('image/png');
+				response.end(await this.generate(regionX, regionY, theme));
+			});
+		}
 	}
 
-	async generate(regionX: number, regionY: number) {
+	async generate(regionX: number, regionY: number, theme: PlanningMapTheme) {
 		const logger = this.logger.task('generator');
 
 		const size = mapBaseTileSize * this.scale;
@@ -51,7 +98,7 @@ export class PlanningMapGenerator {
 		const canvas = new Canvas(size, size);
 		const context = canvas.getContext('2d');
 
-		context.fillStyle = '#fff';
+		context.fillStyle = theme.background;
 		context.fillRect(0, 0, size, size);
 
 		const labelCanvas = new Canvas(size, size);
@@ -98,8 +145,8 @@ export class PlanningMapGenerator {
 			}
 
 			use(boundary);
-			this.fill(boundary, topLeft, context, '#ccc', '#000', this.plotWidth);
-			this.labelFilledShape(boundary, topLeft, labelContext, '#000', square.name);
+			this.fill(boundary, topLeft, context, theme.square.fill, theme.square.stroke, this.plotWidth);
+			this.labelFilledShape(boundary, topLeft, labelContext, theme.square.label, square.name);
 		}
 
 		// draw roads
@@ -116,10 +163,9 @@ export class PlanningMapGenerator {
 			}
 
 			use(boundary);
-			this.fill(boundary, topLeft, context, '#eee', '#000', this.plotWidth);
+			this.fill(boundary, topLeft, context, theme.street.fill, theme.street.stroke, this.plotWidth);
 
 			const path = calculateDanwinstonShapePath(Point.unpack(street.path), false);
-			context.fillStyle = '#f00';
 
 			for (let pointIndex = 5; pointIndex < path.length; pointIndex += 10) {
 				const point = path[pointIndex];
@@ -129,7 +175,7 @@ export class PlanningMapGenerator {
 
 				if (before && after) {
 					if (boundary.has(Point.pack([point]))) {
-						this.label(point, topLeft, labelContext, '#aaa', street.name);
+						this.label(point, topLeft, labelContext, theme.street.label, street.name);
 					}
 				}
 			}
@@ -149,7 +195,7 @@ export class PlanningMapGenerator {
 			}
 
 			use(boundary);
-			this.fill(boundary, topLeft, context, '#00f4', '#00f', this.plotWidth);
+			this.fill(boundary, topLeft, context, theme.waterBody.fill, theme.waterBody.stroke, this.plotWidth);
 		}
 
 		// fill properties
@@ -162,8 +208,8 @@ export class PlanningMapGenerator {
 		for (let plot of plotBoundaries) {
 			const boundary = Point.unpack(plot.shape);
 
-			const filled = use(this.fillShape(boundary, topLeft, context, '#fff', '#000', this.plotWidth));
-			this.labelFilledShape(filled, topLeft, labelContext, '#000', plot.propertyId.split('-')[0]);
+			const filled = use(this.fillShape(boundary, topLeft, context, theme.plot.fill, theme.plot.stroke, this.plotWidth));
+			this.labelFilledShape(filled, topLeft, labelContext, theme.plot.label, plot.propertyId.split('-')[0]);
 		}
 
 		// fill buildings
@@ -174,11 +220,11 @@ export class PlanningMapGenerator {
 			.toArray();
 
 		for (let building of buildings) {
-			use(this.fillShape(Point.unpack(building.boundary), topLeft, context, '#ff0', '#000', this.buildingWidth));
+			use(this.fillShape(Point.unpack(building.boundary), topLeft, context, theme.building.fill, theme.building.stroke, this.buildingWidth));
 		}
 
 		// draw not used
-		this.fill(unusedPixels, topLeft, context, '#afa', '#4f4', this.administrativeWidth);
+		this.fill(unusedPixels, topLeft, context, theme.unused.fill, theme.unused.stroke, this.administrativeWidth);
 
 		// draw rail lines
 		logger.log('render train routes');
@@ -186,8 +232,6 @@ export class PlanningMapGenerator {
 			.where(route => route.closed == null)
 			.include(route => route.activePath)
 			.toArray();
-
-		context.fillStyle = '#f0f';
 
 		// outline rail lines
 		for (let route of trainRoutes) {
@@ -205,8 +249,8 @@ export class PlanningMapGenerator {
 					set.set(Point.pack([point]), point);
 				}
 
-				this.fill(filledPixels, topLeft, context, '#222', null, 0);
-				this.fill(whitePixels, topLeft, context, '#eee', '#222', this.railWidth);
+				this.fill(filledPixels, topLeft, context, theme.train.fillEven, null, 0);
+				this.fill(whitePixels, topLeft, context, theme.train.fillOdd, theme.train.fillEven, this.railWidth);
 			}
 		}
 
@@ -219,18 +263,18 @@ export class PlanningMapGenerator {
 		for (let borough of boroughs) {
 			const activeBoundary = await borough.activeBoundary.fetch();
 			const boundary = Point.unpack(activeBoundary.shape);
-			const pixels = this.fillShape(boundary, topLeft, context, null, '#f00', this.administrativeWidth);
+			const pixels = this.fillShape(boundary, topLeft, context, null, theme.borough.stroke, this.administrativeWidth);
 
 			// remove used pixels
 			for (let [packed, pixel] of pixels) {
 				unallocatedPixels.delete(packed);
 			}
 
-			this.labelOutline(boundary, topLeft, labelContext, '#fff', '#f00', borough.name);
+			this.labelOutline(boundary, topLeft, labelContext, theme.borough.label, theme.borough.stroke, borough.name);
 		}
 
 		// not in borough
-		this.fill(unallocatedPixels, topLeft, context, '#f004', null, 0);
+		this.fill(unallocatedPixels, topLeft, context, theme.unallocated.fill, theme.unallocated.stroke, 0);
 
 		context.drawCanvas(labelCanvas, 0, 0);
 

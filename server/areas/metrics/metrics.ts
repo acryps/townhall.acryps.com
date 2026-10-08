@@ -1,4 +1,6 @@
+import { Logger } from "@acryps/log";
 import { CompanyType, DbContext } from "../../managed/database";
+import { WorkerHandle } from "../../worker";
 import { MetricTracker } from "./tracker";
 import { AllocatedAreaMetric } from "./tracker/allocated-area";
 import { NewsArticleCountMetric } from "./tracker/articles";
@@ -22,41 +24,64 @@ import { TotalPropertyValueMetric } from "./tracker/total-property-value";
 import { WorkUnemploymentMetric } from "./tracker/unemployment";
 import { WorkOfferTotalMetric } from "./tracker/work-offers";
 
-export const registerMetrics = async (database: DbContext) => {
-	// order will be keept in client
-	await MetricTracker.track(new PopulationSizeMetric(database));
-	await MetricTracker.track(new PopulationAgeAverageMetric(database));
-	/// await MetricTracker.track(new RelationDistanceMetric(database)); // very slow
+// order will be keept in client
+const buildMetricTrackers = async (database: DbContext) => {
+	const trackers: MetricTracker[] = [
+		new PopulationSizeMetric(database),
+		new PopulationAgeAverageMetric(database),
+		/// new RelationDistanceMetric(database), // very slow
 
-	await MetricTracker.track(new PlayerTraveledBlocksMetric(database));
+		new PlayerTraveledBlocksMetric(database),
 
-	await MetricTracker.track(new HomelessCountMetric(database));
-	await MetricTracker.track(new HomelessRateMetric(database));
+		new HomelessCountMetric(database),
+		new HomelessRateMetric(database),
 
-	await MetricTracker.track(new PropertyCountMetric(database));
-	await MetricTracker.track(new DwellingCountMetric(database));
-	await MetricTracker.track(new EmptyDwellingCountMetric(database));
-	await MetricTracker.track(new AllocatedAreaMetric(database));
-	await MetricTracker.track(new TotalPropertyValueMetric(database));
+		new PropertyCountMetric(database),
+		new DwellingCountMetric(database),
+		new EmptyDwellingCountMetric(database),
+		new AllocatedAreaMetric(database),
+		new TotalPropertyValueMetric(database),
 
-	await MetricTracker.track(new WorkUnemploymentMetric(database));
-	await MetricTracker.track(new WorkOfferTotalMetric(database));
-	await MetricTracker.track(new OpenWorkOfferMetric(database));
+		new WorkUnemploymentMetric(database),
+		new WorkOfferTotalMetric(database),
+		new OpenWorkOfferMetric(database),
 
-	await MetricTracker.track(new NewsArticleCountMetric(database));
+		new NewsArticleCountMetric(database)
+	];
 
 	for (let type in CompanyType) {
 		if (typeof CompanyType[type] == 'string') {
-			await MetricTracker.track(new CompanyCountMetric(database, CompanyType[type]));
+			trackers.push(new CompanyCountMetric(database, CompanyType[type]));
 		}
 	}
 
-	await MetricTracker.track(new CompanyAssetTotalMetric(database));
+	trackers.push(new CompanyAssetTotalMetric(database));
 
 	for (let borough of await database.borough.toArray()) {
-		await MetricTracker.track(new BoroughAllocatedAreaMetric(database, borough));
-		await MetricTracker.track(new BoroughResidentCountMetric(database, borough));
-		await MetricTracker.track(new BoroughJobCountMetric(database, borough));
-		await MetricTracker.track(new BoroughJobCapacityMetric(database, borough));
+		trackers.push(new BoroughAllocatedAreaMetric(database, borough));
+		trackers.push(new BoroughResidentCountMetric(database, borough));
+		trackers.push(new BoroughJobCountMetric(database, borough));
+		trackers.push(new BoroughJobCapacityMetric(database, borough));
+	}
+
+	return trackers;
+};
+
+export const registerMetrics = async (database: DbContext) => {
+	const metrics = await database.metric.toArray();
+
+	for (let tracker of await buildMetricTrackers(database)) {
+		await MetricTracker.track(tracker, metrics);
 	}
 };
+
+// runs a single metric update on a worker thread - which metric is picked via the dispatch `context` (the metric's tag)
+export class MetricTrackerWorkerHandle extends WorkerHandle {
+	static async dispatch(logger: Logger, database: DbContext, tag: string) {
+		const tracker = (await buildMetricTrackers(database)).find(tracker => tracker.tag.join('-') == tag);
+
+		tracker.metric = await database.metric.first(metric => metric.tag.valueOf() == tag);
+
+		await tracker.update();
+	}
+}

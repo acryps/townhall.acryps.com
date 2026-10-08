@@ -1,7 +1,7 @@
 import { Service } from "vlserver";
 import { DbContext } from "../../managed/database";
 import { CommoditySummaryModel, CommodityViewModel } from "./commodity";
-import { CommodityRatingViewModel } from "./rating";
+import { CommodityRatingChartModel, CommodityRatingViewModel } from "./rating";
 import { TradingEntity } from "../../market/entity";
 import { StockModel, StockSeedViewModel, StockViewModel } from "./stock";
 import { CommodityBidViewModel, TraderBidViewModel } from "./bid";
@@ -52,12 +52,6 @@ export class MarketService extends Service {
 		);
 	}
 
-	async getCommodity(tag: string) {
-		return new CommodityViewModel(
-			await this.database.commodity.first(commodity => commodity.tag.valueOf() == tag)
-		);
-	}
-
 	async getRatings() {
 		const lastCycle = await this.database.marketCycle
 			.where(cycle => cycle.closed != null)
@@ -68,10 +62,37 @@ export class MarketService extends Service {
 			return [];
 		}
 
-		return CommodityRatingViewModel.from(
+		return CommodityRatingViewModel.from(lastCycle.commodityRatings);
+	}
+
+	async getRating(id: string) {
+		const lastCycle = await this.database.marketCycle
+			.where(cycle => cycle.closed != null)
+			.orderByDescending(cycle => cycle.closed)
+			.first();
+
+		if (!lastCycle) {
+			return;
+		}
+
+		return new CommodityRatingViewModel(
+			await lastCycle.commodityRatings.first(rating => rating.commodityId == id)
+		);
+	}
+
+	async getCommodity(tag: string) {
+		return new CommodityViewModel(
+			await this.database.commodity.first(commodity => commodity.tag.valueOf() == tag)
+		);
+	}
+
+	async getCommodityRatings(id: string) {
+		return CommodityRatingChartModel.from(
 			this.database.commodityRating
-				.where(rating => rating.cycleId == lastCycle.id)
-				.include(rating => rating.commodity)
+				.where(rating => rating.commodityId == id)
+				.orderByDescending(rating => rating.cycle.opened)
+				.limit(100)
+				.include(rating => rating.cycle)
 		);
 	}
 

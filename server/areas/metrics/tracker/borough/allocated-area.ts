@@ -26,7 +26,6 @@ export class BoroughAllocatedAreaMetric extends BoroughMetricTracker {
 		const plots = await this.database.plotBoundary
 			.where(plot => plot.property.deactivated == null)
 			.where(plot => plot.property.activePlotBoundaryId == plot.id)
-			.where(plot => plot.property.boroughId == this.borough.id)
 			.toArray();
 
 		const propertyPixels = new Map<PackedPoint, true>();

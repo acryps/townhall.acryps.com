@@ -78,6 +78,7 @@ import { ResidentAssessmentParameterDistributionViewModel } from "././../areas/l
 import { LifeService } from "././../areas/life/service";
 import { CommoditySummaryModel } from "././../areas/market/commodity";
 import { CommodityViewModel } from "././../areas/market/commodity";
+import { CommodityRatingChartModel } from "././../areas/market/rating";
 import { CommodityRatingViewModel } from "././../areas/market/rating";
 import { TradingEntity } from "././../market/entity";
 import { StockModel } from "././../areas/market/stock";
@@ -91,8 +92,10 @@ import { MarketCycleSummaryModel } from "././../areas/market/cycle";
 import { MarketCycleViewModel } from "././../areas/market/cycle";
 import { MarketService } from "././../areas/market/service";
 import { MetricTracker } from "././../areas/metrics/tracker";
+import { MetricListValueViewModel } from "././../areas/metrics/view";
 import { MetricValueViewModel } from "././../areas/metrics/view";
 import { MetricViewModel } from "././../areas/metrics/view";
+import { BoroughMetricTracker } from "././../areas/metrics/tracker/borough";
 import { MetricService } from "././../areas/metrics/service";
 import { MilitaryFacility } from "././database";
 import { MilitaryUnitSummaryModel } from "././../areas/military/unit";
@@ -195,7 +198,9 @@ import { AskViewModel } from "./../areas/market/ask";
 import { BidViewModel } from "./../areas/market/bid";
 import { CommodityCategorySummaryModel } from "./../areas/market/commodity";
 import { StockSeedRuleViewModel } from "./../areas/market/commodity";
+import { MarketCycleChartModel } from "./../areas/market/rating";
 import { TradingUnitViewModel } from "./../areas/market/unit";
+import { MetricTagViewModel } from "./../areas/metrics/view";
 import { OracleProposalSummaryModel } from "./../areas/oracle/proposal";
 import { PlanSummaryModel } from "./../areas/plan/plan";
 import { PlanShapeViewModel } from "./../areas/plan/plan";
@@ -1146,6 +1151,26 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
+			"J5dG5oY2MzZGVtYnZmaHlobT9hbTlkej",
+			{},
+			inject => inject.construct(MarketService),
+			(controller, params) => controller.getRatings(
+				
+			)
+		);
+
+		this.expose(
+			"djbXpua2pjMjZweGdnbHt5NjJjamNsMX",
+			{
+			"Q0MWBybjh3ZWlzeWFxcms2cDdkcWR3Zn": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(MarketService),
+			(controller, params) => controller.getRating(
+				params["Q0MWBybjh3ZWlzeWFxcms2cDdkcWR3Zn"]
+			)
+		);
+
+		this.expose(
 			"gzZWZkbmlnMHdrYnc3OD92MGQ5N2lwNn",
 			{
 			"NrZzYyMjUyM3JrZGpkc2NtdDF6anllZH": { type: "string", isArray: false, isOptional: false }
@@ -1157,11 +1182,13 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"J5dG5oY2MzZGVtYnZmaHlobT9hbTlkej",
-			{},
+			"JrNH5qa2B5M3FnbnI0Zzs3MWIwNDR5Zm",
+			{
+			"N4a2c2cHZ2eWN4NjF0dXNsaWgwYXVvY2": { type: "string", isArray: false, isOptional: false }
+			},
 			inject => inject.construct(MarketService),
-			(controller, params) => controller.getRatings(
-				
+			(controller, params) => controller.getCommodityRatings(
+				params["N4a2c2cHZ2eWN4NjF0dXNsaWgwYXVvY2"]
 			)
 		);
 
@@ -1219,13 +1246,11 @@ export class ManagedServer extends BaseServer {
 		);
 
 		this.expose(
-			"BuajI3c2YzaHFsYWN2anh6NmQ5cjdyZ3",
-			{
-			"Q3dmU1eTk5b39qdjU4aDRhNHh2b2Nta3": { type: "date", isArray: false, isOptional: false }
-			},
+			"cyMDZnM2cyZnV3ZHdmY29pMzhraGQyMm",
+			{},
 			inject => inject.construct(MetricService),
 			(controller, params) => controller.listBoroughMetrics(
-				params["Q3dmU1eTk5b39qdjU4aDRhNHh2b2Nta3"]
+				
 			)
 		);
 
@@ -6796,6 +6821,141 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[CommodityRatingChartModel.name]: class ComposedCommodityRatingChartModel extends CommodityRatingChartModel {
+		async map() {
+			return {
+				cycle: new MarketCycleChartModel(await BaseServer.unwrap(this.$$model.cycle)),
+				commercialDemand: this.$$model.commercialDemand,
+				commercialStockSize: this.$$model.commercialStockSize,
+				id: this.$$model.id,
+				retailDemand: this.$$model.retailDemand,
+				retailStockSize: this.$$model.retailStockSize
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get cycle() {
+					return ViewModel.mappings[MarketCycleChartModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "cycle-CommodityRatingChartModel"]
+					);
+				},
+				commercialDemand: true,
+				commercialStockSize: true,
+				id: true,
+				retailDemand: true,
+				retailStockSize: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new CommodityRatingChartModel(null);
+			"cycle" in data && (item.cycle = data.cycle && ViewModel.mappings[MarketCycleChartModel.name].toViewModel(data.cycle));
+			"commercialDemand" in data && (item.commercialDemand = data.commercialDemand === null ? null : +data.commercialDemand);
+			"commercialStockSize" in data && (item.commercialStockSize = data.commercialStockSize === null ? null : +data.commercialStockSize);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"retailDemand" in data && (item.retailDemand = data.retailDemand === null ? null : +data.retailDemand);
+			"retailStockSize" in data && (item.retailStockSize = data.retailStockSize === null ? null : +data.retailStockSize);
+
+			return item;
+		}
+
+		static async toModel(viewModel: CommodityRatingChartModel) {
+			let model: CommodityRating;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(CommodityRating).find(viewModel.id)
+			} else {
+				model = new CommodityRating();
+			}
+			
+			"cycle" in viewModel && (model.cycle.id = viewModel.cycle ? viewModel.cycle.id : null);
+			"commercialDemand" in viewModel && (model.commercialDemand = viewModel.commercialDemand === null ? null : +viewModel.commercialDemand);
+			"commercialStockSize" in viewModel && (model.commercialStockSize = viewModel.commercialStockSize === null ? null : +viewModel.commercialStockSize);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"retailDemand" in viewModel && (model.retailDemand = viewModel.retailDemand === null ? null : +viewModel.retailDemand);
+			"retailStockSize" in viewModel && (model.retailStockSize = viewModel.retailStockSize === null ? null : +viewModel.retailStockSize);
+
+			return model;
+		}
+	},
+	[MarketCycleChartModel.name]: class ComposedMarketCycleChartModel extends MarketCycleChartModel {
+		async map() {
+			return {
+				opened: this.$$model.opened
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				opened: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new MarketCycleChartModel(null);
+			"opened" in data && (item.opened = data.opened === null ? null : new Date(data.opened));
+
+			return item;
+		}
+
+		static async toModel(viewModel: MarketCycleChartModel) {
+			const model = new MarketCycle();
+			
+			"opened" in viewModel && (model.opened = viewModel.opened === null ? null : new Date(viewModel.opened));
+
+			return model;
+		}
+	},
 	[StockViewModel.name]: class ComposedStockViewModel extends StockViewModel {
 		async map() {
 			return {
@@ -7011,12 +7171,11 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
-	[MetricViewModel.name]: class ComposedMetricViewModel extends MetricViewModel {
+	[MetricTagViewModel.name]: class ComposedMetricTagViewModel extends MetricTagViewModel {
 		async map() {
 			return {
-				description: this.$$model.description,
 				id: this.$$model.id,
-				name: this.$$model.name
+				tag: this.$$model.tag
 			}
 		};
 
@@ -7046,22 +7205,20 @@ ViewModel.mappings = {
 			}
 
 			return {
-				description: true,
 				id: true,
-				name: true
+				tag: true
 			};
 		};
 
 		static toViewModel(data) {
-			const item = new MetricViewModel(null);
-			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			const item = new MetricTagViewModel(null);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
-			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
 
 			return item;
 		}
 
-		static async toModel(viewModel: MetricViewModel) {
+		static async toModel(viewModel: MetricTagViewModel) {
 			let model: Metric;
 			
 			if (viewModel.id) {
@@ -7070,9 +7227,8 @@ ViewModel.mappings = {
 				model = new Metric();
 			}
 			
-			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
-			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
 
 			return model;
 		}
@@ -11061,6 +11217,159 @@ ViewModel.mappings = {
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"opened" in viewModel && (model.opened = viewModel.opened === null ? null : new Date(viewModel.opened));
 			"riskAppetite" in viewModel && (model.riskAppetite = viewModel.riskAppetite === null ? null : +viewModel.riskAppetite);
+
+			return model;
+		}
+	},
+	[MetricViewModel.name]: class ComposedMetricViewModel extends MetricViewModel {
+		async map() {
+			return {
+				description: this.$$model.description,
+				id: this.$$model.id,
+				name: this.$$model.name,
+				tag: this.$$model.tag
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				description: true,
+				id: true,
+				name: true,
+				tag: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new MetricViewModel(null);
+			"description" in data && (item.description = data.description === null ? null : `${data.description}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: MetricViewModel) {
+			let model: Metric;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Metric).find(viewModel.id)
+			} else {
+				model = new Metric();
+			}
+			
+			"description" in viewModel && (model.description = viewModel.description === null ? null : `${viewModel.description}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
+
+			return model;
+		}
+	},
+	[MetricListValueViewModel.name]: class ComposedMetricListValueViewModel extends MetricListValueViewModel {
+		async map() {
+			return {
+				metric: new MetricTagViewModel(await BaseServer.unwrap(this.$$model.metric)),
+				elapsed: this.$$model.elapsed,
+				formatted: this.$$model.formatted,
+				id: this.$$model.id,
+				updated: this.$$model.updated,
+				value: this.$$model.value
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get metric() {
+					return ViewModel.mappings[MetricTagViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "metric-MetricListValueViewModel"]
+					);
+				},
+				elapsed: true,
+				formatted: true,
+				id: true,
+				updated: true,
+				value: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new MetricListValueViewModel(null);
+			"metric" in data && (item.metric = data.metric && ViewModel.mappings[MetricTagViewModel.name].toViewModel(data.metric));
+			"elapsed" in data && (item.elapsed = data.elapsed === null ? null : +data.elapsed);
+			"formatted" in data && (item.formatted = data.formatted === null ? null : `${data.formatted}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"updated" in data && (item.updated = data.updated === null ? null : new Date(data.updated));
+			"value" in data && (item.value = data.value === null ? null : +data.value);
+
+			return item;
+		}
+
+		static async toModel(viewModel: MetricListValueViewModel) {
+			let model: MetricValue;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(MetricValue).find(viewModel.id)
+			} else {
+				model = new MetricValue();
+			}
+			
+			"metric" in viewModel && (model.metric.id = viewModel.metric ? viewModel.metric.id : null);
+			"elapsed" in viewModel && (model.elapsed = viewModel.elapsed === null ? null : +viewModel.elapsed);
+			"formatted" in viewModel && (model.formatted = viewModel.formatted === null ? null : `${viewModel.formatted}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"updated" in viewModel && (model.updated = viewModel.updated === null ? null : new Date(viewModel.updated));
+			"value" in viewModel && (model.value = viewModel.value === null ? null : +viewModel.value);
 
 			return model;
 		}

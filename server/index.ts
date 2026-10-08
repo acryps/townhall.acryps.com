@@ -34,7 +34,7 @@ import { FillLife } from "./life/fill/fill";
 import { MetricTracker } from "./areas/metrics/tracker";
 import { TrainRouteTileServer } from "./map/layers/shape/train/route";
 import { TrainRoutesTileServer } from "./map/layers/shape/train/routes";
-import { registerMetrics } from "./areas/metrics/metrics";
+import { MetricTrackerWorkerHandle, registerMetrics } from "./areas/metrics/metrics";
 import { TimeMachineTileServer } from "./map/layers/time-machine";
 import { PlanTileServer } from "./map/layers/shape/plan";
 import { ChangeFrame } from "./areas/change/frame";
@@ -114,8 +114,11 @@ DbClient.connectedClient.connect().then(async () => {
 		nextMarketCycle();
 	}
 
+	logger.log('preparing metrics');
 	await registerMetrics(database);
-	await MetricTracker.executeTask();
+	logger.log('metrics ready');
+
+	MetricTracker.schedule(MetricTrackerWorkerHandle);
 
 	new MinimapGenerator(database, app).schedule();
 	new PlanningMapGenerator(database, app);

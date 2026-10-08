@@ -1,10 +1,10 @@
 import { Canvas, Image, loadImage, Path2D } from "skia-canvas";
-import { DbContext, MapType, MilitaryFacility } from "../managed/database";
+import { DbContext, MapTile, MapType, MilitaryFacility } from "../managed/database";
 import { ManagedServer } from "../managed/server";
 import { MapImporter } from "./import";
 import { getTiles, mapBaseTileSize } from "../../interface/tile";
 import { calculateDanwinstonShapePath } from "../../interface/line";
-import { Point } from "../../interface/point";
+import { PackedPoint, Point } from "../../interface/point";
 import { Logger } from "@acryps/log";
 
 export class BaseTileServer {
@@ -13,7 +13,12 @@ export class BaseTileServer {
 	militaryFacilityCache = {
 		[MapType.overworld]: new Map<string, { image: Image, plot: Point[], top: number, left: number }>(),
 		[MapType.night]: new Map<string, { image: Image, plot: Point[], top: number, left: number }>(),
-	}
+	};
+
+	blurSourceTileCache = {
+		[MapType.overworld]: new Map<PackedPoint, Image>(),
+		[MapType.night]: new Map<PackedPoint, Image>()
+	};
 
 	constructor(
 		private app: ManagedServer,
@@ -41,56 +46,51 @@ export class BaseTileServer {
 
 			// blur military facilities
 			const militaryFacilities = await database.militaryFacility
-				.include(facility => facility.property)
+				.where(facility => facility.closed == null)
 				.toArray();
 
 			for (let facility of militaryFacilities) {
-				const property = await facility.property.fetch();
-				const bounds = await property.activePlotBoundary.fetch();
+				let blurred = this.militaryFacilityCache[type].get(facility.id);
 
-				if (Point.touches(new Point(x * mapBaseTileSize, y * mapBaseTileSize), mapBaseTileSize, Point.unpack(bounds.shape))) {
-					let blurred = this.militaryFacilityCache[type].get(facility.id);
+				if (!blurred) {
+					this.logger.log(`blur facility ${facility.id} for ${x} ${y}`);
 
-					if (!blurred) {
-						this.logger.log(`blur facility ${facility.id} for ${x} ${y}`);
+					const property = await facility.property.fetch();
+					const boundary = await property.activePlotBoundary.fetch();
+					const plot = Point.unpack(boundary.shape);
 
-						const property = await facility.property.fetch();
-						const boundary = await property.activePlotBoundary.fetch();
-						const plot = Point.unpack(boundary.shape);
+					blurred = await this.renderBlurredMilitaryFacility(facility, plot, type);
+					this.militaryFacilityCache[type].set(facility.id, blurred);
 
-						blurred = await this.renderBlurredMilitaryFacility(facility, plot, type);
-						this.militaryFacilityCache[type].set(facility.id, blurred);
+					// refresh every day
+					setTimeout(() => this.militaryFacilityCache[type].delete(facility.id), 1000 * 60 * 60 * 24);
+				}
 
-						// refresh every day
-						setTimeout(() => this.militaryFacilityCache[type].delete(facility.id), 1000 * 60 * 60 * 24);
-					}
+				// create shape
+				for (let offset of [new Point(0, 0), new Point(0, 1), new Point(1, 0), new Point(1, 1)]) {
+					let path: Path2D;
 
-					// create shape
-					for (let offset of [new Point(0, 0), new Point(0, 1), new Point(1, 0), new Point(1, 1)]) {
-						let path: Path2D;
+					for (let point of calculateDanwinstonShapePath(blurred.plot, true)) {
+						point = point.copy(-x * mapBaseTileSize + offset.x, -y * mapBaseTileSize + offset.y);
 
-						for (let point of calculateDanwinstonShapePath(blurred.plot, true)) {
-							point = point.copy(-x * mapBaseTileSize + offset.x, -y * mapBaseTileSize + offset.y);
-
-							if (path) {
-								path.lineTo(point.x, point.y);
-							} else {
-								path = new Path2D();
-								path.moveTo(point.x, point.y);
-							}
+						if (path) {
+							path.lineTo(point.x, point.y);
+						} else {
+							path = new Path2D();
+							path.moveTo(point.x, point.y);
 						}
-
-						context.save();
-
-						context.clip(path);
-						context.drawImage(
-							blurred.image,
-							blurred.left - x * mapBaseTileSize,
-							blurred.top - y * mapBaseTileSize
-						);
-
-						context.restore();
 					}
+
+					context.save();
+
+					context.clip(path);
+					context.drawImage(
+						blurred.image,
+						blurred.left - x * mapBaseTileSize,
+						blurred.top - y * mapBaseTileSize
+					);
+
+					context.restore();
 				}
 			}
 
@@ -190,13 +190,25 @@ export class BaseTileServer {
 		const context = canvas.getContext('2d');
 
 		for (let tile of getTiles(Point.center(plot), bounds.width, bounds.height, mapBaseTileSize)) {
-			const image = await this.getTile(tile.x, tile.y, type)
+			const sourceCache = this.blurSourceTileCache[type as any] as Map<PackedPoint, Image>;
+			let image = sourceCache.get(tile.pack());
 
-			context.drawImage(
-				image,
-				tile.x * mapBaseTileSize - bounds.x.min,
-				tile.y * mapBaseTileSize - bounds.y.min
-			);
+			if (!image) {
+				this.logger.log(`loading blur source ${sourceCache.size}`);
+				image = await this.getTile(tile.x, tile.y, type);
+
+				if (image) {
+					sourceCache.set(tile.pack(), image);
+				}
+			}
+
+			if (image) {
+				context.drawImage(
+					image,
+					tile.x * mapBaseTileSize - bounds.x.min,
+					tile.y * mapBaseTileSize - bounds.y.min
+				);
+			}
 		}
 
 		context.filter = `blur(${blur}px)`;

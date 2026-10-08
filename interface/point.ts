@@ -151,21 +151,7 @@ export class Point {
 	}
 
 	static area(points: Point[]) {
-		const length = points.length;
-
-		if (length < 3) {
-			return 0;
-		}
-
-		let area = 0;
-
-		for (let index = 0; index < length; index++) {
-			const nextIndex = (index + 1) % length;
-			area += points[index].x * points[nextIndex].y;
-			area -= points[index].y * points[nextIndex].x;
-		}
-
-		return Math.abs(area) / 2.0;
+		return this.fill(points).size;
 	}
 
 	static center(points: Point[]) {

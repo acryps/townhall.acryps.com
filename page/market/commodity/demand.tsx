@@ -12,15 +12,14 @@ export class CommodityDemandTab extends Component {
 	}
 
 	async onload() {
-		const ratings = await new MarketService().getRatings();
-
-		this.rating = ratings.find(rating => rating.commodity.id == this.commodity.id);
+		this.rating = await new MarketService().getRating(this.commodity.id);
 	}
 
 	render() {
 		return <ui-demand>
 			<ui-description>
 				The demand lists how much residents and companies want to own a commodity, compared to how much is currently in stock.
+				Commercial demand reflects daily use for a company, not things used for planned production cycles.
 				Values reflect the most recently closed market cycle. Demand may shift over time, because sometimes, consumer and company habits change.
 			</ui-description>
 

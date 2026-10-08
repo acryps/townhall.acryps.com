@@ -475,6 +475,19 @@ export interface CommodityRatingViewModel {
 	retailStockSize: number;
 }
 
+export interface CommodityRatingChartModel {
+    cycle: MarketCycleChartModel;
+	commercialDemand: number;
+	commercialStockSize: number;
+	id: string;
+	retailDemand: number;
+	retailStockSize: number;
+}
+
+export interface MarketCycleChartModel {
+    opened: Date;
+}
+
 export interface StockViewModel {
     commodity: CommoditySummaryModel;
 	quantity: number;
@@ -499,10 +512,9 @@ export interface TradingUnitViewModel {
 	whole: boolean;
 }
 
-export interface MetricViewModel {
-    description: string;
-	id: string;
-	name: string;
+export interface MetricTagViewModel {
+    id: string;
+	tag: string;
 }
 
 export interface MetricValueViewModel {
@@ -911,6 +923,22 @@ export interface MarketCycleViewModel {
 	id: string;
 	opened: Date;
 	riskAppetite: number;
+}
+
+export interface MetricViewModel {
+    description: string;
+	id: string;
+	name: string;
+	tag: string;
+}
+
+export interface MetricListValueViewModel {
+    metric: MetricTagViewModel;
+	elapsed: number;
+	formatted: string;
+	id: string;
+	updated: Date;
+	value: number;
 }
 
 export interface MilitaryUnitViewModel {

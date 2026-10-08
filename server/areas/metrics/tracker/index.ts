@@ -2,36 +2,40 @@ import { ViewModel } from "vlserver";
 import { DbContext, Metric, MetricValue } from "../../../managed/database";
 import { hostname } from "os";
 import { updateMetrics } from "../../..";
-import { Worker } from "worker_threads";
+import { WorkerDispatch, WorkerHandle } from "../../../worker";
 
 export abstract class MetricTracker {
-	static executeWorkerKey = 'EXECUTE_METRIC_WORKER';
 	static tracked: MetricTracker[] = [];
 
-	static async executeTask() {
-		if (updateMetrics) {
-			console.log(`task ${process.env[this.executeWorkerKey]}`);
-
-			const metric = this.tracked.find(tracker => tracker.metric.tag == process.env[this.executeWorkerKey]);
-
-			if (metric) {
-				await metric.update();
-
-				process.exit();
-			} else {
-				for (let tracker of this.tracked) {
-					tracker.dispatchNextUpdate();
-				}
-			}
+	// queues all due metrics and dispatches them to a worker thread one after another - see `MetricTrackerWorkerHandle` in `metrics.ts`
+	static schedule(handle: typeof WorkerHandle) {
+		if (!updateMetrics) {
+			return;
 		}
+
+		const next = async () => {
+			const due = this.tracked
+				.filter(tracker => !tracker.last || +tracker.last.updated + tracker.last.elapsed * 100 + 1000 * 60 * 5 <= Date.now())
+				.sort((a, b) => +(a.last?.updated ?? 0) - +(b.last?.updated ?? 0))[0];
+
+			if (due) {
+				await due.dispatchUpdate(handle);
+
+				setTimeout(() => next(), 1000 * 5);
+			} else {
+				setTimeout(() => next(), 1000 * 10);
+			}
+		};
+
+		next();
 	}
 
-	static async track(tracker: MetricTracker) {
+	static async track(tracker: MetricTracker, metrics: Metric[]) {
 		this.tracked.push(tracker);
 
 		const tag = tracker.tag.join('-');
 
-		let metric = await tracker.database.metric.first(metric => metric.tag.valueOf() == tag);
+		let metric = metrics.find(metric => metric.tag == tag);
 
 		if (!metric) {
 			metric = new Metric();
@@ -40,10 +44,12 @@ export abstract class MetricTracker {
 			await metric.create();
 		}
 
-		metric.name = tracker.name;
-		metric.description = tracker.description;
+		if (metric.name != tracker.name || metric.description != tracker.description) {
+			metric.name = tracker.name;
+			metric.description = tracker.description;
 
-		await metric.update();
+			await metric.update();
+		}
 
 		tracker.metric = metric;
 		await tracker.updateLast();
@@ -65,45 +71,23 @@ export abstract class MetricTracker {
 	async updateLast() {
 		this.last = await this.metric.values
 			.orderByDescending(value => value.updated)
+			.include(value => value.metric)
 			.first();
 	}
 
-	// updates the metric in background thread, automatically adjusting the update frequency based on effort
-	async dispatchNextUpdate() {
-		console.log(`[metric] updating ${this.metric.tag} using ${process.argv[1]}`);
+	// updates the metric on a worker thread - queued and awaited one at a time by `MetricTracker.schedule`
+	async dispatchUpdate(handle: typeof WorkerHandle) {
+		console.log(`[metric] updating ${this.metric.tag}`);
 
-		await new Promise<void>(done => {
-			const environment = {};
-
-			for (let key in process.env) {
-				environment[key] = process.env[key];
-			}
-
-			environment[MetricTracker.executeWorkerKey] = this.metric.tag;
-
-			const worker = new Worker(process.argv[1], {
-				env: environment
-			});
-
-			worker.on('error', error => {
-				console.log(`metric updater ${this.metric.tag} failed`, error);
-
-				done();
-			});
-
-			worker.on('exit', () => {
-				done();
-			});
-		});
+		await WorkerDispatch.dispatch(handle, this.metric.tag);
 
 		// load back
 		await this.updateLast();
 
 		console.log(`[metric] updated ${this.metric.tag} in ${this.last.elapsed}`);
-		setTimeout(() => this.dispatchNextUpdate(), this.last.elapsed * 100 + 1000 * 60 * 5);
 	}
 
-	// may take very long, use `requestUpdate` on main thread.
+	// may take very long, use `dispatchUpdate` on the main thread.
 	async update() {
 		const start = +new Date();
 		const fetched = await this.fetch();

@@ -1,6 +1,6 @@
 import { Service } from "vlserver";
 import { MetricTracker } from "./tracker";
-import { MetricValueViewModel, MetricViewModel } from "./view";
+import { MetricListValueViewModel, MetricValueViewModel, MetricViewModel } from "./view";
 import { DbContext } from "../../managed/database";
 import { BoroughMetricTracker } from "./tracker/borough";
 
@@ -12,11 +12,15 @@ export class MetricService extends Service {
 	}
 
 	list() {
-		return MetricViewModel.from(MetricTracker.tracked.map(metric => metric.metric));
+		return MetricViewModel.from(
+			MetricTracker.tracked
+				.filter(tracker => !(tracker instanceof BoroughMetricTracker))
+				.map(metric => metric.metric)
+		);
 	}
 
 	listBoroughMetrics() {
-		return MetricValueViewModel.from(MetricTracker.tracked
+		return MetricListValueViewModel.from(MetricTracker.tracked
 			.filter(tracker => tracker instanceof BoroughMetricTracker)
 			.map(tracker => tracker.last)
 		);

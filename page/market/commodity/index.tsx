@@ -1,5 +1,5 @@
 import { Component } from "@acryps/page";
-import { AskViewModel, BidViewModel, CommodityViewModel, MarketService } from "../../managed/services";
+import { AskViewModel, BidViewModel, CommodityRatingChartModel, CommodityViewModel, MarketService } from "../../managed/services";
 import { Time } from "../../../interface/time";
 import { LegalEntityComponent } from "../../shared/legal-entity";
 import { positionIntensity } from "./index.style";
@@ -10,6 +10,7 @@ import { Tabs } from "../../shared/tabs";
 import { CommodityPositionsTab } from "./positions";
 import { CommodityDemandTab } from "./demand";
 import { CommodityStockingTab } from "./stocking";
+import { CommodityRatingsTab } from "./rating";
 
 export class CommodityPage extends Component {
 	declare parameters: { tag };
@@ -40,6 +41,7 @@ export class CommodityPage extends Component {
 			</ui-description>}
 
 			{new Tabs()
+				.addTab('Ratings', () => new CommodityRatingsTab(this.commodity))
 				.addTab('Demand', () => new CommodityDemandTab(this.commodity))
 				.addTab('Stocking', () => new CommodityStockingTab(this.commodity))
 				.addTab('Asks', () => new CommodityPositionsTab(

@@ -19,7 +19,7 @@ export class WorkerDispatch {
 		if (parentPort) {
 			this.logger.log(`started as worker`);
 
-			parentPort.on('message', async identifier => {
+			parentPort.on('message', async ({ identifier, context }) => {
 				let target: typeof WorkerHandle;
 
 				for (let global in globalThis) {
@@ -28,7 +28,7 @@ export class WorkerDispatch {
 					}
 				}
 
-				const result = await target.dispatch(this.logger.task(identifier), database);
+				const result = await target.dispatch(this.logger.task(identifier), database, context);
 				parentPort.postMessage(this.serialize(result));
 			});
 
@@ -43,7 +43,7 @@ export class WorkerDispatch {
 		}
 	}
 
-	static dispatch<ResponseType>(handle: typeof WorkerHandle) {
+	static dispatch<ResponseType>(handle: typeof WorkerHandle, context?: any) {
 		const identifier = Math.random().toString(36).substring(2);
 		const logger = this.logger.task(`${handle.name} ${identifier}`);
 
@@ -80,7 +80,7 @@ export class WorkerDispatch {
 			});
 
 			worker.on('online', () => {
-				worker.postMessage(identifier);
+				worker.postMessage({ identifier, context });
 			});
 
 			worker.on('error', error => {
@@ -222,7 +222,7 @@ export class WorkerDispatch {
 }
 
 export class WorkerHandle {
-	static async dispatch(logger: Logger, database: DbContext): Promise<any> {
+	static async dispatch(logger: Logger, database: DbContext, context?: any): Promise<any> {
 		throw 'no handle implemented';
 	}
 }

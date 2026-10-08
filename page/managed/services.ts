@@ -1101,6 +1101,38 @@ export class CommodityRatingViewModel {
 	}
 }
 
+export class CommodityRatingChartModel {
+	cycle: MarketCycleChartModel;
+	commercialDemand: number;
+	commercialStockSize: number;
+	id: string;
+	retailDemand: number;
+	retailStockSize: number;
+
+	private static $build(raw) {
+		const item = new CommodityRatingChartModel();
+		raw.cycle === undefined || (item.cycle = raw.cycle ? MarketCycleChartModel["$build"](raw.cycle) : null)
+		raw.commercialDemand === undefined || (item.commercialDemand = raw.commercialDemand === null ? null : +raw.commercialDemand)
+		raw.commercialStockSize === undefined || (item.commercialStockSize = raw.commercialStockSize === null ? null : +raw.commercialStockSize)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.retailDemand === undefined || (item.retailDemand = raw.retailDemand === null ? null : +raw.retailDemand)
+		raw.retailStockSize === undefined || (item.retailStockSize = raw.retailStockSize === null ? null : +raw.retailStockSize)
+		
+		return item;
+	}
+}
+
+export class MarketCycleChartModel {
+	opened: Date;
+
+	private static $build(raw) {
+		const item = new MarketCycleChartModel();
+		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
+		
+		return item;
+	}
+}
+
 export class StockViewModel {
 	commodity: CommoditySummaryModel;
 	quantity: number;
@@ -1158,16 +1190,14 @@ export class TradingUnitViewModel {
 	}
 }
 
-export class MetricViewModel {
-	description: string;
+export class MetricTagViewModel {
 	id: string;
-	name: string;
+	tag: string;
 
 	private static $build(raw) {
-		const item = new MetricViewModel();
-		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
+		const item = new MetricTagViewModel();
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
-		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
 		
 		return item;
 	}
@@ -2137,6 +2167,44 @@ export class MarketCycleViewModel {
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
 		raw.riskAppetite === undefined || (item.riskAppetite = raw.riskAppetite === null ? null : +raw.riskAppetite)
+		
+		return item;
+	}
+}
+
+export class MetricViewModel {
+	description: string;
+	id: string;
+	name: string;
+	tag: string;
+
+	private static $build(raw) {
+		const item = new MetricViewModel();
+		raw.description === undefined || (item.description = raw.description === null ? null : `${raw.description}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
+		
+		return item;
+	}
+}
+
+export class MetricListValueViewModel {
+	metric: MetricTagViewModel;
+	elapsed: number;
+	formatted: string;
+	id: string;
+	updated: Date;
+	value: number;
+
+	private static $build(raw) {
+		const item = new MetricListValueViewModel();
+		raw.metric === undefined || (item.metric = raw.metric ? MetricTagViewModel["$build"](raw.metric) : null)
+		raw.elapsed === undefined || (item.elapsed = raw.elapsed === null ? null : +raw.elapsed)
+		raw.formatted === undefined || (item.formatted = raw.formatted === null ? null : `${raw.formatted}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.updated === undefined || (item.updated = raw.updated ? new Date(raw.updated) : null)
+		raw.value === undefined || (item.value = raw.value === null ? null : +raw.value)
 		
 		return item;
 	}
@@ -3917,6 +3985,48 @@ export class MarketService {
 		});
 	}
 
+	async getRatings(): Promise<Array<CommodityRatingViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("J5dG5oY2MzZGVtYnZmaHlobT9hbTlkej"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : CommodityRatingViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getRating(id: string): Promise<CommodityRatingViewModel> {
+		const $data = new FormData();
+		$data.append("Q0MWBybjh3ZWlzeWFxcms2cDdkcWR3Zn", Service.stringify(id))
+
+		return await fetch(Service.toURL("djbXpua2pjMjZweGdnbHt5NjJjamNsMX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : CommodityRatingViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async getCommodity(tag: string): Promise<CommodityViewModel> {
 		const $data = new FormData();
 		$data.append("NrZzYyMjUyM3JrZGpkc2NtdDF6anllZH", Service.stringify(tag))
@@ -3938,11 +4048,11 @@ export class MarketService {
 		});
 	}
 
-	async getRatings(): Promise<Array<CommodityRatingViewModel>> {
+	async getCommodityRatings(id: string): Promise<Array<CommodityRatingChartModel>> {
 		const $data = new FormData();
-		
+		$data.append("N4a2c2cHZ2eWN4NjF0dXNsaWgwYXVvY2", Service.stringify(id))
 
-		return await fetch(Service.toURL("J5dG5oY2MzZGVtYnZmaHlobT9hbTlkej"), {
+		return await fetch(Service.toURL("JrNH5qa2B5M3FnbnI0Zzs3MWIwNDR5Zm"), {
 			method: "post",
 			credentials: "include",
 			body: $data
@@ -3950,7 +4060,7 @@ export class MarketService {
 			if ("data" in r) {
 				const d = r.data;
 
-				return d.map(d => d === null ? null : CommodityRatingViewModel["$build"](d));
+				return d.map(d => d === null ? null : CommodityRatingChartModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
@@ -4066,11 +4176,11 @@ export class MetricService {
 		});
 	}
 
-	async listBoroughMetrics(cutoff: Date): Promise<Array<MetricValueViewModel>> {
+	async listBoroughMetrics(): Promise<Array<MetricListValueViewModel>> {
 		const $data = new FormData();
-		$data.append("Q3dmU1eTk5b39qdjU4aDRhNHh2b2Nta3", Service.stringify(cutoff))
+		
 
-		return await fetch(Service.toURL("BuajI3c2YzaHFsYWN2anh6NmQ5cjdyZ3"), {
+		return await fetch(Service.toURL("cyMDZnM2cyZnV3ZHdmY29pMzhraGQyMm"), {
 			method: "post",
 			credentials: "include",
 			body: $data
@@ -4078,7 +4188,7 @@ export class MetricService {
 			if ("data" in r) {
 				const d = r.data;
 
-				return d.map(d => d === null ? null : MetricValueViewModel["$build"](d));
+				return d.map(d => d === null ? null : MetricListValueViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

@@ -6582,8 +6582,10 @@ export class TradeBid extends Entity<TradeBidQueryProxy> {
 			
 export class TrainRouteQueryProxy extends QueryProxy {
 	get activePath(): Partial<TrainRoutePathQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get class(): Partial<TrainRouteClassQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get operator(): Partial<LegalEntityQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get activePathId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get classId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get closed(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get code(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get color(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -6598,10 +6600,12 @@ export class TrainRouteQueryProxy extends QueryProxy {
 
 export class TrainRoute extends Entity<TrainRouteQueryProxy> {
 	get activePath(): Partial<ForeignReference<TrainRoutePath>> { return this.$activePath; }
+	get class(): Partial<ForeignReference<TrainRouteClass>> { return this.$class; }
 	get operator(): Partial<ForeignReference<LegalEntity>> { return this.$operator; }
 	stops: PrimaryReference<TrainStop, TrainStopQueryProxy>;
 		paths: PrimaryReference<TrainRoutePath, TrainRoutePathQueryProxy>;
 		activePathId: string;
+	classId: string;
 	closed: Date;
 	code: string;
 	color: string;
@@ -6618,6 +6622,7 @@ export class TrainRoute extends Entity<TrainRouteQueryProxy> {
 		source: "train_route",
 		columns: {
 			activePathId: { type: "uuid", name: "active_path_id" },
+			classId: { type: "uuid", name: "class_id" },
 			closed: { type: "timestamp", name: "closed" },
 			code: { type: "text", name: "code" },
 			color: { type: "text", name: "color" },
@@ -6639,6 +6644,7 @@ export class TrainRoute extends Entity<TrainRouteQueryProxy> {
 		super();
 		
 		this.$activePath = new ForeignReference<TrainRoutePath>(this, "activePathId", TrainRoutePath);
+	this.$class = new ForeignReference<TrainRouteClass>(this, "classId", TrainRouteClass);
 	this.$operator = new ForeignReference<LegalEntity>(this, "operatorId", LegalEntity);
 	this.stops = new PrimaryReference<TrainStop, TrainStopQueryProxy>(this, "routeId", TrainStop);
 		this.paths = new PrimaryReference<TrainRoutePath, TrainRoutePathQueryProxy>(this, "trainRouteId", TrainRoutePath);
@@ -6656,6 +6662,18 @@ export class TrainRoute extends Entity<TrainRouteQueryProxy> {
 		}
 	}
 
+	private $class: ForeignReference<TrainRouteClass>;
+
+	set class(value: Partial<ForeignReference<TrainRouteClass>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.classId = value.id as string;
+		} else {
+			this.classId = null;
+		}
+	}
+
 	private $operator: ForeignReference<LegalEntity>;
 
 	set operator(value: Partial<ForeignReference<LegalEntity>>) {
@@ -6669,6 +6687,39 @@ export class TrainRoute extends Entity<TrainRouteQueryProxy> {
 	}
 
 	
+}
+			
+export class TrainRouteClassQueryProxy extends QueryProxy {
+	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get stopDwellTimeSeconds(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get trainSpeedUnitsPerSecond(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class TrainRouteClass extends Entity<TrainRouteClassQueryProxy> {
+	routes: PrimaryReference<TrainRoute, TrainRouteQueryProxy>;
+		declare id: string;
+	name: string;
+	stopDwellTimeSeconds: number;
+	trainSpeedUnitsPerSecond: number;
+	
+	$$meta = {
+		source: "train_route_class",
+		columns: {
+			id: { type: "uuid", name: "id" },
+			name: { type: "text", name: "name" },
+			stopDwellTimeSeconds: { type: "float4", name: "stop_dwell_time_seconds" },
+			trainSpeedUnitsPerSecond: { type: "float4", name: "train_speed_units_per_second" }
+		},
+		get set(): DbSet<TrainRouteClass, TrainRouteClassQueryProxy> { 
+			return new DbSet<TrainRouteClass, TrainRouteClassQueryProxy>(TrainRouteClass, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.routes = new PrimaryReference<TrainRoute, TrainRouteQueryProxy>(this, "classId", TrainRoute);
+	}
 }
 			
 export class TrainRoutePathQueryProxy extends QueryProxy {
@@ -7582,6 +7633,7 @@ export class DbContext {
 	tradeAsk: DbSet<TradeAsk, TradeAskQueryProxy>;
 	tradeBid: DbSet<TradeBid, TradeBidQueryProxy>;
 	trainRoute: DbSet<TrainRoute, TrainRouteQueryProxy>;
+	trainRouteClass: DbSet<TrainRouteClass, TrainRouteClassQueryProxy>;
 	trainRoutePath: DbSet<TrainRoutePath, TrainRoutePathQueryProxy>;
 	trainStation: DbSet<TrainStation, TrainStationQueryProxy>;
 	trainStationExit: DbSet<TrainStationExit, TrainStationExitQueryProxy>;
@@ -7698,6 +7750,7 @@ export class DbContext {
 		this.tradeAsk = new DbSet<TradeAsk, TradeAskQueryProxy>(TradeAsk, this.runContext);
 		this.tradeBid = new DbSet<TradeBid, TradeBidQueryProxy>(TradeBid, this.runContext);
 		this.trainRoute = new DbSet<TrainRoute, TrainRouteQueryProxy>(TrainRoute, this.runContext);
+		this.trainRouteClass = new DbSet<TrainRouteClass, TrainRouteClassQueryProxy>(TrainRouteClass, this.runContext);
 		this.trainRoutePath = new DbSet<TrainRoutePath, TrainRoutePathQueryProxy>(TrainRoutePath, this.runContext);
 		this.trainStation = new DbSet<TrainStation, TrainStationQueryProxy>(TrainStation, this.runContext);
 		this.trainStationExit = new DbSet<TrainStationExit, TrainStationExitQueryProxy>(TrainStationExit, this.runContext);

@@ -85,6 +85,11 @@ export const trainStyle = () => child('ui-trains',
 			marginBottom(rem(0.75)),
 		),
 
+		child('ui-class',
+			display('block'),
+			marginBottom(rem(0.75)),
+		),
+
 		child('ui-stops',
 			display('block'),
 			width(percentage(100)),

@@ -15,7 +15,7 @@ export async function orderRouteStops(
 	route: TrainRoute,
 	pathPoints: Point[],
 	stops: TrainStop[]
-): Promise<{ ordered: OrderedRouteStop[], totalLength: number }> {
+): Promise<{ ordered: OrderedRouteStop[], totalLength: number, pixels: Point[], pixelPositions: number[] }> {
 	const boundaryByStop = new Map<string, Point[]>();
 
 	for (let stop of stops) {
@@ -36,13 +36,13 @@ export async function orderRouteStops(
 
 	const pixels = calculateDanwinstonShapePath(pathPoints, false);
 
-	const position = [0];
+	const pixelPositions = [0];
 
 	for (let i = 1; i < pixels.length; i++) {
-		position.push(position[i - 1] + pixels[i - 1].distance(pixels[i]));
+		pixelPositions.push(pixelPositions[i - 1] + pixels[i - 1].distance(pixels[i]));
 	}
 
-	const totalLength = position[position.length - 1] ?? 0;
+	const totalLength = pixelPositions[pixelPositions.length - 1] ?? 0;
 
 	const ordered: OrderedRouteStop[] = [];
 	let previousStop: TrainStop = null;
@@ -51,7 +51,7 @@ export async function orderRouteStops(
 		const stop = findStop(pixels[i]);
 
 		if (stop && stop != previousStop) {
-			ordered.push({ stop, position: position[i] });
+			ordered.push({ stop, position: pixelPositions[i] });
 		}
 
 		previousStop = stop ?? previousStop;
@@ -83,10 +83,10 @@ export async function orderRouteStops(
 			}
 		}
 
-		ordered.push({ stop, position: position[closestIndex] });
+		ordered.push({ stop, position: pixelPositions[closestIndex] });
 	}
 
 	ordered.sort((a, b) => a.position - b.position);
 
-	return { ordered, totalLength };
+	return { ordered, totalLength, pixels, pixelPositions };
 }

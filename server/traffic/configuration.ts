@@ -21,5 +21,11 @@ export const TrafficConfiguration = {
 	// graphviz points per map position unit, used only for the suggested node placement in
 	// traffic.dot - map distances are far larger than a comfortable node layout, so this shrinks
 	// them down while keeping stations in the same relative geographic arrangement
-	graphvizPositionScale: 0.2
+	graphvizPositionScale: 50,
+
+	// diameter of the home/office overlay dots in traffic.dot, in map position units - scaled into
+	// graphviz inches by graphvizPositionScale the same way node positions are, so the dots stay in
+	// proportion to the station layout if that scale changes
+	graphvizHomeNodeDiameter: 0.01,
+	graphvizOfficeNodeDiameter: 0.01
 };

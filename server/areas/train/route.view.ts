@@ -1,14 +1,24 @@
 import { ViewModel } from "vlserver";
-import { TrainRoute, TrainRoutePath } from "../../managed/database";
+import { TrainRoute, TrainRouteClass, TrainRoutePath } from "../../managed/database";
 import { TrainStopViewModel } from "./stop.view";
 import { CompanyViewModel } from "../company.view";
 import { LegalEntityViewModel } from "../legal-entity";
+
+export class TrainRouteClassViewModel extends ViewModel<TrainRouteClass> {
+	id;
+
+	name;
+
+	trainSpeedUnitsPerSecond;
+	stopDwellTimeSeconds;
+}
 
 export class TrainRouteSummaryModel extends ViewModel<TrainRoute> {
 	id;
 	code;
 
 	name;
+	class: TrainRouteClassViewModel;
 
 	color;
 	textColor;

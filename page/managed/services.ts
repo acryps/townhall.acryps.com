@@ -1494,7 +1494,25 @@ export class TrainStationExitViewModel {
 	}
 }
 
+export class TrainRouteClassViewModel {
+	id: string;
+	name: string;
+	stopDwellTimeSeconds: number;
+	trainSpeedUnitsPerSecond: number;
+
+	private static $build(raw) {
+		const item = new TrainRouteClassViewModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.stopDwellTimeSeconds === undefined || (item.stopDwellTimeSeconds = raw.stopDwellTimeSeconds === null ? null : +raw.stopDwellTimeSeconds)
+		raw.trainSpeedUnitsPerSecond === undefined || (item.trainSpeedUnitsPerSecond = raw.trainSpeedUnitsPerSecond === null ? null : +raw.trainSpeedUnitsPerSecond)
+		
+		return item;
+	}
+}
+
 export class TrainRouteSummaryModel {
+	class: TrainRouteClassViewModel;
 	closed: Date;
 	code: string;
 	color: string;
@@ -1505,6 +1523,7 @@ export class TrainRouteSummaryModel {
 
 	private static $build(raw) {
 		const item = new TrainRouteSummaryModel();
+		raw.class === undefined || (item.class = raw.class ? TrainRouteClassViewModel["$build"](raw.class) : null)
 		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
 		raw.code === undefined || (item.code = raw.code === null ? null : `${raw.code}`)
 		raw.color === undefined || (item.color = raw.color === null ? null : `${raw.color}`)
@@ -2384,6 +2403,7 @@ export class ValuationViewModel {
 
 export class TrainRouteViewModel {
 	activePath: TrainRoutePathViewModel;
+	class: TrainRouteClassViewModel;
 	operator: LegalEntityViewModel;
 	stops: TrainStopViewModel[];
 	closed: Date;
@@ -2399,6 +2419,7 @@ export class TrainRouteViewModel {
 	private static $build(raw) {
 		const item = new TrainRouteViewModel();
 		raw.activePath === undefined || (item.activePath = raw.activePath ? TrainRoutePathViewModel["$build"](raw.activePath) : null)
+		raw.class === undefined || (item.class = raw.class ? TrainRouteClassViewModel["$build"](raw.class) : null)
 		raw.operator === undefined || (item.operator = raw.operator ? LegalEntityViewModel["$build"](raw.operator) : null)
 		raw.stops === undefined || (item.stops = raw.stops ? raw.stops.map(i => TrainStopViewModel["$build"](i)) : null)
 		raw.closed === undefined || (item.closed = raw.closed ? new Date(raw.closed) : null)
@@ -5639,6 +5660,47 @@ export class TrainService {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {
 				throw new Error(r.error);
+			}
+		});
+	}
+
+	async getClasses(): Promise<Array<TrainRouteClassViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("FiMWtnMjUwemVzeXJidGR1YW00cHQ3MG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : TrainRouteClassViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async setClass(routeId: string, classId: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("11emJvM2Frbmx5en5oMjM3ZHJ6MDYzaG", Service.stringify(routeId))
+		$data.append("tneGluemR2bXU2OTxsZz8zeWRoeHVxZm", Service.stringify(classId))
+
+		return await fetch(Service.toURL("ZzZ3E2aGF5MWUyMnhweGVicmIzZngyMm"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
 			}
 		});
 	}

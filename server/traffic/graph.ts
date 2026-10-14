@@ -19,6 +19,10 @@ export interface RailEdge {
 	fromStationId?: string;
 	toStationId?: string;
 
+	// the route's actual (curved) track between fromStationId and toStationId, in travel order -
+	// only present on 'ride' edges
+	path?: Point[];
+
 	// present on 'board' | 'alight' edges
 	stationId?: string;
 
@@ -36,7 +40,6 @@ export interface RailGraph {
 	adjacency: Map<string, RailEdge[]>;
 	stationsById: Map<string, StationNode>;
 	routeNamesById: Map<string, string>;
-	routeColorsById: Map<string, string>;
 }
 
 export const entryNode = (stationId: string) => `entry:${stationId}`;
@@ -98,13 +101,11 @@ export async function buildRailGraph(database: DbContext, points: PropertyPointR
 
 	const routes = await database.trainRoute.where(route => route.closed == null && route.classId != null).toArray();
 	const routeNamesById = new Map<string, string>();
-	const routeColorsById = new Map<string, string>();
 
 	for (let route of routes) {
 		const routeClass = await route.class.fetch();
 
 		routeNamesById.set(route.id, route.name ?? route.code);
-		routeColorsById.set(route.id, route.color ?? '#333333');
 
 		const activePath = await route.activePath.fetch();
 
@@ -125,7 +126,7 @@ export async function buildRailGraph(database: DbContext, points: PropertyPointR
 			continue;
 		}
 
-		const { ordered, totalLength } = await orderRouteStops(database, route, pathPoints, stops);
+		const { ordered, totalLength, pixels, pixelPositions } = await orderRouteStops(database, route, pathPoints, stops);
 
 		// distance travelled along the track between two stops, by their position in `ordered`
 		const segmentDistance = (fromIndex: number, toIndex: number) => {
@@ -135,6 +136,23 @@ export async function buildRailGraph(database: DbContext, points: PropertyPointR
 
 			// wrap-around segment on a looping route
 			return (totalLength - ordered[fromIndex].position) + ordered[toIndex].position;
+		};
+
+		// the actual track pixels between two stops, by their position in `ordered` - mirrors
+		// segmentDistance's wrap-around handling for the one segment that closes a looping route
+		const segmentPoints = (fromIndex: number, toIndex: number) => {
+			const fromPosition = ordered[fromIndex].position;
+			const toPosition = ordered[toIndex].position;
+
+			if (toIndex > fromIndex) {
+				return pixels.filter((_, pixelIndex) => pixelPositions[pixelIndex] >= fromPosition && pixelPositions[pixelIndex] <= toPosition);
+			}
+
+			// wrap-around segment on a looping route: tail of the track, then the head
+			return [
+				...pixels.filter((_, pixelIndex) => pixelPositions[pixelIndex] >= fromPosition),
+				...pixels.filter((_, pixelIndex) => pixelPositions[pixelIndex] <= toPosition)
+			];
 		};
 
 		// a looping route runs in a single direction; any other route is ridden both ways
@@ -170,6 +188,10 @@ export async function buildRailGraph(database: DbContext, points: PropertyPointR
 					? segmentDistance(nextIndex, index)
 					: segmentDistance(index, nextIndex);
 
+				const path = direction.name == 'backward'
+					? segmentPoints(nextIndex, index)
+					: segmentPoints(index, nextIndex);
+
 				const cost = distance / routeClass.trainSpeedUnitsPerSecond + routeClass.stopDwellTimeSeconds;
 
 				addEdge(platformId, {
@@ -181,7 +203,8 @@ export async function buildRailGraph(database: DbContext, points: PropertyPointR
 					fromStopId: stop.id,
 					toStopId: nextStop.id,
 					fromStationId: stop.stationId,
-					toStationId: nextStop.stationId
+					toStationId: nextStop.stationId,
+					path
 				});
 			}
 		}
@@ -199,5 +222,5 @@ export async function buildRailGraph(database: DbContext, points: PropertyPointR
 		}
 	}
 
-	return { adjacency, stationsById, routeNamesById, routeColorsById };
+	return { adjacency, stationsById, routeNamesById };
 }

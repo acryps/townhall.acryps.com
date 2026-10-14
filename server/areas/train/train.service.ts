@@ -1,6 +1,6 @@
 import { Service } from "vlserver";
 import { DbContext, TrainRoute, TrainRoutePath, TrainStation, TrainStop } from "../../managed/database";
-import { TrainRouteViewModel } from "./route.view";
+import { TrainRouteClassViewModel, TrainRouteViewModel } from "./route.view";
 import { PropertyTrainStationViewModel, TrainStationViewModel } from "./station.view";
 import { Point } from "../../../interface/point";
 
@@ -103,5 +103,19 @@ export class TrainService extends Service {
 			this.database.trainStation
 				.orderByAscending(station => station.name)
 		);
+	}
+
+	getClasses() {
+		return TrainRouteClassViewModel.from(
+			this.database.trainRouteClass
+				.orderByAscending(trainRouteClass => trainRouteClass.name)
+		);
+	}
+
+	async setClass(routeId: string, classId: string) {
+		const route = await this.database.trainRoute.find(routeId);
+		route.classId = classId;
+
+		await route.update();
 	}
 }

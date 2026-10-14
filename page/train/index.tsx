@@ -45,6 +45,10 @@ export class TrainsPage extends Component {
 					Operated by {new LegalEntityComponent(route.operator)}
 				</ui-operator>}
 
+				{route.class && <ui-class>
+					{route.class.name}
+				</ui-class>}
+
 				<ui-stops>
 					{route.stops.map(stop => {
 						const station = this.stations.find(station => station.id == stop.stationId);

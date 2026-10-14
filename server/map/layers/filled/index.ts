@@ -1,6 +1,7 @@
 import { Canvas } from "skia-canvas";
 import { PackedPoint, Point } from "../../../../interface/point";
 import { ManagedServer } from "../../../managed/server";
+import { setImmediate } from "timers/promises";
 
 type Color = {
 	fill: [number, number, number, number],
@@ -20,14 +21,14 @@ export class FilledTileServer<ItemType extends { id: string }> {
 	) {
 		const size = 500;
 
-		const canvas = new Canvas(size, size);
-		const context = canvas.getContext('2d');
-
 		const registerRoute = (route: string, showBounds: boolean) => app.app.get(route, async (request, response) => {
 			const regionX = +request.params.x;
 			const regionY = +request.params.y;
 
 			const offset = new Point(regionX * size, regionY * size);
+
+			const canvas = new Canvas(size, size);
+			const context = canvas.getContext('2d');
 
 			const imageData = context.createImageData(size, size);
 			const source = fetchFilled();
@@ -69,6 +70,9 @@ export class FilledTileServer<ItemType extends { id: string }> {
 
 					index += 4;
 				}
+
+				// yield between rows so one tile can't stall the whole event loop
+				await setImmediate();
 			}
 
 			context.putImageData(imageData, 0, 0);

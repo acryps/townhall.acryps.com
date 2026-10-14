@@ -20,6 +20,7 @@ export const waterBoundaryLayer = MapLayer.fromTileSource((x, y) => `/tile/water
 
 export const trainRoutesLayer = MapLayer.fromShapeSource((x, y) => `/tile/train-routes/${x}/${y}`, 500, 'source-over');
 export const trainRouteLayer = (code: string) => MapLayer.fromShapeSource((x, y) => `/tile/train-route/${code}/${x}/${y}`, 500, 'source-over');
+export const trafficLayer = MapLayer.fromShapeSource((x, y) => `/tile/traffic/${x}/${y}`, 500, 'source-over', true);
 
 export const planLayer = (tag: string) => MapLayer.fromShapeSource((x, y) => `/tile/plan/${tag}/${x}/${y}`, 500, 'source-over');
 

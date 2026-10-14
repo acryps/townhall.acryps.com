@@ -8,12 +8,16 @@ type Coordinate = {
 	y: number;
 };
 
-export const drawDanwinstonLine = (context: Partial<CanvasRenderingContext2D>, start: Coordinate, end: Coordinate) => {
+// brush is a set of offsets (in block units) applied around every pixel of the line, used to draw
+// a line thicker than 1 block - see Point.searchMap for how a brush covering a given width is built
+export const drawDanwinstonLine = (context: Partial<CanvasRenderingContext2D>, start: Coordinate, end: Coordinate, brush: Coordinate[] = [{ x: 0, y: 0 }]) => {
 	const fillStyle = context.fillStyle;
 	context.fillStyle = context.strokeStyle;
 
 	for (let point of calcualteDanwinstonLine(start, end)) {
-		context.fillRect(point.x, point.y, 1, 1);
+		for (let offset of brush) {
+			context.fillRect(point.x + offset.x, point.y + offset.y, 1, 1);
+		}
 	}
 
 	context.fillStyle = fillStyle;

@@ -48,6 +48,8 @@ import { PoliticalCompassRater } from "./life/political-compass";
 import { WallpaperInterface } from "./map/wallpaper";
 import { ItemContextTracker } from "./context";
 import { StationTileServer } from "./map/layers/shape/train/stations";
+import { TrafficTileServer } from "./map/layers/shape/train/traffic";
+import { Shape } from "../interface/shape";
 import { MinimapGenerator } from "./map/minimap";
 import { WaterBodyTileServer } from "./map/layers/filled/water";
 import { WaterBodyFiller, WaterBodyFillWorkerHandle } from "./map/fill/water";
@@ -62,6 +64,7 @@ import { readdirSync, readFileSync } from "fs";
 import { CommodityIconImageInterface } from "./areas/market/icon";
 import { MarketCycleGenerator } from "./market/cycle";
 import { WorkerDispatch } from "./worker";
+import { TrafficAnalysisWorkerHandle } from "./traffic";
 import { PlanningMapGenerator } from "./map/planning";
 import { BlockTouchesTileServer } from "./map/layers/heatmap/gradiant/block-touches";
 import { PlayerHeadImageInterface } from "./areas/game/head";
@@ -92,6 +95,10 @@ DbClient.connectedClient.connect().then(async () => {
 	if (WorkerDispatch.main(database)) {
 		return;
 	}
+
+	WorkerDispatch.dispatch<Shape[]>(TrafficAnalysisWorkerHandle)
+		.then(shapes => TrafficAnalysisWorkerHandle.shapes = shapes)
+		.catch(error => logger.error('traffic analysis failed', error));
 
 	const app = new ManagedServer();
 	ws(app.app);
@@ -226,6 +233,7 @@ DbClient.connectedClient.connect().then(async () => {
 	new TrainRouteTileServer(app, database);
 	new TrainRoutesTileServer(app, database);
 	new StationTileServer(app, database);
+	new TrafficTileServer(app);
 	new PlanTileServer(app, database);
 	new BlockTouchesTileServer(app, database);
 

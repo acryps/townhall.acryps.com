@@ -19,6 +19,11 @@ export const trainRouteStyle = () => child('ui-route',
 		marginBottom(pageGutter),
 	),
 
+	child('ui-class',
+		display('block'),
+		marginBottom(pageGutter),
+	),
+
 	child('ui-map-container',
 		height(vh(25)),
 		marginInline(pageGutter.invert()),

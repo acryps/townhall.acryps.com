@@ -1,5 +1,5 @@
 import { Component } from "@acryps/page";
-import { TrainRouteViewModel, TrainService, TrainStationViewModel, TrainStopViewModel } from "../../managed/services";
+import { TrainRouteClassViewModel, TrainRouteViewModel, TrainService, TrainStationViewModel, TrainStopViewModel } from "../../managed/services";
 import { TrainRouteIconComponent } from "../../shared/train-route";
 import { MapComponent } from "../../shared/map";
 import { Point } from "../../../interface/point";
@@ -19,11 +19,13 @@ export class TrainRoutePage extends Component {
 
 	trainRoute: TrainRouteViewModel;
 	segments: TrainRouteSegment[];
+	classes: TrainRouteClassViewModel[];
 
 	editing = false;
 
 	async onload() {
 		this.trainRoute = await new TrainService().getRoute(this.parameters.code);
+		this.classes = await new TrainService().getClasses();
 
 		this.segments = TrainRouteSegment.split(this.trainRoute, this.parent.stations);
 
@@ -113,6 +115,10 @@ export class TrainRoutePage extends Component {
 				Operated by {new LegalEntityComponent(this.trainRoute.operator)}
 			</ui-operator>
 
+			{this.trainRoute.class && <ui-class>
+				{this.trainRoute.class.name}
+			</ui-class>}
+
 			{this.editing ? <ui-detail>
 				<ui-field>
 					<label>Code (Unique)</label>
@@ -153,6 +159,19 @@ export class TrainRoutePage extends Component {
 
 						new TrainService().setOperator(this.trainRoute.id, operator.id);
 					})}
+				</ui-field>
+
+				<ui-field>
+					<label>Class</label>
+
+					<select $ui-value={this.trainRoute.class} ui-change={() => new TrainService().setClass(this.trainRoute.id, this.trainRoute.class?.id)}>
+						<option ui-value={null}>No class assigned</option>
+						<option disabled></option>
+
+						{this.classes.map(trainRouteClass => <option ui-value={trainRouteClass}>
+							{trainRouteClass.name}
+						</option>)}
+					</select>
 				</ui-field>
 			</ui-detail> : map}
 

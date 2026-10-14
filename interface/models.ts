@@ -637,8 +637,16 @@ export interface TrainStationExitViewModel {
 	position: string;
 }
 
+export interface TrainRouteClassViewModel {
+    id: string;
+	name: string;
+	stopDwellTimeSeconds: number;
+	trainSpeedUnitsPerSecond: number;
+}
+
 export interface TrainRouteSummaryModel {
-    closed: Date;
+    class: TrainRouteClassViewModel;
+	closed: Date;
 	code: string;
 	color: string;
 	id: string;
@@ -1017,6 +1025,7 @@ export interface ValuationViewModel {
 
 export interface TrainRouteViewModel {
     activePath: TrainRoutePathViewModel;
+	class: TrainRouteClassViewModel;
 	operator: LegalEntityViewModel;
 	stops: TrainStopViewModel[];
 	closed: Date;

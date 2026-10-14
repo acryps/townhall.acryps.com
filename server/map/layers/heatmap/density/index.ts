@@ -1,6 +1,7 @@
 import { Canvas, ImageData } from "skia-canvas";
 import { Point } from "../../../../../interface/point";
 import { ManagedServer } from "../../../../managed/server";
+import { setImmediate } from "timers/promises";
 
 export class DensityHeatmapTileServer {
 	baseTransparency = 0xaf;
@@ -31,6 +32,11 @@ export class DensityHeatmapTileServer {
 				image.data[offset++] = 0xff;
 
 				image.data[offset++] = this.baseTransparency;
+
+				// yield between rows so one tile can't stall the whole event loop
+				if (offset % (size * 4) == 0) {
+					await setImmediate();
+				}
 			}
 
 			const points = await fetch(offset.x, offset.y, offset.x + size, offset.y + size);

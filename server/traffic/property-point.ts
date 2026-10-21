@@ -1,8 +1,12 @@
 import { DbContext } from "../managed/database";
 import { Point } from "../../interface/point";
 
-// resolves a property to a single representative point, the same way the map does: the center of
-// its active plot boundary. results are cached since many residents share the same home or workplace.
+// resolves a property to a single representative point: a random point inside its active plot
+// boundary, not just the center - some properties are a whole block of consecutive buildings
+// merged into one big plot, and everyone "living" at the exact center would bunch all of their
+// trips onto the same spot instead of spreading across the block. results are cached since many
+// residents share the same home or workplace, so each property still resolves to one stable point
+// for the whole analysis run.
 export class PropertyPointResolver {
 	private cache = new Map<string, Point | null>();
 
@@ -39,6 +43,14 @@ export class PropertyPointResolver {
 			return null;
 		}
 
-		return Point.center(shape);
+		const interior = [...Point.fill(shape).values()];
+
+		// Point.fill only works out the interior for an actual polygon (3+ points) - fall back to
+		// the center for anything degenerate
+		if (!interior.length) {
+			return Point.center(shape);
+		}
+
+		return interior[Math.floor(Math.random() * interior.length)];
 	}
 }

@@ -30,7 +30,7 @@ export abstract class MetricTracker {
 		next();
 	}
 
-	static async track(tracker: MetricTracker, metrics: Metric[]) {
+	static async track(tracker: MetricTracker, metrics: Metric[], recentValues?: Map<string, MetricValue>) {
 		this.tracked.push(tracker);
 
 		const tag = tracker.tag.join('-');
@@ -52,7 +52,14 @@ export abstract class MetricTracker {
 		}
 
 		tracker.metric = metric;
-		await tracker.updateLast();
+
+		const cachedLast = recentValues?.get(metric.id);
+
+		if (cachedLast) {
+			tracker.last = cachedLast;
+		} else {
+			await tracker.updateLast();
+		}
 	}
 
 	tag: string[];

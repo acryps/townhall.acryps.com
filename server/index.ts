@@ -64,7 +64,7 @@ import { readdirSync, readFileSync } from "fs";
 import { CommodityIconImageInterface } from "./areas/market/icon";
 import { MarketCycleGenerator } from "./market/cycle";
 import { WorkerDispatch } from "./worker";
-import { TrafficAnalysisWorkerHandle } from "./traffic";
+import { TrafficAnalysisResult, TrafficAnalysisWorkerHandle } from "./traffic";
 import { PlanningMapGenerator } from "./map/planning";
 import { BlockTouchesTileServer } from "./map/layers/heatmap/gradiant/block-touches";
 import { PlayerHeadImageInterface } from "./areas/game/head";
@@ -96,8 +96,11 @@ DbClient.connectedClient.connect().then(async () => {
 		return;
 	}
 
-	WorkerDispatch.dispatch<Shape[]>(TrafficAnalysisWorkerHandle)
-		.then(shapes => TrafficAnalysisWorkerHandle.shapes = shapes)
+	WorkerDispatch.dispatch<TrafficAnalysisResult>(TrafficAnalysisWorkerHandle)
+		.then(result => {
+			TrafficAnalysisWorkerHandle.shapes = result.shapes;
+			TrafficAnalysisWorkerHandle.samples = result.samples;
+		})
 		.catch(error => logger.error('traffic analysis failed', error));
 
 	const app = new ManagedServer();

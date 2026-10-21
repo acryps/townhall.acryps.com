@@ -1,5 +1,5 @@
 import { Logger } from "@acryps/log";
-import { CompanyType, DbContext } from "../../managed/database";
+import { CompanyType, DbContext, MetricValue } from "../../managed/database";
 import { WorkerHandle } from "../../worker";
 import { MetricTracker } from "./tracker";
 import { AllocatedAreaMetric } from "./tracker/allocated-area";
@@ -69,9 +69,27 @@ const buildMetricTrackers = async (database: DbContext) => {
 
 export const registerMetrics = async (database: DbContext) => {
 	const metrics = await database.metric.toArray();
+	const trackers = await buildMetricTrackers(database);
 
-	for (let tracker of await buildMetricTrackers(database)) {
-		await MetricTracker.track(tracker, metrics);
+	// preload the most recent values in a single query - metrics are updated one after another,
+	// so the last `2 * trackers.length` values will usually cover the latest value of every metric,
+	// sparing each tracker its own round trip on startup
+	const recentValues = await database.metricValue
+		.orderByDescending(value => value.updated)
+		.include(value => value.metric)
+		.limit(trackers.length * 2)
+		.toArray();
+
+	const lastValueByMetricId = new Map<string, MetricValue>();
+
+	for (let value of recentValues) {
+		if (!lastValueByMetricId.has(value.metricId)) {
+			lastValueByMetricId.set(value.metricId, value);
+		}
+	}
+
+	for (let tracker of trackers) {
+		await MetricTracker.track(tracker, metrics, lastValueByMetricId);
 	}
 };
 

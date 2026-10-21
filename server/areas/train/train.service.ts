@@ -2,7 +2,9 @@ import { Service } from "vlserver";
 import { DbContext, TrainRoute, TrainRoutePath, TrainStation, TrainStop } from "../../managed/database";
 import { TrainRouteClassViewModel, TrainRouteViewModel } from "./route.view";
 import { PropertyTrainStationViewModel, TrainStationViewModel } from "./station.view";
+import { TrafficAnalysisSampleViewModel } from "./analysis.view";
 import { Point } from "../../../interface/point";
+import { TrafficAnalysisWorkerHandle } from "../../traffic";
 
 export class TrainService extends Service {
 	constructor(
@@ -117,5 +119,11 @@ export class TrainService extends Service {
 		route.classId = classId;
 
 		await route.update();
+	}
+
+	// reads the samples collected alongside the main traffic report, built once on a worker thread
+	// at server startup (see TrafficAnalysisWorkerHandle) - not recomputed per request
+	getTrafficSamples() {
+		return TrafficAnalysisSampleViewModel.from(TrafficAnalysisWorkerHandle.samples);
 	}
 }

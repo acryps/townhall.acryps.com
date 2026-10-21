@@ -3,10 +3,13 @@ import { TrafficConfiguration } from "./configuration";
 import { PropertyPointResolver } from "./property-point";
 import { resolveResidentProperties } from "./resident-properties";
 
+export type MovementKind = 'work' | 'visit';
+
 export interface Movement {
 	fromPropertyId: string;
 	toPropertyId: string;
 	weeklyTrips: number;
+	kind: MovementKind;
 }
 
 // turns residents, their tenancies, their work contracts and their friendships into a weighted list
@@ -19,15 +22,21 @@ export async function buildMovements(database: DbContext, points: PropertyPointR
 		database.residentRelationship.where(relationship => relationship.ended == null).toArray()
 	]);
 
-	const movementWeights = new Map<string, number>();
+	const movements = new Map<string, Movement>();
 
-	const addMovement = (fromPropertyId: string, toPropertyId: string, weeklyTrips: number) => {
+	const addMovement = (fromPropertyId: string, toPropertyId: string, kind: MovementKind, weeklyTrips: number) => {
 		if (!fromPropertyId || !toPropertyId || fromPropertyId == toPropertyId) {
 			return;
 		}
 
-		const key = `${fromPropertyId}->${toPropertyId}`;
-		movementWeights.set(key, (movementWeights.get(key) ?? 0) + weeklyTrips);
+		const key = `${fromPropertyId}->${toPropertyId}:${kind}`;
+		const existing = movements.get(key);
+
+		if (existing) {
+			existing.weeklyTrips += weeklyTrips;
+		} else {
+			movements.set(key, { fromPropertyId, toPropertyId, kind, weeklyTrips });
+		}
 	};
 
 	for (let resident of residents) {
@@ -40,8 +49,8 @@ export async function buildMovements(database: DbContext, points: PropertyPointR
 		const work = workPropertyByResident.get(resident.id);
 
 		if (work) {
-			addMovement(home, work, TrafficConfiguration.workTripsPerWeek);
-			addMovement(work, home, TrafficConfiguration.workTripsPerWeek);
+			addMovement(home, work, 'work', TrafficConfiguration.workTripsPerWeek);
+			addMovement(work, home, 'work', TrafficConfiguration.workTripsPerWeek);
 		}
 	}
 
@@ -52,22 +61,10 @@ export async function buildMovements(database: DbContext, points: PropertyPointR
 		const homeB = homePropertyByResident.get(relationship.peerId);
 
 		if (homeA && homeB) {
-			addMovement(homeA, homeB, TrafficConfiguration.friendVisitTripsPerWeek);
-			addMovement(homeB, homeA, TrafficConfiguration.friendVisitTripsPerWeek);
+			addMovement(homeA, homeB, 'visit', TrafficConfiguration.friendVisitTripsPerWeek);
+			addMovement(homeB, homeA, 'visit', TrafficConfiguration.friendVisitTripsPerWeek);
 		}
 	}
 
-	const movements: Movement[] = [];
-
-	for (let [key, weeklyTrips] of movementWeights) {
-		const separatorIndex = key.indexOf('->');
-
-		movements.push({
-			fromPropertyId: key.slice(0, separatorIndex),
-			toPropertyId: key.slice(separatorIndex + 2),
-			weeklyTrips
-		});
-	}
-
-	return movements;
+	return [...movements.values()];
 }

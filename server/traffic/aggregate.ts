@@ -1,6 +1,7 @@
-import { RailGraph } from "./graph";
+import { Point } from "../../interface/point";
+import { RailGraph, stationIdOfNode } from "./graph";
 import { RouteFinder } from "./route-finder";
-import { Movement } from "./movements";
+import { Movement, MovementKind } from "./movements";
 import { PropertyPointResolver } from "./property-point";
 
 export interface SegmentStats {
@@ -18,9 +19,19 @@ export interface StationStats {
 	transfers: number;
 }
 
+// the walked part of a single movement's route - either from the origin to the first station it
+// boards at, or from the last station it alights at to the destination (a movement that never
+// touches the rail network produces exactly one of these, covering the whole trip)
+export interface WalkSegment {
+	from: Point;
+	to: Point;
+	kind: MovementKind;
+}
+
 export interface TrafficReport {
 	segments: Map<string, SegmentStats>;
 	stations: Map<string, StationStats>;
+	walks: WalkSegment[];
 	unroutable: number;
 	totalMovements: number;
 }
@@ -45,6 +56,7 @@ export async function aggregateMovements(
 
 	const segments = new Map<string, SegmentStats>();
 	const stations = new Map<string, StationStats>();
+	const walks: WalkSegment[] = [];
 
 	let unroutable = 0;
 
@@ -64,10 +76,21 @@ export async function aggregateMovements(
 			continue;
 		}
 
+		// tracks where along the route we currently are, in map position units, so a 'walk' edge
+		// (the only kind that actually moves between two points) can be turned into an actual line
+		let position = fromPoint;
+
 		for (let index = 0; index < path.edges.length; index++) {
 			const edge = path.edges[index];
 
-			if (edge.kind == 'board') {
+			if (edge.kind == 'walk') {
+				const destination = edge.to == 'destination'
+					? toPoint
+					: graph.stationsById.get(stationIdOfNode(edge.to)).position;
+
+				walks.push({ from: position, to: destination, kind: movement.kind });
+				position = destination;
+			} else if (edge.kind == 'board') {
 				ensureStation(stations, edge.stationId).boarded += movement.weeklyTrips;
 			} else if (edge.kind == 'alight') {
 				ensureStation(stations, edge.stationId).alighted += movement.weeklyTrips;
@@ -95,9 +118,11 @@ export async function aggregateMovements(
 				if (next?.kind == 'ride' && next.routeId == edge.routeId && next.direction == edge.direction) {
 					ensureStation(stations, edge.toStationId).passed += movement.weeklyTrips;
 				}
+
+				position = graph.stationsById.get(edge.toStationId).position;
 			}
 		}
 	}
 
-	return { segments, stations, unroutable, totalMovements: movements.length };
+	return { segments, stations, walks, unroutable, totalMovements: movements.length };
 }

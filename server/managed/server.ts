@@ -157,6 +157,8 @@ import { TrainRouteClassViewModel } from "././../areas/train/route.view";
 import { TrainRouteViewModel } from "././../areas/train/route.view";
 import { PropertyTrainStationViewModel } from "././../areas/train/station.view";
 import { TrainStationViewModel } from "././../areas/train/station.view";
+import { TrafficAnalysisSampleViewModel } from "././../areas/train/analysis.view";
+import { TrafficAnalysisWorkerHandle } from "././../traffic";
 import { TrainService } from "././../areas/train/train.service";
 import { Bill } from "././database";
 import { OpenHonestiumViewModel } from "././../areas/vote/honestium";
@@ -263,6 +265,7 @@ import { OracleProposal } from "./../managed/database";
 import { ArticleOpinion } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
 import { Asset } from "./../areas/trade/asset";
+import { TrafficAnalysisSampleModel } from "./../areas/train/analysis.view";
 import { TrainStationExit } from "./../managed/database";
 import { TrainRouteClass } from "./../managed/database";
 import { BillHonestium } from "./../managed/database";
@@ -2102,6 +2105,15 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.setClass(
 				params["11emJvM2Frbmx5en5oMjM3ZHJ6MDYzaG"],
 				params["tneGluemR2bXU2OTxsZz8zeWRoeHVxZm"]
+			)
+		);
+
+		this.expose(
+			"hncHB4N3FsZX1xa2I2bHF6amRycz1yOX",
+			{},
+			inject => inject.construct(TrainService),
+			(controller, params) => controller.getTrafficSamples(
+				
 			)
 		);
 
@@ -8417,6 +8429,84 @@ ViewModel.mappings = {
 			
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"price" in viewModel && (model.price = viewModel.price === null ? null : +viewModel.price);
+
+			return model;
+		}
+	},
+	[TrafficAnalysisSampleViewModel.name]: class ComposedTrafficAnalysisSampleViewModel extends TrafficAnalysisSampleViewModel {
+		async map() {
+			return {
+				id: this.$$model.id,
+				tag: this.$$model.tag,
+				givenName: this.$$model.givenName,
+				familyName: this.$$model.familyName,
+				purpose: this.$$model.purpose,
+				path: this.$$model.path
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				id: true,
+				tag: true,
+				givenName: true,
+				familyName: true,
+				purpose: true,
+				path: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new TrafficAnalysisSampleViewModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"tag" in data && (item.tag = data.tag === null ? null : `${data.tag}`);
+			"givenName" in data && (item.givenName = data.givenName === null ? null : `${data.givenName}`);
+			"familyName" in data && (item.familyName = data.familyName === null ? null : `${data.familyName}`);
+			"purpose" in data && (item.purpose = data.purpose === null ? null : `${data.purpose}`);
+			"path" in data && (item.path = data.path === null ? null : `${data.path}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: TrafficAnalysisSampleViewModel) {
+			let model: TrafficAnalysisSampleModel;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(TrafficAnalysisSampleModel).find(viewModel.id)
+			} else {
+				model = new TrafficAnalysisSampleModel();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"tag" in viewModel && (model.tag = viewModel.tag === null ? null : `${viewModel.tag}`);
+			"givenName" in viewModel && (model.givenName = viewModel.givenName === null ? null : `${viewModel.givenName}`);
+			"familyName" in viewModel && (model.familyName = viewModel.familyName === null ? null : `${viewModel.familyName}`);
+			"purpose" in viewModel && (model.purpose = viewModel.purpose === null ? null : `${viewModel.purpose}`);
+			"path" in viewModel && (model.path = viewModel.path === null ? null : `${viewModel.path}`);
 
 			return model;
 		}

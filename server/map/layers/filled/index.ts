@@ -2,6 +2,7 @@ import { Canvas } from "skia-canvas";
 import { PackedPoint, Point } from "../../../../interface/point";
 import { ManagedServer } from "../../../managed/server";
 import { setImmediate } from "timers/promises";
+import { Logger } from "@acryps/log";
 
 type Color = {
 	fill: [number, number, number, number],
@@ -20,10 +21,14 @@ export class FilledTileServer<ItemType extends { id: string }> {
 		boundaryColor: [number, number, number, number]
 	) {
 		const size = 500;
+		const logger = new Logger('filled-tile').child(route);
 
 		const registerRoute = (route: string, showBounds: boolean) => app.app.get(route, async (request, response) => {
 			const regionX = +request.params.x;
 			const regionY = +request.params.y;
+
+			const task = logger.task(`${regionX},${regionY}`);
+			task.log('start');
 
 			const offset = new Point(regionX * size, regionY * size);
 
@@ -79,6 +84,8 @@ export class FilledTileServer<ItemType extends { id: string }> {
 
 			response.contentType('image/png');
 			response.end(await canvas.toBuffer('png'));
+
+			task.finish('end');
 		});
 
 		registerRoute(`/tile/${route}/:x/:y`, false);

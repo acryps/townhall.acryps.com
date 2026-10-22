@@ -2,6 +2,7 @@ import { Canvas, ImageData, loadImage } from "skia-canvas";
 import { Point } from "../../../../../interface/point";
 import { setImmediate } from "timers/promises";
 import { ManagedServer } from "../../../../managed/server";
+import { Logger } from "@acryps/log";
 
 export class GradiantHeatmapTileServer<SourceType> {
 	baseTransparency = 0xaf;
@@ -22,9 +23,14 @@ export class GradiantHeatmapTileServer<SourceType> {
 			throw 'Interpolation field must be even fraction of tile size';
 		}
 
+		const logger = new Logger('gradiant-heatmap-tile').child(route);
+
 		app.app.get(`/tile/${route}/:x/:y`, async (request, response) => {
 			const regionX = +request.params.x;
 			const regionY = +request.params.y;
+
+			const task = logger.task(`${regionX},${regionY}`);
+			task.log('start');
 
 			const offset = new Point(regionX * tileSize, regionY * tileSize);
 
@@ -86,7 +92,11 @@ export class GradiantHeatmapTileServer<SourceType> {
 			);
 
 			response.contentType('image/png');
-			canvas.toBuffer('png').then(buffer => response.end(buffer));
+			canvas.toBuffer('png').then(buffer => {
+				response.end(buffer);
+
+				task.finish('end');
+			});
 		});
 	}
 }

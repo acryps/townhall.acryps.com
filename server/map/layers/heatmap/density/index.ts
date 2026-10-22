@@ -2,6 +2,7 @@ import { Canvas, ImageData } from "skia-canvas";
 import { Point } from "../../../../../interface/point";
 import { ManagedServer } from "../../../../managed/server";
 import { setImmediate } from "timers/promises";
+import { Logger } from "@acryps/log";
 
 export class DensityHeatmapTileServer {
 	baseTransparency = 0xaf;
@@ -15,9 +16,14 @@ export class DensityHeatmapTileServer {
 
 		fetch: (minX: number, minY: number, maxX: number, maxY: number) => Promise<{ x: number, y: number, dimension: (0 | 1 | 2) }[]>
 	) {
+		const logger = new Logger('density-heatmap-tile').child(route);
+
 		app.app.get(`/tile/${route}/:x/:y`, async (request, response) => {
 			const regionX = +request.params.x;
 			const regionY = +request.params.y;
+
+			const task = logger.task(`${regionX},${regionY}`);
+			task.log('start');
 
 			const offset = new Point(regionX * size, regionY * size);
 
@@ -62,7 +68,11 @@ export class DensityHeatmapTileServer {
 			context.putImageData(image, 0, 0);
 
 			response.contentType('image/png');
-			canvas.toBuffer('png').then(buffer => response.end(buffer));
+			canvas.toBuffer('png').then(buffer => {
+				response.end(buffer);
+
+				task.finish('end');
+			});
 		});
 	}
 }

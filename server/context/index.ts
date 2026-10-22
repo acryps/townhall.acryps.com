@@ -1,4 +1,5 @@
 import { deepEqual } from "node:assert";
+import { parentPort } from "worker_threads";
 import { composeItemContexts, writeItemContexts } from "..";
 import { Interpreter, SystemMessage, ToolError, UserMessage } from "../life/interpreter";
 import { Language } from "../life/language";
@@ -6,6 +7,7 @@ import { DbContext, ItemContext, ItemContextFragment, ItemContextLink, ItemConte
 import { ItemContextComposeable, ItemContextComposer, FoundItemContextLink } from "./composer";
 import { itemContextTypes } from "./types";
 import { Logger } from "@acryps/log";
+import { WorkerDispatch, WorkerHandle } from "../worker";
 
 export class ItemContextTracker {
 	static instance: ItemContextTracker;
@@ -44,7 +46,18 @@ export class ItemContextTracker {
 			return this.activeExpanders.get(id);
 		}
 
-		const expander = new Promise<void>(async done => {
+		// already running on a worker thread (dispatched by `ItemContextWorkerHandle`) - do the (possibly recursive) work here instead of spawning another worker
+		const expander = parentPort
+			? this.expandLocally(id, depth, peers)
+			: WorkerDispatch.dispatch<void>(ItemContextWorkerHandle, { id, depth, peers });
+
+		this.activeExpanders.set(id, expander);
+
+		return expander;
+	}
+
+	private expandLocally(id: string, depth: number, peers: string[]) {
+		return new Promise<void>(async done => {
 			for (let type of this.types) {
 				const item = await type.find(id);
 
@@ -58,10 +71,6 @@ export class ItemContextTracker {
 			// not composer found
 			done();
 		});
-
-		this.activeExpanders.set(id, expander);
-
-		return expander;
 	}
 
 	async update<ItemType extends ItemContextComposeable>(item: ItemType, type: ItemContextComposer<any>, depth: number, peers: string[]) {
@@ -252,5 +261,12 @@ export class ItemContextTracker {
 
 		context.updated = new Date();
 		await context.update();
+	}
+}
+
+// runs the (possibly recursive) expand/update/writeContext chain for one item on a worker thread, see `ItemContextTracker.expand`
+export class ItemContextWorkerHandle extends WorkerHandle {
+	static async dispatch(logger: Logger, database: DbContext, context: { id: string, depth: number, peers: string[] }) {
+		await new ItemContextTracker(database).expand(context.id, context.depth, context.peers);
 	}
 }

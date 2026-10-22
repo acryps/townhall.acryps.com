@@ -84,6 +84,30 @@ const logger = new Logger('server');
 logger.log('connect database');
 DbClient.connectedClient = new DbClient({ max: 2 });
 
+// the pool only has `max` real connections shared by every query in this process - one slow query can starve all the others, so flag anything taking long
+const databaseLogger = new Logger('database');
+const slowQueryThreshold = 500;
+const query = DbClient.connectedClient.query.bind(DbClient.connectedClient);
+
+// lets tasks that issue a lot of queries (eg. LegalEntityReferenceCounter.rerank) report how much of the shared pool they used - see `databaseQueryCount` usages
+export let databaseQueryCount = 0;
+
+DbClient.connectedClient.query = async (sql: string, params: any[]) => {
+	databaseQueryCount++;
+
+	const start = Date.now();
+
+	try {
+		return await query(sql, params);
+	} finally {
+		const elapsed = Date.now() - start;
+
+		if (elapsed > slowQueryThreshold) {
+			databaseLogger.warn(`slow query (${elapsed}ms)`, sql);
+		}
+	}
+};
+
 DbClient.connectedClient.connect().then(async () => {
 	logger.log('connected');
 

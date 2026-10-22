@@ -1,6 +1,7 @@
 import { DbClient, DbSet, ForeignReference } from "vlquery";
 import { DbContext, LegalEntity } from "../../managed/database";
 import { Logger } from "@acryps/log";
+import { databaseQueryCount } from "../..";
 
 export class LegalEntityReferenceCounter {
 	private logger = new Logger('legal entity rank');
@@ -50,6 +51,8 @@ export class LegalEntityReferenceCounter {
 
 	async rerank() {
 		const logger = this.logger.task('rerank');
+		const startQueryCount = databaseQueryCount;
+
 		const referenceCounter = (await this.database.legalEntity.toArray()).map(entity => ({ entity, references: 0 }));
 
 		for (let source of this.sources) {
@@ -81,7 +84,7 @@ export class LegalEntityReferenceCounter {
 			}
 		}
 
-		logger.finish('ranked');
+		logger.finish(`ranked, used ${databaseQueryCount - startQueryCount} queries`);
 
 		this.ranked = referenceCounter.map(item => item.entity);
 	}

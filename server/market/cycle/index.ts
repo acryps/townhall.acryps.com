@@ -39,10 +39,29 @@ export class MarketCycleGenerator {
 	async advance() {
 		const sponsor = await this.database.tokenSponsor.first();
 
+		// the process may have died mid-cycle - throw away the half-finished cycle (and anything it already wrote) before deciding on a new one
+		const unclosedCycle = await this.database.marketCycle
+			.where(cycle => cycle.closed == null)
+			.orderByDescending(cycle => cycle.opened)
+			.first();
+
+		if (unclosedCycle) {
+			await this.deleteCycle(unclosedCycle);
+		}
+
 		const lastCycle = await this.database.marketCycle
 			.where(cycle => cycle.closed != null)
 			.orderByDescending(cycle => cycle.closed)
 			.first();
+
+		const news = await this.collectNews(lastCycle);
+
+		// nothing changed since the last cycle closed - do not spin up (and pay for) an empty one
+		if (lastCycle && !news.length) {
+			new Logger('market cycle').log(`no new articles since cycle #${lastCycle.id.split('-')[0]} closed, skipping`);
+
+			return;
+		}
 
 		const cycle = new MarketCycle();
 		cycle.sponsor = sponsor;
@@ -57,8 +76,6 @@ export class MarketCycleGenerator {
 
 		const logger = new Logger('market cycle').child(cycle.id.split('-')[0]);
 		logger.log(`cycle opened ${new Time(cycle.opened).toString()}: ${MarketSituationParameter.toSituationString(this.situation, cycle)}`);
-
-		const news = await this.collectNews(lastCycle);
 		logger.log(`collected ${news.length} new articles since the last cycle closed`);
 
 		cycle.context = await this.compileContext(cycle, sponsor, news);
@@ -90,6 +107,44 @@ export class MarketCycleGenerator {
 		await this.tracker.update(cycle);
 
 		logger.log(`cycle closed`);
+	}
+
+	// removes a cycle together with everything recorded against it - used to throw away a cycle that never closed (eg. after a crash)
+	private async deleteCycle(cycle: MarketCycle) {
+		const logger = new Logger('market cycle').child(cycle.id.split('-')[0]);
+		logger.log(`deleting unclosed cycle opened ${new Time(cycle.opened).toString()}`);
+
+		for (let segmentCycle of await cycle.segmentCycles.toArray()) {
+			await segmentCycle.delete();
+		}
+
+		for (let rating of await cycle.commodityRatings.toArray()) {
+			await rating.delete();
+		}
+
+		for (let stockSeed of await cycle.stockSeeds.toArray()) {
+			await stockSeed.delete();
+		}
+
+		for (let article of await cycle.articles.toArray()) {
+			await article.delete();
+		}
+
+		for (let trade of await cycle.trades.toArray()) {
+			await trade.delete();
+		}
+
+		for (let ask of await cycle.asks.toArray()) {
+			await ask.delete();
+		}
+
+		for (let bid of await cycle.bids.toArray()) {
+			await bid.delete();
+		}
+
+		await cycle.delete();
+
+		logger.log('deleted');
 	}
 
 	// every article published since the last cycle closed (or, for the very first cycle, all published articles)

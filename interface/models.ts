@@ -612,6 +612,28 @@ export interface ArticleImageViewModel {
 	id: string;
 }
 
+export interface DraftSummaryModel {
+    publication: PublicationSummaryModel;
+	draft: string;
+	id: string;
+	title: string;
+}
+
+export interface DraftAnswerViewModel {
+    content: string;
+	id: string;
+	orderIndex: number;
+}
+
+export interface DraftQuestionViewModel {
+    answers: DraftAnswerViewModel[];
+	answerId: string;
+	detail: string;
+	id: string;
+	orderIndex: number;
+	question: string;
+}
+
 export interface PublicationSummaryModel {
     company: CompanySummaryModel;
 	description: string;
@@ -1018,6 +1040,16 @@ export interface ArticleViewModel {
 	publication: PublicationSummaryModel;
 	body: string;
 	id: string;
+	published: Date;
+	title: string;
+}
+
+export interface DraftReviewViewModel {
+    draftQuestions: DraftQuestionViewModel[];
+	publication: PublicationSummaryModel;
+	draft: string;
+	id: string;
+	interpreted: Date;
 	published: Date;
 	title: string;
 }

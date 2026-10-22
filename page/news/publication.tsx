@@ -42,6 +42,14 @@ export class PublicationPage extends Component {
 				}}>
 					Write Article
 				</ui-action>
+
+				<ui-action ui-click={async () => {
+					const id = await new PublicationService().createDraft(this.publication.id);
+
+					this.navigate(`../../draft/write/${id}`);
+				}}>
+					Write Draft
+				</ui-action>
 			</ui-actions>
 
 			{new ArticleListComponent(this.publication.articles)}

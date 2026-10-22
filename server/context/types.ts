@@ -1,6 +1,7 @@
 import { DbContext } from "../managed/database";
 import { ArticleContextComposer } from "./article";
 import { BoroughContextComposer } from "./borough";
+import { CommodityContextComposer } from "./commodity";
 import { CompanyContextComposer } from "./company";
 import { OfficeContextComposer } from "./office";
 
@@ -8,5 +9,6 @@ export const itemContextTypes = (database: DbContext) => [
 	new BoroughContextComposer(database),
 	new ArticleContextComposer(database),
 	new CompanyContextComposer(database),
-	new OfficeContextComposer(database)
+	new OfficeContextComposer(database),
+	new CommodityContextComposer(database)
 ];

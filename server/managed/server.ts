@@ -135,6 +135,9 @@ import { ArticleNewstickerModel } from "././../areas/publication/article";
 import { ArticlePreviewModel } from "././../areas/publication/article";
 import { ArticleViewModel } from "././../areas/publication/article";
 import { PublicationViewModel } from "././../areas/publication/publication";
+import { ArticleDraftInterpreter } from "././../areas/publication/draft-interpreter";
+import { DraftReviewViewModel } from "././../areas/publication/draft";
+import { DraftSummaryModel } from "././../areas/publication/draft";
 import { PublicationService } from "././../areas/publication/service";
 import { ChatManager } from "././../areas/resident/chat/manager";
 import { ChatInteractionViewModel } from "././../areas/resident/chat/interaction";
@@ -210,6 +213,8 @@ import { PlanSummaryModel } from "./../areas/plan/plan";
 import { PlanShapeViewModel } from "./../areas/plan/plan";
 import { BuildingShapeModel } from "./../areas/property/building";
 import { ArticleOpinionViewModel } from "./../areas/publication/article";
+import { DraftAnswerViewModel } from "./../areas/publication/draft";
+import { DraftQuestionViewModel } from "./../areas/publication/draft";
 import { PublicationSummaryModel } from "./../areas/publication/publication";
 import { ValuationSummaryModel } from "./../areas/trade/valuation.view";
 import { TrainStationExitViewModel } from "./../areas/train/exit.view";
@@ -265,6 +270,8 @@ import { MetricValue } from "./../managed/database";
 import { MilitaryUnit } from "./../managed/database";
 import { OracleProposal } from "./../managed/database";
 import { ArticleOpinion } from "./../managed/database";
+import { ArticleDraftAnswer } from "./../managed/database";
+import { ArticleDraftQuestion } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
 import { Asset } from "./../areas/trade/asset";
 import { TrafficAnalysisSampleModel } from "./../areas/train/analysis.view";
@@ -1760,6 +1767,107 @@ export class ManagedServer extends BaseServer {
 			inject => inject.construct(PublicationService),
 			(controller, params) => controller.publish(
 				params["loc2IzMGQxdzliYzhrZ3NwYjlrNHp4Ym"]
+			)
+		);
+
+		this.expose(
+			"k2MzFqN3xtcW1tODV5YzB1bDRiYjVwcG",
+			{
+			"NkbT5zcT5raT11MzlhMmF1NmQyZ2hpNz": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.createDraft(
+				params["NkbT5zcT5raT11MzlhMmF1NmQyZ2hpNz"]
+			)
+		);
+
+		this.expose(
+			"xwdHdjbjQ5b3I1bGpoOWMxMnhqazZtcG",
+			{
+			"A2ZnZmcDFuZmZodHRzNDhqZzI3bzVpNj": { type: "string", isArray: false, isOptional: false },
+				"E3MWczcmRxNGR0Zzp1amliMTRieTlhNm": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.saveDraft(
+				params["A2ZnZmcDFuZmZodHRzNDhqZzI3bzVpNj"],
+				params["E3MWczcmRxNGR0Zzp1amliMTRieTlhNm"]
+			)
+		);
+
+		this.expose(
+			"lvemgyNDIwaGQ4eWgwMGNqN2ZrcmJ6dX",
+			{
+			"1zZDR5eWljM29mN2ZvcmwwaWNuNmt5Y2": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.interpretDraft(
+				params["1zZDR5eWljM29mN2ZvcmwwaWNuNmt5Y2"]
+			)
+		);
+
+		this.expose(
+			"Z4d3R5b2k1czppMWllZjN6ZzZ1bmluNj",
+			{
+			"dxNjV3Yzd4NmFjYntpYml6OWNqeHV5cG": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.getDraftReview(
+				params["dxNjV3Yzd4NmFjYntpYml6OWNqeHV5cG"]
+			)
+		);
+
+		this.expose(
+			"dpcnNvNGN6MW42cWlnODNoNmU3eXpiam",
+			{
+			"VtZm1remV0NG5kNGl1Y3B2c3U0dDl2dD": { type: "string", isArray: false, isOptional: false },
+				"MwbXQzcj1pMH82ajhjN3NrazBhZGZvdm": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.selectAnswer(
+				params["VtZm1remV0NG5kNGl1Y3B2c3U0dDl2dD"],
+				params["MwbXQzcj1pMH82ajhjN3NrazBhZGZvdm"]
+			)
+		);
+
+		this.expose(
+			"Joc2F2dTl1cG9qd3F0ZGN6azFzeHh0MW",
+			{
+			"I0cDF0ZGVmZHVlZ2l1N3VjOXZmYm55Nn": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.writeDraft(
+				params["I0cDF0ZGVmZHVlZ2l1N3VjOXZmYm55Nn"]
+			)
+		);
+
+		this.expose(
+			"Zra2cxbDNuZGJicmpyYWljeWxhMzAwdj",
+			{
+			"g4cXFsajR1cnZ0NDljdWcybXQxYzcwbH": { type: "string", isArray: false, isOptional: false },
+				"90MHxkZzFnNzRieHpqNzkxMWQ2bW44dD": { type: "string", isArray: false, isOptional: false }
+			},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.editAnswer(
+				params["g4cXFsajR1cnZ0NDljdWcybXQxYzcwbH"],
+				params["90MHxkZzFnNzRieHpqNzkxMWQ2bW44dD"]
+			)
+		);
+
+		this.expose(
+			"5icGBiNmNiNW9pZXJubWQyZHFoOGMyaT",
+			{},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.hasPendingDrafts(
+				
+			)
+		);
+
+		this.expose(
+			"F2cX52Y2U0cG52djRmanFxMWNjODFlan",
+			{},
+			inject => inject.construct(PublicationService),
+			(controller, params) => controller.listPendingDrafts(
+				
 			)
 		);
 
@@ -8241,6 +8349,230 @@ ViewModel.mappings = {
 			return model;
 		}
 	},
+	[DraftSummaryModel.name]: class ComposedDraftSummaryModel extends DraftSummaryModel {
+		async map() {
+			return {
+				publication: new PublicationSummaryModel(await BaseServer.unwrap(this.$$model.publication)),
+				draft: this.$$model.draft,
+				id: this.$$model.id,
+				title: this.$$model.title
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get publication() {
+					return ViewModel.mappings[PublicationSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "publication-DraftSummaryModel"]
+					);
+				},
+				draft: true,
+				id: true,
+				title: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new DraftSummaryModel(null);
+			"publication" in data && (item.publication = data.publication && ViewModel.mappings[PublicationSummaryModel.name].toViewModel(data.publication));
+			"draft" in data && (item.draft = data.draft === null ? null : `${data.draft}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: DraftSummaryModel) {
+			let model: Article;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Article).find(viewModel.id)
+			} else {
+				model = new Article();
+			}
+			
+			"publication" in viewModel && (model.publication.id = viewModel.publication ? viewModel.publication.id : null);
+			"draft" in viewModel && (model.draft = viewModel.draft === null ? null : `${viewModel.draft}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
+
+			return model;
+		}
+	},
+	[DraftAnswerViewModel.name]: class ComposedDraftAnswerViewModel extends DraftAnswerViewModel {
+		async map() {
+			return {
+				content: this.$$model.content,
+				id: this.$$model.id,
+				orderIndex: this.$$model.orderIndex
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				content: true,
+				id: true,
+				orderIndex: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new DraftAnswerViewModel(null);
+			"content" in data && (item.content = data.content === null ? null : `${data.content}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"orderIndex" in data && (item.orderIndex = data.orderIndex === null ? null : +data.orderIndex);
+
+			return item;
+		}
+
+		static async toModel(viewModel: DraftAnswerViewModel) {
+			let model: ArticleDraftAnswer;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ArticleDraftAnswer).find(viewModel.id)
+			} else {
+				model = new ArticleDraftAnswer();
+			}
+			
+			"content" in viewModel && (model.content = viewModel.content === null ? null : `${viewModel.content}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"orderIndex" in viewModel && (model.orderIndex = viewModel.orderIndex === null ? null : +viewModel.orderIndex);
+
+			return model;
+		}
+	},
+	[DraftQuestionViewModel.name]: class ComposedDraftQuestionViewModel extends DraftQuestionViewModel {
+		async map() {
+			return {
+				answers: (await this.$$model.answers.includeTree(ViewModel.mappings[DraftAnswerViewModel.name].items).toArray()).map(item => new DraftAnswerViewModel(item)),
+				answerId: this.$$model.answerId,
+				detail: this.$$model.detail,
+				id: this.$$model.id,
+				orderIndex: this.$$model.orderIndex,
+				question: this.$$model.question
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get answers() {
+					return ViewModel.mappings[DraftAnswerViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "answers-DraftQuestionViewModel"]
+					);
+				},
+				answerId: true,
+				detail: true,
+				id: true,
+				orderIndex: true,
+				question: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new DraftQuestionViewModel(null);
+			"answers" in data && (item.answers = data.answers && [...data.answers].map(i => ViewModel.mappings[DraftAnswerViewModel.name].toViewModel(i)));
+			"answerId" in data && (item.answerId = data.answerId === null ? null : `${data.answerId}`);
+			"detail" in data && (item.detail = data.detail === null ? null : `${data.detail}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"orderIndex" in data && (item.orderIndex = data.orderIndex === null ? null : +data.orderIndex);
+			"question" in data && (item.question = data.question === null ? null : `${data.question}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: DraftQuestionViewModel) {
+			let model: ArticleDraftQuestion;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(ArticleDraftQuestion).find(viewModel.id)
+			} else {
+				model = new ArticleDraftQuestion();
+			}
+			
+			"answers" in viewModel && (null);
+			"answerId" in viewModel && (model.answerId = viewModel.answerId === null ? null : `${viewModel.answerId}`);
+			"detail" in viewModel && (model.detail = viewModel.detail === null ? null : `${viewModel.detail}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"orderIndex" in viewModel && (model.orderIndex = viewModel.orderIndex === null ? null : +viewModel.orderIndex);
+			"question" in viewModel && (model.question = viewModel.question === null ? null : `${viewModel.question}`);
+
+			return model;
+		}
+	},
 	[PublicationSummaryModel.name]: class ComposedPublicationSummaryModel extends PublicationSummaryModel {
 		async map() {
 			return {
@@ -12172,6 +12504,98 @@ ViewModel.mappings = {
 			"publication" in viewModel && (model.publication.id = viewModel.publication ? viewModel.publication.id : null);
 			"body" in viewModel && (model.body = viewModel.body === null ? null : `${viewModel.body}`);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"published" in viewModel && (model.published = viewModel.published === null ? null : new Date(viewModel.published));
+			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
+
+			return model;
+		}
+	},
+	[DraftReviewViewModel.name]: class ComposedDraftReviewViewModel extends DraftReviewViewModel {
+		async map() {
+			return {
+				draftQuestions: (await this.$$model.draftQuestions.includeTree(ViewModel.mappings[DraftQuestionViewModel.name].items).toArray()).map(item => new DraftQuestionViewModel(item)),
+				publication: new PublicationSummaryModel(await BaseServer.unwrap(this.$$model.publication)),
+				draft: this.$$model.draft,
+				id: this.$$model.id,
+				interpreted: this.$$model.interpreted,
+				published: this.$$model.published,
+				title: this.$$model.title
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				get draftQuestions() {
+					return ViewModel.mappings[DraftQuestionViewModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "draftQuestions-DraftReviewViewModel"]
+					);
+				},
+				get publication() {
+					return ViewModel.mappings[PublicationSummaryModel.name].getPrefetchingProperties(
+						level,
+						[...parents, "publication-DraftReviewViewModel"]
+					);
+				},
+				draft: true,
+				id: true,
+				interpreted: true,
+				published: true,
+				title: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new DraftReviewViewModel(null);
+			"draftQuestions" in data && (item.draftQuestions = data.draftQuestions && [...data.draftQuestions].map(i => ViewModel.mappings[DraftQuestionViewModel.name].toViewModel(i)));
+			"publication" in data && (item.publication = data.publication && ViewModel.mappings[PublicationSummaryModel.name].toViewModel(data.publication));
+			"draft" in data && (item.draft = data.draft === null ? null : `${data.draft}`);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"interpreted" in data && (item.interpreted = data.interpreted === null ? null : new Date(data.interpreted));
+			"published" in data && (item.published = data.published === null ? null : new Date(data.published));
+			"title" in data && (item.title = data.title === null ? null : `${data.title}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: DraftReviewViewModel) {
+			let model: Article;
+			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(Article).find(viewModel.id)
+			} else {
+				model = new Article();
+			}
+			
+			"draftQuestions" in viewModel && (null);
+			"publication" in viewModel && (model.publication.id = viewModel.publication ? viewModel.publication.id : null);
+			"draft" in viewModel && (model.draft = viewModel.draft === null ? null : `${viewModel.draft}`);
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"interpreted" in viewModel && (model.interpreted = viewModel.interpreted === null ? null : new Date(viewModel.interpreted));
 			"published" in viewModel && (model.published = viewModel.published === null ? null : new Date(viewModel.published));
 			"title" in viewModel && (model.title = viewModel.title === null ? null : `${viewModel.title}`);
 

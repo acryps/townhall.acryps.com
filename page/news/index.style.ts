@@ -16,6 +16,7 @@ export const newsStyle = () => child('ui-news',
 		display('flex'),
 		gap(pageGutter),
 		marginBottom(pageGutter.multiply(2)),
+		justifyContent('center'),
 
 		overflowY('auto'),
 
@@ -30,6 +31,17 @@ export const newsStyle = () => child('ui-news',
 					height(rem(4))
 				)
 			)
+		)
+	),
+
+	child('ui-actions',
+		display('flex'),
+		justifyContent('center'),
+		gap(rem(1)),
+		marginBottom(pageGutter.multiply(2)),
+
+		child('ui-action',
+			buttonStyle()
 		)
 	),
 

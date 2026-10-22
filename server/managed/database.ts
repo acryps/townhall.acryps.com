@@ -46,7 +46,9 @@ export class ArticleQueryProxy extends QueryProxy {
 	get oracleProposal(): Partial<OracleProposalQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get publication(): Partial<PublicationQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get body(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get draft(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get generatedSummary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get interpreted(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get marketCycleId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get oracleProposalId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get publicationId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -55,14 +57,18 @@ export class ArticleQueryProxy extends QueryProxy {
 }
 
 export class Article extends Entity<ArticleQueryProxy> {
-	images: PrimaryReference<ArticleImage, ArticleImageQueryProxy>;
+	draftQuestions: PrimaryReference<ArticleDraftQuestion, ArticleDraftQuestionQueryProxy>;
+		images: PrimaryReference<ArticleImage, ArticleImageQueryProxy>;
 		opinions: PrimaryReference<ArticleOpinion, ArticleOpinionQueryProxy>;
+		references: PrimaryReference<ArticleReference, ArticleReferenceQueryProxy>;
 		get marketCycle(): Partial<ForeignReference<MarketCycle>> { return this.$marketCycle; }
 	get oracleProposal(): Partial<ForeignReference<OracleProposal>> { return this.$oracleProposal; }
 	get publication(): Partial<ForeignReference<Publication>> { return this.$publication; }
 	body: string;
+	draft: string;
 	generatedSummary: string;
 	declare id: string;
+	interpreted: Date;
 	marketCycleId: string;
 	oracleProposalId: string;
 	publicationId: string;
@@ -73,8 +79,10 @@ export class Article extends Entity<ArticleQueryProxy> {
 		source: "article",
 		columns: {
 			body: { type: "text", name: "body" },
+			draft: { type: "text", name: "draft" },
 			generatedSummary: { type: "text", name: "generated_summary" },
 			id: { type: "uuid", name: "id" },
+			interpreted: { type: "timestamp", name: "interpreted" },
 			marketCycleId: { type: "uuid", name: "market_cycle_id" },
 			oracleProposalId: { type: "uuid", name: "oracle_proposal_id" },
 			publicationId: { type: "uuid", name: "publication_id" },
@@ -89,8 +97,10 @@ export class Article extends Entity<ArticleQueryProxy> {
 	constructor() {
 		super();
 		
+		this.draftQuestions = new PrimaryReference<ArticleDraftQuestion, ArticleDraftQuestionQueryProxy>(this, "articleId", ArticleDraftQuestion);
 		this.images = new PrimaryReference<ArticleImage, ArticleImageQueryProxy>(this, "articleId", ArticleImage);
 		this.opinions = new PrimaryReference<ArticleOpinion, ArticleOpinionQueryProxy>(this, "articleId", ArticleOpinion);
+		this.references = new PrimaryReference<ArticleReference, ArticleReferenceQueryProxy>(this, "articleId", ArticleReference);
 		this.$marketCycle = new ForeignReference<MarketCycle>(this, "marketCycleId", MarketCycle);
 	this.$oracleProposal = new ForeignReference<OracleProposal>(this, "oracleProposalId", OracleProposal);
 	this.$publication = new ForeignReference<Publication>(this, "publicationId", Publication);
@@ -129,6 +139,127 @@ export class Article extends Entity<ArticleQueryProxy> {
 			this.publicationId = value.id as string;
 		} else {
 			this.publicationId = null;
+		}
+	}
+
+	
+}
+			
+export class ArticleDraftAnswerQueryProxy extends QueryProxy {
+	get question(): Partial<ArticleDraftQuestionQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get content(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get orderIndex(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get questionId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class ArticleDraftAnswer extends Entity<ArticleDraftAnswerQueryProxy> {
+	selectedInQuestions: PrimaryReference<ArticleDraftQuestion, ArticleDraftQuestionQueryProxy>;
+		get question(): Partial<ForeignReference<ArticleDraftQuestion>> { return this.$question; }
+	content: string;
+	declare id: string;
+	orderIndex: number;
+	questionId: string;
+	
+	$$meta = {
+		source: "article_draft_answer",
+		columns: {
+			content: { type: "text", name: "content" },
+			id: { type: "uuid", name: "id" },
+			orderIndex: { type: "int4", name: "order_index" },
+			questionId: { type: "uuid", name: "question_id" }
+		},
+		get set(): DbSet<ArticleDraftAnswer, ArticleDraftAnswerQueryProxy> { 
+			return new DbSet<ArticleDraftAnswer, ArticleDraftAnswerQueryProxy>(ArticleDraftAnswer, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.selectedInQuestions = new PrimaryReference<ArticleDraftQuestion, ArticleDraftQuestionQueryProxy>(this, "answerId", ArticleDraftQuestion);
+		this.$question = new ForeignReference<ArticleDraftQuestion>(this, "questionId", ArticleDraftQuestion);
+	}
+	
+	private $question: ForeignReference<ArticleDraftQuestion>;
+
+	set question(value: Partial<ForeignReference<ArticleDraftQuestion>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.questionId = value.id as string;
+		} else {
+			this.questionId = null;
+		}
+	}
+
+	
+}
+			
+export class ArticleDraftQuestionQueryProxy extends QueryProxy {
+	get answer(): Partial<ArticleDraftAnswerQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get article(): Partial<ArticleQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get answerId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get articleId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get detail(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get orderIndex(): Partial<QueryNumber> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get question(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class ArticleDraftQuestion extends Entity<ArticleDraftQuestionQueryProxy> {
+	get answer(): Partial<ForeignReference<ArticleDraftAnswer>> { return this.$answer; }
+	get article(): Partial<ForeignReference<Article>> { return this.$article; }
+	answers: PrimaryReference<ArticleDraftAnswer, ArticleDraftAnswerQueryProxy>;
+		answerId: string;
+	articleId: string;
+	detail: string;
+	declare id: string;
+	orderIndex: number;
+	question: string;
+	
+	$$meta = {
+		source: "article_draft_question",
+		columns: {
+			answerId: { type: "uuid", name: "answer_id" },
+			articleId: { type: "uuid", name: "article_id" },
+			detail: { type: "text", name: "detail" },
+			id: { type: "uuid", name: "id" },
+			orderIndex: { type: "int4", name: "order_index" },
+			question: { type: "text", name: "question" }
+		},
+		get set(): DbSet<ArticleDraftQuestion, ArticleDraftQuestionQueryProxy> { 
+			return new DbSet<ArticleDraftQuestion, ArticleDraftQuestionQueryProxy>(ArticleDraftQuestion, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$answer = new ForeignReference<ArticleDraftAnswer>(this, "answerId", ArticleDraftAnswer);
+	this.$article = new ForeignReference<Article>(this, "articleId", Article);
+	this.answers = new PrimaryReference<ArticleDraftAnswer, ArticleDraftAnswerQueryProxy>(this, "questionId", ArticleDraftAnswer);
+	}
+	
+	private $answer: ForeignReference<ArticleDraftAnswer>;
+
+	set answer(value: Partial<ForeignReference<ArticleDraftAnswer>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.answerId = value.id as string;
+		} else {
+			this.answerId = null;
+		}
+	}
+
+	private $article: ForeignReference<Article>;
+
+	set article(value: Partial<ForeignReference<Article>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.articleId = value.id as string;
+		} else {
+			this.articleId = null;
 		}
 	}
 
@@ -243,6 +374,54 @@ export class ArticleOpinion extends Entity<ArticleOpinionQueryProxy> {
 			this.authorId = value.id as string;
 		} else {
 			this.authorId = null;
+		}
+	}
+
+	
+}
+			
+export class ArticleReferenceQueryProxy extends QueryProxy {
+	get article(): Partial<ArticleQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get articleId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get itemId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get type(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+}
+
+export class ArticleReference extends Entity<ArticleReferenceQueryProxy> {
+	get article(): Partial<ForeignReference<Article>> { return this.$article; }
+	articleId: string;
+	declare id: string;
+	itemId: string;
+	type: string;
+	
+	$$meta = {
+		source: "article_reference",
+		columns: {
+			articleId: { type: "uuid", name: "article_id" },
+			id: { type: "uuid", name: "id" },
+			itemId: { type: "uuid", name: "item_id" },
+			type: { type: "text", name: "type" }
+		},
+		get set(): DbSet<ArticleReference, ArticleReferenceQueryProxy> { 
+			return new DbSet<ArticleReference, ArticleReferenceQueryProxy>(ArticleReference, null);
+		}
+	};
+	
+	constructor() {
+		super();
+		
+		this.$article = new ForeignReference<Article>(this, "articleId", Article);
+	}
+	
+	private $article: ForeignReference<Article>;
+
+	set article(value: Partial<ForeignReference<Article>>) {
+		if (value) {
+			if (!value.id) { throw new Error("Invalid null id. Save the referenced model prior to creating a reference to it."); }
+
+			this.articleId = value.id as string;
+		} else {
+			this.articleId = null;
 		}
 	}
 
@@ -5312,6 +5491,7 @@ export class PublicationQueryProxy extends QueryProxy {
 	get marketReportStandpoint(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get name(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get tag(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get writingStyle(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 }
 
 export class Publication extends Entity<PublicationQueryProxy> {
@@ -5324,6 +5504,7 @@ export class Publication extends Entity<PublicationQueryProxy> {
 	marketReportStandpoint: string;
 	name: string;
 	tag: string;
+	writingStyle: string;
 	
 	$$meta = {
 		source: "publication",
@@ -5334,7 +5515,8 @@ export class Publication extends Entity<PublicationQueryProxy> {
 			incorporation: { type: "timestamp", name: "incorporation" },
 			marketReportStandpoint: { type: "text", name: "market_report_standpoint" },
 			name: { type: "text", name: "name" },
-			tag: { type: "text", name: "tag" }
+			tag: { type: "text", name: "tag" },
+			writingStyle: { type: "text", name: "writing_style" }
 		},
 		get set(): DbSet<Publication, PublicationQueryProxy> { 
 			return new DbSet<Publication, PublicationQueryProxy>(Publication, null);
@@ -7692,8 +7874,11 @@ export class CommoditySymbolTickerView extends View<CommoditySymbolTickerViewPro
 
 export class DbContext {
 	article: DbSet<Article, ArticleQueryProxy>;
+	articleDraftAnswer: DbSet<ArticleDraftAnswer, ArticleDraftAnswerQueryProxy>;
+	articleDraftQuestion: DbSet<ArticleDraftQuestion, ArticleDraftQuestionQueryProxy>;
 	articleImage: DbSet<ArticleImage, ArticleImageQueryProxy>;
 	articleOpinion: DbSet<ArticleOpinion, ArticleOpinionQueryProxy>;
+	articleReference: DbSet<ArticleReference, ArticleReferenceQueryProxy>;
 	bill: DbSet<Bill, BillQueryProxy>;
 	billHonestium: DbSet<BillHonestium, BillHonestiumQueryProxy>;
 	borough: DbSet<Borough, BoroughQueryProxy>;
@@ -7811,8 +7996,11 @@ export class DbContext {
 
 	constructor(private runContext: RunContext) {
 		this.article = new DbSet<Article, ArticleQueryProxy>(Article, this.runContext);
+		this.articleDraftAnswer = new DbSet<ArticleDraftAnswer, ArticleDraftAnswerQueryProxy>(ArticleDraftAnswer, this.runContext);
+		this.articleDraftQuestion = new DbSet<ArticleDraftQuestion, ArticleDraftQuestionQueryProxy>(ArticleDraftQuestion, this.runContext);
 		this.articleImage = new DbSet<ArticleImage, ArticleImageQueryProxy>(ArticleImage, this.runContext);
 		this.articleOpinion = new DbSet<ArticleOpinion, ArticleOpinionQueryProxy>(ArticleOpinion, this.runContext);
+		this.articleReference = new DbSet<ArticleReference, ArticleReferenceQueryProxy>(ArticleReference, this.runContext);
 		this.bill = new DbSet<Bill, BillQueryProxy>(Bill, this.runContext);
 		this.billHonestium = new DbSet<BillHonestium, BillHonestiumQueryProxy>(BillHonestium, this.runContext);
 		this.borough = new DbSet<Borough, BoroughQueryProxy>(Borough, this.runContext);

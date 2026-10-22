@@ -35,6 +35,9 @@ import { WorkOfferPage } from "./company-office/work-offer";
 import { CreateOfficePage } from "./company-office/office/create";
 import { RegisterBoroughPage } from "./borough/register";
 import { WriteArticlePage } from "./news/write";
+import { WriteDraftPage } from "./news/draft/write";
+import { DraftReviewPage } from "./news/draft/review";
+import { PendingDraftsPage } from "./news/draft/pending";
 import { EditPlotAction } from "./map/edit-plot";
 import { CreateBuildingAction } from "./map/create-building";
 import { Metadata } from "@acryps/metadata";
@@ -183,6 +186,9 @@ export class Application {
 				.route('/news/write/:id', WriteArticlePage)
 				.route('/news/article/:id', ArticePage)
 				.route('/news/publication/:tag', PublicationPage)
+				.route('/news/draft/write/:id', WriteDraftPage)
+				.route('/news/draft/review/:id', DraftReviewPage)
+				.route('/news/drafts', PendingDraftsPage)
 				.route('/news', NewsPage)
 
 				.route('/market', MarketPage

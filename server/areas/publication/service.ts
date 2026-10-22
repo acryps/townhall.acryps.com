@@ -3,6 +3,8 @@ import { Article, ArticleImage, DbContext, Publication } from "../../managed/dat
 import { ArticleImageViewModel, ArticleNewstickerModel, ArticlePreviewModel, ArticleViewModel } from "./article";
 import { PublicationViewModel } from "./publication";
 import { Annotator } from "../../annotate";
+import { ArticleDraftInterpreter } from "./draft-interpreter";
+import { DraftReviewViewModel, DraftSummaryModel } from "./draft";
 
 export class PublicationService extends Service {
 	constructor(
@@ -122,5 +124,99 @@ export class PublicationService extends Service {
 		article.published = new Date();
 
 		await article.update();
+	}
+
+	async createDraft(publicationId: string) {
+		const article = new Article();
+		article.title = '';
+		article.draft = '';
+		article.publicationId = publicationId;
+
+		await article.create();
+
+		return article.id;
+	}
+
+	async saveDraft(id: string, draft: string) {
+		const article = await this.database.article.find(id);
+
+		if (article.published) {
+			throw new Error(`Article '${article.title}' already published`);
+		}
+
+		article.draft = draft;
+
+		await article.update();
+	}
+
+	interpretDraft(id: string) {
+		// fire and forget - the review page polls until it completes
+		ArticleDraftInterpreter.interpret(this.database, id);
+	}
+
+	async getDraftReview(id: string) {
+		return new DraftReviewViewModel(await this.database.article.find(id));
+	}
+
+	async selectAnswer(questionId: string, answerId: string) {
+		const question = await this.database.articleDraftQuestion.find(questionId);
+		question.answerId = answerId;
+
+		await question.update();
+	}
+
+	writeDraft(id: string) {
+		// fire and forget - the review page polls until it completes
+		ArticleDraftInterpreter.write(this.database, id);
+	}
+
+	async editAnswer(answerId: string, content: string) {
+		const answer = await this.database.articleDraftAnswer.find(answerId);
+		answer.content = content;
+
+		await answer.update();
+	}
+
+	async hasPendingDrafts() {
+		const candidates = await this.database.article
+			.where(article => article.interpreted != null)
+			.where(article => article.published == null)
+			.toArray();
+
+		for (let article of candidates) {
+			const unanswered = await this.database.articleDraftQuestion
+				.where(question => question.articleId == article.id)
+				.where(question => question.answerId == null)
+				.count();
+
+			if (unanswered) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	async listPendingDrafts() {
+		const candidates = await this.database.article
+			.where(article => article.interpreted != null)
+			.where(article => article.published == null)
+			.orderByAscending(article => article.interpreted)
+			.toArray();
+
+		const pending: Article[] = [];
+
+		for (let article of candidates) {
+			const unanswered = await this.database.articleDraftQuestion
+				.where(question => question.articleId == article.id)
+				.where(question => question.answerId == null)
+				.count();
+
+			if (unanswered) {
+				pending.push(article);
+			}
+		}
+
+		return DraftSummaryModel.from(pending);
 	}
 }

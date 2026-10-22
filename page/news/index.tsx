@@ -7,6 +7,7 @@ import { Banner } from "../../interface/banner";
 export class NewsPage extends Component {
 	articles: ArticlePreviewModel[];
 	publications: PublicationSummaryModel[];
+	pendingDrafts: boolean;
 
 	async onload() {
 		this.articles = await new PublicationService().listNewestArticles(0, null);
@@ -17,6 +18,8 @@ export class NewsPage extends Component {
 				this.publications.push(article.publication);
 			}
 		}
+
+		this.pendingDrafts = await new PublicationService().hasPendingDrafts();
 	}
 
 	render() {
@@ -26,6 +29,12 @@ export class NewsPage extends Component {
 					{new BannerComponent(Banner.unpack(publication.company.banner))}
 				</ui-publication>)}
 			</ui-publications>
+
+			{this.pendingDrafts && <ui-actions>
+				<ui-action ui-href='drafts'>
+					Answer Questions
+				</ui-action>
+			</ui-actions>}
 
 			{new ArticleListComponent(this.articles)}
 		</ui-news>;

@@ -19,6 +19,8 @@ import { propertiesStyle } from "./properties/index.style";
 import { locationMarkerStyle } from "./shared/location/index.style";
 import { registerBoroughStyle } from "./borough/register/index.style";
 import { writeArticleStyle } from "./news/write/index.style";
+import { draftReviewStyle } from "./news/draft/review/index.style";
+import { pendingDraftsStyle } from "./news/draft/pending/index.style";
 import { annotatedTextStyle } from "./shared/annotaded-text/index.style";
 import { streetStyle } from "./street/index.style";
 import { legalEntitySelectorStyle } from "./shared/legal-entity/select/index.style";
@@ -148,6 +150,8 @@ export const pageStyle = () => root(
 				publicationStyle(),
 				articleStyle(),
 				writeArticleStyle(),
+				draftReviewStyle(),
+				pendingDraftsStyle(),
 
 				oracleStyle(),
 

@@ -1432,6 +1432,59 @@ export class ArticleImageViewModel {
 	}
 }
 
+export class DraftSummaryModel {
+	publication: PublicationSummaryModel;
+	draft: string;
+	id: string;
+	title: string;
+
+	private static $build(raw) {
+		const item = new DraftSummaryModel();
+		raw.publication === undefined || (item.publication = raw.publication ? PublicationSummaryModel["$build"](raw.publication) : null)
+		raw.draft === undefined || (item.draft = raw.draft === null ? null : `${raw.draft}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
+		
+		return item;
+	}
+}
+
+export class DraftAnswerViewModel {
+	content: string;
+	id: string;
+	orderIndex: number;
+
+	private static $build(raw) {
+		const item = new DraftAnswerViewModel();
+		raw.content === undefined || (item.content = raw.content === null ? null : `${raw.content}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.orderIndex === undefined || (item.orderIndex = raw.orderIndex === null ? null : +raw.orderIndex)
+		
+		return item;
+	}
+}
+
+export class DraftQuestionViewModel {
+	answers: DraftAnswerViewModel[];
+	answerId: string;
+	detail: string;
+	id: string;
+	orderIndex: number;
+	question: string;
+
+	private static $build(raw) {
+		const item = new DraftQuestionViewModel();
+		raw.answers === undefined || (item.answers = raw.answers ? raw.answers.map(i => DraftAnswerViewModel["$build"](i)) : null)
+		raw.answerId === undefined || (item.answerId = raw.answerId === null ? null : `${raw.answerId}`)
+		raw.detail === undefined || (item.detail = raw.detail === null ? null : `${raw.detail}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.orderIndex === undefined || (item.orderIndex = raw.orderIndex === null ? null : +raw.orderIndex)
+		raw.question === undefined || (item.question = raw.question === null ? null : `${raw.question}`)
+		
+		return item;
+	}
+}
+
 export class PublicationSummaryModel {
 	company: CompanySummaryModel;
 	description: string;
@@ -2392,6 +2445,29 @@ export class ArticleViewModel {
 		raw.publication === undefined || (item.publication = raw.publication ? PublicationSummaryModel["$build"](raw.publication) : null)
 		raw.body === undefined || (item.body = raw.body === null ? null : `${raw.body}`)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.published === undefined || (item.published = raw.published ? new Date(raw.published) : null)
+		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
+		
+		return item;
+	}
+}
+
+export class DraftReviewViewModel {
+	draftQuestions: DraftQuestionViewModel[];
+	publication: PublicationSummaryModel;
+	draft: string;
+	id: string;
+	interpreted: Date;
+	published: Date;
+	title: string;
+
+	private static $build(raw) {
+		const item = new DraftReviewViewModel();
+		raw.draftQuestions === undefined || (item.draftQuestions = raw.draftQuestions ? raw.draftQuestions.map(i => DraftQuestionViewModel["$build"](i)) : null)
+		raw.publication === undefined || (item.publication = raw.publication ? PublicationSummaryModel["$build"](raw.publication) : null)
+		raw.draft === undefined || (item.draft = raw.draft === null ? null : `${raw.draft}`)
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.interpreted === undefined || (item.interpreted = raw.interpreted ? new Date(raw.interpreted) : null)
 		raw.published === undefined || (item.published = raw.published ? new Date(raw.published) : null)
 		raw.title === undefined || (item.title = raw.title === null ? null : `${raw.title}`)
 		
@@ -5138,6 +5214,188 @@ export class PublicationService {
 
 			if ("aborted" in r) {
 				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async createDraft(publicationId: string): Promise<string> {
+		const $data = new FormData();
+		$data.append("NkbT5zcT5raT11MzlhMmF1NmQyZ2hpNz", Service.stringify(publicationId))
+
+		return await fetch(Service.toURL("k2MzFqN3xtcW1tODV5YzB1bDRiYjVwcG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : `${d}`;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async saveDraft(id: string, draft: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("A2ZnZmcDFuZmZodHRzNDhqZzI3bzVpNj", Service.stringify(id))
+		$data.append("E3MWczcmRxNGR0Zzp1amliMTRieTlhNm", Service.stringify(draft))
+
+		return await fetch(Service.toURL("xwdHdjbjQ5b3I1bGpoOWMxMnhqazZtcG"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async interpretDraft(id: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("1zZDR5eWljM29mN2ZvcmwwaWNuNmt5Y2", Service.stringify(id))
+
+		return await fetch(Service.toURL("lvemgyNDIwaGQ4eWgwMGNqN2ZrcmJ6dX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async getDraftReview(id: string): Promise<DraftReviewViewModel> {
+		const $data = new FormData();
+		$data.append("dxNjV3Yzd4NmFjYntpYml6OWNqeHV5cG", Service.stringify(id))
+
+		return await fetch(Service.toURL("Z4d3R5b2k1czppMWllZjN6ZzZ1bmluNj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d === null ? null : DraftReviewViewModel["$build"](d);
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async selectAnswer(questionId: string, answerId: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("VtZm1remV0NG5kNGl1Y3B2c3U0dDl2dD", Service.stringify(questionId))
+		$data.append("MwbXQzcj1pMH82ajhjN3NrazBhZGZvdm", Service.stringify(answerId))
+
+		return await fetch(Service.toURL("dpcnNvNGN6MW42cWlnODNoNmU3eXpiam"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async writeDraft(id: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("I0cDF0ZGVmZHVlZ2l1N3VjOXZmYm55Nn", Service.stringify(id))
+
+		return await fetch(Service.toURL("Joc2F2dTl1cG9qd3F0ZGN6azFzeHh0MW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async editAnswer(answerId: string, content: string): Promise<void> {
+		const $data = new FormData();
+		$data.append("g4cXFsajR1cnZ0NDljdWcybXQxYzcwbH", Service.stringify(answerId))
+		$data.append("90MHxkZzFnNzRieHpqNzkxMWQ2bW44dD", Service.stringify(content))
+
+		return await fetch(Service.toURL("Zra2cxbDNuZGJicmpyYWljeWxhMzAwdj"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("error" in r) {
+				throw new Error(r.error);
+			}
+
+			if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async hasPendingDrafts(): Promise<boolean> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("5icGBiNmNiNW9pZXJubWQyZHFoOGMyaT"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return !!d;
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
+	async listPendingDrafts(): Promise<Array<DraftSummaryModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("F2cX52Y2U0cG52djRmanFxMWNjODFlan"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : DraftSummaryModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
 			}
 		});
 	}

@@ -4,7 +4,6 @@ import { pageGutter } from "../index.style";
 import { inputStyle } from "../shared/field.style";
 
 export const chartLineColor = hex('000');
-export const chartLineWidth = 2;
 
 export const chartFillColor = hex('00f4');
 
@@ -68,17 +67,6 @@ export const metricsStyle = () => child('ui-metrics',
 
 					fontSize(rem(0.8))
 				)
-			)
-		),
-
-		child('ui-chart',
-			display('block'),
-			height(rem(10)),
-			marginBottom(pageGutter),
-
-			child('canvas',
-				width(percentage(100)),
-				height(percentage(100))
 			)
 		),
 

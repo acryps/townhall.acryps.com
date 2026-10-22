@@ -1,23 +1,21 @@
 import { ManagedServer } from "../managed/server";
-import { MarketTracker } from "./tracker";
+import { DbContext } from "../managed/database";
 
 export class MarketFeedInterface {
 	constructor(
 		app: ManagedServer,
-		tracker: MarketTracker
+		database: DbContext
 	) {
 		app.app.get('/market/feed/ticker', async (request, response) => {
-			let feed = [];
+			const items = await database.views.commoditySymbolTicker
+				.orderByAscending(item => item.symbol)
+				.toArray();
 
-			for (let entry of tracker.ratings) {
-				if (entry.commodity.symbol) {
-					const direction = parseInt(entry.commodity.id[0], 16) >= 8;
+			const feed = items.map(item => {
+				const arrow = item.direction == 'up' ? '{' : item.direction == 'down' ? '}' : '';
 
-					feed.push(`${entry.commodity.symbol} ${this.formatNumber(entry.rating.retailStockSize)}${direction ? '{' : '}'}`);
-				}
-			}
-
-			console.log(feed);
+				return `${item.symbol} ${this.formatNumber(item.price)}${arrow}`;
+			});
 
 			response.end(feed.join(' ').toUpperCase());
 		});

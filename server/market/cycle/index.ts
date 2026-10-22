@@ -1,5 +1,5 @@
 import { Logger } from "@acryps/log";
-import { Borough, Company, DbContext, MarketCycle, TokenSponsor } from "../../managed/database";
+import { Article, Borough, Company, DbContext, MarketCycle, TokenSponsor } from "../../managed/database";
 import { MarketTracker } from "../tracker";
 import { MarketCycleGeneratorStep } from "./step";
 import { StockSeedRuleMarketCycleGeneratorStep } from "./step/1-stock-seed";
@@ -7,6 +7,7 @@ import { Time } from "../../../interface/time";
 import { ResidentialDemandMarketCycleGeneratorStep } from "./step/2-residential-demand";
 import { CommercialDemandMarketCycleGeneratorStep } from "./step/3-commercial-demand";
 import { BoroughDemandMarketCycleGeneratorStep } from "./step/4-borough-demand";
+import { MarketSegmentCycleGeneratorStep } from "./step/5-market-segment";
 import { Interpreter, SystemMessage, ToolError, UserMessage } from "../../life/interpreter";
 import { OpenAiInterpreterProvider } from "../../life/interpreter/provider/openai";
 import { Point } from "../../../interface/point";
@@ -19,6 +20,7 @@ export class MarketCycleGenerator {
 		'commercial demand': CommercialDemandMarketCycleGeneratorStep,
 		'borough demand': BoroughDemandMarketCycleGeneratorStep,
 		'stock seed rule': StockSeedRuleMarketCycleGeneratorStep,
+		'market segment': MarketSegmentCycleGeneratorStep,
 	});
 
 	situation = [
@@ -54,9 +56,12 @@ export class MarketCycleGenerator {
 		await cycle.create();
 
 		const logger = new Logger('market cycle').child(cycle.id.split('-')[0]);
-		logger.log(`cycle opened ${new Time(cycle.opened).toString()}: ${this.situation.join(', ')}`);
+		logger.log(`cycle opened ${new Time(cycle.opened).toString()}: ${MarketSituationParameter.toSituationString(this.situation, cycle)}`);
 
-		cycle.context = await this.compileContext(cycle, sponsor);
+		const news = await this.collectNews(lastCycle);
+		logger.log(`collected ${news.length} new articles since the last cycle closed`);
+
+		cycle.context = await this.compileContext(cycle, sponsor, news);
 		logger.log(`context: ${cycle.context}`);
 		await cycle.update();
 
@@ -68,6 +73,7 @@ export class MarketCycleGenerator {
 				this.tracker,
 				cycle,
 				this.situation,
+				news,
 
 				sponsor,
 				logger,
@@ -86,7 +92,23 @@ export class MarketCycleGenerator {
 		logger.log(`cycle closed`);
 	}
 
-	private async compileContext(cycle: MarketCycle, sponsor: TokenSponsor) {
+	// every article published since the last cycle closed (or, for the very first cycle, all published articles)
+	// collected once here so every step and the context compiler work off the same set, instead of each querying it separately
+	private async collectNews(lastCycle: MarketCycle) {
+		let query = this.database.article
+			.where(article => article.published != null)
+			.orderByDescending(article => article.published)
+			.include(article => article.publication)
+			.include(article => article.opinions);
+
+		if (lastCycle) {
+			query = query.where(article => article.published.isAfter(lastCycle.closed));
+		}
+
+		return await query.toArray();
+	}
+
+	private async compileContext(cycle: MarketCycle, sponsor: TokenSponsor, recentNews: Article[]) {
 		const interpreter = new Interpreter(new OpenAiInterpreterProvider(sponsor));
 
 		interpreter.remember([
@@ -96,18 +118,10 @@ export class MarketCycleGenerator {
 
 				It is currently ${Time.now().toString()}.
 
-				I will provide some recent articles, note referenced companies and boroughs.
+				I will provide all articles published since the last cycle, note referenced companies and boroughs.
 				The context from the last few cycles will be included too.
 			`)
 		]);
-
-		const recentNews = await this.database.article
-			.where(article => article.published != null)
-			.orderByDescending(article => article.published)
-			.include(article => article.publication)
-			.include(article => article.opinions)
-			.limit(5)
-			.toArray();
 
 		const boroughs = await this.database.borough
 			.orderByDescending(borough => borough.name.length())

@@ -90,6 +90,7 @@ import { CommodityAskViewModel } from "././../areas/market/ask";
 import { TraderAskViewModel } from "././../areas/market/ask";
 import { MarketCycleSummaryModel } from "././../areas/market/cycle";
 import { MarketCycleViewModel } from "././../areas/market/cycle";
+import { CommoditySymbolTickerViewModel } from "././../areas/market/ticker";
 import { MarketService } from "././../areas/market/service";
 import { MetricTracker } from "././../areas/metrics/tracker";
 import { MetricListValueViewModel } from "././../areas/metrics/view";
@@ -257,6 +258,7 @@ import { StockSeedRule } from "./../managed/database";
 import { MarketCycle } from "./../managed/database";
 import { CommodityRating } from "./../managed/database";
 import { StockSeed } from "./../managed/database";
+import { CommoditySymbolTickerView } from "./../managed/database";
 import { CommodityTradingUnit } from "./../managed/database";
 import { Metric } from "./../managed/database";
 import { MetricValue } from "./../managed/database";
@@ -1151,6 +1153,15 @@ export class ManagedServer extends BaseServer {
 			{},
 			inject => inject.construct(MarketService),
 			(controller, params) => controller.getCommodities(
+				
+			)
+		);
+
+		this.expose(
+			"Q5Y2Y2Y2h3ZGA0YXF0bGR3dXtvZmR4c2",
+			{},
+			inject => inject.construct(MarketService),
+			(controller, params) => controller.getSymbolTicker(
 				
 			)
 		);
@@ -6781,6 +6792,7 @@ ViewModel.mappings = {
 				commercialDemand: this.$$model.commercialDemand,
 				commercialStockSize: this.$$model.commercialStockSize,
 				id: this.$$model.id,
+				price: this.$$model.price,
 				retailDemand: this.$$model.retailDemand,
 				retailStockSize: this.$$model.retailStockSize
 			}
@@ -6821,6 +6833,7 @@ ViewModel.mappings = {
 				commercialDemand: true,
 				commercialStockSize: true,
 				id: true,
+				price: true,
 				retailDemand: true,
 				retailStockSize: true
 			};
@@ -6832,6 +6845,7 @@ ViewModel.mappings = {
 			"commercialDemand" in data && (item.commercialDemand = data.commercialDemand === null ? null : +data.commercialDemand);
 			"commercialStockSize" in data && (item.commercialStockSize = data.commercialStockSize === null ? null : +data.commercialStockSize);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"price" in data && (item.price = data.price === null ? null : +data.price);
 			"retailDemand" in data && (item.retailDemand = data.retailDemand === null ? null : +data.retailDemand);
 			"retailStockSize" in data && (item.retailStockSize = data.retailStockSize === null ? null : +data.retailStockSize);
 
@@ -6851,6 +6865,7 @@ ViewModel.mappings = {
 			"commercialDemand" in viewModel && (model.commercialDemand = viewModel.commercialDemand === null ? null : +viewModel.commercialDemand);
 			"commercialStockSize" in viewModel && (model.commercialStockSize = viewModel.commercialStockSize === null ? null : +viewModel.commercialStockSize);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"price" in viewModel && (model.price = viewModel.price === null ? null : +viewModel.price);
 			"retailDemand" in viewModel && (model.retailDemand = viewModel.retailDemand === null ? null : +viewModel.retailDemand);
 			"retailStockSize" in viewModel && (model.retailStockSize = viewModel.retailStockSize === null ? null : +viewModel.retailStockSize);
 
@@ -6864,6 +6879,7 @@ ViewModel.mappings = {
 				commercialDemand: this.$$model.commercialDemand,
 				commercialStockSize: this.$$model.commercialStockSize,
 				id: this.$$model.id,
+				price: this.$$model.price,
 				retailDemand: this.$$model.retailDemand,
 				retailStockSize: this.$$model.retailStockSize
 			}
@@ -6904,6 +6920,7 @@ ViewModel.mappings = {
 				commercialDemand: true,
 				commercialStockSize: true,
 				id: true,
+				price: true,
 				retailDemand: true,
 				retailStockSize: true
 			};
@@ -6915,6 +6932,7 @@ ViewModel.mappings = {
 			"commercialDemand" in data && (item.commercialDemand = data.commercialDemand === null ? null : +data.commercialDemand);
 			"commercialStockSize" in data && (item.commercialStockSize = data.commercialStockSize === null ? null : +data.commercialStockSize);
 			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
+			"price" in data && (item.price = data.price === null ? null : +data.price);
 			"retailDemand" in data && (item.retailDemand = data.retailDemand === null ? null : +data.retailDemand);
 			"retailStockSize" in data && (item.retailStockSize = data.retailStockSize === null ? null : +data.retailStockSize);
 
@@ -6934,6 +6952,7 @@ ViewModel.mappings = {
 			"commercialDemand" in viewModel && (model.commercialDemand = viewModel.commercialDemand === null ? null : +viewModel.commercialDemand);
 			"commercialStockSize" in viewModel && (model.commercialStockSize = viewModel.commercialStockSize === null ? null : +viewModel.commercialStockSize);
 			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
+			"price" in viewModel && (model.price = viewModel.price === null ? null : +viewModel.price);
 			"retailDemand" in viewModel && (model.retailDemand = viewModel.retailDemand === null ? null : +viewModel.retailDemand);
 			"retailStockSize" in viewModel && (model.retailStockSize = viewModel.retailStockSize === null ? null : +viewModel.retailStockSize);
 
@@ -6943,6 +6962,7 @@ ViewModel.mappings = {
 	[MarketCycleChartModel.name]: class ComposedMarketCycleChartModel extends MarketCycleChartModel {
 		async map() {
 			return {
+				id: this.$$model.id,
 				opened: this.$$model.opened
 			}
 		};
@@ -6973,20 +6993,29 @@ ViewModel.mappings = {
 			}
 
 			return {
+				id: true,
 				opened: true
 			};
 		};
 
 		static toViewModel(data) {
 			const item = new MarketCycleChartModel(null);
+			"id" in data && (item.id = data.id === null ? null : `${data.id}`);
 			"opened" in data && (item.opened = data.opened === null ? null : new Date(data.opened));
 
 			return item;
 		}
 
 		static async toModel(viewModel: MarketCycleChartModel) {
-			const model = new MarketCycle();
+			let model: MarketCycle;
 			
+			if (viewModel.id) {
+				model = await ViewModel.globalFetchingContext.findSet(MarketCycle).find(viewModel.id)
+			} else {
+				model = new MarketCycle();
+			}
+			
+			"id" in viewModel && (model.id = viewModel.id === null ? null : `${viewModel.id}`);
 			"opened" in viewModel && (model.opened = viewModel.opened === null ? null : new Date(viewModel.opened));
 
 			return model;
@@ -7125,6 +7154,66 @@ ViewModel.mappings = {
 			"sourceName" in viewModel && (model.sourceName = viewModel.sourceName === null ? null : `${viewModel.sourceName}`);
 			"sourceQuantity" in viewModel && (model.sourceQuantity = viewModel.sourceQuantity === null ? null : `${viewModel.sourceQuantity}`);
 			"sourceReason" in viewModel && (model.sourceReason = viewModel.sourceReason === null ? null : `${viewModel.sourceReason}`);
+
+			return model;
+		}
+	},
+	[CommoditySymbolTickerViewModel.name]: class ComposedCommoditySymbolTickerViewModel extends CommoditySymbolTickerViewModel {
+		async map() {
+			return {
+				price: this.$$model.price,
+				symbol: this.$$model.symbol,
+				direction: this.$$model.direction
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				price: true,
+				symbol: true,
+				direction: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new CommoditySymbolTickerViewModel(null);
+			"price" in data && (item.price = data.price === null ? null : +data.price);
+			"symbol" in data && (item.symbol = data.symbol === null ? null : `${data.symbol}`);
+			"direction" in data && (item.direction = data.direction === null ? null : `${data.direction}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: CommoditySymbolTickerViewModel) {
+			const model = new CommoditySymbolTickerView();
+			
+			"price" in viewModel && (model.price = viewModel.price === null ? null : +viewModel.price);
+			"symbol" in viewModel && (model.symbol = viewModel.symbol === null ? null : `${viewModel.symbol}`);
+			"direction" in viewModel && (model.direction = viewModel.direction === null ? null : `${viewModel.direction}`);
 
 			return model;
 		}

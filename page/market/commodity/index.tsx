@@ -1,5 +1,5 @@
 import { Component } from "@acryps/page";
-import { AskViewModel, BidViewModel, CommodityRatingChartModel, CommodityViewModel, MarketService } from "../../managed/services";
+import { AskViewModel, BidViewModel, CommodityRatingChartModel, CommodityRatingViewModel, CommodityViewModel, MarketService } from "../../managed/services";
 import { Time } from "../../../interface/time";
 import { LegalEntityComponent } from "../../shared/legal-entity";
 import { positionIntensity } from "./index.style";
@@ -16,15 +16,23 @@ export class CommodityPage extends Component {
 	declare parameters: { tag };
 
 	commodity: CommodityViewModel;
+	rating: CommodityRatingViewModel;
 
 	async onload() {
 		this.commodity = await new MarketService().getCommodity(this.parameters.tag);
+		this.rating = await new MarketService().getRating(this.commodity.id);
 	}
 
 	render() {
 		return <ui-commodity>
 			<ui-title>
-				{this.commodity.name}
+				<ui-name>
+					{this.commodity.name}
+				</ui-name>
+
+				{this.rating?.price != null && <ui-price>
+					{convertToCurrency(this.rating.price)}
+				</ui-price>}
 			</ui-title>
 
 			{this.commodity.category && <ui-category>

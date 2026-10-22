@@ -1085,6 +1085,7 @@ export class CommodityRatingViewModel {
 	commercialDemand: number;
 	commercialStockSize: number;
 	id: string;
+	price: number;
 	retailDemand: number;
 	retailStockSize: number;
 
@@ -1094,6 +1095,7 @@ export class CommodityRatingViewModel {
 		raw.commercialDemand === undefined || (item.commercialDemand = raw.commercialDemand === null ? null : +raw.commercialDemand)
 		raw.commercialStockSize === undefined || (item.commercialStockSize = raw.commercialStockSize === null ? null : +raw.commercialStockSize)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
 		raw.retailDemand === undefined || (item.retailDemand = raw.retailDemand === null ? null : +raw.retailDemand)
 		raw.retailStockSize === undefined || (item.retailStockSize = raw.retailStockSize === null ? null : +raw.retailStockSize)
 		
@@ -1106,6 +1108,7 @@ export class CommodityRatingChartModel {
 	commercialDemand: number;
 	commercialStockSize: number;
 	id: string;
+	price: number;
 	retailDemand: number;
 	retailStockSize: number;
 
@@ -1115,6 +1118,7 @@ export class CommodityRatingChartModel {
 		raw.commercialDemand === undefined || (item.commercialDemand = raw.commercialDemand === null ? null : +raw.commercialDemand)
 		raw.commercialStockSize === undefined || (item.commercialStockSize = raw.commercialStockSize === null ? null : +raw.commercialStockSize)
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
 		raw.retailDemand === undefined || (item.retailDemand = raw.retailDemand === null ? null : +raw.retailDemand)
 		raw.retailStockSize === undefined || (item.retailStockSize = raw.retailStockSize === null ? null : +raw.retailStockSize)
 		
@@ -1123,10 +1127,12 @@ export class CommodityRatingChartModel {
 }
 
 export class MarketCycleChartModel {
+	id: string;
 	opened: Date;
 
 	private static $build(raw) {
 		const item = new MarketCycleChartModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.opened === undefined || (item.opened = raw.opened ? new Date(raw.opened) : null)
 		
 		return item;
@@ -1164,6 +1170,21 @@ export class StockSeedViewModel {
 		raw.sourceName === undefined || (item.sourceName = raw.sourceName === null ? null : `${raw.sourceName}`)
 		raw.sourceQuantity === undefined || (item.sourceQuantity = raw.sourceQuantity === null ? null : `${raw.sourceQuantity}`)
 		raw.sourceReason === undefined || (item.sourceReason = raw.sourceReason === null ? null : `${raw.sourceReason}`)
+		
+		return item;
+	}
+}
+
+export class CommoditySymbolTickerViewModel {
+	price: number;
+	symbol: string;
+	direction: string;
+
+	private static $build(raw) {
+		const item = new CommoditySymbolTickerViewModel();
+		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
+		raw.symbol === undefined || (item.symbol = raw.symbol === null ? null : `${raw.symbol}`)
+		raw.direction === undefined || (item.direction = raw.direction === null ? null : `${raw.direction}`)
 		
 		return item;
 	}
@@ -1472,6 +1493,27 @@ export class ValuationSummaryModel {
 		const item = new ValuationSummaryModel();
 		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
 		raw.price === undefined || (item.price = raw.price === null ? null : +raw.price)
+		
+		return item;
+	}
+}
+
+export class TrafficAnalysisSampleViewModel {
+	id: string;
+	tag: string;
+	givenName: string;
+	familyName: string;
+	purpose: string;
+	path: string;
+
+	private static $build(raw) {
+		const item = new TrafficAnalysisSampleViewModel();
+		raw.id === undefined || (item.id = raw.id === null ? null : `${raw.id}`)
+		raw.tag === undefined || (item.tag = raw.tag === null ? null : `${raw.tag}`)
+		raw.givenName === undefined || (item.givenName = raw.givenName === null ? null : `${raw.givenName}`)
+		raw.familyName === undefined || (item.familyName = raw.familyName === null ? null : `${raw.familyName}`)
+		raw.purpose === undefined || (item.purpose = raw.purpose === null ? null : `${raw.purpose}`)
+		raw.path === undefined || (item.path = raw.path === null ? null : `${raw.path}`)
 		
 		return item;
 	}
@@ -4006,6 +4048,27 @@ export class MarketService {
 		});
 	}
 
+	async getSymbolTicker(): Promise<Array<CommoditySymbolTickerViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("Q5Y2Y2Y2h3ZGA0YXF0bGR3dXtvZmR4c2"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : CommoditySymbolTickerViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+
 	async getRatings(): Promise<Array<CommodityRatingViewModel>> {
 		const $data = new FormData();
 		
@@ -5701,6 +5764,27 @@ export class TrainService {
 
 			if ("aborted" in r) {
 				throw new Error("request aborted by server");
+			}
+		});
+	}
+
+	async getTrafficSamples(): Promise<Array<TrafficAnalysisSampleViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("hncHB4N3FsZX1xa2I2bHF6amRycz1yOX"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : TrafficAnalysisSampleViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
 			}
 		});
 	}

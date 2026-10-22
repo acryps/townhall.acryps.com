@@ -96,13 +96,6 @@ DbClient.connectedClient.connect().then(async () => {
 		return;
 	}
 
-	WorkerDispatch.dispatch<TrafficAnalysisResult>(TrafficAnalysisWorkerHandle)
-		.then(result => {
-			TrafficAnalysisWorkerHandle.shapes = result.shapes;
-			TrafficAnalysisWorkerHandle.samples = result.samples;
-		})
-		.catch(error => logger.error('traffic analysis failed', error));
-
 	const app = new ManagedServer();
 	ws(app.app);
 
@@ -122,6 +115,8 @@ DbClient.connectedClient.connect().then(async () => {
 		};
 
 		nextMarketCycle();
+
+		return;
 	}
 
 	logger.log('preparing metrics');
@@ -129,6 +124,13 @@ DbClient.connectedClient.connect().then(async () => {
 	logger.log('metrics ready');
 
 	MetricTracker.schedule(MetricTrackerWorkerHandle);
+
+	WorkerDispatch.dispatch<TrafficAnalysisResult>(TrafficAnalysisWorkerHandle)
+		.then(result => {
+			TrafficAnalysisWorkerHandle.shapes = result.shapes;
+			TrafficAnalysisWorkerHandle.samples = result.samples;
+		})
+		.catch(error => logger.error('traffic analysis failed', error));
 
 	new MinimapGenerator(database, app).schedule();
 	new PlanningMapGenerator(database, app);
@@ -273,7 +275,7 @@ DbClient.connectedClient.connect().then(async () => {
 	});
 
 	new GoInterface(app, database);
-	new MarketFeedInterface(app, marketTracker);
+	new MarketFeedInterface(app, database);
 
 	app.prepareRoutes();
 	app.use(new StaticFileRoute('/assets/', join(process.cwd(), '..', 'page', 'assets')));

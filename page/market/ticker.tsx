@@ -3,6 +3,7 @@ import { MarketPage } from ".";
 import { CommoditySummaryModel, CommodityRatingViewModel } from "../managed/services";
 import { formatTradingUnit } from "../../interface/trading-unit";
 import { commercialIcon, homeIcon, retailIcon } from "../assets/icons/managed";
+import { convertToCurrency } from "../../interface/currency";
 
 export class CommodityTickerComponent extends Component {
 	declare rootNode: HTMLElement;
@@ -10,6 +11,8 @@ export class CommodityTickerComponent extends Component {
 	last: string;
 
 	rating: CommodityRatingViewModel;
+
+	price: HTMLElement = <ui-price />;
 
 	retailStockSize = document.createTextNode('?');
 	retailDemand = document.createTextNode('?');
@@ -37,6 +40,8 @@ export class CommodityTickerComponent extends Component {
 		this.rating = rating;
 
 		if (this.rootNode) {
+			this.price.textContent = convertToCurrency(this.rating.price);
+
 			this.retailStockSize.textContent = formatTradingUnit(this.commodity.tradingUnit, this.rating.retailStockSize);
 			this.retailDemand.textContent = formatTradingUnit(this.commodity.tradingUnit, this.rating.retailDemand);
 			this.commercialStockSize.textContent = formatTradingUnit(this.commodity.tradingUnit, this.rating.commercialStockSize);
@@ -63,13 +68,17 @@ export class CommodityTickerComponent extends Component {
 
 			<ui-detail>
 				<ui-header>
-					<ui-name>
-						{this.commodity.name}
-					</ui-name>
+					<ui-commodity>
+						<ui-name>
+							{this.commodity.name}
+						</ui-name>
 
-					<ui-unit>
-						{this.commodity.tradingUnit.baseUnit}
-					</ui-unit>
+						<ui-unit>
+							{this.commodity.tradingUnit.baseUnit}
+						</ui-unit>
+					</ui-commodity>
+
+					{this.price}
 				</ui-header>
 
 				<ui-volume>
@@ -86,3 +95,8 @@ export class CommodityTickerComponent extends Component {
 
 export const ratingStockSize = (rating: CommodityRatingViewModel) => rating ? rating.retailStockSize + rating.commercialStockSize : 0;
 export const ratingDemand = (rating: CommodityRatingViewModel) => rating ? rating.retailDemand + rating.commercialDemand : 0;
+
+// quantities alone favor cheap, per-piece goods (eg. nails) over commodities that trade in far smaller,
+// but much more valuable quantities - weighing by price gives a sense of the money actually moving
+export const ratingStockValue = (rating: CommodityRatingViewModel) => rating?.price ? ratingStockSize(rating) * rating.price : 0;
+export const ratingDemandValue = (rating: CommodityRatingViewModel) => rating?.price ? ratingDemand(rating) * rating.price : 0;

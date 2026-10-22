@@ -471,6 +471,7 @@ export interface CommodityRatingViewModel {
 	commercialDemand: number;
 	commercialStockSize: number;
 	id: string;
+	price: number;
 	retailDemand: number;
 	retailStockSize: number;
 }
@@ -480,12 +481,14 @@ export interface CommodityRatingChartModel {
 	commercialDemand: number;
 	commercialStockSize: number;
 	id: string;
+	price: number;
 	retailDemand: number;
 	retailStockSize: number;
 }
 
 export interface MarketCycleChartModel {
-    opened: Date;
+    id: string;
+	opened: Date;
 }
 
 export interface StockViewModel {
@@ -501,6 +504,12 @@ export interface StockSeedViewModel {
 	sourceName: string;
 	sourceQuantity: string;
 	sourceReason: string;
+}
+
+export interface CommoditySymbolTickerViewModel {
+    price: number;
+	symbol: string;
+	direction: string;
 }
 
 export interface TradingUnitViewModel {
@@ -628,6 +637,15 @@ export interface AssetViewModel {
 export interface ValuationSummaryModel {
     id: string;
 	price: number;
+}
+
+export interface TrafficAnalysisSampleViewModel {
+    id: string;
+	tag: string;
+	givenName: string;
+	familyName: string;
+	purpose: string;
+	path: string;
 }
 
 export interface TrainStationExitViewModel {

@@ -91,6 +91,7 @@ import { LoreProposalReviewPage } from "./lore/propose/review";
 import { ExpandLorePage } from "./lore/item/expand";
 import { MarketCyclePage } from "./market/cycle";
 import { BoroughsPage } from "./boroughs";
+import { AnalyzeTrainTrafficPage } from "./train/analyze";
 
 export class Application {
 	static router: Router;
@@ -176,6 +177,7 @@ export class Application {
 				.route('/train', TrainsPage
 					.route('/register/:path', RegisterTrainRoutePage)
 					.route('/route/:code', TrainRoutePage)
+					.route('/analyze', AnalyzeTrainTrafficPage)
 				)
 
 				.route('/news/write/:id', WriteArticlePage)

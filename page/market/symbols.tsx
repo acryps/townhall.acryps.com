@@ -1,18 +1,35 @@
 import { Component } from "@acryps/page";
-import { CommodityRatingViewModel } from "../managed/services";
-import { formatTradingUnit } from "../../interface/trading-unit";
+import { CommoditySymbolTickerViewModel, MarketService } from "../managed/services";
+import { negativeColor, positiveColor } from "../index.style";
+
+const pollInterval = 5000;
 
 export class MarketSymbolsComponent extends Component {
 	declare rootNode: HTMLElement;
 
-	symbols: Symbol[] = [];
+	items: CommoditySymbolTickerViewModel[] = [];
 
 	scroller = new OffscreenCanvas(1, 1);
 	scrollerContext = this.scroller.getContext('2d');
 
 	margin = 20;
 
-	updateRatings(ratings: CommodityRatingViewModel[]) {
+	async onload() {
+		this.items = await new MarketService().getSymbolTicker();
+	}
+
+	private async poll() {
+		if (!document.contains(this.rootNode)) {
+			return;
+		}
+
+		this.items = await new MarketService().getSymbolTicker();
+		this.redraw();
+
+		setTimeout(() => this.poll(), pollInterval);
+	}
+
+	redraw() {
 		if (!(this.rootNode instanceof HTMLElement)) {
 			return;
 		}
@@ -22,42 +39,53 @@ export class MarketSymbolsComponent extends Component {
 
 		this.scrollerContext.font = style.font;
 
-		const segments: { text: string, width: number }[] = [];
+		const segments: { symbol: string, parts: { text: string, width: number, color: string }[], width: number }[] = [];
 		let width = 0;
 
-		let textMetrics: TextMetrics;
-
-		for (let rating of ratings) {
-			const commodity = rating.commodity;
-
-			if (commodity && commodity.symbol && commodity.tradingUnit) {
-				const text = `${commodity.symbol} ${formatTradingUnit(commodity.tradingUnit, rating.retailStockSize + rating.commercialStockSize)}`
-				textMetrics = this.scrollerContext.measureText(text);
-
-				width += textMetrics.width;
-				width += this.margin;
-
-				segments.push({
-					text,
-					width: textMetrics.width
-				});
+		for (let item of this.items) {
+			// prices are not available until the commodity has been rated at least once
+			if (item.price == null) {
+				continue;
 			}
+
+			const symbolText = `${item.symbol} `;
+			const priceText = item.price.toFixed(2);
+
+			const symbolWidth = this.scrollerContext.measureText(symbolText).width;
+			const priceWidth = this.scrollerContext.measureText(priceText).width;
+
+			const priceColor = item.direction == 'up' ? positiveColor.toValueString() : item.direction == 'down' ? negativeColor.toValueString() : style.color;
+
+			width += symbolWidth + priceWidth + this.margin;
+
+			segments.push({
+				symbol: item.symbol,
+				width: symbolWidth + priceWidth,
+				parts: [
+					{ text: symbolText, width: symbolWidth, color: style.color },
+					{ text: priceText, width: priceWidth, color: priceColor }
+				]
+			});
 		}
 
-		segments.sort((a, b) => a.text.localeCompare(b.text));
+		segments.sort((a, b) => a.symbol.localeCompare(b.symbol));
 
-		this.scroller.width = width;
+		this.scroller.width = Math.max(width, 1);
 		this.scroller.height = bounds.height;
 
 		this.scrollerContext.font = style.font;
 		this.scrollerContext.textBaseline = 'top';
-		this.scrollerContext.fillStyle = style.color;
 
 		let x = 0;
 
 		for (let segment of segments) {
-			this.scrollerContext.fillText(segment.text, x, 0);
-			x += segment.width + this.margin;
+			for (let part of segment.parts) {
+				this.scrollerContext.fillStyle = part.color;
+				this.scrollerContext.fillText(part.text, x, 0);
+				x += part.width;
+			}
+
+			x += this.margin;
 		}
 	}
 
@@ -72,6 +100,9 @@ export class MarketSymbolsComponent extends Component {
 
 			const context = canvas.getContext('2d');
 			context.imageSmoothingEnabled = false;
+
+			this.redraw();
+			this.poll();
 
 			// unsmooth the motion
 			const nextFrame = () => {

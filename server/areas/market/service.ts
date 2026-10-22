@@ -7,6 +7,7 @@ import { StockModel, StockSeedViewModel, StockViewModel } from "./stock";
 import { CommodityBidViewModel, TraderBidViewModel } from "./bid";
 import { CommodityAskViewModel, TraderAskViewModel } from "./ask";
 import { MarketCycleSummaryModel, MarketCycleViewModel } from "./cycle";
+import { CommoditySymbolTickerViewModel } from "./ticker";
 
 export class MarketService extends Service {
 	constructor(
@@ -49,6 +50,13 @@ export class MarketService extends Service {
 		return CommoditySummaryModel.from(
 			this.database.commodity
 				.orderByAscending(commodity => commodity.name)
+		);
+	}
+
+	getSymbolTicker() {
+		return CommoditySymbolTickerViewModel.from(
+			this.database.views.commoditySymbolTicker
+				.orderByAscending(item => item.symbol)
 		);
 	}
 

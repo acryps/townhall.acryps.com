@@ -3,6 +3,8 @@ import { boxed } from "../shared/boxed.style";
 import { pageBackgroundColor, pageGutter, pageTextColor } from "../index.style";
 import { trainRouteStyle } from "./route/index.style";
 import { registerTrainRouteStyle } from "./register/index.style";
+import { analyzeTrainTrafficStyle } from "./analyze/index.style";
+import { buttonStyle } from "../shared/index.style";
 
 export const routeColor = new Variable<ColorValue>('route-color');
 
@@ -14,6 +16,16 @@ export const trainStyle = () => child('ui-trains',
 
 	trainRouteStyle(),
 	registerTrainRouteStyle(),
+	analyzeTrainTrafficStyle(),
+
+	child('ui-actions',
+		display('flex'),
+		marginBottom(pageGutter),
+
+		child('ui-action',
+			buttonStyle()
+		)
+	),
 
 	child('ui-network-graph',
 		display('block'),

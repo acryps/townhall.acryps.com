@@ -11,6 +11,8 @@ export class CommodityRatingViewModel extends ViewModel<CommodityRating> {
 	retailDemand;
 	commercialDemand;
 
+	price;
+
 	commodity: CommoditySummaryModel;
 }
 
@@ -23,9 +25,13 @@ export class CommodityRatingChartModel extends ViewModel<CommodityRating> {
 	retailDemand;
 	commercialDemand;
 
+	price;
+
 	cycle: MarketCycleChartModel;
 }
 
 export class MarketCycleChartModel extends ViewModel<MarketCycle> {
+	id;
+
 	opened;
 }

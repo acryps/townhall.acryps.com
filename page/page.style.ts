@@ -28,6 +28,7 @@ import { valuationStyle } from "./trade/valuation/index.style";
 import { mapStartStyle } from "./map/start/index.style";
 import { assetsStyle } from "./trade/assets/index.style";
 import { metricsStyle } from "./metrics/index.style";
+import { chartStyle } from "./shared/chart/index.style";
 import { trainStyle } from "./train/index.style";
 import { trainRouteIconStyle } from "./shared/train-route/index.style";
 import { plansStyle } from "./plans/index.style";
@@ -153,6 +154,7 @@ export const pageStyle = () => root(
 				marketStyle(),
 
 				metricsStyle(),
+				chartStyle(),
 
 				militaryStyle(),
 

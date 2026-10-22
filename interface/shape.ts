@@ -27,7 +27,9 @@ export class Shape {
 
 		const bounds = Point.unpack(shape.bounds);
 
-		if (bounds.length < 3) {
+		// a closed (filled) shape needs at least a triangle, but an open polyline is a valid shape
+		// down to a single 2-point line
+		if (bounds.length < (shape.open ? 2 : 3)) {
 			return;
 		}
 

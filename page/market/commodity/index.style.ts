@@ -1,17 +1,30 @@
-import { backgroundColor, border, borderBottom, ch, child, display, flexBasis, flexGrow, flexShrink, fontSize, fontWeight, gap, height, hsl, justifyContent, lineHeight, marginBottom, marginLeft, marginRight, overflow, padding, percentage, Percentage, px, rem, rgb, textAlign, textOverflow, Variable, whiteSpace, width } from "@acryps/style";
+import { alignItems, backgroundColor, border, borderBottom, ch, child, display, flexBasis, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, hex, height, hsl, justifyContent, lineHeight, marginBottom, marginLeft, marginRight, overflow, padding, percentage, Percentage, px, rem, rgb, textAlign, textOverflow, Variable, whiteSpace, width } from "@acryps/style";
 import { pageGutter } from "../../index.style";
 import { tabsStyle } from "../../shared/tabs/index.style";
+import { inputStyle } from "../../shared/field.style";
 
 export const positionIntensity = new Variable<Number>('intensity');
+
+export const retailColor = hex('c91a4b');
+export const commercialColor = hex('1a6ac9');
 
 export const commodityStyle = () => child('ui-commodity',
 	display('block'),
 
 	child('ui-title',
-		display('block'),
+		display('flex'),
+		justifyContent('space-between'),
+		alignItems('flex-end'),
+		gap(pageGutter),
 		marginBottom(rem(0.75)),
 
-		fontSize(rem(2))
+		fontSize(rem(2)),
+
+		child('ui-price',
+			flexShrink(0),
+
+			fontSize(rem(1.25))
+		)
 	),
 
 	child('ui-category',
@@ -25,6 +38,48 @@ export const commodityStyle = () => child('ui-commodity',
 	),
 
 	tabsStyle(
+		child('ui-ratings',
+			display('block'),
+
+			child('ui-view-options',
+				display('flex'),
+				flexWrap('wrap'),
+				gap(pageGutter),
+				marginBottom(pageGutter.multiply(2)),
+
+				child('select',
+					inputStyle()
+				)
+			),
+
+			child('ui-rating',
+				display('block'),
+				marginBottom(rem(2)),
+
+				child('ui-header',
+					display('block'),
+					marginBottom(rem(0.75)),
+
+					child('ui-name',
+						display('block'),
+
+						fontWeight('bold')
+					),
+
+					child('ui-description',
+						display('block')
+					)
+				),
+
+				child('ui-empty',
+					display('block'),
+					padding(pageGutter),
+
+					border(px(1), 'solid', 'currentColor')
+				)
+			)
+		),
+
 		child('ui-demand',
 			display('block'),
 

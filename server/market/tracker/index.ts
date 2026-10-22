@@ -6,6 +6,10 @@ import { CommodityMarketRating } from "./rating";
 export class MarketTracker {
 	ratings: CommodityMarketRating[] = [];
 
+	// prices decided by the market segment step, keyed by commodity id
+	// picked up by updateCommodity below, so commodity_rating stays the only place prices are written
+	pendingPrices = new Map<string, number>();
+
 	constructor(
 		private logger: Logger,
 		private database: DbContext
@@ -76,6 +80,7 @@ export class MarketTracker {
 		}
 
 		this.ratings = ratings;
+		this.pendingPrices.clear();
 
 		this.logger.log(`updated ${commodities.length} ratings`);
 	}
@@ -110,6 +115,9 @@ export class MarketTracker {
 		rating.commercialDemand = commercialDemand
 			? MarketRuleResolver.aggregate(await commercialDemand.rules.toArray(), companyAssessments) * (commercialDemand.likeliness ?? 1)
 			: 0;
+
+		// carry the previous price forward if the segment step didn't touch this commodity this cycle
+		rating.price = this.pendingPrices.get(commodity.id) ?? this.find(commodity)?.rating.price ?? null;
 
 		await rating.create();
 

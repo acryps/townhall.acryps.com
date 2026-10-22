@@ -2,7 +2,7 @@ import { Queryable } from "vlquery";
 import { MarketCycleGenerator } from "..";
 import { Interpreter, SystemMessage } from "../../../life/interpreter";
 import { OpenAiInterpreterProvider } from "../../../life/interpreter/provider/openai";
-import { DbContext, LegalEntity, LegalEntityQueryProxy, MarketCycle, TokenSponsor } from "../../../managed/database";
+import { Article, DbContext, LegalEntity, LegalEntityQueryProxy, MarketCycle, TokenSponsor } from "../../../managed/database";
 import { MarketTracker } from "../../tracker";
 import { Logger, TaskLogger } from "@acryps/log";
 import { TradingEntity } from "../../entity";
@@ -17,6 +17,8 @@ export abstract class MarketCycleGeneratorStep {
 		public tracker: MarketTracker,
 		public cycle: MarketCycle,
 		public situation: MarketSituationParameter[],
+		// every article published since the last cycle closed, shared across all steps so each doesn't have to query it separately
+		public news: Article[],
 
 		public sponsor: TokenSponsor,
 		logger: Logger,
@@ -33,6 +35,10 @@ export abstract class MarketCycleGeneratorStep {
 		interpreter.remember([
 			new SystemMessage(`
 				We are creating a market simulation.
+
+				This is entirely fictional. Nothing here reflects real-world history or current events - this world runs on its own timeline, unrelated to ours.
+				Real events did not happen here: there was no World War, none of our real countries, companies or public figures exist in this world.
+				Whatever happened in this world's past is only what is described in its own news, context and records - never assume real-world history applies.
 
 				Current year: ${new Time(new Date()).year},
 				our imaginary country is somewhere in Europe,

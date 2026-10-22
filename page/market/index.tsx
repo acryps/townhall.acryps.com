@@ -1,7 +1,7 @@
 import { Component } from "@acryps/page";
 import { CommoditySummaryModel, MarketCycleSummaryModel, MarketCycleViewModel, MarketService } from "../managed/services";
 import { marketIcon } from "../assets/icons/managed";
-import { CommodityTickerComponent, ratingDemand, ratingStockSize } from "./ticker";
+import { CommodityTickerComponent, ratingDemand, ratingDemandValue, ratingStockSize, ratingStockValue } from "./ticker";
 import { MarketSymbolsComponent } from "./symbols";
 import { Time } from "../../interface/time";
 
@@ -18,8 +18,8 @@ export class MarketPage extends Component {
 
 	sorters = [
 		new Sorter('Name', (a, b) => 0), // name is always applied first
-		new Sorter('Stock Size', (a, b) => ratingStockSize(b.rating) - ratingStockSize(a.rating)),
-		new Sorter('Demand', (a, b) => ratingDemand(b.rating) - ratingDemand(a.rating)),
+		new Sorter('Stock Size', (a, b) => ratingStockValue(b.rating) - ratingStockValue(a.rating)),
+		new Sorter('Demand', (a, b) => ratingDemandValue(b.rating) - ratingDemandValue(a.rating)),
 		new Sorter('Spread', (a, b) => {
 			if (!ratingDemand(a.rating) || !ratingDemand(b.rating)) {
 				return -Infinity;
@@ -63,8 +63,6 @@ export class MarketPage extends Component {
 
 	async updateTicker() {
 		const update = await new MarketService().getRatings();
-
-		this.symbols.updateRatings(update);
 
 		for (let rating of update) {
 			const component = this.tickers.find(component => component.commodity.id == rating.commodity.id);

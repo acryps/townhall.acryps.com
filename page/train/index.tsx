@@ -28,6 +28,12 @@ export class TrainsPage extends Component {
 		return <ui-trains>
 			{new RailwayNetworkComponent()}
 
+			<ui-actions>
+				<ui-action ui-href="analyze">
+					Analyze Traffic
+				</ui-action>
+			</ui-actions>
+
 			{this.routes.map(route => <ui-train-route ui-href={`route/${route.code}`} style={routeColor.provide(hex(route.color))}>
 				<ui-header>
 					{new TrainRouteIconComponent(route)}

@@ -159,17 +159,24 @@ export const marketStyle = () => child('ui-market',
 				display('block'),
 
 				child('ui-header',
-					display('block'),
+					display('flex'),
+					justifyContent('space-between'),
+					gap(rem(0.5)),
 
-					child('ui-name',
-						display('inline'),
-						marginRight(rem(0.5)),
+					child('ui-commodity',
+						child('ui-name',
+							display('inline'),
+							fontWeight('bold')
+						),
 
-						fontWeight('bold')
+						child('ui-unit',
+							display('inline-block'),
+							marginLeft(rem(0.5))
+						)
 					),
 
-					child('ui-unit',
-						display('inline')
+					child('ui-price',
+						whiteSpace('nowrap')
 					)
 				),
 

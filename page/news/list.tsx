@@ -4,6 +4,28 @@ import { BannerComponent } from "../banner";
 import { Banner } from "../../interface/banner";
 import { oracleIcon } from "../assets/icons/managed";
 
+function articleDateGroup(published: Date) {
+	const now = new Date();
+	const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+	const startOfPublishedDay = new Date(published.getFullYear(), published.getMonth(), published.getDate());
+
+	const days = (+startOfToday - +startOfPublishedDay) / (24 * 60 * 60 * 1000);
+
+	if (days <= 0) {
+		return 'Today';
+	}
+
+	if (days < 7) {
+		return 'This Week';
+	}
+
+	if (days < 30) {
+		return 'This Month';
+	}
+
+	return 'Older';
+}
+
 export class ArticleListComponent extends Component {
 	articles: ArticlePreviewModel[];
 
@@ -16,7 +38,7 @@ export class ArticleListComponent extends Component {
 	}
 
 	render() {
-		let lastDate = new Date();
+		let lastGroup: string = null;
 
 		return <ui-articles>
 			{this.articles.filter(article => article.published).map(article => {
@@ -41,22 +63,22 @@ export class ArticleListComponent extends Component {
 						</ui-publication>
 					</ui-detail>
 
-					{article.images.length > 0 && <img src={`/article/image/${article.images[0].id}`} />}
+					{article.images.length > 0 && <img src={`/article/image/${article.images[0].id}`} loading="lazy" />}
 				</ui-article>;
 
-				if (lastDate.toDateString() != article.published.toDateString()) {
-					lastDate = article.published;
+				const group = articleDateGroup(article.published);
+
+				if (group != lastGroup) {
+					lastGroup = group;
 
 					return [
 						<ui-date>
-							{article.published.toLocaleDateString()}
+							{group}
 						</ui-date>,
 
 						element
-					]
+					];
 				}
-
-				lastDate = article.published;
 
 				return element;
 			})}

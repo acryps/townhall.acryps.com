@@ -47,7 +47,7 @@ export class PublicationService extends Service {
 			query = query.where(article => article.publicationId == publication);
 		}
 
-		return ArticlePreviewModel.from(query);
+		return ArticlePreviewModel.from(query.page(page, 30));
 	}
 
 	async createArticle(publicationId: string) {

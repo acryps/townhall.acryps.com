@@ -650,6 +650,17 @@ export interface ChatInteractionViewModel {
 	response: string;
 }
 
+export interface QueuedTaskViewModel {
+    name: string;
+	urgent: boolean;
+	usesWorker: boolean;
+	enabled: boolean;
+	running: boolean;
+	nextRunAt: number;
+	lastStartedAt: number;
+	lastError: string;
+}
+
 export interface AssetViewModel {
     id: string;
 	name: string;

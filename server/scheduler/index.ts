@@ -24,7 +24,25 @@ export abstract class Task {
 	// set by `Scheduler.register` - lets a task wake the loop early (eg. `MapImporter.poke` scheduling a debounced region update)
 	scheduler?: Scheduler;
 
+	// bookkeeping surfaced on the /queue page - see `Scheduler.getStatus`
+	lastStartedAt?: number;
+	lastError?: string;
+
 	abstract run(): Promise<number | void>;
+}
+
+// plain snapshot of a task's state - returned by `Scheduler.getStatus`, consumed by `SchedulerService`.
+// a class, not an interface - `QueuedTaskViewModel`'s generated `toModel()` needs to construct one.
+// `nextRunAt` is `null` (not `Infinity`) for one-shot tasks that already ran - `Infinity` doesn't survive JSON
+export class QueuedTaskStatus {
+	name: string;
+	urgent: boolean;
+	usesWorker: boolean;
+	enabled: boolean;
+	running: boolean;
+	nextRunAt: number | null;
+	lastStartedAt?: number;
+	lastError?: string;
 }
 
 export class Scheduler {
@@ -59,6 +77,22 @@ export class Scheduler {
 	// (eg. `MapImporter.poke` scheduling a debounced region update)
 	notify() {
 		this.wake();
+	}
+
+	// plain snapshot of every registered task - see `SchedulerService.getQueue` for the exposed service
+	getStatus(): QueuedTaskStatus[] {
+		return this.tasks
+			.sort((a, b) => (a.urgent == b.urgent ? a.name.localeCompare(b.name) : a.urgent ? -1 : 1))
+			.map(task => ({
+				name: task.name,
+				urgent: task.urgent,
+				usesWorker: task.usesWorker,
+				enabled: task.enabled,
+				running: task.running,
+				nextRunAt: Number.isFinite(task.nextRunAt) ? task.nextRunAt : null,
+				lastStartedAt: task.lastStartedAt,
+				lastError: task.lastError
+			}));
 	}
 
 	private runningCount() {
@@ -96,16 +130,19 @@ export class Scheduler {
 
 	private execute(task: Task) {
 		task.running = true;
+		task.lastStartedAt = Date.now();
 
 		const logger = this.logger.task(task.name);
 
 		task.run()
 			.then(delay => {
 				task.nextRunAt = Date.now() + (delay || 0);
+				task.lastError = undefined;
 			})
 			.catch(error => {
 				logger.error('failed', error);
 				task.nextRunAt = Date.now() + this.errorBackoff;
+				task.lastError = error?.message ?? String(error);
 			})
 			.finally(() => {
 				task.running = false;

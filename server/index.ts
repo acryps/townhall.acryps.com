@@ -229,7 +229,8 @@ DbClient.connectedClient.connect().then(async () => {
 		DbContext: database,
 		Life: life,
 		LawHouse: lawHouse,
-		MarketTracker: marketTracker
+		MarketTracker: marketTracker,
+		Scheduler: scheduler
 	});
 
 	new GoInterface(app, database);

@@ -46,6 +46,7 @@ import { squareStyle } from "./square/index.style";
 import { marketStyle } from "./market/index.style";
 import { loreStyle } from "./lore/index.style";
 import { boroughsStyle } from "./boroughs/index.style";
+import { queueStyle } from "./queue/index.style";
 
 export const navigationHeight = new Variable('navigation-height',
 	rem(0.8).multiply(2).multiply(1.2)
@@ -159,6 +160,8 @@ export const pageStyle = () => root(
 
 				metricsStyle(),
 				chartStyle(),
+
+				queueStyle(),
 
 				militaryStyle(),
 

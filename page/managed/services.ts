@@ -1523,6 +1523,31 @@ export class ChatInteractionViewModel {
 	}
 }
 
+export class QueuedTaskViewModel {
+	name: string;
+	urgent: boolean;
+	usesWorker: boolean;
+	enabled: boolean;
+	running: boolean;
+	nextRunAt: number;
+	lastStartedAt: number;
+	lastError: string;
+
+	private static $build(raw) {
+		const item = new QueuedTaskViewModel();
+		raw.name === undefined || (item.name = raw.name === null ? null : `${raw.name}`)
+		raw.urgent === undefined || (item.urgent = !!raw.urgent)
+		raw.usesWorker === undefined || (item.usesWorker = !!raw.usesWorker)
+		raw.enabled === undefined || (item.enabled = !!raw.enabled)
+		raw.running === undefined || (item.running = !!raw.running)
+		raw.nextRunAt === undefined || (item.nextRunAt = raw.nextRunAt === null ? null : +raw.nextRunAt)
+		raw.lastStartedAt === undefined || (item.lastStartedAt = raw.lastStartedAt === null ? null : +raw.lastStartedAt)
+		raw.lastError === undefined || (item.lastError = raw.lastError === null ? null : `${raw.lastError}`)
+		
+		return item;
+	}
+}
+
 export class AssetViewModel {
 	id: string;
 	name: string;
@@ -5458,6 +5483,29 @@ export class ChatService {
 				const d = r.data;
 
 				return d.map(d => d === null ? null : ChatInteractionViewModel["$build"](d));
+			} else if ("aborted" in r) {
+				throw new Error("request aborted by server");
+			} else if ("error" in r) {
+				throw new Error(r.error);
+			}
+		});
+	}
+}
+
+export class SchedulerService {
+	async getQueue(): Promise<Array<QueuedTaskViewModel>> {
+		const $data = new FormData();
+		
+
+		return await fetch(Service.toURL("lrZHJ0cXU2M3Z3dXdtMDxxZTQ4MzlocW"), {
+			method: "post",
+			credentials: "include",
+			body: $data
+		}).then(res => res.json()).then(r => {
+			if ("data" in r) {
+				const d = r.data;
+
+				return d.map(d => d === null ? null : QueuedTaskViewModel["$build"](d));
 			} else if ("aborted" in r) {
 				throw new Error("request aborted by server");
 			} else if ("error" in r) {

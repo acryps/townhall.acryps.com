@@ -95,6 +95,7 @@ import { ExpandLorePage } from "./lore/item/expand";
 import { MarketCyclePage } from "./market/cycle";
 import { BoroughsPage } from "./boroughs";
 import { AnalyzeTrainTrafficPage } from "./train/analyze";
+import { QueuePage } from "./queue";
 
 export class Application {
 	static router: Router;
@@ -202,6 +203,8 @@ export class Application {
 				.route('/oracle', OraclePage)
 
 				.route('/metrics', MetricsPage)
+
+				.route('/queue', QueuePage)
 
 				.route('/military', MilitaryPage
 					.route('/unit/:id', MilitaryUnitPage)

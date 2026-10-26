@@ -142,6 +142,9 @@ import { PublicationService } from "././../areas/publication/service";
 import { ChatManager } from "././../areas/resident/chat/manager";
 import { ChatInteractionViewModel } from "././../areas/resident/chat/interaction";
 import { ChatService } from "././../areas/resident/chat/service";
+import { Scheduler } from "././../scheduler";
+import { QueuedTaskViewModel } from "././../areas/scheduler/view";
+import { SchedulerService } from "././../areas/scheduler/service";
 import { Square } from "././database";
 import { SquareBoundary } from "././database";
 import { SquareViewModel } from "././../areas/square.view";
@@ -273,6 +276,7 @@ import { ArticleOpinion } from "./../managed/database";
 import { ArticleDraftAnswer } from "./../managed/database";
 import { ArticleDraftQuestion } from "./../managed/database";
 import { ChatInteraction } from "./../managed/database";
+import { QueuedTaskStatus } from "./../scheduler/index";
 import { Asset } from "./../areas/trade/asset";
 import { TrafficAnalysisSampleModel } from "./../areas/train/analysis.view";
 import { TrainStationExit } from "./../managed/database";
@@ -385,6 +389,14 @@ Inject.mappings = {
 	"ChatManager": {
 		objectConstructor: ChatManager,
 		parameters: ["DbContext","Life"]
+	},
+	"SchedulerService": {
+		objectConstructor: SchedulerService,
+		parameters: ["Scheduler"]
+	},
+	"Scheduler": {
+		objectConstructor: Scheduler,
+		parameters: []
 	},
 	"SquareService": {
 		objectConstructor: SquareService,
@@ -1903,6 +1915,15 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.send(
 				params["prbXM3dnU2aTAyNDYxdWs5aWdtbnRsZn"],
 				params["J2ZXFweXFuNGd1cmQ1enFsaG14NTA5c3"]
+			)
+		);
+
+		this.expose(
+			"lrZHJ0cXU2M3Z3dXdtMDxxZTQ4MzlocW",
+			{},
+			inject => inject.construct(SchedulerService),
+			(controller, params) => controller.getQueue(
+				
 			)
 		);
 
@@ -8722,6 +8743,86 @@ ViewModel.mappings = {
 			"question" in viewModel && (model.question = viewModel.question === null ? null : `${viewModel.question}`);
 			"responded" in viewModel && (model.responded = viewModel.responded === null ? null : new Date(viewModel.responded));
 			"response" in viewModel && (model.response = viewModel.response === null ? null : `${viewModel.response}`);
+
+			return model;
+		}
+	},
+	[QueuedTaskViewModel.name]: class ComposedQueuedTaskViewModel extends QueuedTaskViewModel {
+		async map() {
+			return {
+				name: this.$$model.name,
+				urgent: this.$$model.urgent,
+				usesWorker: this.$$model.usesWorker,
+				enabled: this.$$model.enabled,
+				running: this.$$model.running,
+				nextRunAt: this.$$model.nextRunAt,
+				lastStartedAt: this.$$model.lastStartedAt,
+				lastError: this.$$model.lastError
+			}
+		};
+
+		static get items() {
+			return this.getPrefetchingProperties(ViewModel.maximumPrefetchingRecursionDepth, []);
+		}
+
+		static getPrefetchingProperties(level: number, parents: string[]) {
+			let repeats = false;
+
+			for (let size = 1; size <= parents.length / 2; size++) {
+				if (!repeats) {
+					for (let index = 0; index < parents.length; index++) {
+						if (parents[parents.length - 1 - index] == parents[parents.length - 1 - index - size]) {
+							repeats = true;
+						}
+					}
+				}
+			}
+
+			if (repeats) {
+				level--;
+			}
+
+			if (!level) {
+				return {};
+			}
+
+			return {
+				name: true,
+				urgent: true,
+				usesWorker: true,
+				enabled: true,
+				running: true,
+				nextRunAt: true,
+				lastStartedAt: true,
+				lastError: true
+			};
+		};
+
+		static toViewModel(data) {
+			const item = new QueuedTaskViewModel(null);
+			"name" in data && (item.name = data.name === null ? null : `${data.name}`);
+			"urgent" in data && (item.urgent = !!data.urgent);
+			"usesWorker" in data && (item.usesWorker = !!data.usesWorker);
+			"enabled" in data && (item.enabled = !!data.enabled);
+			"running" in data && (item.running = !!data.running);
+			"nextRunAt" in data && (item.nextRunAt = data.nextRunAt === null ? null : +data.nextRunAt);
+			"lastStartedAt" in data && (item.lastStartedAt = data.lastStartedAt === null ? null : +data.lastStartedAt);
+			"lastError" in data && (item.lastError = data.lastError === null ? null : `${data.lastError}`);
+
+			return item;
+		}
+
+		static async toModel(viewModel: QueuedTaskViewModel) {
+			const model = new QueuedTaskStatus();
+			
+			"name" in viewModel && (model.name = viewModel.name === null ? null : `${viewModel.name}`);
+			"urgent" in viewModel && (model.urgent = !!viewModel.urgent);
+			"usesWorker" in viewModel && (model.usesWorker = !!viewModel.usesWorker);
+			"enabled" in viewModel && (model.enabled = !!viewModel.enabled);
+			"running" in viewModel && (model.running = !!viewModel.running);
+			"nextRunAt" in viewModel && (model.nextRunAt = viewModel.nextRunAt === null ? null : +viewModel.nextRunAt);
+			"lastStartedAt" in viewModel && (model.lastStartedAt = viewModel.lastStartedAt === null ? null : +viewModel.lastStartedAt);
+			"lastError" in viewModel && (model.lastError = viewModel.lastError === null ? null : `${viewModel.lastError}`);
 
 			return model;
 		}

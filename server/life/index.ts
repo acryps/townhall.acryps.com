@@ -11,8 +11,9 @@ import { config } from "process";
 import { Point } from "../../interface/point";
 import { Time } from "../../interface/time";
 import { Logger } from "@acryps/log";
+import { Task } from "../scheduler";
 
-export class Life {
+export class Life extends Task {
 	// weights, of how many people do what on a tick
 	// factor of total people * random(0 - 1) rounded up
 	readonly bondingFactor = new TickFactor(this, 'bond', 0.1, 2);
@@ -32,7 +33,9 @@ export class Life {
 
 	constructor(
 		private database: DbContext
-	) {}
+	) {
+		super();
+	}
 
 	async load() {
 		this.residents = await this.database.resident
@@ -86,6 +89,12 @@ export class Life {
 
 	async tick() {
 		await this.bondNext();
+	}
+
+	async run() {
+		await this.tick();
+
+		return 1000 * 30;
 	}
 
 	async bondNext() {

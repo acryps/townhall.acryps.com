@@ -1,6 +1,7 @@
 import { Logger } from "@acryps/log";
 import { DbContext } from "../managed/database";
-import { WorkerHandle } from "../worker";
+import { WorkerDispatch, WorkerHandle } from "../worker";
+import { Task } from "../scheduler";
 import { buildRailGraph } from "./graph";
 import { buildMovements } from "./movements";
 import { aggregateMovements } from "./aggregate";
@@ -19,11 +20,11 @@ export interface TrafficAnalysisResult {
 
 // runs the whole rail traffic analysis on a worker thread (see WorkerDispatch in ../worker), prints
 // the result to the console, builds the shapes served by TrafficTileServer as the "traffic" map
-// layer, and picks a handful of example journeys for the /train/analyze page. kicked off once on
-// server launch from index.ts; the result is cached on this class by the caller (see index.ts),
-// since the worker thread's own copy of the class is discarded once it exits - this is also why the
-// analyze page reads from here instead of calling collectTrafficSamples itself: everything it needs
-// (the rail graph, resident/property resolution) was already built for the main report.
+// layer, and picks a handful of example journeys for the /train/analyze page. run periodically by
+// `TrafficAnalysisTask` below; the result is cached on this class by the caller, since the worker
+// thread's own copy of the class is discarded once it exits - this is also why the analyze page reads
+// from here instead of calling collectTrafficSamples itself: everything it needs (the rail graph,
+// resident/property resolution) was already built for the main report.
 export class TrafficAnalysisWorkerHandle extends WorkerHandle {
 	static shapes: Shape[] = [];
 	static samples: TrafficAnalysisSampleModel[] = [];
@@ -55,5 +56,19 @@ export class TrafficAnalysisWorkerHandle extends WorkerHandle {
 		const samples = await collectTrafficSamples(database, graph, points, 20);
 
 		return { shapes, samples };
+	}
+}
+
+// re-runs the traffic analysis on a worker thread periodically, keeping the cached shapes/samples fresh
+export class TrafficAnalysisTask extends Task {
+	usesWorker = true;
+
+	async run() {
+		const result = await WorkerDispatch.dispatch<TrafficAnalysisResult>(TrafficAnalysisWorkerHandle);
+
+		TrafficAnalysisWorkerHandle.shapes = result.shapes;
+		TrafficAnalysisWorkerHandle.samples = result.samples;
+
+		return 1000 * 60 * 60;
 	}
 }

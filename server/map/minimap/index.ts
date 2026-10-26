@@ -8,9 +8,12 @@ import { getMinimapBounds, minimapScale } from "../../../interface/minimap";
 import { BoroughSummaryModel } from "../../areas/borough.summary";
 import { Logger } from "@acryps/log";
 import { WorkerDispatch, WorkerHandle } from "../../worker";
+import { Task } from "../../scheduler";
 
-export class MinimapGenerator {
+export class MinimapGenerator extends Task {
 	private logger = new Logger('minimap');
+
+	usesWorker = true;
 
 	cached: Buffer;
 
@@ -18,6 +21,8 @@ export class MinimapGenerator {
 		private database: DbContext,
 		server?: ManagedServer
 	) {
+		super();
+
 		// generate empty image
 		const canvas = new Canvas(1, 1);
 		canvas.getContext('2d');
@@ -33,18 +38,15 @@ export class MinimapGenerator {
 	}
 
 	// computes on a worker thread - see `MinimapWorkerHandle`
-	schedule() {
-		const next = async () => {
-			this.logger.log('render');
+	async run() {
+		this.logger.log('render');
 
-			const result = await WorkerDispatch.dispatch<{ image: string }>(MinimapWorkerHandle);
-			this.cached = Buffer.from(result.image, 'base64');
+		const result = await WorkerDispatch.dispatch<{ image: string }>(MinimapWorkerHandle);
+		this.cached = Buffer.from(result.image, 'base64');
 
-			this.logger.log('rendered');
-			setTimeout(() => next(), 1000 * 60 * 60);
-		};
+		this.logger.log('rendered');
 
-		next();
+		return 1000 * 60 * 60;
 	}
 
 	async generate() {

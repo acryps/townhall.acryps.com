@@ -4,6 +4,7 @@ import { DbContext, Movement, Valuation } from "../../../../managed/database";
 import { ManagedServer } from "../../../../managed/server";
 import { GradiantHeatmapTileServer } from ".";
 import { calculateDanwinstonShapePath } from "../../../../../interface/line";
+import { Task } from "../../../../scheduler";
 
 type Datapoint = {
 	center: Point,
@@ -62,8 +63,6 @@ export class PropertyValueTileServer extends GradiantHeatmapTileServer<Datapoint
 				return sum;
 			}
 		);
-
-		this.update();
 	}
 
 	async update() {
@@ -112,7 +111,21 @@ export class PropertyValueTileServer extends GradiantHeatmapTileServer<Datapoint
 		this.values = values;
 
 		console.log(`indexed ${values.length} valuation points`);
+	}
+}
 
-		setTimeout(() => this.update(), 1000 * 60);
+// `PropertyValueTileServer` already extends `GradiantHeatmapTileServer`, so it can't also extend `Task` -
+// this thin companion just re-runs its indexing on a schedule
+export class PropertyValueIndexTask extends Task {
+	constructor(
+		private tileServer: PropertyValueTileServer
+	) {
+		super();
+	}
+
+	async run() {
+		await this.tileServer.update();
+
+		return 1000 * 60;
 	}
 }

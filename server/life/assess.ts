@@ -4,15 +4,18 @@ import { Time } from "../../interface/time";
 import { Borough, DbContext, Resident, ResidentAssessment, ResidentAssessmentParameter } from "../managed/database";
 import { Interpreter, SystemMessage, UserMessage } from "./interpreter";
 import { time } from "console";
+import { Task } from "../scheduler";
 
-export class ResidentAssessor {
+export class ResidentAssessor extends Task {
 	logger = new Logger('life').task('resident-assessor');
 
 	constructor(
 		private database: DbContext
-	) {}
+	) {
+		super();
+	}
 
-	async next() {
+	async run() {
 		const candidates = await this.database.resident
 			.where(resident => resident.assessed == null)
 			.orderByAscending(resident => resident.id)
@@ -24,10 +27,10 @@ export class ResidentAssessor {
 
 			await this.assess(resident);
 
-			setTimeout(() => this.next(), 50);
-		} else {
-			setTimeout(() => this.next(), 1000 * 60);
+			return 50;
 		}
+
+		return 1000 * 60;
 	}
 
 	async assess(resident: Resident) {

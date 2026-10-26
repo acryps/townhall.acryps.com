@@ -3,51 +3,51 @@ import { Time } from "../../../interface/time";
 import { BillHonestium, Company, DbContext, District, LawHouseSession, Property, Resident, Vote } from "../../managed/database";
 import { Language } from "../language";
 import { LawHouseSessionManager } from "./session";
+import { Task } from "../../scheduler";
 
-export class LawHouse {
+export class LawHouse extends Task {
 	active = false;
 
 	interval = 1000 * 60; /// 4 * 60 * 60 * 1000;
+
+	private openedCompleted = false;
 
 	constructor(
 		private database: DbContext,
 		private language: Language,
 		private life: Life
-	) { }
+	) {
+		super();
 
-	schedule() {
-		const next = async () => {
-			const hour = new Date().getHours();
+		// stagger the first run so multiple instances don't all hit the DB at once
+		this.nextRunAt = Date.now() + 1000 * 30 * Math.random();
+	}
 
-			// sessions can only take place in the work day
-			////if (hour >= 8 && hour <= 18) {
-				this.active = true;
-
-				for (let district of await this.database.district.toArray()) {
-					console.log('DSISTRICT', district.name)
-					const lastSession = await district.lawHouseSessions.orderByDescending(session => session.started).first();
-
-					if (!lastSession || +new Date() - +lastSession.ended > this.interval) {
-						await new LawHouseSessionManager(this.database, this.language, this.life, district, this).execute();
-					}
-				}
-
-				this.active = false;
-				///}
-
-			// check every minute
-			setTimeout(() => {
-				next();
-			}, 1000 * 60);
-		};
-
-		// check for the first time within the first 30 minutes from launch
-		// prevents multiple instances from messing with eachother
-		setTimeout(async () => {
+	async run() {
+		if (!this.openedCompleted) {
 			await this.completeOpen();
+			this.openedCompleted = true;
+		}
 
-			next();
-		}, 1000 * 30 * Math.random());
+		const hour = new Date().getHours();
+
+		// sessions can only take place in the work day
+		////if (hour >= 8 && hour <= 18) {
+			this.active = true;
+
+			for (let district of await this.database.district.toArray()) {
+				console.log('DSISTRICT', district.name)
+				const lastSession = await district.lawHouseSessions.orderByDescending(session => session.started).first();
+
+				if (!lastSession || +new Date() - +lastSession.ended > this.interval) {
+					await new LawHouseSessionManager(this.database, this.language, this.life, district, this).execute();
+				}
+			}
+
+			this.active = false;
+			///}
+
+		return 1000 * 60 * 60;
 	}
 
 	async completeOpen() {

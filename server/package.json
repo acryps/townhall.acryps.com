@@ -13,7 +13,9 @@
 		"pgpassword": "Postgres password",
 		"townhallServerAddress": "Minecraft File Server Location",
 		"runLife?": "Run Life (YES to enable)",
+		"runLawHouse?": "Run Law House (YES to enable)",
 		"updateMetrics": "Update Metrics (YES to enable)",
+		"assignMissingFigures?": "Assign missing figures (YES to enable)",
 		"itemContext": {
 			"compose": "Compose Item Context (YES to enable)",
 			"write": "Write Item Context with LLM (YES to enable)"

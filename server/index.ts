@@ -19,19 +19,19 @@ import { BoroughTileServer } from "./map/layers/shape/borough";
 import { PropertyUsageTileServer } from "./map/layers/shape/usage";
 import { ImpressionImageInterface } from "./areas/impressions/interface";
 import { StreetTileServer } from "./map/layers/filled/street";
-import { updateWorkOffers } from "./life/work/offers";
 import { Annotator } from "./annotate";
 import { PlotterInterface } from "./plot/interface";
-import { StreetFiller, StreetFillWorkerHandle } from "./map/fill/street";
+import { StreetFiller } from "./map/fill/street";
 import { LegalEntityReferenceCounter } from "./areas/legal-entity/reference-counter";
-import { PropertyValueTileServer } from "./map/layers/heatmap/gradiant/property-value";
+import { PropertyValueTileServer, PropertyValueIndexTask } from "./map/layers/heatmap/gradiant/property-value";
 import { PropertyOwnershipTileServer } from "./map/layers/shape/propety-ownership";
 import { RelocateTenancyTileServer } from "./map/layers/shape/relocate-tenancy";
 import { RelocateOfficeTileServer } from "./map/layers/shape/relocate-office";
-import { PropertyValueator } from "./areas/trade/valuation/property";
+import { ValuationBackfillTask } from "./areas/trade/valuation/backfill";
+import { WorkOfferBackfillTask } from "./life/work/backfill";
 import { LegalEntityManager } from "./areas/legal-entity/manager";
 import { FillLife } from "./life/fill/fill";
-import { MetricTracker } from "./areas/metrics/tracker";
+import { MetricDispatchTask } from "./areas/metrics/tracker";
 import { TrainRouteTileServer } from "./map/layers/shape/train/route";
 import { TrainRoutesTileServer } from "./map/layers/shape/train/routes";
 import { MetricTrackerWorkerHandle, registerMetrics } from "./areas/metrics/metrics";
@@ -40,7 +40,7 @@ import { PlanTileServer } from "./map/layers/shape/plan";
 import { ChangeFrame } from "./areas/change/frame";
 import { Oracle } from "./areas/oracle/generator";
 import { ArticleOpinionGenerator } from "./areas/publication/opinion";
-import { Preload } from "./preload";
+import { Preload, PreloadUpdateTask } from "./preload";
 import { registerPreload } from "./preload/routes";
 import { ScheduledEpoch } from "../interface/time/epoch";
 import { Time } from "../interface/time";
@@ -52,8 +52,8 @@ import { TrafficTileServer } from "./map/layers/shape/train/traffic";
 import { Shape } from "../interface/shape";
 import { MinimapGenerator } from "./map/minimap";
 import { WaterBodyTileServer } from "./map/layers/filled/water";
-import { WaterBodyFiller, WaterBodyFillWorkerHandle } from "./map/fill/water";
-import { SquareFiller, SquareFillWorkerHandle } from "./map/fill/square";
+import { WaterBodyFiller } from "./map/fill/water";
+import { SquareFiller } from "./map/fill/square";
 import { MarketTracker } from "./market/tracker";
 import { Logger } from "@acryps/log";
 import { ResidentAssessor } from "./life/assess";
@@ -64,11 +64,13 @@ import { readdirSync, readFileSync } from "fs";
 import { CommodityIconImageInterface } from "./areas/market/icon";
 import { MarketCycleGenerator } from "./market/cycle";
 import { WorkerDispatch } from "./worker";
-import { TrafficAnalysisResult, TrafficAnalysisWorkerHandle } from "./traffic";
+import { TrafficAnalysisTask } from "./traffic";
 import { PlanningMapGenerator } from "./map/planning";
 import { BlockTouchesTileServer } from "./map/layers/heatmap/gradiant/block-touches";
 import { PlayerHeadImageInterface } from "./areas/game/head";
 import { MarketFeedInterface } from "./market/feed";
+import { Scheduler } from "./scheduler";
+import { ResidentFigureAssignmentTask } from "./life/figure-assignment";
 
 export const runLife = process.env.RUN_LIFE == 'YES';
 export const runMarket = process.env.RUN_MARKET == 'YES';
@@ -76,37 +78,15 @@ export const updateMetrics = process.env.UPDATE_METRICS == 'YES';
 export const updatePreloadedPages = process.env.PRELOAD_UPDATE_PAGES == 'YES';
 export const composeItemContexts = process.env.ITEM_CONTEXT_COMPOSE == 'YES';
 export const writeItemContexts = process.env.ITEM_CONTEXT_WRITE == 'YES';
+export const runLawHouse = process.env.RUN_LAW_HOUSE == 'YES';
+export const assignMissingFigures = process.env.ASSIGN_MISSING_FIGURES == 'YES';
 
 export const port = +process.env.PORT || 7420;
 
 const logger = new Logger('server');
 
 logger.log('connect database');
-DbClient.connectedClient = new DbClient({ max: 2 });
-
-// the pool only has `max` real connections shared by every query in this process - one slow query can starve all the others, so flag anything taking long
-const databaseLogger = new Logger('database');
-const slowQueryThreshold = 500;
-const query = DbClient.connectedClient.query.bind(DbClient.connectedClient);
-
-// lets tasks that issue a lot of queries (eg. LegalEntityReferenceCounter.rerank) report how much of the shared pool they used - see `databaseQueryCount` usages
-export let databaseQueryCount = 0;
-
-DbClient.connectedClient.query = async (sql: string, params: any[]) => {
-	databaseQueryCount++;
-
-	const start = Date.now();
-
-	try {
-		return await query(sql, params);
-	} finally {
-		const elapsed = Date.now() - start;
-
-		if (elapsed > slowQueryThreshold) {
-			databaseLogger.warn(`slow query (${elapsed}ms)`, sql);
-		}
-	}
-};
+DbClient.connectedClient = new DbClient({ max: 8 });
 
 DbClient.connectedClient.connect().then(async () => {
 	logger.log('connected');
@@ -130,123 +110,78 @@ DbClient.connectedClient.connect().then(async () => {
 	await marketTracker.load();
 
 	if (runMarket) {
-		const cycle = new MarketCycleGenerator(database, marketTracker);
-
-		const nextMarketCycle = async () => {
-			await cycle.advance();
-
-			setTimeout(() => nextMarketCycle(), 1000 * 10);
-		};
-
-		nextMarketCycle();
+		const marketScheduler = new Scheduler();
+		marketScheduler.register(new MarketCycleGenerator(database, marketTracker));
+		marketScheduler.start();
 
 		return;
 	}
 
-	logger.log('preparing metrics');
+	const scheduler = new Scheduler();
+
 	await registerMetrics(database);
-	logger.log('metrics ready');
 
-	MetricTracker.schedule(MetricTrackerWorkerHandle);
+	scheduler.register(new MetricDispatchTask(MetricTrackerWorkerHandle), updateMetrics);
+	scheduler.register(new TrafficAnalysisTask());
 
-	WorkerDispatch.dispatch<TrafficAnalysisResult>(TrafficAnalysisWorkerHandle)
-		.then(result => {
-			TrafficAnalysisWorkerHandle.shapes = result.shapes;
-			TrafficAnalysisWorkerHandle.samples = result.samples;
-		})
-		.catch(error => logger.error('traffic analysis failed', error));
-
-	new MinimapGenerator(database, app).schedule();
+	scheduler.register(new MinimapGenerator(database, app));
 	new PlanningMapGenerator(database, app);
 
 	const preload = new Preload(database);
 	registerPreload(preload, database);
 
-	await preload.executeTask();
+	scheduler.register(new PreloadUpdateTask(preload), updatePreloadedPages);
 
-	new MapImporter(database);
+	const mapImporter = new MapImporter(database);
+	scheduler.register(mapImporter);
 
 	const annotator = new Annotator(database);
 	await annotator.load();
-
-	// new ResidentAssessor(database).next();
+	annotator.nextRunAt = Date.now() + 1000 * 60 * 5;
+	scheduler.register(annotator);
 
 	ItemContextTracker.instance = new ItemContextTracker(database);
 
-	new LegalEntityReferenceCounter(database).schedule();
+	scheduler.register(new LegalEntityReferenceCounter(database));
 
 	const life = new Life(database);
+
+	// `tick()` depends on `load()` having populated `residents`/`residentAnchors` - don't let the
+	// scheduler run it until that's done, but (as before) don't block the rest of startup on it either
+	life.nextRunAt = Infinity;
 	life.load().then(() => {
-		if (runLife) {
-			const nextTick = async () => {
-				await life.tick();
-
-				setTimeout(() => nextTick(), 1000 * 30);
-			}
-
-			setTimeout(() => nextTick(), 1000 * 30);
-		}
+		life.nextRunAt = 0;
+		scheduler.notify();
 	});
 
+	scheduler.register(life, runLife);
+
 	const lawHouse = new LawHouse(database, new Language('smart'), life);
+	scheduler.register(lawHouse, runLawHouse);
 
 	if (runLife) {
-		new Oracle(database, new LegalEntityManager(database)).schedule();
-		new ArticleOpinionGenerator(database).schedule();
+		scheduler.register(new Oracle(database, new LegalEntityManager(database)));
+		scheduler.register(new ArticleOpinionGenerator(database));
 
-		new PoliticalCompassRater(database).next();
-		new ResidentAssessor(database).next();
-		new CompanyAssessor(database).next();
-		new BoroughAssessor(database).next();
+		scheduler.register(new PoliticalCompassRater(database));
+		scheduler.register(new ResidentAssessor(database));
+		scheduler.register(new CompanyAssessor(database));
+		scheduler.register(new BoroughAssessor(database));
 
-		// lawHouse.schedule();
 		life.vote();
 
-		new FillLife(life, database).fillEmptyDwellings();
-
-		(async () => {
-			const properties = await database.property
-				.where(property => property.deactivated == null)
-				.where(property => property.typeId != null)
-				.where(property => property.boroughId != null)
-				.toArray()
-
-			for (let property of properties) {
-				const owner = await property.owners.orderByDescending(owner => owner.aquired).first();
-
-				if (owner && !owner.aquiredValuationId) {
-					const borough = await new LegalEntityManager(database).findBorough(property.boroughId);
-
-					console.log(`valueing property ${property.id}`);
-					const valueation = await new PropertyValueator(borough).valueate(property);
-
-					owner.aquiredValuation = valueation;
-					await owner.update();
-				}
-			}
-		})();
-
-		(async () => {
-			for (let company of await database.company.toArray()) {
-				console.log(company.name);
-
-				for (let office of await company.offices.toArray()) {
-					await updateWorkOffers(office);
-				}
-			}
-		})();
+		scheduler.register(new FillLife(life, database));
+		scheduler.register(new ValuationBackfillTask(database));
+		scheduler.register(new WorkOfferBackfillTask(database));
 	}
 
-	// add missing figures
-	/* for (let resident of await database.resident.where(resident => resident.figure == null).toArray()) {
-		console.log(resident.givenName)
+	scheduler.register(new ResidentFigureAssignmentTask(database, life), assignMissingFigures);
 
-		await life.assignFigure(resident);
-	} */
+	SquareFiller.active = scheduler.register(new SquareFiller(database));
+	StreetFiller.active = scheduler.register(new StreetFiller(database));
+	WaterBodyFiller.active = scheduler.register(new WaterBodyFiller(database));
 
-	SquareFiller.active = new SquareFiller(database).schedule(SquareFillWorkerHandle);
-	StreetFiller.active = new StreetFiller(database).schedule(StreetFillWorkerHandle);
-	WaterBodyFiller.active = new WaterBodyFiller(database).schedule(WaterBodyFillWorkerHandle);
+	scheduler.register(new PropertyValueIndexTask(new PropertyValueTileServer(app, database)));
 
 	new BaseTileServer(app, database);
 	new TimeMachineTileServer(app, database);
@@ -255,7 +190,6 @@ DbClient.connectedClient.connect().then(async () => {
 	new WaterBodyTileServer(app);
 	new BoroughTileServer(app, database);
 	new PropertyUsageTileServer(app, database);
-	new PropertyValueTileServer(app, database);
 	new PropertyOwnershipTileServer(app, database);
 	new RelocateTenancyTileServer(app, database);
 	new RelocateOfficeTileServer(app, database);
@@ -308,4 +242,5 @@ DbClient.connectedClient.connect().then(async () => {
 	preload.apply(app.app, join(process.cwd(), '..', 'page', 'assets', 'index.html'), 'Townhall');
 
 	app.start(port);
+	scheduler.start();
 });

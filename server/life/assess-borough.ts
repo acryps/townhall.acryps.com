@@ -1,26 +1,29 @@
 import { Logger } from "@acryps/log";
 import { Borough, BoroughAssessment, BoroughAssessmentParameter, DbContext } from "../managed/database";
 import { Interpreter, SystemMessage, UserMessage } from "./interpreter";
+import { Task } from "../scheduler";
 
 // mirrors CompanyAssessor: scores one (borough, parameter) pair at a time, so newly added parameters
 // can be backfilled across every borough without re-touching the ones they were already scored on
-export class BoroughAssessor {
+export class BoroughAssessor extends Task {
 	logger = new Logger('life').task('borough-assessor');
 
 	constructor(
 		private database: DbContext
-	) {}
+	) {
+		super();
+	}
 
-	async next() {
+	async run() {
 		const candidate = await this.findCandidate();
 
 		if (candidate) {
 			await this.assess(candidate.borough, candidate.parameter);
 
-			setTimeout(() => this.next(), 50);
-		} else {
-			setTimeout(() => this.next(), 1000 * 60);
+			return 50;
 		}
+
+		return 1000 * 60;
 	}
 
 	private async findCandidate() {

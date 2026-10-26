@@ -1,21 +1,24 @@
 import { DbContext, Resident } from "../managed/database";
 import { Interpreter, SystemMessage, UserMessage } from "./interpreter";
+import { Task } from "../scheduler";
 
-export class PoliticalCompassRater {
+export class PoliticalCompassRater extends Task {
 	constructor(
 		private database: DbContext
-	) {}
+	) {
+		super();
+	}
 
-	async next() {
+	async run() {
 		const resident = await this.database.resident.first(resident => resident.compassSocial == null);
 
 		if (resident) {
 			await this.rate(resident);
 
-			setTimeout(() => this.next(), 50);
-		} else {
-			setTimeout(() => this.next(), 1000 * 60);
+			return 50;
 		}
+
+		return 1000 * 60;
 	}
 
 	rate(resident: Resident) {

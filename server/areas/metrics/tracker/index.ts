@@ -1,34 +1,11 @@
 import { ViewModel } from "vlserver";
 import { DbContext, Metric, MetricValue } from "../../../managed/database";
 import { hostname } from "os";
-import { updateMetrics } from "../../..";
 import { WorkerDispatch, WorkerHandle } from "../../../worker";
+import { Task } from "../../../scheduler";
 
 export abstract class MetricTracker {
 	static tracked: MetricTracker[] = [];
-
-	// queues all due metrics and dispatches them to a worker thread one after another - see `MetricTrackerWorkerHandle` in `metrics.ts`
-	static schedule(handle: typeof WorkerHandle) {
-		if (!updateMetrics) {
-			return;
-		}
-
-		const next = async () => {
-			const due = this.tracked
-				.filter(tracker => !tracker.last || +tracker.last.updated + tracker.last.elapsed * 100 + 1000 * 60 * 5 <= Date.now())
-				.sort((a, b) => +(a.last?.updated ?? 0) - +(b.last?.updated ?? 0))[0];
-
-			if (due) {
-				await due.dispatchUpdate(handle);
-
-				setTimeout(() => next(), 1000 * 5);
-			} else {
-				setTimeout(() => next(), 1000 * 10);
-			}
-		};
-
-		next();
-	}
 
 	static async track(tracker: MetricTracker, metrics: Metric[], recentValues?: Map<string, MetricValue>) {
 		this.tracked.push(tracker);
@@ -82,7 +59,7 @@ export abstract class MetricTracker {
 			.first();
 	}
 
-	// updates the metric on a worker thread - queued and awaited one at a time by `MetricTracker.schedule`
+	// updates the metric on a worker thread - queued and awaited one at a time by `MetricDispatchTask`
 	async dispatchUpdate(handle: typeof WorkerHandle) {
 		console.log(`[metric] updating ${this.metric.tag}`);
 
@@ -127,5 +104,30 @@ export abstract class MetricTracker {
 
 	format(value: number) {
 		return value.toString();
+	}
+}
+
+// queues all due metrics and dispatches them to a worker thread one after another - see `MetricTrackerWorkerHandle` in `metrics.ts`
+export class MetricDispatchTask extends Task {
+	usesWorker = true;
+
+	constructor(
+		private handle: typeof WorkerHandle
+	) {
+		super();
+	}
+
+	async run() {
+		const due = MetricTracker.tracked
+			.filter(tracker => !tracker.last || +tracker.last.updated + tracker.last.elapsed * 100 + 1000 * 60 * 5 <= Date.now())
+			.sort((a, b) => +(a.last?.updated ?? 0) - +(b.last?.updated ?? 0))[0];
+
+		if (due) {
+			await due.dispatchUpdate(this.handle);
+
+			return 1000 * 5;
+		}
+
+		return 1000 * 10;
 	}
 }

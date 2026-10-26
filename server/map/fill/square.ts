@@ -7,6 +7,8 @@ import { WorkerHandle } from "../../worker";
 export class SquareFiller extends Filler<Square> {
 	static active: SquareFiller;
 
+	workerHandle = SquareFillWorkerHandle;
+
 	constructor(
 		private database: DbContext
 	) {

@@ -1,9 +1,10 @@
 import { Browser, launch } from "puppeteer-core";
 import { PreloadRoute, RouteParameterValue } from "./route";
-import { port, updatePreloadedPages } from "..";
+import { port } from "..";
 import { DbContext, PreloadedPage } from "../managed/database";
 import { readFileSync } from "fs";
 import { Logger } from "@acryps/log";
+import { Task } from "../scheduler";
 
 export class Preload {
 	static browser: Browser;
@@ -32,11 +33,6 @@ export class Preload {
 		</urlset>`;
 	}
 
-	async executeTask() {
-		if (updatePreloadedPages) {
-			this.update();
-		}
-	}
 
 	apply(app, indexPagePath: string, defaultTitle: string) {
 		const indexPage = readFileSync(indexPagePath).toString();
@@ -154,5 +150,20 @@ export class Preload {
 		}
 
 		await page.close();
+	}
+}
+
+// one-shot: crawls and indexes every preloadable page - see `Preload.update`
+export class PreloadUpdateTask extends Task {
+	constructor(
+		private preload: Preload
+	) {
+		super();
+	}
+
+	async run() {
+		await this.preload.update();
+
+		return Infinity;
 	}
 }

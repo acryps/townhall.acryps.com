@@ -1,36 +1,35 @@
 import { Time } from "../../../interface/time";
 import { Interpreter, SystemMessage, UserMessage } from "../../life/interpreter";
 import { Article, ArticleOpinion, DbContext } from "../../managed/database";
+import { Task } from "../../scheduler";
 
-export class ArticleOpinionGenerator {
+export class ArticleOpinionGenerator extends Task {
 	constructor(
 		private database: DbContext
-	) {}
+	) {
+		super();
+	}
 
-	schedule() {
-		const commentNext = async () => {
-			const articles = await this.database.article
-				.where(article => article.published != null)
-				.orderByAscending(article => article.id)
-				.toArray();
+	async run() {
+		const articles = await this.database.article
+			.where(article => article.published != null)
+			.orderByAscending(article => article.id)
+			.toArray();
 
-			for (let article of articles) {
-				const opinions = await article.opinions.count();
+		for (let article of articles) {
+			const opinions = await article.opinions.count();
 
-				// use first id letter for count, to make it determenistically random
-				const targetCount = parseInt(article.id[0], 16) / 2 + 2;
+			// use first id letter for count, to make it determenistically random
+			const targetCount = parseInt(article.id[0], 16) / 2 + 2;
 
-				if (opinions < targetCount) {
-					await this.comment(article);
+			if (opinions < targetCount) {
+				await this.comment(article);
 
-					break;
-				}
+				break;
 			}
+		}
 
-			setTimeout(() => commentNext(), 1000 * 10);
-		};
-
-		commentNext();
+		return 1000 * 10;
 	}
 
 	async comment(article: Article) {

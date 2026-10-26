@@ -12,6 +12,8 @@ export class StreetFiller extends Filler<Street> {
 	// squares take priority over streets - if a street passes through a square, the square wins
 	after = [SquareFiller];
 
+	workerHandle = StreetFillWorkerHandle;
+
 	constructor(
 		private database: DbContext
 	) {

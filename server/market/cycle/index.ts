@@ -13,8 +13,9 @@ import { OpenAiInterpreterProvider } from "../../life/interpreter/provider/opena
 import { Point } from "../../../interface/point";
 import { convertToLegalCompanyName } from "../../../interface/company";
 import { MarketSituationParameter } from "./situation";
+import { Task } from "../../scheduler";
 
-export class MarketCycleGenerator {
+export class MarketCycleGenerator extends Task {
 	steps = () => ({
 		'residential demand': ResidentialDemandMarketCycleGeneratorStep,
 		'commercial demand': CommercialDemandMarketCycleGeneratorStep,
@@ -34,7 +35,15 @@ export class MarketCycleGenerator {
 	constructor(
 		public database: DbContext,
 		public tracker: MarketTracker
-	) {}
+	) {
+		super();
+	}
+
+	async run() {
+		await this.advance();
+
+		return 1000 * 60 * 60;
+	}
 
 	async advance() {
 		const sponsor = await this.database.tokenSponsor.first();

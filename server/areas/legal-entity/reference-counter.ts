@@ -1,12 +1,15 @@
 import { DbClient, DbSet, ForeignReference } from "vlquery";
 import { DbContext, LegalEntity } from "../../managed/database";
 import { Logger } from "@acryps/log";
-import { databaseQueryCount } from "../..";
+import { Task } from "../../scheduler";
+import { WorkerDispatch, WorkerHandle } from "../../worker";
 
-export class LegalEntityReferenceCounter {
+export class LegalEntityReferenceCounter extends Task {
 	private logger = new Logger('legal entity rank');
 
 	static active: LegalEntityReferenceCounter;
+
+	usesWorker = true;
 
 	sources: ForeignReference<LegalEntity>[] = [];
 	ranked: LegalEntity[] = [];
@@ -14,6 +17,8 @@ export class LegalEntityReferenceCounter {
 	constructor(
 		private database: DbContext
 	) {
+		super();
+
 		if (LegalEntityReferenceCounter.active) {
 			throw 'Legal Entity Reference Counter already running';
 		}
@@ -41,18 +46,15 @@ export class LegalEntityReferenceCounter {
 		this.logger.log(`legal entity referenced in ${this.sources.map(source => source.$$item.$$meta.source).join(', ')}`);
 	}
 
-	schedule() {
-		this.rerank();
+	// the heavy DB loop below runs on a worker thread - see `LegalEntityReferenceCounterWorkerHandle`
+	async run() {
+		this.ranked = await WorkerDispatch.dispatch<LegalEntity[]>(LegalEntityReferenceCounterWorkerHandle);
 
-		setInterval(() => {
-			this.rerank();
-		}, 1000 * 60 * 60);
+		return 1000 * 60 * 60;
 	}
 
 	async rerank() {
 		const logger = this.logger.task('rerank');
-		const startQueryCount = databaseQueryCount;
-
 		const referenceCounter = (await this.database.legalEntity.toArray()).map(entity => ({ entity, references: 0 }));
 
 		for (let source of this.sources) {
@@ -84,8 +86,15 @@ export class LegalEntityReferenceCounter {
 			}
 		}
 
-		logger.finish(`ranked, used ${databaseQueryCount - startQueryCount} queries`);
-
 		this.ranked = referenceCounter.map(item => item.entity);
+	}
+}
+
+export class LegalEntityReferenceCounterWorkerHandle extends WorkerHandle {
+	static async dispatch(logger: Logger, database: DbContext) {
+		const counter = new LegalEntityReferenceCounter(database);
+		await counter.rerank();
+
+		return counter.ranked;
 	}
 }

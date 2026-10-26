@@ -1,27 +1,30 @@
 import { Logger } from "@acryps/log";
 import { Company, CompanyAssessment, CompanyAssessmentParameter, DbContext } from "../managed/database";
 import { Interpreter, SystemMessage, UserMessage } from "./interpreter";
+import { Task } from "../scheduler";
 
 // unlike ResidentAssessor, this scores one (company, parameter) pair at a time instead of every parameter in one shot.
 // parameters get added continuously (eg new technology-bound ones), so existing companies must be able to be
 // backfilled against just the new parameter without re-touching everything they were already scored on
-export class CompanyAssessor {
+export class CompanyAssessor extends Task {
 	logger = new Logger('life').task('company-assessor');
 
 	constructor(
 		private database: DbContext
-	) {}
+	) {
+		super();
+	}
 
-	async next() {
+	async run() {
 		const candidate = await this.findCandidate();
 
 		if (candidate) {
 			await this.assess(candidate.company, candidate.parameter);
 
-			setTimeout(() => this.next(), 50);
-		} else {
-			setTimeout(() => this.next(), 1000 * 60);
+			return 50;
 		}
+
+		return 1000 * 60;
 	}
 
 	private async findCandidate() {

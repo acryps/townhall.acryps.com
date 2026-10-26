@@ -4,8 +4,12 @@ import { Canvas, CanvasRenderingContext2D, loadImage } from "skia-canvas";
 import { PackedPoint, Point } from "../../interface/point";
 import { mapBaseTileSize } from "../../interface/tile";
 import { Logger } from "@acryps/log";
+import { Task } from "../scheduler";
+import { WorkerDispatch, WorkerHandle } from "../worker";
 
-export class MapImporter {
+type RegionSchedule = Map<string, { region: Point, dueAt: number }>;
+
+export class MapImporter extends Task {
 	static readonly tile = mapBaseTileSize;
 
 	static readonly debounce = 1000 * 30;
@@ -18,11 +22,21 @@ export class MapImporter {
 
 	private logger = new Logger('map-import');
 
+	// the only urgent task in the scheduler - fresh map tiles are tied to live gameplay
+	urgent = true;
+	usesWorker = true;
+
 	changedRegions: Point[] = [];
+
+	// debounced + guaranteed-save region updates, replacing the two setTimeouts `poke` used to set directly
+	private debounceSchedule: RegionSchedule = new Map();
+	private backstopSchedule: RegionSchedule = new Map();
 
 	constructor(
 		private database: DbContext
 	) {
+		super();
+
 		if (MapImporter.instance) {
 			throw new Error('Multiple MapImporters running.');
 		}
@@ -60,14 +74,55 @@ export class MapImporter {
 		if (!MapImporter.instance.changedRegions.find(peer => peer.x == region.x && peer.y == region.y)) {
 			MapImporter.instance.changedRegions.push(region);
 
-			setTimeout(async () => {
-				await MapImporter.instance.update(region);
+			const key = region.toString();
+			const now = Date.now();
 
-				MapImporter.instance.changedRegions.splice(MapImporter.instance.changedRegions.indexOf(region), 1);
-			}, MapImporter.debounce);
+			MapImporter.instance.debounceSchedule.set(key, { region, dueAt: now + MapImporter.debounce });
+			MapImporter.instance.backstopSchedule.set(key, { region, dueAt: now + MapImporter.sureSaved });
 
-			setTimeout(() => MapImporter.instance.update(region), MapImporter.sureSaved);
+			// wake the scheduler early so the debounce fires close to on-time instead of waiting for its next unrelated check
+			MapImporter.instance.scheduler?.notify();
 		}
+	}
+
+	async run() {
+		const now = Date.now();
+		let soonest = Infinity;
+
+		for (let [key, entry] of this.debounceSchedule) {
+			if (entry.dueAt > now) {
+				soonest = Math.min(soonest, entry.dueAt - now);
+				continue;
+			}
+
+			this.debounceSchedule.delete(key);
+
+			const index = this.changedRegions.findIndex(peer => peer.x == entry.region.x && peer.y == entry.region.y);
+
+			if (index >= 0) {
+				this.changedRegions.splice(index, 1);
+			}
+
+			await this.dispatchUpdate(entry.region);
+		}
+
+		for (let [key, entry] of this.backstopSchedule) {
+			if (entry.dueAt > now) {
+				soonest = Math.min(soonest, entry.dueAt - now);
+				continue;
+			}
+
+			this.backstopSchedule.delete(key);
+
+			await this.dispatchUpdate(entry.region);
+		}
+
+		return Number.isFinite(soonest) ? soonest : 1000 * 60;
+	}
+
+	// computes the heavy canvas fetch/decode/diff work on a worker thread - see `MapImportWorkerHandle`
+	private async dispatchUpdate(region: Point) {
+		await WorkerDispatch.dispatch(MapImportWorkerHandle, { x: region.x, y: region.y });
 	}
 
 	async update(region: Point) {
@@ -169,5 +224,12 @@ export class MapImporter {
 		}
 
 		return false;
+	}
+}
+
+// runs the heavy canvas fetch/decode/diff work for one region on a worker thread - see `MapImporter.dispatchUpdate`
+export class MapImportWorkerHandle extends WorkerHandle {
+	static async dispatch(logger: Logger, database: DbContext, context: { x: number, y: number }) {
+		await new MapImporter(database).update(new Point(context.x, context.y));
 	}
 }

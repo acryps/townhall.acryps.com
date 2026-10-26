@@ -2,8 +2,9 @@ import { Logger } from "@acryps/log";
 import { AnnotatedTextPart, AnnotatedTextType } from "../interface/annotate";
 import { convertToLegalCompanyName } from "../interface/company";
 import { Borough, Company, DbContext, Property, Resident } from "./managed/database";
+import { Task } from "./scheduler";
 
-export class Annotator {
+export class Annotator extends Task {
 	private logger = new Logger('annotator');
 
 	static instance: Annotator;
@@ -16,11 +17,19 @@ export class Annotator {
 	constructor(
 		private database: DbContext
 	) {
+		super();
+
 		if (Annotator.instance) {
 			throw new Error('Annotator already created');
 		}
 
 		Annotator.instance = this;
+	}
+
+	async run() {
+		await this.load();
+
+		return 1000 * 60 * 5;
 	}
 
 	async load() {
@@ -41,8 +50,6 @@ export class Annotator {
 			.toArray();
 
 		logger.finish();
-
-		setTimeout(() => this.load(), 1000 * 60 * 5);
 	}
 
 	static annotate(source: string) {

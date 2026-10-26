@@ -12,6 +12,8 @@ export class WaterBodyFiller extends Filler<WaterBody> {
 	// streets and squares both take priority over water
 	after = [StreetFiller, SquareFiller];
 
+	workerHandle = WaterBodyFillWorkerHandle;
+
 	constructor(
 		private database: DbContext
 	) {

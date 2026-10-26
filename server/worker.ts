@@ -76,15 +76,20 @@ export class WorkerDispatch {
 			worker.on('message', async result => {
 				logger.finish(`completed in ${Date.now() - start}ms`);
 
-				done(await this.deserialize(result, this.database));
+				const deserialized = await this.deserialize(result, this.database);
+				await worker.terminate();
+
+				done(deserialized);
 			});
 
 			worker.on('online', () => {
 				worker.postMessage({ identifier, context });
 			});
 
-			worker.on('error', error => {
+			worker.on('error', async error => {
 				logger.error(`failed in ${Date.now() - start}ms`, error);
+
+				await worker.terminate();
 
 				fail(error);
 			});

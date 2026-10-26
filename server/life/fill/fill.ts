@@ -5,8 +5,9 @@ import { Borough, DbContext, Dwelling, Property, Resident, ResidentRelationship,
 import { female, genders, male } from "../gender";
 import { Interpreter, SystemMessage, UserMessage } from "../interpreter";
 import { Language } from "../language";
+import { Task } from "../../scheduler";
 
-export class FillLife {
+export class FillLife extends Task {
 	oldestPersonBirthday = +new Date('2021-06-01');
 	youngestParentBirthday = +new Date('2024-01-01');
 	now = +new Date();
@@ -16,7 +17,15 @@ export class FillLife {
 	constructor(
 		private life: Life,
 		private database: DbContext
-	) {}
+	) {
+		super();
+	}
+
+	async run() {
+		await this.fillEmptyDwellings();
+
+		return Infinity;
+	}
 
 	async fillEmptyDwellings() {
 		const properties = await this.database.property

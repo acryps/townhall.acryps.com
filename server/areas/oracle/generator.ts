@@ -4,46 +4,65 @@ import { Annotator } from "../../annotate";
 import { Article, DbContext, LegalEntity, OracleProposal } from "../../managed/database";
 import { LegalEntityManager } from "../legal-entity/manager";
 import { Interpreter, SystemMessage, UserMessage } from "../../life/interpreter";
+import { Task } from "../../scheduler";
 
-export class Oracle {
+export class Oracle extends Task {
 	readonly targetUnreviewedPropsoalsCount = 10;
+
+	// two independently-paced loops (checking whether to propose new lore, and expanding reviewed
+	// proposals into articles), both polled every minute - tracked here instead of as two separate
+	// Tasks since they share the same Oracle state and were always scheduled together
+	private nextProposeCheckAt = 0;
+	private nextExpandAt = 0;
 
 	constructor(
 		private database: DbContext,
 		private legalEntityManager: LegalEntityManager
-	) {}
+	) {
+		super();
+	}
 
-	schedule() {
-		setInterval(async () => {
-			const count = await this.database.oracleProposal
-				.where(proposal => proposal.reviewed == null)
-				.count();
+	async run() {
+		const now = Date.now();
 
-			if (count < this.targetUnreviewedPropsoalsCount) {
-				this.propose();
+		if (now >= this.nextProposeCheckAt) {
+			await this.checkPropose();
+			this.nextProposeCheckAt = Date.now() + 1000 * 60;
+		}
+
+		if (now >= this.nextExpandAt) {
+			await this.expandNext();
+			this.nextExpandAt = Date.now() + 1000 * 60;
+		}
+
+		return Math.min(this.nextProposeCheckAt, this.nextExpandAt) - Date.now();
+	}
+
+	private async checkPropose() {
+		const count = await this.database.oracleProposal
+			.where(proposal => proposal.reviewed == null)
+			.count();
+
+		if (count < this.targetUnreviewedPropsoalsCount) {
+			await this.propose();
+		}
+	}
+
+	private async expandNext() {
+		const reviewed = await this.database.oracleProposal
+			.where(proposal => proposal.reviewed != null)
+			.where(proposal => proposal.realistic == true)
+			.toArray();
+
+		for (let proposal of reviewed) {
+			const articles = await proposal.articles.count();
+
+			if (!articles) {
+				await this.expand(proposal);
+
+				break;
 			}
-		}, 1000 * 60);
-
-		const expandNext = async () => {
-			const reviewed = await this.database.oracleProposal
-				.where(proposal => proposal.reviewed != null)
-				.where(proposal => proposal.realistic == true)
-				.toArray();
-
-			for (let proposal of reviewed) {
-				const articles = await proposal.articles.count();
-
-				if (!articles) {
-					await this.expand(proposal);
-
-					break;
-				}
-			}
-
-			setTimeout(() => expandNext(), 1000 * 60);
-		};
-
-		expandNext();
+		}
 	}
 
 	async propose() {

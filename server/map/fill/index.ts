@@ -2,8 +2,11 @@ import { Logger } from "@acryps/log";
 import { calcualteDanwinstonLine, calculateDanwinstonShapePath, drawDanwinstonLine } from "../../../interface/line";
 import { PackedPoint, Point } from "../../../interface/point";
 import { WorkerDispatch, WorkerHandle } from "../../worker";
+import { Task } from "../../scheduler";
 
-export abstract class Filler<SourceType> {
+export abstract class Filler<SourceType> extends Task {
+	private logger = new Logger(this.constructor.name);
+
 	cached: {
 		filled: Map<PackedPoint, SourceType>,
 		boundaries: PackedPoint[]
@@ -15,25 +18,21 @@ export abstract class Filler<SourceType> {
 	// removes anything filled by parents
 	after: { active: Filler<any> }[] = [];
 
+	usesWorker = true;
+
+	// the worker handle that computes this filler's shapes - see the `WorkerHandle` subclasses in the concrete fillers
+	abstract workerHandle: typeof WorkerHandle;
+
 	abstract fetch(): Promise<SourceType[]>;
 	abstract obstacles(): Promise<Point[][]>;
 	abstract rank(a: SourceType, b: SourceType): number;
 	abstract fill(source: SourceType): Promise<PackedPoint[]>;
 
-	// computes on a worker thread - see `WorkerHandle` subclasses in the concrete fillers
-	schedule(handle: typeof WorkerHandle) {
-		const logger = new Logger(this.constructor.name);
+	async run() {
+		this.logger.log('fill');
+		this.cached = await dispatchFill(this.workerHandle);
 
-		const next = async () => {
-			logger.log('fill');
-			this.cached = await dispatchFill(handle);
-
-			setTimeout(() => next(), 1000 * 60 * 5);
-		};
-
-		next();
-
-		return this;
+		return 1000 * 60 * 5;
 	}
 
 	async update() {

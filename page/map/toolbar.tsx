@@ -1,6 +1,6 @@
 import { Component } from "@acryps/page";
 import { MapPage } from ".";
-import { addIcon, boroughIcon, captureIcon, dayIcon, deleteIcon, drawIcon, flipIcon, goIcon, movementIcon, priceIcon, propertyRegisterIcon, relationGraphIcon, residentIcon, streetIcon, timeMachineIcon, trainIcon, undoIcon, waterIcon } from "../assets/icons/managed";
+import { addIcon, boroughIcon, captureIcon, dayIcon, deleteIcon, drawIcon, flipIcon, goIcon, movementIcon, pointAfterIcon, pointBeforeIcon, priceIcon, propertyRegisterIcon, relationGraphIcon, residentIcon, streetIcon, timeMachineIcon, trainIcon, waterIcon } from "../assets/icons/managed";
 import { PackedPoint, Point } from "../../interface/point";
 import { MapLayer } from "../shared/map/layer";
 import { baseLayer, nightLayer, boroughLayer, propertyLayer, streetLayer, blockTouchesHeatmapLayer, propertyUsageLayer, propertyValueHeatmapLayer, trainRoutesLayer, propertyOwnershipLayer, waterLayer, trafficLayer } from "../shared/map/layers";
@@ -146,31 +146,64 @@ export class MapToolbarComponent extends Component {
 
 			{this.timeMachine}
 
-			{this.parent.map.drawer && <ui-actions>
-				<ui-group>
-					<ui-action ui-click={() => this.parent.map.pushDrawingPoint()}>
-						{addIcon()} Add
-					</ui-action>
+			{this.parent.map.drawer && <ui-draw>
+				<ui-actions>
+					<ui-group>
+						<ui-action ui-click={() => this.changeDrawing(() => this.parent.map.selectPreviousDrawingPoint())}>
+							{pointBeforeIcon()}
+						</ui-action>
 
-					<ui-action ui-click={() => this.parent.map.popDrawingPoint()}>
-						{undoIcon()}
-					</ui-action>
+						<ui-action ui-click={() => this.changeDrawing(() => this.parent.map.insertDrawingPointBefore())}>
+							{pointBeforeIcon()}{addIcon()}
+						</ui-action>
+					</ui-group>
 
-					<ui-action ui-click={() => this.parent.map.flipDrawingDirection()}>
-						{flipIcon()}
-					</ui-action>
-				</ui-group>
+					<ui-metric>
+						{this.parent.map.drawer.focusIndex + 1} / {this.parent.map.drawer.shape.length}
+					</ui-metric>
 
-				{this.parent.drawing.type == 'closed-shape' ? (
-					this.parent.map.drawer.closeable.map(possible => possible ? <ui-action ui-click={() => this.parent.completeDrawing()}>
-						{this.parent.drawing.name} {goIcon()}
-					</ui-action> : <ui-action ui-disabled>
-						{this.parent.drawing.name} {goIcon()}
-					</ui-action>)
-				) : <ui-action ui-click={() => this.parent.completeDrawing()}>
-					{this.parent.drawing.name} {goIcon()}
-				</ui-action>}
-			</ui-actions>}
+					<ui-group>
+						<ui-action ui-click={() => this.changeDrawing(() => this.parent.map.insertDrawingPointAfter())}>
+							{addIcon()}{pointAfterIcon()}
+						</ui-action>
+
+						<ui-action ui-click={() => this.changeDrawing(() => this.parent.map.selectNextDrawingPoint())}>
+							{pointAfterIcon()}
+						</ui-action>
+					</ui-group>
+				</ui-actions>
+
+				<ui-actions>
+					<ui-group>
+						<ui-action
+							ui-disabled={this.parent.map.drawer.shape.length <= 1}
+							ui-click={() => this.changeDrawing(() => this.parent.map.deleteFocusedDrawingPoint())}
+						>
+							{deleteIcon()}
+						</ui-action>
+
+						<ui-action ui-click={() => this.changeDrawing(() => this.parent.map.flipDrawingDirection())}>
+							{flipIcon()}
+						</ui-action>
+					</ui-group>
+
+					<ui-metric>
+						{this.parent.map.drawer.area}b²
+					</ui-metric>
+
+					<ui-group>
+						{!this.parent.map.drawer.closed || this.parent.map.drawer.shape.length >= 3 ? (
+							<ui-action ui-click={() => this.parent.completeDrawing()}>
+								{this.parent.drawing.name} {goIcon()}
+							</ui-action>
+						) : (
+							<ui-action ui-disabled>
+								{this.parent.drawing.name} {goIcon()}
+							</ui-action>
+						)}
+					</ui-group>
+				</ui-actions>
+			</ui-draw>}
 
 			{(this.parent.child instanceof Action) && this.parent.child.renderPanel()}
 		</ui-tools>
@@ -200,6 +233,14 @@ export class MapToolbarComponent extends Component {
 			this.rootNode.style.removeProperty(activeBoroughColor.propertyName);
 			this.rootNode.style.removeProperty(activeBoroughContrast.propertyName);
 		}
+	}
+
+	// runs a drawing panel action and re-renders the toolbar, as the point navigator and area reflect
+	// the shape's current state
+	changeDrawing(change: () => void) {
+		change();
+
+		this.update();
 	}
 
 	toggleLayer(enable: MapLayer, disable?: MapLayer) {

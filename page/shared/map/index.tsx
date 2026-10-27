@@ -82,25 +82,40 @@ export class MapComponent extends Component {
 	}
 
 	// enable drawing mode
-	enableDrawing(shape: Point[] = []) {
-		this.drawer = new MapDrawView(this, shape);
+	enableDrawing(shape: Point[] = [], closed = true) {
+		this.drawer = new MapDrawView(this, shape, closed);
 		this.updateViews();
 
 		return this;
 	}
 
-	pushDrawingPoint(point = this.cursor) {
-		this.drawer.shape.push(point.copy());
+	selectPreviousDrawingPoint() {
+		this.drawer.selectPrevious();
 		this.renderLayers();
 	}
 
-	popDrawingPoint() {
-		this.drawer.shape.pop();
+	selectNextDrawingPoint() {
+		this.drawer.selectNext();
+		this.renderLayers();
+	}
+
+	insertDrawingPointBefore() {
+		this.drawer.insertBefore();
+		this.renderLayers();
+	}
+
+	insertDrawingPointAfter() {
+		this.drawer.insertAfter();
+		this.renderLayers();
+	}
+
+	deleteFocusedDrawingPoint() {
+		this.drawer.deleteFocused();
 		this.renderLayers();
 	}
 
 	flipDrawingDirection() {
-		this.drawer.shape.reverse();
+		this.drawer.flip();
 		this.renderLayers();
 	}
 

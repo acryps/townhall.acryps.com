@@ -1,4 +1,3 @@
-import { Observable } from "@acryps/page-observable";
 import { MapView } from ".";
 import { Point } from "../../../../interface/point";
 import { calcualteDanwinstonLine, drawDanwinstonLine } from "../../../../interface/line";
@@ -8,13 +7,75 @@ import { MapComponent } from "..";
 export class MapDrawView extends MapView {
 	readonly targetPixelSize = 5;
 
-	closeable = new Observable(false);
+	// index of the point currently focused for editing - always valid, as a shape always has at least
+	// one point. panning the map (the same precise controls used everywhere else) moves this point
+	focusIndex = 0;
 
 	constructor(
 		map: MapComponent,
-		public shape: Point[]
+		public shape: Point[],
+
+		// whether the shape loops back to its first point - a dim preview of that closing edge is shown
+		// once there's enough points to form one, and finishing requires at least a triangle
+		public closed: boolean
 	) {
 		super(map);
+
+		if (!this.shape.length) {
+			this.shape.push(map.cursor.copy());
+		}
+
+		this.snapCursorToFocus();
+	}
+
+	selectPrevious() {
+		this.focusIndex = (this.focusIndex - 1 + this.shape.length) % this.shape.length;
+		this.snapCursorToFocus();
+	}
+
+	selectNext() {
+		this.focusIndex = (this.focusIndex + 1) % this.shape.length;
+		this.snapCursorToFocus();
+	}
+
+	// inserts a copy of the focused point right before it - the copy becomes focused, the original
+	// point it was copied from is left untouched, just shifted one position later
+	insertBefore() {
+		this.shape.splice(this.focusIndex, 0, this.shape[this.focusIndex].copy());
+	}
+
+	// inserts a copy of the focused point right after it, and focuses that new point
+	insertAfter() {
+		this.shape.splice(this.focusIndex + 1, 0, this.shape[this.focusIndex].copy());
+		this.focusIndex++;
+	}
+
+	// removes the focused point - a shape always keeps at least one point
+	deleteFocused() {
+		if (this.shape.length <= 1) {
+			return;
+		}
+
+		this.shape.splice(this.focusIndex, 1);
+		this.focusIndex = Math.min(this.focusIndex, this.shape.length - 1);
+		this.snapCursorToFocus();
+	}
+
+	flip() {
+		this.shape.reverse();
+
+		this.focusIndex = this.shape.length - 1 - this.focusIndex;
+	}
+
+	get area() {
+		return Point.area(this.shape);
+	}
+
+	// aligns the map cursor with the focused point, so panning continues from where it visually is
+	private snapCursorToFocus() {
+		const point = this.shape[this.focusIndex];
+
+		this.map.move(point.floor().copy(0.5, 0.5));
 	}
 
 	resize() {
@@ -30,7 +91,6 @@ export class MapDrawView extends MapView {
 		delete this.map.drawer;
 
 		this.map.render();
-		this.closeable.emit(false);
 
 		return shape;
 	}
@@ -38,20 +98,24 @@ export class MapDrawView extends MapView {
 	render(offset: Point) {
 		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-		if (this.shape.length) {
-			const firstPoint = this.shape[0];
+		// the focused point follows the cursor - panning moves it directly, using the same precise
+		// controls used everywhere else on the map, instead of an imprecise direct drag
+		this.shape[this.focusIndex] = this.map.cursor.copy();
 
-			this.closeable.emit(this.map.cursor.x == firstPoint.x && this.map.cursor.y == firstPoint.y);
-		}
-
-		// draw existing
-		this.context.fillStyle = '#000';
-
+		// draw edges - green when straight (axis-aligned or at a clean 45 degrees), red otherwise.
+		// this is live, so edges being reshaped by moving or adding a point update immediately
 		for (let pointIndex = 1; pointIndex < this.shape.length; pointIndex++) {
-			this.drawCheckeredLine(this.shape[pointIndex - 1], this.shape[pointIndex], offset);
+			this.drawAlignedLine(this.shape[pointIndex - 1], this.shape[pointIndex], offset);
 		}
 
-		// draw edges
+		// once there's enough points to form a shape, preview the closing edge faintly
+		if (this.closed && this.shape.length >= 3) {
+			this.context.globalAlpha = 0.5;
+			this.drawAlignedLine(this.shape[this.shape.length - 1], this.shape[0], offset);
+			this.context.globalAlpha = 1;
+		}
+
+		// draw vertices
 		if (this.superscale > 1) {
 			this.context.strokeStyle = '#00f';
 
@@ -71,33 +135,17 @@ export class MapDrawView extends MapView {
 			}
 		}
 
-		// draw current line
-		const last = this.shape[this.shape.length - 1];
-		const cursor = this.map.cursor;
-
-		if (last) {
-			// draw current line
-			this.context.fillStyle = '#0008';
-			this.drawCheckeredLine(last, cursor, offset);
-
-			// alignment
-			if (last.x == cursor.x || last.y == cursor.y || Math.abs(last.x - cursor.x) == Math.abs(last.y - cursor.y)) {
-				this.context.strokeStyle = positiveColor.toValueString();
-			} else {
-				this.context.strokeStyle = negativeColor.toValueString();
-			}
-
-			this.context.strokeRect(
-				(cursor.x - offset.x) * this.superscale - 0.5,
-				(cursor.y - offset.y) * this.superscale - 0.5,
-				this.superscale + 1,
-				this.superscale + 1
-			);
-		}
-
 		// draw cursor
 		this.context.fillStyle = '#000';
-		this.drawCheckeredPixel(cursor, offset);
+		this.drawCheckeredPixel(this.map.cursor, offset);
+	}
+
+	// draws a line, colored by whether it's a clean edge - axis-aligned or a 45 degree diagonal - or not
+	private drawAlignedLine(start: Point, end: Point, offset: Point) {
+		const aligned = start.x == end.x || start.y == end.y || Math.abs(start.x - end.x) == Math.abs(start.y - end.y);
+
+		this.context.fillStyle = (aligned ? positiveColor : negativeColor).toValueString();
+		this.drawCheckeredLine(start, end, offset);
 	}
 
 	private drawCheckeredLine(start: Point, end: Point, offset: Point) {

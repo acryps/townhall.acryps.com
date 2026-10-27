@@ -14,7 +14,9 @@ export class EditSquareBoundaryAction extends Action {
 	async activate() {
 		this.square = await new SquareService().getSquare(this.parameters.tag);
 
-		this.parent.draw('Save Boundary', 'closed-shape').then(shape => this.complete(shape));
+		const activeBoundary = this.square.boundaries.find(boundary => boundary.id == this.square.activeBoundaryId);
+
+		this.parent.draw('Save Boundary', 'closed-shape', Point.unpack(activeBoundary.shape)).then(shape => this.complete(shape));
 	}
 
 	async complete(shape: Point[]) {

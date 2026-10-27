@@ -1,4 +1,4 @@
-import { alignItems, alignSelf, background, backgroundColor, border, borderBottom, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, cursor, display, flexDirection, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, height, Hex, hex, imageRendering, inset, insetInline, justifyContent, left, lineHeight, margin, marginBottom, marginInline, marginLeft, marginTop, maxHeight, maxWidth, Number, objectFit, opacity, overflow, overflowY, padding, paddingBlock, paddingBottom, paddingInline, paddingTop, pointerEvents, position, px, rem, right, select, style, textAlign, top, Variable, vh, width } from "@acryps/style";
+import { alignItems, alignSelf, background, backgroundColor, border, borderBottom, borderRight, borderRightStyle, borderRightWidth, borderTop, bottom, boxShadow, child, color, cursor, display, flexDirection, flexGrow, flexShrink, flexWrap, fontSize, fontWeight, gap, height, Hex, hex, imageRendering, inset, insetInline, justifyContent, justifySelf, left, lineHeight, margin, marginBottom, marginInline, marginLeft, marginTop, maxHeight, maxWidth, Number, objectFit, opacity, overflow, overflowY, padding, paddingBlock, paddingBottom, paddingInline, paddingTop, pointerEvents, position, px, rem, right, select, style, textAlign, top, Variable, vh, width } from "@acryps/style";
 import { pageTextColor, navigationBackgroundColor, navigationBorderColor, pageGutter, pageBackgroundColor, neutralColor } from "../index.style";
 import { buttonStyle } from "../shared/index.style";
 import { PageComponent } from "../page";
@@ -153,6 +153,50 @@ export const mapStyle = () => [
 						opacity(0.5),
 						pointerEvents('none')
 					)
+			),
+
+			child('ui-draw',
+				display('flex'),
+				flexDirection('column'),
+				gap(pageGutter.divide(2)),
+
+				margin(pageGutter.divide(2)),
+				padding(pageGutter.divide(2)),
+
+				backgroundColor(pageBackgroundColor),
+				boxShadow(hex('0005'), 0, rem(0.5), pageGutter),
+
+				child('ui-actions',
+					display('flex'),
+					alignItems('center'),
+					gap(pageGutter.divide(2)),
+
+					child('ui-group',
+						display('flex'),
+
+						backgroundColor(pageBackgroundColor),
+
+						child('ui-action',
+							buttonStyle(),
+
+							style(':not(:last-of-type)',
+								borderRightStyle('none')
+							)
+						)
+							.attribute('ui-disabled',
+								opacity(0.5),
+								pointerEvents('none')
+							)
+					)
+						.attribute('ui-finish',
+							flexGrow(1),
+							justifyContent('flex-end')
+						),
+
+					child('ui-metric',
+						paddingInline(pageGutter.divide(2))
+					)
+				),
 			),
 
 			child('ui-time-machine',

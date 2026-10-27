@@ -14,7 +14,9 @@ export class EditBoroughBoundaryAction extends Action {
 	async activate() {
 		this.borough = await new BoroughService().get(this.parameters.tag);
 
-		this.parent.draw('Save Boundary', 'closed-shape').then(shape => this.complete(shape));
+		const activeBoundary = this.borough.boundaries.find(boundary => boundary.id == this.borough.activeBoundaryId);
+
+		this.parent.draw('Save Boundary', 'closed-shape', Point.unpack(activeBoundary.shape)).then(shape => this.complete(shape));
 	}
 
 	async complete(shape: Point[]) {

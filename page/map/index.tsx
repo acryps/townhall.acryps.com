@@ -92,7 +92,7 @@ export class MapPage extends Component {
 				complete: shape => done(shape)
 			}
 
-			this.map.enableDrawing(shape);
+			this.map.enableDrawing(shape, type != 'path');
 			this.toolbar.update();
 		});
 	}

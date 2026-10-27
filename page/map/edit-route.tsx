@@ -9,8 +9,11 @@ export class EditRouteAction extends Action {
 	declare parent: MapPage;
 	declare parameters: { id };
 
-	activate() {
-		this.parent.draw('Save Route', 'path').then(shape => this.complete(shape));
+	async activate() {
+		const street = await new StreetService().getStreet(this.parameters.id);
+		const activeRoute = street.routes.find(route => route.id == street.activeRouteId);
+
+		this.parent.draw('Save Route', 'path', Point.unpack(activeRoute.path)).then(shape => this.complete(shape));
 	}
 
 	async complete(shape: Point[]) {

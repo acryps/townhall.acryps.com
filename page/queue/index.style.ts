@@ -1,6 +1,6 @@
-import { alignItems, border, borderBottom, child, color, columnGap, display, flexWrap, fontSize, fontWeight, hex, marginBottom, marginLeft, marginTop, opacity, padding, percentage, px, rem, textTransform, width } from "@acryps/style";
+import { alignItems, backgroundColor, border, borderBottom, child, color, columnGap, display, flexWrap, fontSize, fontWeight, gap, hex, justifyContent, marginBottom, marginLeft, marginTop, opacity, padding, percentage, px, rem, textAlign, textTransform, whiteSpace, width, wordBreak } from "@acryps/style";
 import { boxed } from "../shared/boxed.style";
-import { infoColor, negativeColor, pageGutter, positiveColor } from "../index.style";
+import { infoColor, negativeColor, pageBackgroundColor, pageGutter, pageTextColor, positiveColor } from "../index.style";
 
 export const queueStyle = () => child('ui-queue',
 	boxed(),
@@ -19,38 +19,51 @@ export const queueStyle = () => child('ui-queue',
 
 		child('ui-task',
 			display('flex'),
-			flexWrap('wrap'),
-			alignItems('center'),
-			columnGap(pageGutter),
-			padding(rem(0.6), pageGutter),
+			justifyContent('space-between'),
+			gap(pageGutter),
+			padding(pageGutter),
 
 			borderBottom(px(1), 'dotted', 'currentColor'),
 
-			child('ui-name',
-				fontWeight('bold')
-			),
-
-			child('ui-priority',
-				fontSize(rem(0.75)),
-				textTransform('uppercase'),
-				opacity(0.6)
-			),
-
-			child('ui-worker',
-				fontSize(rem(0.75)),
-				textTransform('uppercase'),
-				opacity(0.6)
-			),
-
 			child('ui-detail',
-				display('flex'),
-				columnGap(pageGutter),
-				marginLeft('auto'),
+				display('block'),
 
-				fontSize(rem(0.85)),
+				child('ui-name',
+					display('block'),
+
+					fontWeight('bold'),
+					wordBreak('break-word')
+				),
+
+				child('ui-tags',
+					display('flex'),
+					flexWrap('wrap'),
+					gap(pageGutter.divide(2)),
+
+					child('*',
+						fontSize(rem(0.75)),
+						textTransform('uppercase')
+					)
+				)
+			),
+
+			child('ui-runtime',
+				textAlign('right'),
+				fontSize(rem(0.75)),
+				whiteSpace('nowrap'),
 
 				child('ui-status',
+					display('block'),
+
 					fontWeight('bold')
+				),
+
+				child('ui-next',
+					display('block'),
+				),
+
+				child('ui-last',
+					display('block')
 				)
 			),
 
@@ -63,9 +76,15 @@ export const queueStyle = () => child('ui-queue',
 				color(negativeColor)
 			)
 		)
-			.attribute('ui-state', 'disabled', opacity(0.4))
-			.attribute('ui-state', 'waiting', opacity(0.7))
-			.attribute('ui-state', 'running', color(infoColor))
-			.attribute('ui-state', 'ready', color(positiveColor))
+			.attribute('ui-state', 'disabled',
+				opacity(0.4)
+			)
+			.attribute('ui-state', 'running',
+				color(pageBackgroundColor),
+				backgroundColor(pageTextColor)
+			)
+			.attribute('ui-state', 'ready',
+				backgroundColor(positiveColor)
+			)
 	)
 );

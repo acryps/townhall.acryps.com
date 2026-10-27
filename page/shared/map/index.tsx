@@ -279,6 +279,13 @@ export class MapComponent extends Component {
 
 	// updates map content
 	updateLayers() {
+		// the map may not be mounted yet (e.g. an action starting a drawing synchronously, before the
+		// map's own render() has run its first requestAnimationFrame) - that initial render re-applies
+		// the current state once the map is actually mounted, so it's safe to skip this update for now
+		if (!this.rootNode) {
+			return;
+		}
+
 		const bounds = this.rootNode.getBoundingClientRect();
 
 		// how much partially visible pixels are on the canvas

@@ -181,7 +181,7 @@ DbClient.connectedClient.connect().then(async () => {
 	StreetFiller.active = scheduler.register(new StreetFiller(database));
 	WaterBodyFiller.active = scheduler.register(new WaterBodyFiller(database));
 
-	scheduler.register(new PropertyValueIndexTask(new PropertyValueTileServer(app, database)));
+	scheduler.register(new PropertyValueIndexTask(new PropertyValueTileServer(app)));
 
 	new BaseTileServer(app, database);
 	new TimeMachineTileServer(app, database);

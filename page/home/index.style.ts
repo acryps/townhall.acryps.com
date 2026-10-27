@@ -1,4 +1,4 @@
-import { alignContent, alignItems, animationIterationCount, aspectRatio, backdropFilter, background, backgroundColor, border, bottom, boxShadow, brightness, child, color, ColorValue, contrast, cursor, display, flexDirection, flexGrow, flexWrap, fontSize, fontStyle, fontWeight, gap, grayscale, gridTemplateColumns, height, hex, Hex, imageRendering, inset, insetInline, invert, justifyContent, Keyframe, Keyframes, left, lineHeight, margin, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, maxHeight, minWidth, Mm, objectFit, overflow, padding, paddingBlock, paddingInline, percentage, position, px, Rad, ratio, rem, rotate, seconds, style, textAlign, top, transform, translateX, turn, Variable, vh, whiteSpace, width, zIndex } from "@acryps/style";
+import { alignContent, alignItems, animationIterationCount, aspectRatio, backdropFilter, background, backgroundColor, border, bottom, boxShadow, brightness, child, color, ColorValue, contrast, cursor, display, flexDirection, flexGrow, flexWrap, fontSize, fontStyle, fontWeight, gap, grayscale, gridTemplateColumns, height, hex, Hex, imageRendering, inset, insetInline, invert, justifyContent, Keyframe, Keyframes, left, lineHeight, margin, marginBlock, marginBottom, marginInline, marginLeft, marginRight, marginTop, maxHeight, minWidth, Mm, objectFit, overflow, padding, paddingBlock, paddingInline, percentage, position, px, Rad, ratio, rem, rotate, seconds, style, textAlign, textDecoration, textDecorationLine, top, transform, translateX, turn, Variable, vh, whiteSpace, width, zIndex } from "@acryps/style";
 import { buttonStyle } from "../shared/index.style";
 import { collection, collectionItem } from "../shared/collection.style";
 import { card, cardSpacingBlock, cardSpacingInline } from "../shared/card.style";
@@ -188,6 +188,21 @@ export const homeStyle = () => child('ui-home',
 			display('block'),
 
 			fontSize(rem(0.6))
+		)
+	),
+
+	child('ui-about',
+		display('block'),
+		marginBottom(pageGutter)
+	),
+
+	child('ui-links',
+		display('flex'),
+		alignItems('flex-start'),
+		gap(pageGutter.divide(2)),
+
+		child('ui-link',
+			textDecorationLine('underline')
 		)
 	)
 )

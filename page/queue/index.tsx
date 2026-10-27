@@ -25,19 +25,23 @@ export class QueuePage extends Component {
 
 			<ui-tasks>
 				{this.queue.map(task => <ui-task ui-state={this.state(task)}>
-					<ui-name>
-						{task.name}
-					</ui-name>
-
-					<ui-priority>
-						{task.urgent ? 'urgent' : 'idle'}
-					</ui-priority>
-
-					{task.usesWorker && <ui-worker>
-						worker
-					</ui-worker>}
-
 					<ui-detail>
+						<ui-name>
+							{task.name}
+						</ui-name>
+
+						<ui-tags>
+							<ui-priority>
+								{task.urgent ? 'Urgent' : 'Idle'}
+							</ui-priority>
+
+							{task.usesWorker && <ui-worker>
+								Worker
+							</ui-worker>}
+						</ui-tags>
+					</ui-detail>
+
+					<ui-runtime>
 						<ui-status>
 							{this.state(task)}
 						</ui-status>
@@ -49,7 +53,7 @@ export class QueuePage extends Component {
 						<ui-last>
 							{this.lastRun(task)}
 						</ui-last>
-					</ui-detail>
+					</ui-runtime>
 
 					{task.lastError && <ui-error>
 						{task.lastError}

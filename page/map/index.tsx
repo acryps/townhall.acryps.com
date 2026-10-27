@@ -36,7 +36,13 @@ export class MapPage extends Component {
 
 		Application.setTitle(this.drawing?.name, 'Map');
 
-		this.map.show(new Point(+this.parameters.x, +this.parameters.y), 1 / ((+this.parameters.zoom / this.zoomAccuracy) ** 2));
+		// only center on the URL's (static) coordinates before a drawing starts - once a drawer exists,
+		// it already focuses a specific point, and re-centering here on every re-render (e.g. right
+		// after an edit action's `activate()` resolves and calls `this.parent.update()`) would silently
+		// drag that focused point back to wherever the URL originally pointed at
+		if (!this.map.drawer) {
+			this.map.show(new Point(+this.parameters.x, +this.parameters.y), 1 / ((+this.parameters.zoom / this.zoomAccuracy) ** 2));
+		}
 
 		requestAnimationFrame(() => {
 			this.toolbar.updateLocationIndicator();

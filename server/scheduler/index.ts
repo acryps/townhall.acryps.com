@@ -6,7 +6,7 @@ import { Logger } from "@acryps/log";
 //  - a positive number  -> not eligible again until that many ms have passed (fixed-interval recurring, or backoff)
 //  - `Infinity`         -> one-shot, never runs again
 export abstract class Task {
-	readonly name: string = this.constructor.name;
+	readonly name: string = this.constructor.name.replace('_', '');
 
 	enabled = true;
 

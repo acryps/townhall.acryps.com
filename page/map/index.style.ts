@@ -269,6 +269,14 @@ export const mapStyle = () => [
 				backgroundColor(navigationBackgroundColor)
 			),
 
+			child('ui-edit-street',
+				alignSelf('stretch'),
+				paddingTop(pageGutter.divide(2)),
+				paddingInline(pageGutter),
+
+				backgroundColor(navigationBackgroundColor)
+			),
+
 			child('ui-plan-shape',
 				alignSelf('stretch'),
 				paddingTop(pageGutter.divide(2)),

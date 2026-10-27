@@ -198,6 +198,12 @@ export class HomePage extends Component {
 				This application is a testing bed for large language models (LLM), our own open source libraries and geographic information systems (GIS) at <ui-company ui-href='https://acryps.com'>Acryps AG</ui-company>.
 				Acryps Cloud hosts our minecraft server.
 			</ui-about>
+
+			<ui-links>
+				<ui-link ui-href='/queue'>
+					Application Queue
+				</ui-link>
+			</ui-links>
 		</ui-home>
 	}
 }

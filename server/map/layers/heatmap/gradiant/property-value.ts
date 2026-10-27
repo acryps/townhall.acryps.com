@@ -5,6 +5,8 @@ import { ManagedServer } from "../../../../managed/server";
 import { GradiantHeatmapTileServer } from ".";
 import { calculateDanwinstonShapePath } from "../../../../../interface/line";
 import { Task } from "../../../../scheduler";
+import { Logger } from "@acryps/log";
+import { WorkerDispatch, WorkerHandle } from "../../../../worker";
 
 type Datapoint = {
 	center: Point,
@@ -17,12 +19,11 @@ export class PropertyValueTileServer extends GradiantHeatmapTileServer<Datapoint
 
 	depth = 10;
 
-	plotAreaWeight = 0.3;
-	buildingAreaWeight = 0.7;
+	static plotAreaWeight = 0.3;
+	static buildingAreaWeight = 0.7;
 
 	constructor(
-		app: ManagedServer,
-		private database: DbContext
+		app: ManagedServer
 	) {
 		super(
 			app,
@@ -65,15 +66,29 @@ export class PropertyValueTileServer extends GradiantHeatmapTileServer<Datapoint
 		);
 	}
 
+	// the heavy DB loop runs on a worker thread - see `PropertyValueIndexWorkerHandle`
 	async update() {
+		const values = await WorkerDispatch.dispatch<Datapoint[]>(PropertyValueIndexWorkerHandle);
+
+		// `Point` instances lose their prototype (and so their methods, eg. `distance`) crossing the worker boundary - rebuild them
+		this.values = values.map(value => Object.assign({}, value, {
+			center: new Point(value.center.x, value.center.y)
+		}));
+
+		console.log(`indexed ${this.values.length} valuation points`);
+	}
+}
+
+export class PropertyValueIndexWorkerHandle extends WorkerHandle {
+	static async dispatch(logger: Logger, database: DbContext): Promise<Datapoint[]> {
 		const values: Datapoint[] = [];
 
-		const properties = await this.database.property
+		const properties = await database.property
 			.include(property => property.activePlotBoundary)
 			.include(property => property.buildings)
 			.toArray();
 
-		const owners = await this.database.propertyOwner
+		const owners = await database.propertyOwner
 			.where(owner => owner.aquiredValuation.price != null)
 			.include(owner => owner.aquiredValuation)
 			.toArray();
@@ -101,22 +116,22 @@ export class PropertyValueTileServer extends GradiantHeatmapTileServer<Datapoint
 				for (let pointIndex = 0; pointIndex < outline.length; pointIndex += 5) {
 					values.push({
 						center: outline[pointIndex],
-						area: plotArea * this.plotAreaWeight + buildingArea * this.buildingAreaWeight,
+						area: plotArea * PropertyValueTileServer.plotAreaWeight + buildingArea * PropertyValueTileServer.buildingAreaWeight,
 						valuation: valuation
 					});
 				}
 			}
 		}
 
-		this.values = values;
-
-		console.log(`indexed ${values.length} valuation points`);
+		return values;
 	}
 }
 
 // `PropertyValueTileServer` already extends `GradiantHeatmapTileServer`, so it can't also extend `Task` -
 // this thin companion just re-runs its indexing on a schedule
 export class PropertyValueIndexTask extends Task {
+	usesWorker = true;
+
 	constructor(
 		private tileServer: PropertyValueTileServer
 	) {

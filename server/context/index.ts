@@ -1,6 +1,7 @@
 import { deepEqual } from "node:assert";
 import { parentPort } from "worker_threads";
 import { composeItemContexts, writeItemContexts } from "..";
+import { Annotator } from "../annotate";
 import { Interpreter, SystemMessage, ToolError, UserMessage } from "../life/interpreter";
 import { Language } from "../life/language";
 import { DbContext, ItemContext, ItemContextFragment, ItemContextLink, ItemContextLinkRank } from "../managed/database";
@@ -267,6 +268,11 @@ export class ItemContextTracker {
 // runs the (possibly recursive) expand/update/writeContext chain for one item on a worker thread, see `ItemContextTracker.expand`
 export class ItemContextWorkerHandle extends WorkerHandle {
 	static async dispatch(logger: Logger, database: DbContext, context: { id: string, depth: number, peers: string[] }) {
+		// the application's own startup (which normally constructs & loads this) never runs inside a worker thread - composers here (eg. `ArticleReferenceContextFragment`) still need it
+		if (!Annotator.instance) {
+			await new Annotator(database).load();
+		}
+
 		await new ItemContextTracker(database).expand(context.id, context.depth, context.peers);
 	}
 }

@@ -77,11 +77,10 @@ export class DraftReviewPage extends Component {
 		new PublicationService().editAnswer(answer.id, answer.content);
 	}
 
-	async write() {
+	write() {
+		// the article draft worker picks this up on its own once every question is answered - this just switches the view into polling mode
 		this.writing = true;
 		this.update();
-
-		await new PublicationService().writeDraft(this.draft.id);
 
 		this.reload();
 	}

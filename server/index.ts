@@ -40,6 +40,7 @@ import { PlanTileServer } from "./map/layers/shape/plan";
 import { ChangeFrame } from "./areas/change/frame";
 import { Oracle } from "./areas/oracle/generator";
 import { ArticleOpinionGenerator } from "./areas/publication/opinion";
+import { ArticleDraftWorker } from "./areas/publication/draft-worker";
 import { Preload, PreloadUpdateTask } from "./preload";
 import { registerPreload } from "./preload/routes";
 import { ScheduledEpoch } from "../interface/time/epoch";
@@ -143,6 +144,7 @@ DbClient.connectedClient.connect().then(async () => {
 	ItemContextTracker.instance = new ItemContextTracker(database);
 
 	scheduler.register(new LegalEntityReferenceCounter(database));
+	scheduler.register(new ArticleDraftWorker(database));
 
 	const life = new Life(database);
 

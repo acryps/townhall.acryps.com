@@ -3,7 +3,6 @@ import { Article, ArticleImage, DbContext, Publication } from "../../managed/dat
 import { ArticleImageViewModel, ArticleNewstickerModel, ArticlePreviewModel, ArticleViewModel } from "./article";
 import { PublicationViewModel } from "./publication";
 import { Annotator } from "../../annotate";
-import { ArticleDraftInterpreter } from "./draft-interpreter";
 import { DraftReviewViewModel, DraftSummaryModel } from "./draft";
 
 export class PublicationService extends Service {
@@ -149,9 +148,12 @@ export class PublicationService extends Service {
 		await article.update();
 	}
 
-	interpretDraft(id: string) {
-		// fire and forget - the review page polls until it completes
-		ArticleDraftInterpreter.interpret(this.database, id);
+	async interpretDraft(id: string) {
+		const article = await this.database.article.find(id);
+		article.draftSubmitted = new Date();
+
+		// the article draft worker picks this up on its next tick - the review page just polls until it completes
+		await article.update();
 	}
 
 	async getDraftReview(id: string) {
@@ -163,11 +165,6 @@ export class PublicationService extends Service {
 		question.answerId = answerId;
 
 		await question.update();
-	}
-
-	writeDraft(id: string) {
-		// fire and forget - the review page polls until it completes
-		ArticleDraftInterpreter.write(this.database, id);
 	}
 
 	async editAnswer(answerId: string, content: string) {

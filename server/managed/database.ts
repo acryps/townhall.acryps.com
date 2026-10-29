@@ -47,6 +47,7 @@ export class ArticleQueryProxy extends QueryProxy {
 	get publication(): Partial<PublicationQueryProxy> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get body(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get draft(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
+	get draftSubmitted(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get generatedSummary(): Partial<QueryString> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get interpreted(): Partial<QueryTimeStamp> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
 	get marketCycleId(): Partial<QueryUUID> { throw new Error("Invalid use of QueryModels. QueryModels cannot be used during runtime"); }
@@ -66,6 +67,7 @@ export class Article extends Entity<ArticleQueryProxy> {
 	get publication(): Partial<ForeignReference<Publication>> { return this.$publication; }
 	body: string;
 	draft: string;
+	draftSubmitted: Date;
 	generatedSummary: string;
 	declare id: string;
 	interpreted: Date;
@@ -80,6 +82,7 @@ export class Article extends Entity<ArticleQueryProxy> {
 		columns: {
 			body: { type: "text", name: "body" },
 			draft: { type: "text", name: "draft" },
+			draftSubmitted: { type: "timestamp", name: "draft_submitted" },
 			generatedSummary: { type: "text", name: "generated_summary" },
 			id: { type: "uuid", name: "id" },
 			interpreted: { type: "timestamp", name: "interpreted" },

@@ -5344,25 +5344,6 @@ export class PublicationService {
 		});
 	}
 
-	async writeDraft(id: string): Promise<void> {
-		const $data = new FormData();
-		$data.append("I0cDF0ZGVmZHVlZ2l1N3VjOXZmYm55Nn", Service.stringify(id))
-
-		return await fetch(Service.toURL("Joc2F2dTl1cG9qd3F0ZGN6azFzeHh0MW"), {
-			method: "post",
-			credentials: "include",
-			body: $data
-		}).then(res => res.json()).then(r => {
-			if ("error" in r) {
-				throw new Error(r.error);
-			}
-
-			if ("aborted" in r) {
-				throw new Error("request aborted by server");
-			}
-		});
-	}
-
 	async editAnswer(answerId: string, content: string): Promise<void> {
 		const $data = new FormData();
 		$data.append("g4cXFsajR1cnZ0NDljdWcybXQxYzcwbH", Service.stringify(answerId))

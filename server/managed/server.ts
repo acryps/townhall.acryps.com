@@ -135,7 +135,6 @@ import { ArticleNewstickerModel } from "././../areas/publication/article";
 import { ArticlePreviewModel } from "././../areas/publication/article";
 import { ArticleViewModel } from "././../areas/publication/article";
 import { PublicationViewModel } from "././../areas/publication/publication";
-import { ArticleDraftInterpreter } from "././../areas/publication/draft-interpreter";
 import { DraftReviewViewModel } from "././../areas/publication/draft";
 import { DraftSummaryModel } from "././../areas/publication/draft";
 import { PublicationService } from "././../areas/publication/service";
@@ -1838,17 +1837,6 @@ export class ManagedServer extends BaseServer {
 			(controller, params) => controller.selectAnswer(
 				params["VtZm1remV0NG5kNGl1Y3B2c3U0dDl2dD"],
 				params["MwbXQzcj1pMH82ajhjN3NrazBhZGZvdm"]
-			)
-		);
-
-		this.expose(
-			"Joc2F2dTl1cG9qd3F0ZGN6azFzeHh0MW",
-			{
-			"I0cDF0ZGVmZHVlZ2l1N3VjOXZmYm55Nn": { type: "string", isArray: false, isOptional: false }
-			},
-			inject => inject.construct(PublicationService),
-			(controller, params) => controller.writeDraft(
-				params["I0cDF0ZGVmZHVlZ2l1N3VjOXZmYm55Nn"]
 			)
 		);
 

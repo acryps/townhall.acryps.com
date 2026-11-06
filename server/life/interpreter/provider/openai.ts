@@ -7,7 +7,8 @@ export class OpenAiInterpreterProvider implements InterpreterProvider {
 	client: OpenAI;
 
 	constructor(
-		private sponsor: TokenSponsor
+		private sponsor: TokenSponsor,
+		private model = sponsor.model
 	) {
 		this.client = new OpenAI({
 			apiKey: this.sponsor.key
@@ -16,7 +17,7 @@ export class OpenAiInterpreterProvider implements InterpreterProvider {
 
 	async request(messages: InterpreterMessage[]) {
 		const response = await this.client.responses.create({
-			model: this.sponsor.model,
+			model: this.model,
 			input: messages.map(message => `${message.role}:\n${message.message}`).join('\n\n')
 		});
 

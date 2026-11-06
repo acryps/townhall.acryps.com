@@ -205,9 +205,7 @@ export class Interpreter {
 	}
 
 	private parseParameters(source: string, parameters: ToolParameter[]) {
-		source = this.fixInStringNewLines(source);
-
-		const object = this.findJSONObject(source);
+		const object = this.findParameterObject(source);
 		const data = [];
 
 		for (let parameter of parameters) {
@@ -292,6 +290,17 @@ export class Interpreter {
 		}
 
 		return buffer.trim();
+	}
+
+	// smaller models sometimes escape the whole call as if it were being embedded into a JSON string,
+	// eg. writing `{\"key\": \"value\"}` instead of `{"key": "value"}` - if normal parsing fails, retry
+	// once assuming that's what happened
+	private findParameterObject(source: string) {
+		try {
+			return this.findJSONObject(this.fixInStringNewLines(source));
+		} catch (error) {
+			return this.findJSONObject(this.fixInStringNewLines(source.replace(/\\"/g, '"')));
+		}
 	}
 
 	private findJSONObject(source: string) {

@@ -3,6 +3,7 @@ import { parentPort } from "worker_threads";
 import { composeItemContexts, writeItemContexts } from "..";
 import { Annotator } from "../annotate";
 import { Interpreter, SystemMessage, ToolError, UserMessage } from "../life/interpreter";
+import { OpenAiInterpreterProvider } from "../life/interpreter/provider/openai";
 import { Language } from "../life/language";
 import { DbContext, ItemContext, ItemContextFragment, ItemContextLink, ItemContextLinkRank } from "../managed/database";
 import { ItemContextComposeable, ItemContextComposer, FoundItemContextLink } from "./composer";
@@ -12,6 +13,9 @@ import { WorkerDispatch, WorkerHandle } from "../worker";
 
 export class ItemContextTracker {
 	static instance: ItemContextTracker;
+
+	// context writing is high-volume but low-stakes (plain factual compilation, no creative writing) - the smallest available model is plenty
+	static readonly model = 'gpt-5.4-nano';
 
 	logger = new Logger('context');
 	types = itemContextTypes(this.database);
@@ -182,8 +186,10 @@ export class ItemContextTracker {
 			.include(link => link.target)
 			.toArray();
 
+		const sponsor = await this.database.tokenSponsor.first();
+
 		context.context = await new Promise<string>(async done => {
-			const interpreter = new Interpreter('smart');
+			const interpreter = new Interpreter(new OpenAiInterpreterProvider(sponsor, ItemContextTracker.model));
 			interpreter.addTool('composed', [{ type: String, name: 'content' }], content => done(content));
 
 			// fragments of this item
@@ -230,7 +236,7 @@ export class ItemContextTracker {
 		});
 
 		context.summary = await new Promise<string>(done => {
-			const interpreter = new Interpreter('smart');
+			const interpreter = new Interpreter(new OpenAiInterpreterProvider(sponsor, ItemContextTracker.model));
 			interpreter.addTool('summarized', [{ type: String, name: 'content' }], content => done(content));
 			interpreter.remember([new UserMessage(`# ${context.name}`), new UserMessage(context.context)]);
 			interpreter.execute(new SystemMessage(`
@@ -242,7 +248,7 @@ export class ItemContextTracker {
 		});
 
 		context.tagline = await new Promise<string>(done => {
-			const interpreter = new Interpreter('smart');
+			const interpreter = new Interpreter(new OpenAiInterpreterProvider(sponsor, ItemContextTracker.model));
 
 			interpreter.addTool('summarized', [{ type: String, name: 'content' }], content => {
 				if (content.split('. ').length > 2) {
@@ -269,9 +275,7 @@ export class ItemContextTracker {
 export class ItemContextWorkerHandle extends WorkerHandle {
 	static async dispatch(logger: Logger, database: DbContext, context: { id: string, depth: number, peers: string[] }) {
 		// the application's own startup (which normally constructs & loads this) never runs inside a worker thread - composers here (eg. `ArticleReferenceContextFragment`) still need it
-		if (!Annotator.instance) {
-			await new Annotator(database).load();
-		}
+		await new Annotator(database).load();
 
 		await new ItemContextTracker(database).expand(context.id, context.depth, context.peers);
 	}
